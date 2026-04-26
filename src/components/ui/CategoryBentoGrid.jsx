@@ -74,6 +74,8 @@ const CategoryBentoGrid = () => {
                     src={cat.image} 
                     alt={cat.name} 
                     className="bento-image" 
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 </div>

@@ -40,6 +40,7 @@ const InstagramShowcase = () => {
                       frameBorder="0"
                       scrolling="no"
                       title={`Instagram-${reel.id}`}
+                      loading="lazy"
                    ></iframe>
                 </div>
              </FadeIn>

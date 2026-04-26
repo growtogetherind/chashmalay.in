@@ -90,12 +90,19 @@ const HeroSlider = () => {
         >
           {/* Background Image - Now Full Fit without overlay text */}
           <div className="absolute inset-0">
-             <picture>
-                {currentSlide.mobile_image && (
-                   <source media="(max-width: 768px)" srcSet={currentSlide.mobile_image} />
-                )}
-                <img src={currentSlide.image} alt="Hero" className="w-full h-full object-cover" />
-             </picture>
+              <picture>
+                 {currentSlide.mobile_image && (
+                    <source media="(max-width: 768px)" srcSet={currentSlide.mobile_image} />
+                 )}
+                 <img 
+                   src={currentSlide.image} 
+                   alt={currentSlide.title || "Chashmaly Hero"} 
+                   className="w-full h-full object-cover"
+                   loading="eager"
+                   fetchpriority="high"
+                   decoding="async"
+                 />
+              </picture>
              {/* Gradient overlay for navigation visibility */}
              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
           </div>

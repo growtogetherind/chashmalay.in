@@ -25,6 +25,8 @@ const ProductCard = ({ product }) => {
               src={isHovered ? (product.modelImage || product.model_image) : (product.frameImage || product.frame_image)} 
               alt={product.name} 
               className="w-full h-full object-contain drop-shadow-sm"
+              loading="lazy"
+              decoding="async"
             />
           </AnimatePresence>
 
