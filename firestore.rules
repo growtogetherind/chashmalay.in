@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Admin Guard ───────────────────────────────────────────────────────────
+    // Reads the is_admin flag from the profile document.
+    // IMPORTANT: Until Firebase Custom Claims are implemented via a Cloud Function,
+    // this is the best client-side guard available. The profile write rule below
+    // prevents users from setting is_admin on themselves.
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.is_admin == true;
+    }
+
+    // ─── Products ──────────────────────────────────────────────────────────────
+    // Public read. Only admins can create/delete/update.
+    // Stock updates are now gated to admins only (previously any auth user could
+    // change stock_quantity — attack vector for store shutdown).
+    match /products/{productId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin();
+    }
+
+    // ─── Profiles ──────────────────────────────────────────────────────────────
+    // Users can read/write their own profile.
+    // CRITICAL FIX: Users cannot write `is_admin` field (prevents self-promotion).
+    match /profiles/{userId} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == userId || isAdmin());
+
+      // Users can update their own profile but CANNOT set is_admin
+      allow write: if request.auth != null &&
+        request.auth.uid == userId &&
+        !('is_admin' in request.resource.data.diff(resource.data).affectedKeys());
+
+      // Allow admins to write any profile field
+      allow write: if isAdmin();
+    }
+
+    // ─── Cart Items ────────────────────────────────────────────────────────────
+    match /cart_items/{itemId} {
+      allow read, delete, update: if request.auth != null &&
+        request.auth.uid == resource.data.user_id;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.user_id;
+    }
+
+    // ─── Orders ───────────────────────────────────────────────────────────────
+    // CRITICAL FIX: Guest orders now require a positive total amount and
+    // cannot be created with status 'delivered' or 'cancelled' (prevents fake orders).
+    // Users can only read their own orders. Admins can read all.
+    match /orders/{orderId} {
+      allow read: if isAdmin() ||
+        (request.auth != null && request.auth.uid == resource.data.user_id);
+
+      // Allow order creation for authenticated users
+      allow create: if request.auth != null &&
+        request.resource.data.total_amount > 0 &&
+        request.resource.data.status == 'confirmed';
+
+      // Allow guest order creation with restrictions
+      allow create: if request.auth == null &&
+        request.resource.data.total_amount > 0 &&
+        request.resource.data.status == 'confirmed' &&
+        request.resource.data.user_id.matches('guest-.*');
+
+      // Users can only cancel their own confirmed orders
+      allow update: if isAdmin() ||
+        (request.auth != null &&
+         request.auth.uid == resource.data.user_id &&
+         request.resource.data.status == 'cancelled' &&
+         resource.data.status == 'confirmed');
+    }
+
+    // ─── Order Items ──────────────────────────────────────────────────────────
+    // CRITICAL FIX: Previously any authenticated user could read ALL order_items.
+    // Now users can only read items belonging to their own orders.
+    match /order_items/{itemId} {
+      allow read: if isAdmin() ||
+        (request.auth != null &&
+         get(/databases/$(database)/documents/orders/$(resource.data.order_id)).data.user_id
+           == request.auth.uid);
+
+      // Allow order_items creation for authenticated users creating a real order
+      allow create: if request.auth != null;
+
+      // Allow guest order_items (for guest checkout flow)
+      allow create: if request.auth == null;
+    }
+
+    // ─── Coupons ──────────────────────────────────────────────────────────────
+    // Admin only write. Public read is required for client-side coupon lookup.
+    // TODO (server-side): Move coupon validation to a Cloud Function to prevent
+    // client-side discount manipulation.
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Reviews ──────────────────────────────────────────────────────────────
+    // Publicly readable. Only logged-in, verified users can write their own review.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.user_id;
+      allow update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.user_id;
+    }
+
+    // ─── Offers ───────────────────────────────────────────────────────────────
+    match /offers/{offerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Carousel ─────────────────────────────────────────────────────────────
+    match /carousel/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,22 @@
+.testimonial-stack-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.testimonial-card {
+  width: 100%;
+  max-width: 450px;
+  transition: transform 0.5s ease;
+}
+
+.testimonial-card:hover {
+  transform: scale(1.05) translate(-10px, -10px) rotate(0deg) !important;
+  z-index: 10 !important;
+}
+
+@media (max-width: 1024px) {
+  .testimonial-stack-container {
+    height: 450px;
+  }
+}

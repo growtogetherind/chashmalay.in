@@ -1,0 +1,21 @@
+.product-card-oa {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Base styles for the OA product cards are primarily handled by utility classes and the component's JSX structure. 
+   This file is reserved for specific decorative or animation-heavy CSS that Tailwind/JSX doesn't cover as easily. */
+
+.product-card-oa img {
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .product-card-oa .p-10 {
+    padding: 1.5rem;
+  }
+  .product-card-oa .rounded-\[2\.5rem\] {
+    border-radius: 1.5rem;
+  }
+}

@@ -1,0 +1,10 @@
+.loader-content {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

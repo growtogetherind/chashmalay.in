@@ -1,0 +1,42 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ─── Product Images ───────────────────────────────────────────────────────
+    // Public read. Writes are restricted to authenticated users only (admins
+    // upload product images). In a mature setup, this should be admin-only via
+    // Custom Claims: request.auth.token.admin == true
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ─── Prescription Uploads ─────────────────────────────────────────────────
+    // Users can only upload to their own prescription folder.
+    // Admins can read all prescriptions.
+    // Files must be images or PDFs, max 10MB.
+    match /prescriptions/{userId}/{allPaths=**} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == userId || request.auth.token.admin == true);
+      allow write: if request.auth != null &&
+        request.auth.uid == userId &&
+        request.resource.size < 10 * 1024 * 1024 &&
+        (request.resource.contentType.matches('image/.*') ||
+         request.resource.contentType == 'application/pdf');
+    }
+
+    // ─── Carousel & Marketing Images ──────────────────────────────────────────
+    match /carousel/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /offers/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ─── Block all other paths ────────────────────────────────────────────────
+    // Any path not matched above is denied by default in Firebase Storage rules.
+  }
+}

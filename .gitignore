@@ -1,0 +1,36 @@
+# Local environment variables and secrets
+.env
+.env.*
+serviceAccountKey.json
+# Credential and key files — NEVER commit these
+*.csv
+token.txt
+*.pem
+*.key
+*_api_key*
+*_secret*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

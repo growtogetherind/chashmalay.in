@@ -1,0 +1,144 @@
+.search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(255,255,255,0.98);
+  backdrop-filter: blur(10px);
+  z-index: 4000;
+  display: flex;
+  justify-content: center;
+}
+
+.search-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 4rem 1.5rem;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.search-input-wrapper {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  border-bottom: 2px solid var(--primary-blue);
+  padding-bottom: 0.75rem;
+}
+
+.search-icon {
+  color: var(--primary-blue);
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  font-family: inherit;
+}
+
+.close-search {
+  color: var(--text-muted);
+}
+
+.search-results-area {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.trending-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.trending-chip {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  color: var(--text-dark);
+  transition: all 0.2s;
+}
+
+.trending-chip:hover {
+  border-color: var(--primary-blue);
+  background-color: #f8fafc;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 640px) {
+  .quick-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.quick-grid a {
+  padding: 1rem;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--primary-blue);
+  transition: all 0.2s;
+}
+
+.quick-grid a:hover {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+.results-label {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.mock-result-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  cursor: pointer;
+}
+
+.result-img {
+  width: 60px;
+  height: 45px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+}
+
+.result-info {
+  flex-grow: 1;
+}
+
+.result-info h4 {
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.result-info p {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}

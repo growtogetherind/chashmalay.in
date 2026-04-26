@@ -1,0 +1,19 @@
+.hero-viewport {
+  position: relative;
+  z-index: 10;
+}
+
+.hero-slide-item img {
+  filter: brightness(1) contrast(1);
+  /* Full fit without zoom */
+}
+
+.hero-slide-item .container {
+  max-width: 1440px;
+}
+
+@media (max-width: 768px) {
+  .hero-viewport {
+    height: 80vh;
+  }
+}

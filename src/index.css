@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-color: #FAF9F6;
+    --text-primary: #1A1A1A;
+    --text-surface: #FFFFFF;
+    --color-accent: #C5A880;
+    --color-divider: #EAEAEA;
+    --font-sans: 'Inter', sans-serif;
+    --font-heading: 'Cormorant Garamond', serif;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    @apply font-sans antialiased leading-relaxed;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    @apply font-serif tracking-tight leading-tight text-center;
+  }
+
+  h1 {
+    @apply text-5xl md:text-7xl font-medium tracking-tighter;
+  }
+  
+  h2 {
+    @apply text-4xl md:text-5xl font-medium;
+  }
+
+  /* Very subtle grain to unify the whitespace - disabled on mobile for performance */
+  @media (min-width: 768px) {
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.012;
+      z-index: 9999;
+      pointer-events: none;
+    }
+  }
+}
+
+@layer components {
+  .btn-primary {
+    background-color: var(--text-primary);
+    color: var(--text-surface);
+    @apply px-8 py-4 rounded-full font-sans text-sm tracking-widest uppercase transition-all duration-500 ease-cinema hover:shadow-luxury hover:-translate-y-1;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-accent);
+    color: var(--text-primary);
+  }
+  
+  .btn-secondary {
+    border-color: var(--color-divider);
+    color: var(--text-primary);
+    @apply px-8 py-4 border rounded-full font-sans text-sm tracking-widest uppercase transition-all duration-500 ease-cinema;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--text-primary);
+    background-color: var(--text-primary);
+    color: var(--text-surface);
+  }
+
+  .glass-panel {
+    background-color: rgba(255, 255, 255, 0.8);
+    @apply backdrop-blur-xl border border-white/50 shadow-luxury;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .main-content {
+    min-height: 100vh;
+    padding-top: 7rem; /* Matches navbar height (h-28 = 7rem) */
+    @apply transition-all duration-500 ease-cinema;
+  }
+}
+
+/* Custom Scrollbar (Hidden for cinematic feel) */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Custom Scrollbar for Filters */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e5e5e5;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #161616;
+}

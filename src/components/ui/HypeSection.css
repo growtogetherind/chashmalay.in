@@ -1,0 +1,19 @@
+.hype-section {
+  position: relative;
+}
+
+.reel-card-minimal iframe {
+  pointer-events: none;
+  overflow: hidden;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.reel-card-minimal iframe::-webkit-scrollbar {
+  display: none;
+}
+
+.lenis-scrolling .reel-card-minimal iframe {
+  pointer-events: none;
+}

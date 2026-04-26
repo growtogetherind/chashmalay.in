@@ -1,0 +1,28 @@
+.navbar-main-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+
+
+.is-scrolled .main-navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.titan-styled-logo h1 {
+  font-family: var(--font-heading);
+}
+
+.main-navbar .container {
+  max-width: 1600px;
+}
+
+

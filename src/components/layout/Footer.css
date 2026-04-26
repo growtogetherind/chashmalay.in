@@ -1,0 +1,13 @@
+.footer-oa {
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-oa a { transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
+
+@media (max-width: 1024px) {
+  .footer-oa {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
