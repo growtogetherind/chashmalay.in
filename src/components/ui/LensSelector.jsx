@@ -28,28 +28,28 @@ const LensSelector = ({ isOpen, onClose, product }) => {
       id: 'single', 
       title: 'Single Vision', 
       desc: 'For Distance or Near Vision', 
-      icon: <Eye size={24} />,
+      image: '/assets/im/select_lens/single_vision.jpeg',
       price: 0 
     },
     { 
       id: 'bifocal', 
       title: 'Bifocal / Progressive', 
       desc: 'For both Distance and Near Vision', 
-      icon: <Zap size={24} />,
+      image: '/assets/im/select_lens/bifocal.jpeg',
       price: 1500 
     },
     { 
       id: 'zero', 
       title: 'Zero Power / Fashion', 
       desc: 'No Prescription needed', 
-      icon: <Sparkles size={24} />,
+      image: '/assets/im/select_lens/zero_power.jpeg',
       price: 500 
     },
     { 
       id: 'frame', 
       title: 'Frame Only', 
       desc: 'Buy frame without lenses', 
-      icon: <Shield size={24} />,
+      image: '/assets/im/select_lens/frame_only.jpeg',
       price: 0 
     }
   ];
@@ -59,6 +59,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
       id: 'essential',
       name: 'Essential Blue',
       desc: 'Anti-glare + Blue cut',
+      image: '/assets/im/select_lens/essential.jpeg',
       features: ['Blue Light Protection', 'Anti-Glare', 'Scratch Resistant'],
       price: 999,
       tag: 'BEST VALUE'
@@ -67,6 +68,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
       id: 'premium',
       name: 'Premium Thin',
       desc: 'Thinner lenses + HD clarity',
+      image: '/assets/im/select_lens/premium.jpeg',
       features: ['Super Thin', 'Water Repellent', 'Blue Light Protection', 'UV Protection'],
       price: 1999,
       tag: 'MOST POPULAR'
@@ -75,6 +77,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
       id: 'elite',
       name: 'Elite Supreme',
       desc: 'Ultima thin + Advanced coatings',
+      image: '/assets/im/select_lens/elite.jpeg',
       features: ['Zero Distortion', 'Dust Repellent', 'All Clear Visibility', 'Lifetime Coating'],
       price: 3499,
       tag: 'PREMIUM'
@@ -129,14 +132,16 @@ const LensSelector = ({ isOpen, onClose, product }) => {
           </div>
         </div>
 
-        <div className="lens-modal-content">
+        <div className="lens-modal-content" data-lenis-prevent>
           {step === 1 && (
             <div className="step-content animate-fade-in">
               <h3 className="step-title">Choose your vision type</h3>
               <div className="vision-grid">
                 {visionTypes.map((type) => (
                   <button key={type.id} className="vision-card" onClick={() => handleVisionSelect(type)}>
-                    <div className="vision-icon">{type.icon}</div>
+                    <div className="vision-image-wrapper">
+                      <img src={type.image} alt={type.title} className="vision-image" />
+                    </div>
                     <div className="vision-info">
                       <h4>{type.title}</h4>
                       <p>{type.desc}</p>
@@ -156,6 +161,9 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                 {lensPackages.map((pkg) => (
                   <div key={pkg.id} className="package-card" onClick={() => handlePackageSelect(pkg)}>
                     {pkg.tag && <span className="package-tag">{pkg.tag}</span>}
+                    <div className="package-image-wrapper">
+                       <img src={pkg.image} alt={pkg.name} className="package-image" />
+                    </div>
                     <div className="package-header">
                       <h4>{pkg.name}</h4>
                       <div className="package-price">+ ₹{pkg.price}</div>
@@ -198,7 +206,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                 </div>
               </div>
               <button 
-                className="btn-buy" 
+                className="btn-cta w-full" 
                 onClick={() => {
                   addToCart(product, selections);
                   onClose();
@@ -206,7 +214,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                 }} 
                 style={{marginTop: '2rem'}}
               >
-                Add to Cart & Continue
+                BUY NOW
               </button>
             </div>
           )}

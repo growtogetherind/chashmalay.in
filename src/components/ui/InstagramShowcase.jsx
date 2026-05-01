@@ -15,15 +15,15 @@ const InstagramShowcase = () => {
       <div className="container">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
            <div>
-              <div className="flex items-center gap-3 text-accent-dark mb-4">
+              <div className="flex items-center gap-3 text-accent mb-4">
                  <Camera size={20} />
                  <span className="text-xs font-sans font-bold uppercase tracking-[0.3em]">On Instagram</span>
               </div>
-              <h2 className="text-4xl md:text-6xl text-primary tracking-tighter">
-                 Seen in <span className="italic font-light text-secondary">Motion.</span>
+              <h2 className="text-4xl md:text-6xl text-heading tracking-tighter">
+                 Seen in <span className="italic font-light text-body">Motion.</span>
               </h2>
            </div>
-           <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-xs font-sans font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-2 hover:border-accent-dark transition-colors">
+           <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-xs font-sans font-bold uppercase tracking-widest text-heading border-b border-heading/20 pb-2 hover:border-accent transition-colors">
               Follow @Chashmaly
            </a>
         </div>
@@ -35,7 +35,7 @@ const InstagramShowcase = () => {
                    <iframe
                       src={`${reel.url}embed`}
                       className="w-full h-full border-none"
-                      allowTransparency="true"
+                      allowtransparency="true"
                       allow="encrypted-media"
                       frameBorder="0"
                       scrolling="no"

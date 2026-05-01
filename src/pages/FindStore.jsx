@@ -211,9 +211,6 @@ const FindStore = () => {
                                                 >
                                                     Get Directions <Navigation size={12} />
                                                 </a>
-                                                <button className="bg-primary text-white hover:bg-accent-dark px-6 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all duration-300">
-                                                    Book Appointment
-                                                </button>
                                             </div>
                                         </motion.div>
                                     </StaggerItem>

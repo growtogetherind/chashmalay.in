@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Music, Phone, Navigation, Disc } from 'lucide-react';
 import './HeroSlider.css';
 import { getCarouselItems } from '../../lib/firebase';
@@ -79,14 +80,14 @@ const HeroSlider = () => {
 
   return (
     <section className="hero-viewport relative h-[80vh] overflow-hidden">
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         <motion.div
            key={currentSlide.id}
-           className="hero-slide-item relative w-full h-full"
-           initial={{ opacity: 0 }}
-           animate={{ opacity: 1 }}
-           exit={{ opacity: 0 }}
-           transition={{ duration: 1 }}
+           className="hero-slide-item absolute inset-0 w-full h-full"
+           initial={{ x: '100%' }}
+           animate={{ x: 0 }}
+           exit={{ x: '-100%' }}
+           transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
         >
           {/* Background Image - Now Full Fit without overlay text */}
           <div className="absolute inset-0">
@@ -107,15 +108,19 @@ const HeroSlider = () => {
              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
           </div>
 
-          {/* Navigation Controls only */}
-          <div className="absolute inset-x-0 bottom-10 container flex justify-center gap-4 z-20">
-             {slides.map((_, i) => (
-                <button 
-                  key={i} 
-                  onClick={() => setCurrent(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${current === i ? 'bg-[#009688] w-8' : isLight ? 'bg-black/20' : 'bg-white/40'}`} 
-                />
-             ))}
+          {/* Clean Visual Banner - Text Overlays Removed */}
+
+          {/* Navigation Controls */}
+          <div className="absolute inset-x-0 bottom-10 container flex justify-between items-center z-20">
+             <div className="flex gap-2">
+                {slides.map((_, i) => (
+                   <button 
+                     key={i} 
+                     onClick={() => setCurrent(i)}
+                     className={`w-2 h-2 rounded-full transition-all ${current === i ? 'bg-[#009688] w-8' : isLight ? 'bg-black/20' : 'bg-white/40'}`} 
+                   />
+                ))}
+             </div>
           </div>
           
           <button onClick={prev} className={`absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center hover:bg-[#009688] hover:text-white z-20 transition-all ${isLight ? 'bg-black/10 text-black' : 'bg-white/10 text-white'}`}>

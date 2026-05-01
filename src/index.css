@@ -6,71 +6,83 @@
 
 @layer base {
   :root {
-    --bg-color: #FAF9F6;
-    --text-primary: #1A1A1A;
-    --text-surface: #FFFFFF;
-    --color-accent: #C5A880;
-    --color-divider: #EAEAEA;
+    --bg-color: #FFFFFF;
+    --bg-section: #F8FAFC;
+    --text-primary: #0F172A;
+    --text-body: #475569;
+    --text-muted: #94A3B8;
+    --color-primary: #1E3A8A;
+    --color-accent: #2FA4B7;
+    --color-accent-dark: #1E6FA3;
+    --color-cta: #E79A3B;
+    --color-divider: #E2E8F0;
+    --glass-bg: rgba(255, 255, 255, 0.6);
     --font-sans: 'Inter', sans-serif;
-    --font-heading: 'Cormorant Garamond', serif;
   }
 
   body {
     background-color: var(--bg-color);
-    color: var(--text-primary);
-    @apply font-sans antialiased leading-relaxed;
+    color: var(--text-body);
+    @apply font-sans antialiased;
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary);
-    @apply font-serif tracking-tight leading-tight text-center;
+    @apply font-sans font-bold tracking-tight;
   }
 
-  h1 {
-    @apply text-5xl md:text-7xl font-medium tracking-tighter;
-  }
-  
-  h2 {
-    @apply text-4xl md:text-5xl font-medium;
+  .premium-gradient {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   }
 
-  /* Very subtle grain to unify the whitespace - disabled on mobile for performance */
-  @media (min-width: 768px) {
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-      opacity: 0.012;
-      z-index: 9999;
-      pointer-events: none;
-    }
+  .luxury-shadow {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-divider);
+    @apply luxury-shadow;
   }
 }
 
 @layer components {
   .btn-primary {
-    background-color: var(--text-primary);
-    color: var(--text-surface);
-    @apply px-8 py-4 rounded-full font-sans text-sm tracking-widest uppercase transition-all duration-500 ease-cinema hover:shadow-luxury hover:-translate-y-1;
+    background: var(--color-primary);
+    color: #FFFFFF;
+    @apply px-8 py-4 rounded-full font-sans text-sm font-bold tracking-widest uppercase transition-all duration-500 luxury-shadow;
   }
   
   .btn-primary:hover {
-    background-color: var(--color-accent);
-    color: var(--text-primary);
+    background: var(--color-accent-dark);
+    @apply -translate-y-1;
+    box-shadow: 0 12px 25px rgba(30, 58, 138, 0.15);
+  }
+
+  .btn-cta {
+    background: var(--color-cta);
+    color: #FFFFFF;
+    @apply px-10 py-5 rounded-full font-sans text-sm font-black tracking-[0.2em] uppercase transition-all duration-500 luxury-shadow;
+  }
+
+  .btn-cta:hover {
+    filter: brightness(1.1);
+    @apply -translate-y-1;
+    box-shadow: 0 12px 30px rgba(231, 154, 59, 0.2);
   }
   
   .btn-secondary {
-    border-color: var(--color-divider);
-    color: var(--text-primary);
-    @apply px-8 py-4 border rounded-full font-sans text-sm tracking-widest uppercase transition-all duration-500 ease-cinema;
+    border: 1px solid var(--color-divider);
+    color: var(--color-primary);
+    @apply px-8 py-4 rounded-full font-sans text-sm font-bold tracking-widest uppercase transition-all duration-500;
   }
 
   .btn-secondary:hover {
-    border-color: var(--text-primary);
-    background-color: var(--text-primary);
-    color: var(--text-surface);
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: #FFFFFF;
   }
 
   .glass-panel {
@@ -86,7 +98,7 @@
 
   .main-content {
     min-height: 100vh;
-    padding-top: 7rem; /* Matches navbar height (h-28 = 7rem) */
+    padding-top: 5rem; /* Matches navbar height (h-20 = 5rem) */
     @apply transition-all duration-500 ease-cinema;
   }
 }

@@ -22,22 +22,27 @@ export const storage = getStorage(app);
 
 // --- Products ---
 export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatured, sortBy = 'created_at', adminFilter = false } = {}) => {
-  let q = adminFilter ? query(collection(db, "products")) : query(collection(db, "products"), where("is_active", "==", true));
-  if (category) q = query(q, where("category", "==", category));
-  if (shape) q = query(q, where("shape", "==", shape));
-  if (isFeatured !== undefined) q = query(q, where("is_featured", "==", isFeatured));
-  
-  const querySnapshot = await getDocs(q);
-  let products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  try {
+    let q = adminFilter ? query(collection(db, "products")) : query(collection(db, "products"), where("is_active", "==", true));
+    if (category) q = query(q, where("category", "==", category));
+    if (shape) q = query(q, where("shape", "==", shape));
+    if (isFeatured !== undefined) q = query(q, where("is_featured", "==", isFeatured));
+    
+    const querySnapshot = await getDocs(q);
+    let products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  if (priceMin) products = products.filter(p => p.price >= priceMin);
-  if (priceMax) products = products.filter(p => p.price <= priceMax);
+    if (priceMin) products = products.filter(p => p.price >= priceMin);
+    if (priceMax) products = products.filter(p => p.price <= priceMax);
 
-  if (sortBy === 'price_asc') products.sort((a, b) => a.price - b.price);
-  else if (sortBy === 'price_desc') products.sort((a, b) => b.price - a.price);
-  else products.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
+    if (sortBy === 'price_asc') products.sort((a, b) => a.price - b.price);
+    else if (sortBy === 'price_desc') products.sort((a, b) => b.price - a.price);
+    else products.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
 
-  return { data: products, error: null };
+    return { data: products, error: null };
+  } catch (error) {
+    console.error("Firebase getProducts error:", error);
+    return { data: [], error };
+  }
 };
 
 export const getProductById = async (id) => {

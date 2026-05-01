@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, HelpCircle, Shield, Trash2, Tag, ArrowRight, Plus, Minus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -44,7 +44,7 @@ const Cart = () => {
         <ShoppingBag size={80} strokeWidth={1} color="var(--border-color)" />
         <h2>Your shopping cart is empty!</h2>
         <p>Explore our wide range of premium eyewear.</p>
-        <Link to="/" className="btn-buy" style={{ display: 'inline-block', marginTop: '1.5rem', width: 'auto', padding: '1rem 2rem' }}>
+        <Link to="/" className="btn-secondary" style={{ display: 'inline-block', marginTop: '1.5rem', width: 'auto', padding: '1rem 2rem' }}>
           Continue Shopping
         </Link>
       </div>
@@ -165,7 +165,7 @@ const Cart = () => {
 
             {/* Coupon Section */}
             <div className="coupon-section">
-              <h4><Tag size={14} /> Apply Coupon</h4>
+              <h4>Apply Coupon</h4>
               {!discount.code ? (
                 <div className="coupon-input-group">
                   <div className="input-with-icon">
@@ -193,11 +193,11 @@ const Cart = () => {
                 <p className={couponMsg.success ? 'savings-msg' : 'coupon-error'}>{couponMsg.text}</p>
               )}
               {discount.amount > 0 && (
-                <p className="savings-msg">🎉 You're saving ₹{Math.round(discount.amount).toLocaleString()} on this order!</p>
+                <p className="savings-msg">🎉 You&apos;re saving ₹{Math.round(discount.amount).toLocaleString()} on this order!</p>
               )}
             </div>
 
-            <button className="btn-buy checkout-btn" onClick={() => {
+            <button className="btn-cta w-full" onClick={() => {
               if (!user) {
                 toast.error('Please sign in to proceed with your order');
                 navigate('/auth', { state: { from: '/checkout' } });
@@ -205,7 +205,10 @@ const Cart = () => {
                 navigate('/checkout');
               }
             }}>
-              Proceed to Checkout <ArrowRight size={18} />
+              <span className="btn-text">BUY NOW</span>
+              <div className="btn-icon">
+                <ArrowRight size={18} />
+              </div>
             </button>
             <div className="secure-badge">
               <Shield size={16} />

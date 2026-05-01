@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Package, ShoppingBag, DollarSign, Users, TrendingUp, ArrowRight } from 'lucide-react';
 import { getDashboardStats } from '../../lib/firebase';
 import { useAuth } from '../../context/AuthContext';
+import Logo from '../../components/ui/Logo';
 import '../Admin.css';
 
 const AdminDashboard = () => {
@@ -40,7 +41,10 @@ const AdminDashboard = () => {
   return (
     <div className="admin-page">
       <aside className="admin-sidebar">
-        <div className="admin-brand">Chashmaly <span>ADMIN</span></div>
+        <div className="admin-brand flex items-center gap-2">
+          <Logo className="h-8 w-auto invert brightness-0" />
+          <span>ADMIN</span>
+        </div>
         <nav className="admin-nav">
           <Link to="/admin" className="admin-nav-item active">📊 Dashboard</Link>
           <Link to="/admin/products" className="admin-nav-item">🛍️ Products</Link>

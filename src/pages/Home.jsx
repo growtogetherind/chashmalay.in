@@ -51,17 +51,17 @@ const Home = () => {
                    <span className="text-xs font-sans font-semibold uppercase tracking-[0.3em] text-accent-dark mb-8 block">
                       Our Philosophy
                    </span>
-                   <h2 className="text-5xl md:text-7xl mb-10 leading-tight tracking-tighter text-primary font-medium mx-auto lg:mx-0">
+                   <h2 className="text-5xl md:text-7xl mb-10 leading-tight tracking-tighter text-heading font-medium mx-auto lg:mx-0">
                       <RevealText text="Geometry" className="block" />
-                      <RevealText text="Of Soul." delay={0.2} className="text-secondary italic block font-light" />
+                      <RevealText text="Of Soul." delay={0.2} className="text-body italic block font-light" />
                    </h2>
                    <FadeIn delay={0.4}>
                       <p className="text-secondary tracking-wide text-lg md:text-xl font-sans leading-relaxed mb-12 max-w-lg mx-auto lg:mx-0">
                          We perceive eyewear as architectural structures for the face. Each frame is a dialogue between material, light, and silhouette. 
                       </p>
-                      <Link to="/about" className="group inline-flex items-center gap-4 text-xs font-sans font-semibold uppercase tracking-widest text-primary">
+                      <Link to="/about" className="group inline-flex items-center gap-4 text-xs font-sans font-semibold uppercase tracking-widest text-primary hover:text-accent transition-colors">
                         Read Narrative 
-                        <div className="w-12 h-px bg-primary group-hover:w-24 transition-all duration-700 ease-cinema" />
+                        <div className="w-12 h-px bg-primary group-hover:bg-accent group-hover:w-24 transition-all duration-700 ease-cinema" />
                      </Link>
                   </FadeIn>
                </div>
@@ -76,32 +76,32 @@ const Home = () => {
                <span className="text-xs font-sans font-semibold uppercase tracking-[0.3em] text-accent-dark mb-4 block">
                   Engineering
                </span>
-               <h2 className="text-5xl md:text-7xl tracking-tighter">
-                  <RevealText text="Technical" className="block" />
-                  <RevealText text="Architecture." delay={0.1} className="italic text-accent-dark block font-light" />
-               </h2>
+                <h2 className="text-5xl md:text-7xl tracking-tighter">
+                   <RevealText text="Technical" className="block" />
+                   <RevealText text="Architecture." delay={0.1} className="italic text-accent block font-light" />
+                </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                <FadeIn delay={0.2}>
                   <div className="p-8 rounded-3xl bg-surface-flat border border-divider hover:border-accent-dark transition-all group h-full">
-                     <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
-                        <Glasses className="text-accent-dark" size={24} />
-                     </div>
-                     <h3 className="text-xl font-medium mb-4 tracking-tight">Round Silhouette</h3>
-                     <p className="text-sm font-sans text-secondary leading-relaxed">
-                        Hand-calibrated geometric symmetry designed to follow the face's natural architecture.
-                     </p>
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                        <Glasses className="text-accent" size={24} />
+                      </div>
+                      <h3 className="text-xl font-medium mb-4 tracking-tight">Round Silhouette</h3>
+                      <p className="text-sm font-sans text-body leading-relaxed">
+                         Hand-calibrated geometric symmetry designed to follow the face's natural architecture.
+                      </p>
                   </div>
                </FadeIn>
 
                <FadeIn delay={0.3}>
                   <div className="p-8 rounded-3xl bg-surface-flat border border-divider hover:border-accent-dark transition-all group h-full">
                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
-                        <Zap className="text-accent-dark" size={24} />
+                        <Zap className="text-accent" size={24} />
                      </div>
                      <h3 className="text-xl font-medium mb-4 tracking-tight">Material Integrity</h3>
-                     <p className="text-sm font-sans text-secondary leading-relaxed">
+                     <p className="text-sm font-sans text-body leading-relaxed">
                         Constructed from Japanese Titanium and Italian Acetate for unparalleled structural longevity.
                      </p>
                   </div>
@@ -142,9 +142,9 @@ const Home = () => {
                   <span className="text-xs font-sans font-semibold uppercase tracking-[0.3em] text-secondary mb-4 block">
                      Curated Objects
                   </span>
-                  <h2 className="text-5xl md:text-7xl tracking-tighter text-primary mx-auto lg:mx-0">
+                  <h2 className="text-5xl md:text-7xl tracking-tighter text-heading mx-auto lg:mx-0">
                      <RevealText text="Most" className="block" />
-                     <RevealText text="Loved." delay={0.1} className="italic text-accent-dark block font-light" />
+                     <RevealText text="Loved." delay={0.1} className="italic text-accent block font-light" />
                   </h2>
                </div>
                <FadeIn delay={0.3}>
@@ -185,7 +185,7 @@ const Home = () => {
          <div className="container text-center">
             <h2 className="text-5xl md:text-8xl font-medium leading-[1] mb-16 tracking-tighter uppercase">
               <RevealText text="The New" className="block" />
-              <RevealText text="Perspective." delay={0.1} className="italic text-accent-dark block font-light" />
+              <RevealText text="Perspective." delay={0.1} className="italic text-accent block font-light" />
             </h2>
             <FadeIn delay={0.4}>
                <Link to="/category/all" className="btn-primary inline-flex items-center gap-3">

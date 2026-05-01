@@ -1,4 +1,9 @@
 .lens-modal-overlay {
+  --oa-charcoal: #0F172A;
+  --oa-accent: #1E3A8A;
+  --oa-gray: #475569;
+  --oa-border: #E2E8F0;
+
   position: fixed;
   top: 0;
   left: 0;
@@ -34,13 +39,13 @@
 
 .header-info h2 {
   font-size: 1.15rem;
-  color: var(--text-dark);
+  color: var(--oa-charcoal);
   font-weight: 700;
   margin-bottom: 2px;
 }
 
 .header-info p {
-  color: var(--text-muted);
+  color: var(--oa-gray);
   font-size: 0.75rem;
   font-weight: 500;
 }
@@ -96,11 +101,11 @@
 }
 
 .step-item.active {
-  color: var(--primary-blue);
+  color: var(--oa-accent);
 }
 
 .step-item.active .step-circle {
-  background-color: var(--primary-blue);
+  background-color: var(--oa-accent);
   color: white;
 }
 
@@ -140,41 +145,52 @@
   display: flex;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border: 2px solid #161616;
+  border-radius: 1.25rem;
   text-align: left;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
   background: white;
 }
 
 .vision-card:hover {
-  border-color: var(--primary-blue);
+  border-color: var(--oa-accent);
   background-color: #f8fafc;
   transform: translateX(5px);
 }
 
-.vision-icon {
+.vision-image-wrapper {
   background-color: #f1f5f9;
-  color: var(--primary-blue);
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: 10px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 1.25rem;
-  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.vision-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.vision-card:hover .vision-image {
+  transform: scale(1.1);
 }
 
 .vision-info h4 {
   font-size: 1.125rem;
-  color: var(--text-dark);
+  color: var(--oa-charcoal);
   margin-bottom: 8px;
 }
 
 .vision-info p {
   font-size: 0.8125rem;
-  color: var(--text-muted);
+  color: var(--oa-gray);
 }
 
 .arrow {
@@ -182,13 +198,13 @@
 }
 
 .vision-card:hover .arrow {
-  color: var(--primary-blue);
+  color: var(--oa-accent);
 }
 
 /* Step 2: Package Grid */
 .back-btn {
   font-size: 0.875rem;
-  color: var(--primary-blue);
+  color: var(--oa-accent);
   font-weight: 600;
   margin-bottom: 1.5rem;
 }
@@ -202,7 +218,7 @@
 .package-card {
   position: relative;
   padding: 2rem 1.5rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--oa-border);
   border-radius: var(--radius-lg);
   text-align: center;
   display: flex;
@@ -213,7 +229,7 @@
 
 .package-card:hover {
   transform: translateY(-5px);
-  border-color: var(--primary-blue);
+  border-color: var(--oa-accent);
   box-shadow: var(--shadow-lg);
 }
 
@@ -222,12 +238,37 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--accent-orange);
+  background-color: #f59e0b;
   color: white;
   font-size: 0.7rem;
   font-weight: 800;
   padding: 4px 12px;
-  border-radius: var(--radius-pill);
+  border-radius: 99px;
+  z-index: 10;
+}
+
+.package-image-wrapper {
+  width: 100%;
+  height: 160px;
+  background-color: #f8fafc;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.package-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.package-card:hover .package-image {
+  transform: scale(1.05);
 }
 
 .package-header h4 {
@@ -239,13 +280,13 @@
   font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--oa-accent);
   margin-bottom: 1rem;
 }
 
 .package-desc {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--oa-gray);
   margin-bottom: 1.5rem;
 }
 
@@ -258,7 +299,7 @@
 
 .package-features li {
   font-size: 0.8125rem;
-  color: var(--text-dark);
+  color: var(--oa-charcoal);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -272,15 +313,15 @@
 .select-pkg-btn {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--primary-blue);
+  border: 1px solid var(--oa-accent);
   border-radius: var(--radius-pill);
-  color: var(--primary-blue);
+  color: var(--oa-accent);
   font-weight: 700;
   transition: all 0.2s;
 }
 
 .package-card:hover .select-pkg-btn {
-  background-color: var(--primary-blue);
+  background-color: var(--oa-accent);
   color: white;
 }
 
@@ -315,7 +356,7 @@
   justify-content: space-between;
   margin-bottom: 1rem;
   font-size: 0.9375rem;
-  color: var(--text-muted);
+  color: var(--oa-gray);
 }
 
 .summary-total {
@@ -323,10 +364,10 @@
   justify-content: space-between;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 2px dashed var(--border-color);
+  border-top: 2px dashed var(--oa-border);
   font-weight: 700;
   font-size: 1.25rem;
-  color: var(--primary-blue);
+  color: var(--oa-accent);
 }
 
 @keyframes slideRight {

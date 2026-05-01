@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import SearchModal from './SearchModal';
+import Logo from '../ui/Logo';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -46,14 +47,10 @@ const Navbar = () => {
 
       {/* Main Navigation Bar */}
       <nav className="main-navbar bg-white border-b border-black/5">
-        <div className="container flex justify-between items-center h-28">
+        <div className="container flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="titan-styled-logo flex items-center gap-2 group">
-             <img 
-               src="/assets/im/logo.jpg" 
-               alt="CHASHMALY.IN" 
-               className="h-16 md:h-24 w-auto object-contain transition-transform duration-500 group-hover:scale-105" 
-             />
+             <Logo className="h-12 md:h-16 w-auto scale-125 origin-left transition-transform duration-500 group-hover:scale-130" />
              <h1 className="sr-only">CHASHMALY.IN</h1>
           </Link>
 
@@ -63,7 +60,7 @@ const Navbar = () => {
               <NavLink 
                 key={link.name} 
                 to={link.path} 
-                className={({isActive}) => `text-[11px] font-black tracking-widest hover:text-[#009688] h-full flex items-center border-b-2 transition-all ${isActive ? 'border-[#009688] text-[#009688]' : 'border-transparent'}`}
+                className={({isActive}) => `text-[11px] font-black tracking-widest hover:text-primary h-full flex items-center border-b-2 transition-all ${isActive ? 'border-primary text-primary' : 'border-transparent'}`}
               >
                 {link.name}
               </NavLink>
@@ -72,16 +69,20 @@ const Navbar = () => {
 
           {/* Icons */}
           <div className="flex items-center gap-6">
-             <button className="hover:text-[#009688] transition-colors" onClick={() => setIsSearchOpen(true)}>
-               <Search size={22} />
+             <button className="hover:text-primary transition-colors flex items-center gap-2 group" onClick={() => setIsSearchOpen(true)}>
+               <Search size={20} className="group-hover:scale-110 transition-transform" />
+               <span className="text-[10px] font-black tracking-widest hidden sm:block">SEARCH</span>
              </button>
-             <Link to="/cart" className="relative hover:text-[#009688] transition-colors">
-               <ShoppingBag size={20} className="md:w-[22px]" />
-               {cartCount > 0 && (
-                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                   {cartCount}
-                 </span>
-               )}
+             <Link to="/cart" className="relative hover:text-primary transition-colors hidden lg:flex items-center gap-2 group">
+               <div className="relative">
+                 <ShoppingBag size={20} className="group-hover:scale-110 transition-transform" />
+                 {cartCount > 0 && (
+                   <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                     {cartCount}
+                   </span>
+                 )}
+               </div>
+               <span className="text-[10px] font-black tracking-widest hidden sm:block">CART</span>
              </Link>
              <button 
                className="lg:hidden text-[#161616]"
@@ -112,7 +113,7 @@ const Navbar = () => {
                className="fixed top-0 right-0 h-screen w-[85%] max-w-[350px] bg-white z-[2001] shadow-2xl p-8 flex flex-col"
             >
                <div className="flex justify-between items-center mb-12">
-                  <span className="text-[10px] font-black tracking-[0.3em] text-[#009688]">MENU</span>
+                  <span className="text-[10px] font-black tracking-[0.3em] text-primary">MENU</span>
                   <button onClick={() => setIsMobileMenuOpen(false)}>
                     <X size={24} />
                   </button>
@@ -129,7 +130,7 @@ const Navbar = () => {
                       <Link 
                         to={link.path}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-2xl font-black tracking-tighter text-[#161616] hover:text-[#009688] flex items-center justify-between group"
+                        className="text-2xl font-black tracking-tighter text-[#161616] hover:text-primary flex items-center justify-between group"
                       >
                          {link.name}
                          <ClipboardList size={18} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -144,7 +145,7 @@ const Navbar = () => {
                         <User size={18} /> My Profile
                      </Link>
                      <p className="text-[9px] uppercase tracking-[0.2em] text-[#8C867E] mt-4">
-                        © 2024 CHASHMALY.IN<br/>Vision with Perspective.
+                        © 2024 CHASHMALY.IN
                      </p>
                   </div>
                </div>

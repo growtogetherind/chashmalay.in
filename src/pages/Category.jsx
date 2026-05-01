@@ -39,7 +39,7 @@ const Category = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const { data, error } = await getProducts({ category: name });
+      const { data, error } = await getProducts({ category: name === 'all' ? null : name });
       if (!error && data) {
         // Real-time Inference Fallback
         const processedProducts = data.map(p => ({
@@ -78,19 +78,19 @@ const Category = () => {
   const handleShapeChange = (shape) => {
     const updated = selectedShapes.includes(shape) ? selectedShapes.filter(s => s !== shape) : [...selectedShapes, shape];
     setSelectedShapes(updated);
-    applyFiltersAndSort(products, updated, selectedTypes, selectedColors, sortBy);
+    applyFiltersAndSort(products, updated, selectedTypes, selectedColors, selectedThemes, sortBy);
   };
 
   const handleTypeChange = (type) => {
     const updated = selectedTypes.includes(type) ? selectedTypes.filter(t => t !== type) : [...selectedTypes, type];
     setSelectedTypes(updated);
-    applyFiltersAndSort(products, selectedShapes, updated, selectedColors, sortBy);
+    applyFiltersAndSort(products, selectedShapes, updated, selectedColors, selectedThemes, sortBy);
   };
 
   const handleColorChange = (color) => {
     const updated = selectedColors.includes(color) ? selectedColors.filter(c => c !== color) : [...selectedColors, color];
     setSelectedColors(updated);
-    applyFiltersAndSort(products, selectedShapes, selectedTypes, updated, sortBy);
+    applyFiltersAndSort(products, selectedShapes, selectedTypes, updated, selectedThemes, sortBy);
   };
 
   const handleSortChange = (newSort) => {
@@ -125,29 +125,29 @@ const Category = () => {
                        Collection / Archive
                     </span>
                  </FadeIn>
-                 <h1 className="text-5xl md:text-7xl leading-tight tracking-tighter text-primary break-words font-medium">
-                    <RevealText text={categoryTitle.toUpperCase()} delay={0.1} />
-                    <RevealText text="." delay={0.2} className="italic text-secondary" />
-                 </h1>
+                  <h1 className="text-5xl md:text-7xl leading-tight tracking-tighter text-heading break-words font-medium">
+                     <RevealText text={categoryTitle.toUpperCase()} delay={0.1} />
+                     <RevealText text="." delay={0.2} className="italic text-body" />
+                  </h1>
               </div>
               
-              <FadeIn delay={0.3} className="flex flex-col items-start md:items-end gap-4 text-xs font-sans font-semibold uppercase tracking-widest text-secondary">
-                 <span>{filteredProducts.length} Objects Found</span>
-                 <div className="w-12 h-px bg-divider" />
-                 <div className="flex items-center gap-2">
-                    <span>Sort</span>
-                    <select
-                      className="bg-transparent border-none outline-none text-primary font-bold cursor-pointer"
-                      value={sortBy}
-                      onChange={(e) => handleSortChange(e.target.value)}
-                    >
-                      <option value="recommended">Best Sellers</option>
-                      <option value="price-low">Price Low</option>
-                      <option value="price-high">Price High</option>
-                      <option value="newest">Newest</option>
-                    </select>
-                 </div>
-              </FadeIn>
+               <FadeIn delay={0.3} className="flex flex-col items-start md:items-end gap-4 text-xs font-sans font-semibold uppercase tracking-widest text-body">
+                  <span>{filteredProducts.length} Objects Found</span>
+                  <div className="w-12 h-px bg-divider" />
+                  <div className="flex items-center gap-2">
+                     <span>Sort</span>
+                     <select
+                       className="bg-transparent border-none outline-none text-heading font-bold cursor-pointer"
+                       value={sortBy}
+                       onChange={(e) => handleSortChange(e.target.value)}
+                     >
+                       <option value="recommended">Best Sellers</option>
+                       <option value="price-low">Price Low</option>
+                       <option value="price-high">Price High</option>
+                       <option value="newest">Newest</option>
+                     </select>
+                  </div>
+               </FadeIn>
            </div>
         </div>
       </header>
@@ -161,7 +161,7 @@ const Category = () => {
                   
                   {/* Frame Type */}
                   <div>
-                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Type</h4>
+                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Frame Type</h4>
                     <div className="grid grid-cols-2 gap-3">
                         {['Full Rim', 'Rimless', 'Half Rim'].map(type => {
                             const Icon = FrameIcons[type];
@@ -170,7 +170,8 @@ const Category = () => {
                             const count = products.filter(p => {
                                 const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
                                 const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                return matchesShape && matchesColor && p.frame_type === type;
+                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
+                                return matchesShape && matchesColor && matchesTheme && p.frame_type === type;
                             }).length;
 
                             return (
@@ -179,7 +180,7 @@ const Category = () => {
                                     onClick={() => handleTypeChange(type)}
                                     disabled={count === 0 && !isSelected}
                                     className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 group ${
-                                        isSelected ? 'border-primary bg-primary text-white scale-[1.02]' : 'border-divider hover:border-primary text-secondary hover:text-primary'
+                                        isSelected ? 'border-primary bg-primary text-white scale-[1.02]' : 'border-divider hover:border-accent text-body hover:text-primary'
                                     } ${count === 0 && !isSelected ? 'opacity-30 grayscale cursor-not-allowed' : ''}`}
                                 >
                                     <div className={`mb-2 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
@@ -197,7 +198,7 @@ const Category = () => {
 
                   {/* Frame Shape */}
                   <div>
-                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Shape</h4>
+                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Frame Shape</h4>
                     <div className="grid grid-cols-2 gap-3">
                         {['Round', 'Square', 'Rectangle', 'Cat Eye', 'Geometric', 'Aviator'].map(shape => {
                             const Icon = FrameIcons[shape];
@@ -206,7 +207,8 @@ const Category = () => {
                              const count = products.filter(p => {
                                 const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
                                 const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                return matchesType && matchesColor && p.frame_shape === shape;
+                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
+                                return matchesType && matchesColor && matchesTheme && p.frame_shape === shape;
                             }).length;
 
                             return (
@@ -215,7 +217,7 @@ const Category = () => {
                                     onClick={() => handleShapeChange(shape)}
                                     disabled={count === 0 && !isSelected}
                                     className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 group ${
-                                        isSelected ? 'border-primary bg-primary text-white scale-[1.02]' : 'border-divider hover:border-primary text-secondary hover:text-primary'
+                                        isSelected ? 'border-primary bg-primary text-white scale-[1.02]' : 'border-divider hover:border-accent text-body hover:text-primary'
                                     } ${count === 0 && !isSelected ? 'opacity-30 grayscale cursor-not-allowed' : ''}`}
                                 >
                                     <div className={`mb-2 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
@@ -233,7 +235,7 @@ const Category = () => {
 
                   {/* Frame Colors */}
                   <div>
-                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Color</h4>
+                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Frame Color</h4>
                     <div className="space-y-4 max-h-60 overflow-y-auto pr-4 custom-scrollbar">
                         {['Black', 'Gold', 'Silver', 'Gunmetal', 'Transparent', 'Brown', 'Blue', 'Rose Gold'].map(color => {
                             const isSelected = selectedColors.includes(color);
@@ -252,10 +254,10 @@ const Category = () => {
                                     className={`flex items-center justify-between w-full group transition-colors ${count === 0 && !isSelected ? 'opacity-30 cursor-not-allowed' : ''}`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-4 h-4 rounded-full border transition-all flex items-center justify-center ${isSelected ? 'border-primary bg-primary' : 'border-divider'}`}>
+                                        <div className={`w-4 h-4 rounded-full border transition-all flex items-center justify-center ${isSelected ? 'border-accent bg-accent' : 'border-divider'}`}>
                                             {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                                         </div>
-                                        <span className={`text-[11px] font-medium tracking-wide transition-colors ${isSelected ? 'text-primary' : 'text-secondary group-hover:text-primary'}`}>
+                                        <span className={`text-[11px] font-medium tracking-wide transition-colors ${isSelected ? 'text-accent' : 'text-body group-hover:text-primary'}`}>
                                             {color}
                                         </span>
                                     </div>
@@ -268,17 +270,22 @@ const Category = () => {
 
                 {/* Themes */}
                 <div className="pt-8">
-                  <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Style Theme</h4>
+                  <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Style Theme</h4>
                   <div className="grid grid-cols-2 gap-2">
                       {['Classic', 'Modern', 'Luxury', 'Minimalist', 'Sport', 'Vintage'].map(theme => {
                           const isSelected = selectedThemes.includes(theme);
-                          const count = products.filter(p => p.theme === theme).length;
+                          const count = products.filter(p => {
+                               const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
+                               const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
+                               const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
+                               return matchesShape && matchesType && matchesColor && p.theme === theme;
+                           }).length;
                           return (
                               <button 
                                   key={theme}
                                   onClick={() => handleThemeChange(theme)}
                                   className={`px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider border transition-all ${
-                                      isSelected ? 'bg-primary text-white border-primary' : 'border-divider text-secondary hover:border-primary hover:text-primary'
+                                      isSelected ? 'bg-primary text-white border-primary' : 'border-divider text-body hover:border-accent hover:text-primary'
                                   }`}
                               >
                                   {theme} ({count})
@@ -347,7 +354,8 @@ const Category = () => {
                             const count = products.filter(p => {
                                 const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
                                 const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                return matchesShape && matchesColor && p.frame_type === type;
+                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
+                                return matchesShape && matchesColor && matchesTheme && p.frame_type === type;
                             }).length;
                             return (
                                 <button 
@@ -370,10 +378,11 @@ const Category = () => {
                          {['Round', 'Square', 'Rectangle', 'Cat Eye', 'Geometric', 'Aviator'].map(shape => {
                             const Icon = FrameIcons[shape];
                             const isSelected = selectedShapes.includes(shape);
-                            const count = products.filter(p => {
+                             const count = products.filter(p => {
                                 const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
                                 const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                return matchesType && matchesColor && p.frame_shape === shape;
+                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
+                                return matchesType && matchesColor && matchesTheme && p.frame_shape === shape;
                             }).length;
                             return (
                                 <button 
@@ -419,7 +428,12 @@ const Category = () => {
                       <div className="grid grid-cols-2 gap-3">
                          {['Classic', 'Modern', 'Luxury', 'Minimalist', 'Sport', 'Vintage'].map(theme => {
                             const isSelected = selectedThemes.includes(theme);
-                            const count = products.filter(p => p.theme === theme).length;
+                            const count = products.filter(p => {
+                               const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
+                               const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
+                               const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
+                               return matchesShape && matchesType && matchesColor && p.theme === theme;
+                           }).length;
                             return (
                                 <button 
                                    key={theme} 

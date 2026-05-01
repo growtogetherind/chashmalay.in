@@ -7,17 +7,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#FAF9F6', // Soft Ivory
-        surface: '#FFFFFF', // Pure White
-        'surface-flat': '#F3EFE6', // Flat surface for accents
-        primary: '#1A1A1A', // Deep Charcoal
-        secondary: '#757575', // Soft Gray
+        background: '#FFFFFF', 
+        surface: '#F8FAFC', 
+        'surface-flat': '#F1F5F9', 
+        primary: '#1E3A8A', // Deep Blue
+        secondary: '#475569', // Body Text
         accent: {
-          light: '#F3EFE6',
-          DEFAULT: '#C5A880', // Matte Gold
-          dark: '#A38B6B'
+          light: '#7DD3FC',
+          DEFAULT: '#2FA4B7', // Teal
+          dark: '#1E6FA3' // Deep Teal
         },
-        divider: '#EAEAEA', // Hairline Light Gray
+        cta: '#E79A3B', // Premium Orange
+        heading: '#0F172A',
+        muted: '#94A3B8',
+        divider: '#E2E8F0',
       },
       fontFamily: {
         sans: ['Inter', 'Outfit', 'sans-serif'],

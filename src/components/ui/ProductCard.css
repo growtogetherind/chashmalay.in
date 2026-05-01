@@ -1,21 +1,147 @@
 .product-card-oa {
   position: relative;
   cursor: pointer;
+  border: 1px solid #f1f1f1;
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  background: #ffffff;
 }
 
-/* Base styles for the OA product cards are primarily handled by utility classes and the component's JSX structure. 
-   This file is reserved for specific decorative or animation-heavy CSS that Tailwind/JSX doesn't cover as easily. */
-
-.product-card-oa img {
-  pointer-events: none;
-  user-select: none;
+.product-card-oa:hover {
+  border-color: #e5e5e5;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transform: translateY(-4px);
 }
 
-@media (max-width: 640px) {
-  .product-card-oa .p-10 {
-    padding: 1.5rem;
+.product-card-image-wrapper {
+  background: #fcfcfc;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.product-card-oa:hover .product-card-image-wrapper {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  border-color: #e5e5e5;
+}
+
+.rating-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: #f3f3ff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #5e35b1;
+  z-index: 10;
+}
+
+.rating-badge span.rating-count {
+  color: #8c8c8c;
+  font-weight: 500;
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  color: #1a1a1a;
+  transition: transform 0.2s ease;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.2);
+}
+
+.product-info-v2 {
+  padding: 12px 4px;
+}
+
+.product-brand {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.product-details-subtitle {
+  font-size: 11px;
+  color: #717171;
+  margin-bottom: 8px;
+}
+
+.color-swatches {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.color-more {
+  font-size: 10px;
+  font-weight: 700;
+  color: #717171;
+  margin-left: 2px;
+}
+
+.pricing-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-family: sans-serif;
+}
+
+.current-price {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.original-price {
+  font-size: 11px;
+  color: #8c8c8c;
+  text-decoration: line-through;
+}
+
+.discount-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #00bac6;
+  margin-left: auto;
+}
+
+@media (max-width: 480px) {
+  .product-card-oa {
+    padding: 8px;
   }
-  .product-card-oa .rounded-\[2\.5rem\] {
-    border-radius: 1.5rem;
+  .current-price {
+    font-size: 13px;
+  }
+  .original-price, .discount-tag {
+    font-size: 10px;
+  }
+  .product-brand {
+    font-size: 12px;
+  }
+  .product-details-subtitle {
+    font-size: 10px;
   }
 }

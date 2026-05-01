@@ -130,7 +130,7 @@ const Checkout = () => {
         <div className="w-24 h-24 rounded-full bg-surface-flat flex items-center justify-center border border-divider">
            <ShoppingBag size={32} className="text-secondary" strokeWidth={1} />
         </div>
-        <h2 className="text-3xl font-serif text-primary">Your bag is empty</h2>
+        <h2 className="text-3xl font-sans font-black text-primary tracking-tighter">Your bag is empty</h2>
         <Link to="/" className="btn-secondary mt-4">Return to Archive</Link>
       </div>
     );
@@ -140,7 +140,7 @@ const Checkout = () => {
     <div className="flex flex-col gap-2">
        <input 
          {...props} 
-         className="w-full bg-transparent border-b border-divider py-3 outline-none focus:border-primary transition-colors text-primary font-sans placeholder-secondary/50"
+         className="w-full bg-transparent border-b border-divider py-3 outline-none focus:border-[#2FA4B7] transition-colors text-heading font-sans placeholder-body/50"
        />
     </div>
   );
@@ -153,7 +153,7 @@ const Checkout = () => {
         <div className="flex items-center justify-center gap-4 md:gap-12 mb-16 border-b border-divider pb-8">
            {STEPS.map((s, i) => (
              <div key={s} className="flex items-center gap-2 md:gap-4">
-                <span className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold transition-colors duration-500 ${i <= step ? 'text-primary' : 'text-secondary opacity-50'}`}>
+                <span className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold transition-colors duration-500 ${i <= step ? 'text-primary' : 'text-body opacity-50'}`}>
                    {i < step ? <CheckCircle size={14} className="inline mr-2 -mt-0.5" /> : null}
                    {s}
                 </span>
@@ -167,7 +167,7 @@ const Checkout = () => {
           <div className="w-full lg:w-3/5">
             {step === 0 && (
               <FadeIn>
-                 <h2 className="text-3xl font-serif mb-10 flex items-center justify-between">
+                 <h2 className="text-3xl font-sans font-black mb-10 flex items-center justify-between tracking-tighter">
                     Shipping Details
                  </h2>
                  <form onSubmit={handleAddressSubmit} className="space-y-8">
@@ -191,13 +191,12 @@ const Checkout = () => {
 
             {step === 1 && (
               <FadeIn>
-                <div className="flex justify-between items-end mb-8 border-b border-divider pb-4">
-                   <h2 className="text-3xl font-serif">Review Order</h2>
+                 <div className="flex justify-between items-end mb-8 border-b border-divider pb-4">
+                   <h2 className="text-3xl font-sans font-black tracking-tighter">Review Order</h2>
                    <button onClick={() => setStep(0)} className="text-xs uppercase tracking-widest text-secondary hover:text-primary transition-colors border-b border-current pb-1">Edit</button>
                 </div>
-                
-                <div className="bg-surface-flat p-8 rounded-2xl mb-12">
-                   <p className="font-serif text-xl mb-4">{address.name}</p>
+                                <div className="bg-surface-flat p-8 rounded-2xl mb-12">
+                   <p className="font-sans font-bold text-xl mb-4 tracking-tight">{address.name}</p>
                    <p className="text-secondary font-sans leading-loose">
                       {address.line1}, {address.line2 && `${address.line2},`} <br/>
                       {address.city}, {address.state} — {address.pincode} <br/>
@@ -217,13 +216,13 @@ const Checkout = () => {
                              <img src={item.frameImage || item.gallery?.[0]} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
                           </div>
                           <div className="flex-1">
-                             <h4 className="text-lg font-serif">{item.name}</h4>
+                             <h4 className="text-lg font-sans font-bold tracking-tight">{item.name}</h4>
                              <p className="text-sm font-sans text-secondary mb-1">Qty: {item.quantity}</p>
                              {(item.lensSelection?.visionType || item.lensSelection?.lensPackage) && (
                                <p className="text-xs font-sans text-accent">Includes Lens Package</p>
                              )}
                           </div>
-                          <div className="text-lg font-serif">
+                           <div className="text-lg font-sans font-black">
                              ₹{((basePrice + lensTotal) * item.quantity).toFixed(0)}
                           </div>
                        </div>
@@ -239,19 +238,19 @@ const Checkout = () => {
 
             {step === 2 && (
               <FadeIn>
-                <h2 className="text-3xl font-serif mb-8 border-b border-divider pb-4 flex justify-between">
+                 <h2 className="text-3xl font-sans font-black mb-8 border-b border-divider pb-4 flex justify-between tracking-tighter">
                    Secure Payment
                    <button onClick={() => setStep(1)} className="text-xs font-sans uppercase tracking-widest text-secondary hover:text-primary transition-colors border-b border-current pb-1 hidden md:block">Back</button>
                 </h2>
                 
-                <div className="bg-surface border border-primary rounded-2xl p-6 md:p-8 relative overflow-hidden mb-8 shadow-luxury">
+                <div className="bg-surface border border-accent rounded-2xl p-6 md:p-8 relative overflow-hidden mb-8 shadow-luxury">
                    <div className="flex gap-4 items-center mb-6">
-                      <div className="w-6 h-6 rounded-full border-4 border-primary flex items-center justify-center">
-                         <div className="w-2 h-2 rounded-full bg-primary" />
+                      <div className="w-6 h-6 rounded-full border-4 border-accent flex items-center justify-center">
+                         <div className="w-2 h-2 rounded-full bg-accent" />
                       </div>
-                      <span className="text-lg font-serif">Razorpay Secure Checkout</span>
+                       <span className="text-lg font-sans font-bold tracking-tight">Razorpay Secure Checkout</span>
                    </div>
-                   <p className="text-secondary tracking-wide text-sm pl-10">Pay via Credit Card, Debit Card, Net Banking, or UPI.</p>
+                   <p className="text-body tracking-wide text-sm pl-10">Pay via Credit Card, Debit Card, Net Banking, or UPI.</p>
                 </div>
 
                 <div className="flex items-start gap-4 p-6 bg-surface-flat rounded-xl mb-12">
@@ -295,9 +294,9 @@ const Checkout = () => {
                    )}
                 </div>
 
-                <div className="flex justify-between items-end border-t border-divider pt-6 mb-4">
-                   <span className="font-serif text-lg">Total</span>
-                   <span className="font-serif text-3xl text-primary">₹{finalTotal.toFixed(0)}</span>
+                 <div className="flex justify-between items-end border-t border-divider pt-6 mb-4">
+                   <span className="font-sans font-bold text-lg tracking-tight">Total</span>
+                   <span className="font-sans font-black text-3xl text-primary tracking-tighter">₹{finalTotal.toFixed(0)}</span>
                 </div>
                 <p className="text-[10px] text-secondary text-right">Inclusive of all duties and taxes</p>
              </div>

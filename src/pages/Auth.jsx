@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../components/ui/Logo';
 import { auth } from '../lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import toast from 'react-hot-toast';
@@ -86,7 +87,10 @@ const Auth = () => {
       <div className="auth-container">
         {/* Left Panel */}
         <div className="auth-brand-panel">
-          <Link to="/" className="auth-logo">Chashmalay<span>.in</span></Link>
+          <Link to="/" className="auth-logo flex flex-col items-center">
+            <Logo className="h-20 w-auto mb-4" />
+            <span>Chashmaly.in</span>
+          </Link>
           <div className="auth-brand-content">
             <h2>See the world clearly.<br />Look amazing doing it.</h2>
             <p>Join 1M+ happy customers who trust Chashmaly for their eyewear.</p>
@@ -137,7 +141,7 @@ const Auth = () => {
                     type="button"
                     onClick={handleForgotPassword}
                     disabled={resetLoading}
-                    className="text-xs text-primary-blue font-bold hover:underline disabled:opacity-50"
+                    className="text-xs text-primary font-bold hover:underline disabled:opacity-50"
                   >
                     {resetLoading ? 'Sending...' : 'Forgot Password?'}
                   </button>
@@ -160,7 +164,7 @@ const Auth = () => {
 
             <p className="auth-switch">
               {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
-              <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="ml-2 text-primary-blue font-black underline">
+              <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="ml-2 text-primary font-black underline">
                 {mode === 'login' ? 'Register' : 'Login'}
               </button>
             </p>
