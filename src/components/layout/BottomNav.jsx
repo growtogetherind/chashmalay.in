@@ -1,11 +1,17 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Grid, User, ShoppingBag, Search } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import './BottomNav.css';
 
 const BottomNav = () => {
   const { cartCount } = useCart();
+  const location = useLocation();
+
+  // Hide BottomNav on Product Detail & Cart Page to avoid overlapping with CTAs
+  if (location.pathname.startsWith('/product/') || location.pathname === '/cart') {
+    return null;
+  }
 
   return (
     <nav className="bottom-nav">

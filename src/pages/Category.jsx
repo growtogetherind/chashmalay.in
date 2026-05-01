@@ -98,7 +98,7 @@ const Category = () => {
     applyFiltersAndSort(products, selectedShapes, selectedTypes, selectedColors, selectedThemes, newSort);
   };
 
-  const applyFiltersAndSort = (allProducts, shapes, types, colors, themes, sort) => {
+  const applyFiltersAndSort = React.useCallback((allProducts, shapes, types, colors, themes, sort) => {
     let result = [...allProducts];
 
     if (shapes.length > 0) result = result.filter(p => shapes.includes(p.frame_shape || p.shape));
@@ -111,7 +111,31 @@ const Category = () => {
     else if (sort === 'newest') result.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
 
     setFilteredProducts(result);
-  };
+  }, []);
+
+  // Memoized counts for performance
+  const filterCounts = React.useMemo(() => {
+    const counts = {
+      types: {},
+      shapes: {},
+      colors: {},
+      themes: {}
+    };
+
+    products.forEach(p => {
+      const type = p.frame_type;
+      const shape = p.frame_shape || p.shape;
+      const color = p.color;
+      const theme = p.theme;
+
+      if (type) counts.types[type] = (counts.types[type] || 0) + 1;
+      if (shape) counts.shapes[shape] = (counts.shapes[shape] || 0) + 1;
+      if (color) counts.colors[color] = (counts.colors[color] || 0) + 1;
+      if (theme) counts.themes[theme] = (counts.themes[theme] || 0) + 1;
+    });
+
+    return counts;
+  }, [products]);
 
   return (
     <div className="bg-background text-primary min-h-screen relative overflow-x-hidden">
@@ -167,12 +191,7 @@ const Category = () => {
                             const Icon = FrameIcons[type];
                             const isSelected = selectedTypes.includes(type);
                             // Count across total results, respecting other category filters
-                            const count = products.filter(p => {
-                                const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
-                                const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
-                                return matchesShape && matchesColor && matchesTheme && p.frame_type === type;
-                            }).length;
+                            const count = filterCounts.types[type] || 0;
 
                             return (
                                 <button 
@@ -204,12 +223,7 @@ const Category = () => {
                             const Icon = FrameIcons[shape];
                             const isSelected = selectedShapes.includes(shape);
                              // Count across total results, respecting other category filters
-                             const count = products.filter(p => {
-                                const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
-                                const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
-                                return matchesType && matchesColor && matchesTheme && p.frame_shape === shape;
-                            }).length;
+                             const count = filterCounts.shapes[shape] || 0;
 
                             return (
                                 <button 
@@ -351,12 +365,7 @@ const Category = () => {
                          {['Full Rim', 'Rimless', 'Half Rim'].map(type => {
                             const Icon = FrameIcons[type];
                             const isSelected = selectedTypes.includes(type);
-                            const count = products.filter(p => {
-                                const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
-                                const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
-                                return matchesShape && matchesColor && matchesTheme && p.frame_type === type;
-                            }).length;
+                            const count = filterCounts.types[type] || 0;
                             return (
                                 <button 
                                    key={type} 
@@ -378,12 +387,7 @@ const Category = () => {
                          {['Round', 'Square', 'Rectangle', 'Cat Eye', 'Geometric', 'Aviator'].map(shape => {
                             const Icon = FrameIcons[shape];
                             const isSelected = selectedShapes.includes(shape);
-                             const count = products.filter(p => {
-                                const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
-                                const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                                const matchesTheme = selectedThemes.length === 0 || selectedThemes.includes(p.theme);
-                                return matchesType && matchesColor && matchesTheme && p.frame_shape === shape;
-                            }).length;
+                             const count = filterCounts.shapes[shape] || 0;
                             return (
                                 <button 
                                    key={shape} 
@@ -428,12 +432,7 @@ const Category = () => {
                       <div className="grid grid-cols-2 gap-3">
                          {['Classic', 'Modern', 'Luxury', 'Minimalist', 'Sport', 'Vintage'].map(theme => {
                             const isSelected = selectedThemes.includes(theme);
-                            const count = products.filter(p => {
-                               const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
-                               const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
-                               const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                               return matchesShape && matchesType && matchesColor && p.theme === theme;
-                           }).length;
+                            const count = filterCounts.themes[theme] || 0;
                             return (
                                 <button 
                                    key={theme} 

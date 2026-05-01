@@ -213,16 +213,6 @@ const ProductDetail = () => {
                ({discountPercent}% OFF)
             </div>
 
-            {/* Sale Banner */}
-            <div className="sale-banner">
-               <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-tighter">PAYDAY SALE</span>
-                  <div className="w-px h-4 bg-black/20" />
-                  <span className="text-[10px] font-medium">Sale Extended!</span>
-               </div>
-               <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="w-3 h-3 rounded-full bg-black/10" />
-            </div>
-
             {/* Frame Color */}
             <div className="mb-6">
                <p className="text-[11px] font-bold mb-3 uppercase tracking-wider text-[#1a1a1a]">Frame Color: <span className="font-medium text-[#666] ml-1">{product.colors[activeColor]?.name || 'Standard'}</span></p>
@@ -263,6 +253,14 @@ const ProductDetail = () => {
                   ))}
                </div>
             </div>
+
+            {/* Desktop Action Button */}
+            <button 
+              onClick={() => setIsLensModalOpen(true)} 
+              className="sidebar-cta-btn"
+            >
+              Select Lenses
+            </button>
 
             {/* Delivery Details */}
             <div className="mb-8">
