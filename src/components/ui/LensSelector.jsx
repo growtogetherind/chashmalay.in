@@ -393,7 +393,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                             <p className="text-xs text-gray-400">SVG, PNG, JPG or PDF</p>
                         </div>
                       )}
-                      <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
+                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*,.pdf" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
                     </label>
 
                     <button 
