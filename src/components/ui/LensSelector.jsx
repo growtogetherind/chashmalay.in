@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Check, ChevronRight, Eye, Zap, Shield, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Check, ChevronRight, Eye, Zap, Shield, Sparkles, UploadCloud } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { uploadImage } from '../../lib/cloudinary';
@@ -10,6 +10,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isPowerModalOpen, setIsPowerModalOpen] = useState(false);
   const [selections, setSelections] = useState({
     visionType: null,
     lensPackage: null,
@@ -29,6 +30,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
   useEffect(() => {
     if (isOpen) {
       setStep(1);
+      setIsPowerModalOpen(false);
       setSelections({ visionType: null, lensPackage: null, powerOption: null, prescriptionFile: null });
       setManualDetails({ samePower: false, cylindrical: false, leftSph: '', rightSph: '', name: '', phone: '' });
     }
@@ -135,6 +137,8 @@ const LensSelector = ({ isOpen, onClose, product }) => {
     setSelections({ ...selections, powerOption: option });
     if (option === 'later') {
       setStep(4); // Skip to summary
+    } else if (option === 'upload' || option === 'manual') {
+      setIsPowerModalOpen(true);
     }
   };
 
@@ -275,63 +279,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                  </div>
               </div>
 
-              {selections.powerOption === 'manual' && (
-                 <div className="manual-power-form animate-fade-in">
-                    <h5 className="manual-form-title">Enter power manually</h5>
-                    <div className="checkbox-group">
-                       <label>
-                          <input type="checkbox" onChange={(e) => setManualDetails({...manualDetails, samePower: e.target.checked})} /> I have same power for both eyes
-                       </label>
-                    </div>
-                    <div className="checkbox-group">
-                       <label>
-                          <input type="checkbox" onChange={(e) => setManualDetails({...manualDetails, cylindrical: e.target.checked})} /> I have cylindrical power
-                       </label>
-                    </div>
-                    
-                    <div className="power-inputs-grid">
-                       <div>
-                          <label className="power-label">SPH (Left)</label>
-                          <select className="power-select" onChange={(e) => setManualDetails({...manualDetails, leftSph: e.target.value})}>
-                             <option value="">Select</option>
-                             <option value="-0.25">-0.25</option>
-                             <option value="-0.50">-0.50</option>
-                             <option value="-0.75">-0.75</option>
-                             <option value="-1.00">-1.00</option>
-                             <option value="-1.25">-1.25</option>
-                             <option value="-1.50">-1.50</option>
-                          </select>
-                       </div>
-                       <div>
-                          <label className="power-label">SPH (Right)</label>
-                          <select className="power-select" onChange={(e) => setManualDetails({...manualDetails, rightSph: e.target.value})}>
-                             <option value="">Select</option>
-                             <option value="-0.25">-0.25</option>
-                             <option value="-0.50">-0.50</option>
-                             <option value="-0.75">-0.75</option>
-                             <option value="-1.00">-1.00</option>
-                             <option value="-1.25">-1.25</option>
-                             <option value="-1.50">-1.50</option>
-                          </select>
-                       </div>
-                    </div>
-
-                    <h5 className="manual-form-subtitle">Whose prescription is this</h5>
-                    <input type="text" placeholder="Name *" className="power-input-text" onChange={(e) => setManualDetails({...manualDetails, name: e.target.value})} />
-                    <input type="tel" placeholder="Phone Number *" className="power-input-text" onChange={(e) => setManualDetails({...manualDetails, phone: e.target.value})} />
-                    
-                    <button className="btn-cta w-full" onClick={() => setStep(4)} style={{marginTop: '1rem'}}>Save & Proceed</button>
-                 </div>
-              )}
-
-              {selections.powerOption === 'upload' && (
-                 <div className="upload-power-form animate-fade-in">
-                    <h5 className="manual-form-title">Upload Prescription</h5>
-                    <p style={{fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem'}}>Please upload a clear image of your latest prescription.</p>
-                    <input type="file" accept="image/*,.pdf" className="file-input" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
-                    <button className="btn-cta w-full" onClick={() => setStep(4)} disabled={!selections.prescriptionFile} style={{marginTop: '1.5rem'}}>Save & Proceed</button>
-                 </div>
-              )}
+              {/* Inline forms removed, logic moved to a popup sub-modal */}
             </div>
           )}
 
@@ -408,6 +356,115 @@ const LensSelector = ({ isOpen, onClose, product }) => {
           )}
         </div>
       </div>
+
+      {/* SUB-MODAL FOR POWER ENTRY */}
+      {isPowerModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-800">
+                {selections.powerOption === 'upload' ? 'Upload Prescription' : 'Manual Entry'}
+              </h3>
+              <button 
+                onClick={() => setIsPowerModalOpen(false)} 
+                className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className="p-6 max-h-[80vh] overflow-y-auto">
+              {selections.powerOption === 'upload' && (
+                 <div className="upload-power-form">
+                    <p className="text-xs text-gray-500 mb-6 text-center">Please upload a clear image of your latest eye prescription. We will verify the details.</p>
+                    
+                    <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors group relative overflow-hidden">
+                      {selections.prescriptionFile ? (
+                        <div className="absolute inset-0 p-2">
+                           <img src={URL.createObjectURL(selections.prescriptionFile)} alt="Preview" className="w-full h-full object-contain rounded-lg" />
+                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                             <span className="text-white font-bold text-xs uppercase tracking-widest bg-black/50 px-4 py-2 rounded-full">Change Image</span>
+                           </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <UploadCloud className="w-10 h-10 mb-3 text-gray-400 group-hover:text-primary transition-colors" />
+                            <p className="mb-2 text-sm text-gray-500"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
+                            <p className="text-xs text-gray-400">SVG, PNG, JPG or PDF</p>
+                        </div>
+                      )}
+                      <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
+                    </label>
+
+                    <button 
+                      className="w-full py-4 bg-black text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed" 
+                      onClick={() => {
+                        setIsPowerModalOpen(false);
+                        setStep(4);
+                      }} 
+                      disabled={!selections.prescriptionFile}
+                    >
+                      Save & Proceed
+                    </button>
+                 </div>
+              )}
+
+              {selections.powerOption === 'manual' && (
+                 <div className="manual-power-form">
+                    <div className="flex gap-4 mb-6">
+                       <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-600">
+                          <input type="checkbox" className="accent-black w-4 h-4" onChange={(e) => setManualDetails({...manualDetails, samePower: e.target.checked})} /> Same power for both eyes
+                       </label>
+                       <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-600">
+                          <input type="checkbox" className="accent-black w-4 h-4" onChange={(e) => setManualDetails({...manualDetails, cylindrical: e.target.checked})} /> Cylindrical power
+                       </label>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                       <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                          <label className="block text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2">SPH (Left Eye)</label>
+                          <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black" onChange={(e) => setManualDetails({...manualDetails, leftSph: e.target.value})}>
+                             <option value="">Select Power</option>
+                             {Array.from({length: 41}, (_, i) => -10 + i * 0.25).map(val => (
+                                <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
+                             ))}
+                          </select>
+                       </div>
+                       <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                          <label className="block text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2">SPH (Right Eye)</label>
+                          <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black" onChange={(e) => setManualDetails({...manualDetails, rightSph: e.target.value})}>
+                             <option value="">Select Power</option>
+                             {Array.from({length: 41}, (_, i) => -10 + i * 0.25).map(val => (
+                                <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
+                             ))}
+                          </select>
+                       </div>
+                    </div>
+
+                    <div className="border-t border-gray-100 pt-6">
+                      <h5 className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-4">Patient Details</h5>
+                      <div className="space-y-4">
+                        <input type="text" placeholder="Full Name *" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors" onChange={(e) => setManualDetails({...manualDetails, name: e.target.value})} />
+                        <input type="tel" placeholder="Phone Number *" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors" onChange={(e) => setManualDetails({...manualDetails, phone: e.target.value})} />
+                      </div>
+                    </div>
+                    
+                    <button 
+                      className="w-full py-4 bg-black text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors mt-6 disabled:opacity-50" 
+                      onClick={() => {
+                        setIsPowerModalOpen(false);
+                        setStep(4);
+                      }} 
+                      disabled={!manualDetails.name || !manualDetails.phone || !manualDetails.leftSph || (!manualDetails.samePower && !manualDetails.rightSph)}
+                    >
+                      Save Details & Proceed
+                    </button>
+                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
