@@ -9,6 +9,15 @@ import { FadeIn } from '../components/ui/Motion';
 
 const STEPS = ['Shipping', 'Review', 'Secure Payment'];
 
+const InputField = ({ label, ...props }) => (
+  <div className="flex flex-col gap-2">
+     <input 
+       {...props} 
+       className="w-full bg-transparent border-b border-divider py-3 outline-none focus:border-[#2FA4B7] transition-colors text-heading font-sans placeholder-body/50"
+     />
+  </div>
+);
+
 const Checkout = () => {
   const { cart, cartTotal, tax, finalTotal, discount, emptyCart } = useCart();
   const { user, profile } = useAuth();
@@ -136,14 +145,7 @@ const Checkout = () => {
     );
   }
 
-  const InputField = ({ label, ...props }) => (
-    <div className="flex flex-col gap-2">
-       <input 
-         {...props} 
-         className="w-full bg-transparent border-b border-divider py-3 outline-none focus:border-[#2FA4B7] transition-colors text-heading font-sans placeholder-body/50"
-       />
-    </div>
-  );
+
 
   return (
     <div className="bg-background min-h-screen pt-32 pb-24 text-primary selection:bg-accent/20">
