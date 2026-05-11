@@ -65,7 +65,22 @@ const LensSelector = ({ isOpen, onClose, product }) => {
       image: '/assets/im/select_lens/frame_only.jpeg',
       price: 0 
     }
-  ];
+  ].filter(type => {
+    if (!product?.available_lenses || product.available_lenses.length === 0) return true;
+    
+    // Map of product field names to internal IDs
+    const mapping = {
+      'Single Vision': ['single'],
+      'Bifocal': ['bifocal'],
+      'Progressive': ['bifocal'],
+      'Zero Power': ['zero'],
+      'Blue Cut': ['single', 'zero'],
+      'Photochromic': ['single', 'zero']
+    };
+
+    const allowedIds = product.available_lenses.flatMap(l => mapping[l] || []);
+    return allowedIds.includes(type.id) || type.id === 'frame'; // Always allow frame only
+  });
 
   const lensPackages = [
     {

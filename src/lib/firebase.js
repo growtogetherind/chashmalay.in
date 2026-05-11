@@ -348,10 +348,16 @@ export const getDashboardStats = async () => {
 // --- Categories ---
 export const getCategories = async () => {
   try {
-    const q = query(collection(db, "categories"), orderBy("name", "asc"));
+    const q = query(collection(db, "categories"));
     const snap = await getDocs(q);
-    return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
-  } catch (error) { return { data: [], error }; }
+    const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Sort manually to avoid index requirement
+    data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    return { data, error: null };
+  } catch (error) { 
+    console.error("getCategories Error:", error);
+    return { data: [], error }; 
+  }
 };
 
 export const saveCategory = async (category, id = null) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Tags, Layers, ChevronRight } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Tags, Layers, ChevronRight, Upload, Palette } from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, toggleProductActive } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -29,6 +29,9 @@ const EMPTY_PRODUCT = {
   frame_shape: 'Rectangle',
   frame_material: 'Acetate',
   lens_type: 'Single Vision',
+  available_lenses: [], // New: Multiple compatible lenses
+  available_sizes: ['M'], // New: S, M, L
+  available_colors: ['Standard'], // New: Colors
   tags: '',
   is_active: true, 
   is_new: false,
@@ -42,6 +45,7 @@ const EMPTY_PRODUCT = {
   },
   colors: [] 
 };
+const SIZES = ['S', 'M', 'L'];
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -54,7 +58,43 @@ const AdminProducts = () => {
   const [saving, setSaving] = useState(false);
   const [toggling, setToggling] = useState({});
   const [activeTab, setActiveTab] = useState('basic');
+  const [pendingImages, setPendingImages] = useState({});
+  const [pendingGallery, setPendingGallery] = useState([]);
   const { confirm } = useConfirm();
+
+  // Auto-save draft to localStorage
+  useEffect(() => {
+    if (showForm && !editing && form !== EMPTY_PRODUCT) {
+      // Don't save preview URLs to localStorage, they won't be valid on reload
+      const cleanForm = { ...form };
+      // Optional: you could strip the blob URLs here if you want to be cleaner
+      localStorage.setItem('product_draft', JSON.stringify(cleanForm));
+    }
+  }, [form, showForm, editing]);
+
+  const restoreDraft = () => {
+    const draft = localStorage.getItem('product_draft');
+    if (draft) {
+      const parsed = JSON.parse(draft);
+      // Strip blob URLs as they are invalid after refresh
+      if (parsed.images) {
+        Object.keys(parsed.images).forEach(key => {
+          if (key !== 'gallery' && typeof parsed.images[key] === 'string' && parsed.images[key].startsWith('blob:')) {
+            parsed.images[key] = '';
+          }
+        });
+        if (parsed.images.gallery) {
+          parsed.images.gallery = parsed.images.gallery.filter(url => !url.startsWith('blob:'));
+        }
+      }
+      setForm(parsed);
+      toast.success('Draft restored! (Images need to be re-selected)');
+    }
+  };
+
+  const clearDraft = () => {
+    localStorage.removeItem('product_draft');
+  };
 
   useEffect(() => { 
     loadData(); 
@@ -62,15 +102,37 @@ const AdminProducts = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [pRes, cRes, bRes] = await Promise.all([
-      getProducts({ adminFilter: true }),
-      getCategories(),
-      getBrands()
-    ]);
-    setProducts(pRes.data || []);
-    setCategories(cRes.data || []);
-    setBrands(bRes.data || []);
-    setLoading(false);
+    try {
+      const [pRes, cRes, bRes] = await Promise.all([
+        getProducts({ adminFilter: true }),
+        getCategories(),
+        getBrands()
+      ]);
+      
+      const fetchedProducts = pRes.data || [];
+      setProducts(fetchedProducts);
+
+      // Smart Fallback: If categories/brands collections are empty, 
+      // extract unique values from existing products
+      let fetchedCats = cRes.data || [];
+      if (fetchedCats.length === 0 && fetchedProducts.length > 0) {
+        const uniqueCats = [...new Set(fetchedProducts.map(p => p.category).filter(Boolean))];
+        fetchedCats = uniqueCats.map((name, i) => ({ id: `ext-${i}`, name }));
+      }
+      setCategories(fetchedCats);
+
+      let fetchedBrands = bRes.data || [];
+      if (fetchedBrands.length === 0 && fetchedProducts.length > 0) {
+        const uniqueBrands = [...new Set(fetchedProducts.map(p => p.brand).filter(Boolean))];
+        fetchedBrands = uniqueBrands.map((name, i) => ({ id: `ext-b-${i}`, name }));
+      }
+      setBrands(fetchedBrands);
+    } catch (err) {
+      console.error("LoadData Error:", err);
+      toast.error("Failed to load some data");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -83,67 +145,141 @@ const AdminProducts = () => {
     }
   };
 
-  const handleFileUpload = async (e, path) => {
+  const handleFileUpload = (e, path) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const toastId = toast.loading(`Uploading ${path}...`);
-    const { url, error } = await uploadImage(file, 'products');
+    // Create local preview URL
+    const previewUrl = URL.createObjectURL(file);
     
-    if (error) {
-      toast.error(`Upload failed: ${error}`, { id: toastId });
+    // Store file for later upload
+    setPendingImages(prev => ({ ...prev, [path]: file }));
+
+    if (path.includes('.')) {
+      const [parent, child] = path.split('.');
+      setForm(prev => ({ ...prev, [parent]: { ...prev[parent], [child]: previewUrl } }));
     } else {
-      if (path.includes('.')) {
-        const [parent, child] = path.split('.');
-        setForm(prev => ({ ...prev, [parent]: { ...prev[parent], [child]: url } }));
-      } else {
-        setForm(prev => ({ ...prev, [path]: url }));
-      }
-      toast.success('Uploaded successfully!', { id: toastId });
+      setForm(prev => ({ ...prev, [path]: previewUrl }));
     }
+    
+    toast.success(`${path.split('.').pop()} selected (pending upload)`);
   };
 
-  const handleGalleryUpload = async (e) => {
+  const handleGalleryUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
-    const toastId = toast.loading(`Uploading ${files.length} images...`);
-    const urls = [];
+    const newPreviews = files.map(file => URL.createObjectURL(file));
     
-    for (const file of files) {
-      const { url, error } = await uploadImage(file, 'products/gallery');
-      if (!error) urls.push(url);
-    }
+    // Store files for later upload
+    setPendingGallery(prev => [...prev, ...files]);
 
     setForm(prev => ({ 
       ...prev, 
-      images: { ...prev.images, gallery: [...(prev.images.gallery || []), ...urls] } 
+      images: { ...prev.images, gallery: [...(prev.images.gallery || []), ...newPreviews] } 
     }));
-    toast.success(`Uploaded ${urls.length} images!`, { id: toastId });
+    toast.success(`${files.length} images added to gallery (pending upload)`);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
     if (!form.name || !form.price) { toast.error('Name and price are required.'); return; }
     
-    setSaving(true);
-    const payload = { 
-      ...form, 
-      price: Number(form.price), 
-      original_price: form.original_price ? Number(form.original_price) : null,
-      discount_price: form.discount_price ? Number(form.discount_price) : null,
-      stock_quantity: Number(form.stock_quantity || 0),
-      updated_at: new Date()
-    };
-    
-    const { error } = await saveProduct(payload, editing);
-    if (error) { toast.error('Save failed: ' + error.message); }
-    else { 
-      toast.success(editing ? 'Product updated!' : 'Product added!'); 
-      setShowForm(false); 
-      loadData(); 
+    const isNew = !editing;
+    const confirmMessage = isNew 
+      ? 'Are you sure you want to publish this new product? All images will be uploaded now.' 
+      : 'Are you sure you want to update this product? Any newly selected images will be uploaded.';
+
+    if (!(await confirm({ title: isNew ? 'Publish Product' : 'Update Product', message: confirmMessage }))) {
+      return;
     }
-    setSaving(false);
+
+    setSaving(true);
+    const toastId = toast.loading('Processing product and uploads...');
+
+    try {
+      let finalImages = { ...form.images };
+
+      // 1. Upload Pending Single Images
+      for (const [path, file] of Object.entries(pendingImages)) {
+        const { url, error } = await uploadImage(file, 'products');
+        if (error) throw new Error(`Failed to upload ${path}: ${error}`);
+        
+        if (path.includes('.')) {
+          const [_, child] = path.split('.');
+          finalImages[child] = url;
+        }
+      }
+
+      // 3. CRITICAL: Filter out any remaining blob: URLs from single images
+      Object.keys(finalImages).forEach(key => {
+        if (key !== 'gallery' && typeof finalImages[key] === 'string' && finalImages[key].startsWith('blob:')) {
+          finalImages[key] = ''; // Remove if not uploaded
+        }
+      });
+
+      // 2. Upload Pending Gallery Images
+      if (pendingGallery.length > 0) {
+        const uploadedGalleryUrls = [];
+        for (const file of pendingGallery) {
+          const { url, error } = await uploadImage(file, 'products/gallery');
+          if (error) throw new Error(`Gallery upload failed: ${error}`);
+          uploadedGalleryUrls.push(url);
+        }
+        // Filter out blob URLs and add new Cloudinary URLs
+        const existingUrls = (finalImages.gallery || []).filter(url => typeof url === 'string' && !url.startsWith('blob:'));
+        finalImages.gallery = [...existingUrls, ...uploadedGalleryUrls];
+      } else {
+        // Just filter out blob URLs if any were removed or not uploaded
+        finalImages.gallery = (finalImages.gallery || []).filter(url => typeof url === 'string' && !url.startsWith('blob:'));
+      }
+
+      const payload = { 
+        ...form, 
+        images: finalImages,
+        price: Number(form.price), 
+        original_price: form.original_price ? Number(form.original_price) : null,
+        discount_price: form.discount_price ? Number(form.discount_price) : null,
+        stock_quantity: Number(form.stock_quantity || 0),
+        updated_at: new Date()
+      };
+      
+      const { error } = await saveProduct(payload, editing);
+      if (error) { 
+        toast.error('Save failed: ' + error.message, { id: toastId }); 
+      } else { 
+        toast.success(editing ? 'Product updated!' : 'Product added!', { id: toastId }); 
+        setShowForm(false); 
+        clearDraft();
+        setPendingImages({});
+        setPendingGallery([]);
+        loadData(); 
+      }
+    } catch (err) {
+      toast.error(err.message, { id: toastId });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleNewProduct = () => {
+    setForm(EMPTY_PRODUCT);
+    setEditing(null);
+    setPendingImages({});
+    setPendingGallery([]);
+    
+    const draft = localStorage.getItem('product_draft');
+    if (draft) {
+      confirm({ 
+        title: 'Restore Draft?', 
+        message: 'We found an unfinished product draft. Would you like to restore it?' 
+      }).then(confirmed => {
+        if (confirmed) restoreDraft();
+        setShowForm(true);
+      });
+    } else {
+      setShowForm(true);
+    }
   };
 
   const handleDelete = async (id, name) => {
@@ -191,7 +327,7 @@ const AdminProducts = () => {
             <h1 className="admin-title">Product Catalog</h1>
             <p className="text-xs text-gray-400 font-bold uppercase mt-1 tracking-widest">{products.length} Products Total</p>
           </div>
-          <button onClick={() => { setForm(EMPTY_PRODUCT); setEditing(null); setShowForm(true); }} className="admin-primary-btn"><Plus size={16} /> New Product</button>
+          <button onClick={handleNewProduct} className="admin-primary-btn"><Plus size={16} /> New Product</button>
         </div>
 
         <div className="admin-card">
@@ -215,7 +351,7 @@ const AdminProducts = () => {
                       <td>
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden">
-                             {p.images?.front || p.frame_image || p.image ? <img src={p.images?.front || p.frame_image || p.image} className="w-full h-full object-contain" /> : <ImageIcon size={20} className="text-gray-300" />}
+                             {p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0] ? <img src={p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0]} className="w-full h-full object-contain" /> : <ImageIcon size={20} className="text-gray-300" />}
                           </div>
                           <div>
                             <span className="font-black text-sm text-gray-800 block">{p.name}</span>
@@ -251,7 +387,13 @@ const AdminProducts = () => {
                       </td>
                       <td>
                         <div className="flex gap-2">
-                          <button onClick={() => { setForm(p); setEditing(p.id); setShowForm(true); }} className="admin-table-btn edit"><Edit3 size={14} /></button>
+                          <button onClick={() => { 
+                            setForm(p); 
+                            setEditing(p.id); 
+                            setPendingImages({});
+                            setPendingGallery([]);
+                            setShowForm(true); 
+                          }} className="admin-table-btn edit"><Edit3 size={14} /></button>
                           <button onClick={() => handleDelete(p.id, p.name)} className="admin-table-btn delete"><Trash2 size={14} /></button>
                         </div>
                       </td>
@@ -298,15 +440,20 @@ const AdminProducts = () => {
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Category</label>
-                      <select name="category" value={form.category} onChange={handleChange}>
+                      <label>Category *</label>
+                      <select name="category" value={form.category} onChange={handleChange} required>
                         <option value="">Select Category</option>
                         {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
+                      {categories.length === 0 && (
+                        <p className="text-[9px] text-red-500 font-bold mt-1">
+                          No categories found. Please add them in the <Link to="/admin/categories" className="underline">Categories</Link> tab.
+                        </p>
+                      )}
                     </div>
                     <div className="form-group">
-                      <label>Brand</label>
-                      <select name="brand" value={form.brand} onChange={handleChange}>
+                      <label>Brand *</label>
+                      <select name="brand" value={form.brand} onChange={handleChange} required>
                         <option value="">Select Brand</option>
                         {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                       </select>
@@ -377,6 +524,164 @@ const AdminProducts = () => {
                     <div className="form-group">
                       <label>Tags (Comma separated)</label>
                       <input name="tags" value={form.tags} onChange={handleChange} placeholder="premium, trendy, lightweight" />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Frame Sizes Available</label>
+                    <div className="flex gap-4 p-3 bg-gray-50 rounded-xl">
+                      {SIZES.map(size => (
+                        <label key={size} className="flex items-center gap-2 cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={form.available_sizes?.includes(size)} 
+                            onChange={(e) => {
+                              const sizes = form.available_sizes || [];
+                              const newSizes = e.target.checked 
+                                ? [...sizes, size] 
+                                : sizes.filter(s => s !== size);
+                              setForm(prev => ({ ...prev, available_sizes: newSizes }));
+                            }}
+                          />
+                          <span className="text-xs font-bold">{size}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Available Lenses (Selection for customer)</label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-3 bg-gray-50 rounded-xl">
+                      {LENS_TYPES.map(lens => (
+                        <label key={lens} className="flex items-center gap-2 cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={form.available_lenses?.includes(lens)} 
+                            onChange={(e) => {
+                              const lenses = form.available_lenses || [];
+                              const newLenses = e.target.checked 
+                                ? [...lenses, lens] 
+                                : lenses.filter(l => l !== lens);
+                              setForm(prev => ({ ...prev, available_lenses: newLenses }));
+                            }}
+                          />
+                          <span className="text-[10px] font-bold">{lens}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="form-group col-span-full">
+                    <div className="flex justify-between items-center mb-4">
+                      <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Color Variants</label>
+                      <button 
+                        type="button" 
+                        onClick={() => setForm(prev => ({ ...prev, colors: [...(prev.colors || []), { name: '', hex: '#000000', image: '' }] }))}
+                        className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-800 transition-colors"
+                      >
+                        <Plus size={14} /> Add Color
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {(form.colors || []).map((color, index) => (
+                        <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 items-start">
+                          <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Color Name</label>
+                              <input 
+                                type="text" 
+                                value={color.name}
+                                onChange={(e) => {
+                                  const newColors = [...form.colors];
+                                  newColors[index].name = e.target.value;
+                                  setForm(prev => ({ ...prev, colors: newColors }));
+                                }}
+                                placeholder="e.g. Matte Black"
+                                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Hex Code</label>
+                              <div className="flex gap-2 items-center h-[46px]">
+                                <input 
+                                  type="color" 
+                                  value={color.hex || '#000000'}
+                                  onChange={(e) => {
+                                    const newColors = [...form.colors];
+                                    newColors[index].hex = e.target.value;
+                                    setForm(prev => ({ ...prev, colors: newColors }));
+                                  }}
+                                  className="w-12 h-12 rounded-lg cursor-pointer border-0 p-0"
+                                />
+                                <input 
+                                  type="text" 
+                                  value={color.hex || '#000000'}
+                                  onChange={(e) => {
+                                    const newColors = [...form.colors];
+                                    newColors[index].hex = e.target.value;
+                                    setForm(prev => ({ ...prev, colors: newColors }));
+                                  }}
+                                  className="flex-grow bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all uppercase"
+                                />
+                              </div>
+                            </div>
+                            
+                            {/* Color Image Upload */}
+                            <div className="col-span-full">
+                              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Variant Image (Optional)</label>
+                              <div className="flex items-center gap-4">
+                                {color.image && (
+                                  <div className="w-16 h-16 rounded-xl border border-gray-200 overflow-hidden bg-white">
+                                    <img src={color.image} alt={color.name} className="w-full h-full object-contain" />
+                                  </div>
+                                )}
+                                <label className="cursor-pointer px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors flex items-center gap-2">
+                                  <Upload size={14} /> {color.image ? 'Change Image' : 'Upload Image'}
+                                  <input 
+                                    type="file" 
+                                    className="hidden" 
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      
+                                      const toastId = toast.loading('Uploading color image...');
+                                      const { url, error } = await uploadImage(file, 'products/colors');
+                                      
+                                      if (error) {
+                                        toast.error('Failed to upload image', { id: toastId });
+                                      } else {
+                                        const newColors = [...form.colors];
+                                        newColors[index].image = url;
+                                        setForm(prev => ({ ...prev, colors: newColors }));
+                                        toast.success('Image uploaded', { id: toastId });
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              </div>
+                            </div>
+
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              const newColors = form.colors.filter((_, i) => i !== index);
+                              setForm(prev => ({ ...prev, colors: newColors }));
+                            }}
+                            className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors shrink-0 mt-7"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ))}
+                      {(!form.colors || form.colors.length === 0) && (
+                        <div className="text-center p-8 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400">
+                          <Palette size={32} className="mx-auto mb-2 opacity-50" />
+                          <p className="text-[10px] font-black uppercase tracking-widest">No Color Variants Added</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 

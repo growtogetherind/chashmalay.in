@@ -39,10 +39,22 @@ const Category = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const { data, error } = await getProducts({ category: name === 'all' ? null : name });
+      // Fetch products. If 'all', fetch everything.
+      // If a specific category, we fetch all active and filter in JS to avoid case-sensitivity issues with Firestore
+      const { data, error } = await getProducts({ category: null }); 
+      
       if (!error && data) {
+        let filteredByCat = data;
+        if (name && name !== 'all') {
+          const normalizedName = name.replace(/-/g, ' ').toLowerCase();
+          filteredByCat = data.filter(p => 
+            p.category?.toLowerCase() === normalizedName || 
+            p.category?.toLowerCase().replace(/\s+/g, '-') === name
+          );
+        }
+
         // Real-time Inference Fallback
-        const processedProducts = data.map(p => ({
+        const processedProducts = filteredByCat.map(p => ({
           ...p,
           color: p.color || (p.name.toLowerCase().includes('gold') ? 'Gold' : 
                            p.name.toLowerCase().includes('silver') ? 'Silver' : 

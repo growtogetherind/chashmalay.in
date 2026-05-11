@@ -41,18 +41,21 @@ const ProductCard = ({ product }) => {
         </button>
 
         {/* Rating Badge */}
-        <div className="rating-badge z-10">
-          {product.rating || '4.8'} <Star size={10} fill="currentColor" /> 
-          <div className="w-px h-2.5 bg-divider mx-0.5" />
-          <span className="rating-count">{product.reviewCount || '1.2K'}</span>
-        </div>
+        {(product.rating || product.reviewCount > 0 || (product.reviews && product.reviews.length > 0)) && (
+          <div className="rating-badge z-10">
+            {product.rating || '5.0'} <Star size={10} fill="currentColor" /> 
+            <div className="w-px h-2.5 bg-divider mx-0.5" />
+            <span className="rating-count">{product.reviewCount || product.reviews?.length || 0}</span>
+          </div>
+        )}
         
         {/* Simplified Image - No AnimatePresence for faster response */}
         <img 
-          src={isHovered && product.model_image ? product.model_image : (product.frameImage || product.frame_image)} 
+          src={isHovered ? (product.images?.model || product.model_image || product.images?.gallery?.[1] || product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/800x600/f8fafc/94a3b8?text=No+Image') : (product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/800x600/f8fafc/94a3b8?text=No+Image')} 
           alt={product.name} 
           className="w-full h-full object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-105 pointer-events-none"
           loading="lazy"
+          onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/800x600/f8fafc/94a3b8?text=No+Image'; }}
         />
 
         {/* New Arrival Badge */}
@@ -68,7 +71,7 @@ const ProductCard = ({ product }) => {
       <div className="product-info-v2">
         <h4 className="product-brand">{product.brand || 'Chashmaly'}</h4>
         <p className="product-details-subtitle truncate">
-          {product.name} • {product.size || 'Medium'}
+          {product.name} • {product.category || 'Eyewear'} • {product.size || 'Medium'}
         </p>
 
         {/* Color Swatches */}
@@ -82,13 +85,6 @@ const ProductCard = ({ product }) => {
           ))}
           {product.colors?.length > 3 && (
             <span className="color-more">+{product.colors.length - 3}</span>
-          )}
-          {(!product.colors || product.colors.length === 0) && (
-             <div className="flex gap-1.5">
-               <div className="color-dot bg-black" />
-               <div className="color-dot bg-gray-400" />
-               <div className="color-dot bg-amber-900" />
-             </div>
           )}
         </div>
 

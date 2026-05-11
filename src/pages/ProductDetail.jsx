@@ -4,9 +4,9 @@ import { useParams, Link } from 'react-router-dom';
 import { 
   Star, Heart, Share2, MapPin, Box, RotateCcw, 
   ShieldCheck, ChevronDown, ChevronUp, Map, Eye, Search, Layers,
-  ChevronRight, ChevronLeft, User
+  ChevronRight, ChevronLeft, User, X
 } from 'lucide-react';
-import { getProductById, getProducts } from '../lib/firebase';
+import { getProductById, getProducts, addReview } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ui/ProductCard';
 import LensSelector from '../components/ui/LensSelector';
@@ -50,6 +50,56 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  // Review States
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error('Please sign in to write a review');
+      return;
+    }
+    if (!reviewForm.comment.trim()) {
+      toast.error('Please write a comment');
+      return;
+    }
+
+    setSubmittingReview(true);
+    const userInfo = { full_name: user.displayName || 'Anonymous Customer' };
+    const { error } = await addReview(product.id, user.uid, reviewForm.rating, reviewForm.comment, userInfo);
+    
+    if (error) {
+      toast.error('Failed to submit review');
+    } else {
+      toast.success('Review submitted successfully!');
+      setIsReviewModalOpen(false);
+      setReviewForm({ rating: 5, comment: '' });
+      
+      // Optimistic update
+      const newReview = {
+        id: Date.now().toString(),
+        product_id: product.id,
+        user_id: user.uid,
+        rating: reviewForm.rating,
+        comment: reviewForm.comment,
+        reviewer_name: userInfo.full_name,
+        created_at: { seconds: Math.floor(Date.now() / 1000) },
+        status: 'pending' // Just for UI completeness
+      };
+      
+      setProduct(prev => ({
+        ...prev,
+        reviews: [newReview, ...(prev.reviews || [])],
+        reviewCount: (prev.reviewCount || 0) + 1,
+        // Approximate new rating
+        rating: (((prev.rating || 5) * (prev.reviewCount || 0)) + reviewForm.rating) / ((prev.reviewCount || 0) + 1)
+      }));
+    }
+    setSubmittingReview(false);
+  };
+
   // Functional States
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState(null); // 'checking', 'success', 'error'
@@ -61,7 +111,18 @@ const ProductDetail = () => {
       const { data, error } = await getProductById(id);
       if (!error && data) {
         data.colors = data.colors || [];
-        data.gallery = Array.from(new Set([...(data.gallery || []), data.frame_image, data.model_image])).filter(Boolean);
+        // Combine new and old image fields for the gallery
+        const newGallery = data.images?.gallery || [];
+        const singleImages = [
+          data.images?.front, 
+          data.images?.side, 
+          data.images?.model, 
+          data.images?.zoom, 
+          data.frame_image, 
+          data.model_image
+        ].filter(Boolean);
+        const colorImages = (data.colors || []).map(c => c.image).filter(Boolean);
+        data.gallery = Array.from(new Set([...singleImages, ...newGallery, ...colorImages])).filter(Boolean);
         setProduct(data);
         const { data: allProds } = await getProducts({ category: data.category });
         if (allProds) setRelatedProducts(allProds.filter(p => p.id !== data.id).slice(0, 10));
@@ -131,10 +192,10 @@ const ProductDetail = () => {
 
   // Dynamic Rating Stats
   const reviews = product.reviews || [];
-  const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : product.rating || '4.8';
+  const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : (product.rating || 0);
   const ratingDistribution = [5, 4, 3, 2, 1].map(star => {
     const count = reviews.filter(r => Math.round(r.rating) === star).length;
-    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : (star === 5 ? 85 : star === 4 ? 10 : 2);
+    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
     return { star, percentage, count };
   });
 
@@ -215,9 +276,9 @@ const ProductDetail = () => {
 
             {/* Frame Color */}
             <div className="mb-6">
-               <p className="text-[11px] font-bold mb-3 uppercase tracking-wider text-[#1a1a1a]">Frame Color: <span className="font-medium text-[#666] ml-1">{product.colors[activeColor]?.name || 'Standard'}</span></p>
+               <p className="text-[11px] font-bold mb-3 uppercase tracking-wider text-[#1a1a1a]">Frame Color: <span className="font-medium text-[#666] ml-1">{(product.colors && product.colors.length > 0) ? product.colors[activeColor]?.name : ((product.available_colors && product.available_colors.length > 0) ? product.available_colors[activeColor] : 'Standard')}</span></p>
                 <div className="flex gap-3">
-                  {product.colors && product.colors.length > 0 ? product.colors.map((c, i) => (
+                  {(product.colors && product.colors.length > 0) ? product.colors.map((c, i) => (
                     <button 
                       key={i} 
                       onClick={() => {
@@ -229,10 +290,18 @@ const ProductDetail = () => {
                       }}
                       className={`w-8 h-8 rounded-full border-2 p-0.5 transition-all ${activeColor === i ? 'border-primary' : 'border-transparent'}`}
                     >
-                       <div className="w-full h-full rounded-full border border-black/10" style={{ background: c.hex }} title={c.name} />
+                       <div className="w-full h-full rounded-full border border-black/10 shadow-sm" style={{ background: c.hex }} title={c.name} />
+                    </button>
+                  )) : (product.available_colors && product.available_colors.length > 0) ? product.available_colors.map((c, i) => (
+                    <button 
+                      key={i} 
+                      onClick={() => setActiveColor(i)}
+                      className={`px-3 py-1 rounded-full border text-[10px] font-bold transition-all ${activeColor === i ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'}`}
+                    >
+                       {c}
                     </button>
                   )) : (
-                    <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border-2 border-primary p-0.5"><div className="w-full h-full rounded-full border border-black/10" /></div>
+                    <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border-2 border-primary p-0.5"><div className="w-full h-full rounded-full border border-black/10 shadow-sm" /></div>
                   )}
                </div>
                {activeColor === 0 && <span className="text-[9px] text-red-600 font-bold mt-2 block">Few Left</span>}
@@ -242,7 +311,7 @@ const ProductDetail = () => {
             <div className="mb-8">
                <p className="text-[11px] font-bold mb-3 uppercase tracking-wider text-[#1a1a1a]">Frame Size: <span className="font-medium text-[#666] ml-1">{activeSize}</span></p>
                <div className="size-btn-group">
-                  {['S', 'M', 'L'].map(size => (
+                  {(product.available_sizes || ['S', 'M', 'L']).map(size => (
                     <button 
                       key={size}
                       onClick={() => setActiveSize(size)}
@@ -337,6 +406,13 @@ const ProductDetail = () => {
                   </div>
                </div>
 
+               <button 
+                 onClick={() => setIsReviewModalOpen(true)}
+                 className="w-full py-3 bg-black text-white rounded text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors mb-6"
+               >
+                 Write a Review
+               </button>
+
                {reviews.length > 0 && (
                  <>
                    <p className="text-[10px] font-bold mb-3">User Photos</p>
@@ -412,6 +488,64 @@ const ProductDetail = () => {
         onClose={() => setIsLensModalOpen(false)}
         product={product}
       />
+
+      {/* Review Modal */}
+      <AnimatePresence>
+        {isReviewModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative"
+            >
+              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 className="text-lg font-black text-gray-900">Write a Review</h3>
+                <button onClick={() => setIsReviewModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleReviewSubmit} className="p-6">
+                <div className="mb-6">
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 text-center">Your Rating</label>
+                  <div className="flex justify-center gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button 
+                        key={star} 
+                        type="button"
+                        onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                        className="hover:scale-110 transition-transform"
+                      >
+                        <Star size={32} fill={star <= reviewForm.rating ? '#FBBF24' : 'none'} color={star <= reviewForm.rating ? '#FBBF24' : '#E5E7EB'} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-8">
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Your Experience</label>
+                  <textarea 
+                    value={reviewForm.comment}
+                    onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all resize-none min-h-[120px]"
+                    placeholder="Tell us what you loved about this product..."
+                    required
+                  />
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={submittingReview}
+                  className="w-full py-4 bg-black text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50"
+                >
+                  {submittingReview ? 'Submitting...' : 'Post Review'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

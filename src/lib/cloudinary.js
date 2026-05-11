@@ -26,6 +26,7 @@ export const uploadImage = async (file, folder = 'products') => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', uploadPreset);
+    formData.append('folder', folder);
 
     const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
       method: 'POST',
@@ -39,16 +40,11 @@ export const uploadImage = async (file, folder = 'products') => {
       throw new Error(data.error.message);
     }
 
-    // Use the SDK to generate an optimized URL from the public_id
-    const myImage = cld.image(data.public_id);
+    // Use the secure_url and inject transformations for reliability
+    // Replace '/upload/' with '/upload/q_auto/f_auto/c_scale,w_800/'
+    const optimizedUrl = data.secure_url.replace('/upload/', '/upload/q_auto/f_auto/c_scale,w_800/');
 
-    // Apply optimizations: auto quality, auto format, and scale to 800px width (default)
-    myImage
-      .delivery(quality(autoQuality()))
-      .delivery(format(autoFormat()))
-      .resize(scale().width(800));
-
-    return { url: myImage.toURL(), error: null };
+    return { url: optimizedUrl, error: null };
   } catch (error) {
     console.error("Cloudinary Upload Error:", error);
     return { url: null, error: error.message || "Failed to upload to Cloudinary" };
