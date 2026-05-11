@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Save, Mail, Tool, Globe, Truck } from 'lucide-react';
+import { Save, Mail, Wrench, Globe, Truck } from 'lucide-react';
 import { getSettings, saveSettings } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import toast from 'react-hot-toast';
@@ -54,7 +54,7 @@ const AdminSettings = () => {
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-8">
               <div className="admin-card p-6 space-y-6">
-                <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2"><Tool size={14} /> General Config</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2"><Wrench size={14} /> General Config</h3>
                 <div>
                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Store Name</label>
                    <input value={form.store_name} onChange={e => setForm({...form, store_name: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-black font-bold" />

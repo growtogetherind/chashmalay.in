@@ -517,6 +517,36 @@ export const addReview = async (productId, userId, rating, comment, userInfo) =>
   } catch (error) { return { error }; }
 };
 
+export const getReviews = async () => {
+  try {
+    const q = query(collection(db, "reviews"), orderBy("created_at", "desc"));
+    const querySnapshot = await getDocs(q);
+    const reviews = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return { data: reviews, error: null };
+  } catch (error) {
+    console.error("Firebase getReviews error:", error);
+    return { data: [], error };
+  }
+};
+
+export const updateReviewStatus = async (id, status) => {
+  try {
+    await updateDoc(doc(db, "reviews", id), { status });
+    return { error: null };
+  } catch (error) {
+    return { error };
+  }
+};
+
+export const deleteReview = async (id) => {
+  try {
+    await deleteDoc(doc(db, "reviews", id));
+    return { error: null };
+  } catch (error) {
+    return { error };
+  }
+};
+
 // ─── Coupons ──────────────────────────────────────────────────────────────────
 export const getCoupons = async () => {
   try {
