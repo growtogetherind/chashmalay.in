@@ -6,7 +6,7 @@ async function configureCors() {
     keyFilename: path.join(__dirname, 'serviceAccountKey.json'),
   });
 
-  const bucketName = 'chashmalay.appspot.com';
+  const bucketName = 'chashmalay.firebasestorage.app';
 
   await storage.bucket(bucketName).setCorsConfiguration([
     {

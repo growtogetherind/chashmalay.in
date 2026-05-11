@@ -77,7 +77,10 @@ export const CartProvider = ({ children }) => {
         : null,
       lensPackage: lensSelection.lensPackage
         ? { id: lensSelection.lensPackage.id, name: lensSelection.lensPackage.name, price: lensSelection.lensPackage.price }
-        : null
+        : null,
+      powerOption: lensSelection.powerOption || null,
+      manualDetails: lensSelection.manualDetails || null,
+      prescriptionUrl: lensSelection.prescriptionUrl || null
     } : null;
 
     if (user) {

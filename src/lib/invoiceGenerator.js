@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export const generateInvoice = (order) => {
   const doc = new jsPDF();
@@ -55,7 +55,7 @@ export const generateInvoice = (order) => {
     `INR ${(Number(item.price) * item.quantity).toLocaleString()}`
   ]) || [];
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: 90,
     head: [['Product Details', 'Price', 'Qty', 'Total']],
     body: tableData,
@@ -68,9 +68,8 @@ export const generateInvoice = (order) => {
       3: { halign: 'right' }
     }
   });
-
-  // Totals
-  const finalY = doc.lastAutoTable.finalY + 10;
+// ...
+  const finalY = (doc).lastAutoTable?.finalY || 200;
   doc.setFontSize(10);
   
   const subtotal = Number(order.total_amount) / 1.18;

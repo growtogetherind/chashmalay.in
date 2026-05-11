@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Edit3, Trash2, X, Tag } from 'lucide-react';
-import { getOffers, saveOffer, deleteOffer, uploadGenericImage } from '../../lib/firebase';
+import { Plus, Edit3, Trash2, X } from 'lucide-react';
+import { getOffers, saveOffer, deleteOffer } from '../../lib/firebase';
+import { uploadImage } from '../../lib/cloudinary';
+import AdminSidebar from '../../components/layout/AdminSidebar';
+import { useConfirm } from '../../context/ConfirmContext';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 
@@ -22,6 +25,7 @@ const AdminOffers = () => {
     const [form, setForm] = useState(EMPTY_OFFER);
     const [saving, setSaving] = useState(false);
     const [file, setFile] = useState(null);
+    const { confirm } = useConfirm();
 
     useEffect(() => { loadData(); }, []);
 
@@ -54,8 +58,14 @@ const AdminOffers = () => {
 
         let bg_image = form.bg_image;
         if (file) {
-            const { url, error } = await uploadGenericImage(file, 'offers');
-            if (error) { toast.error('Upload failed'); setSaving(false); return; }
+            const uploadToast = toast.loading('Uploading image...');
+            const { url, error } = await uploadImage(file, 'offers');
+            if (error) { 
+                toast.error('Upload failed', { id: uploadToast }); 
+                setSaving(false); 
+                return; 
+            }
+            toast.success('Image uploaded!', { id: uploadToast });
             bg_image = url;
         }
 
@@ -70,95 +80,96 @@ const AdminOffers = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('Delete this offer?')) return;
+        if (!(await confirm({ title: 'Delete Offer', message: 'Are you sure you want to delete this offer?' }))) return;
         const { error } = await deleteOffer(id);
         if (error) toast.error('Delete failed'); else { toast.success('Offer deleted'); loadData(); }
     };
 
     return (
         <div className="admin-page">
-            <aside className="admin-sidebar">
-                <div className="admin-brand">Chashmaly <span>ADMIN</span></div>
-                <nav className="admin-nav">
-                    <a href="/admin" className="admin-nav-item">📊 Dashboard</a>
-                    <a href="/admin/products" className="admin-nav-item">🛍️ Products</a>
-                    <a href="/admin/offers" className="admin-nav-item active">🏷️ Offers</a>
-                    <a href="/admin/carousel" className="admin-nav-item">🎞️ Carousel</a>
-                    <a href="/admin/orders" className="admin-nav-item">🧾 Orders</a>
-                    <a href="/admin/coupons" className="admin-nav-item">🎟️ Coupons</a>
-                </nav>
-            </aside>
-
+            <AdminSidebar />
             <main className="admin-main">
                 <div className="admin-header">
-                    <h1 className="admin-title">Promotional Offers <span className="text-gray-300">({offers.length})</span></h1>
+                    <h1 className="admin-title">Promotional Offers</h1>
                     <button onClick={openAdd} className="admin-action-btn"><Plus size={16} /> Create Offer</button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {loading ? <div className="col-span-full text-center py-12 text-gray-400">Loading offers...</div> : 
+                    {loading ? <div className="col-span-full text-center py-12 text-gray-400 italic">Loading offers...</div> : 
                     offers.map(o => (
                         <div key={o.id} className="admin-card overflow-hidden group">
-                            <div className="h-32 bg-gray-100 relative">
+                            <div className="h-40 bg-gray-100 relative">
                                 {o.bg_image && <img src={o.bg_image} className="w-full h-full object-cover opacity-60" alt="" />}
                                 <div className={`absolute inset-0 bg-gradient-to-r ${o.color_preset}`} />
-                                <div className="absolute inset-0 p-4 flex flex-col justify-center text-white">
-                                    <div className="text-xs font-black uppercase tracking-widest opacity-80 mb-1">{o.code || 'NO CODE'}</div>
-                                    <h3 className="font-black text-xl">{o.title}</h3>
+                                <div className="absolute inset-0 p-6 flex flex-col justify-center text-white">
+                                    <div className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">{o.code || 'SPECIAL OFFER'}</div>
+                                    <h3 className="font-black text-2xl tracking-tighter">{o.title}</h3>
                                 </div>
-                                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => openEdit(o)} className="p-2 bg-white/20 backdrop-blur-md text-white rounded-lg hover:bg-white/40"><Edit3 size={14}/></button>
-                                    <button onClick={() => handleDelete(o.id)} className="p-2 bg-white/20 backdrop-blur-md text-white rounded-lg hover:bg-red-500/60"><Trash2 size={14}/></button>
+                                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => openEdit(o)} className="p-2 bg-white text-black rounded-lg shadow-xl"><Edit3 size={14}/></button>
+                                    <button onClick={() => handleDelete(o.id)} className="p-2 bg-white text-red-600 rounded-lg shadow-xl"><Trash2 size={14}/></button>
                                 </div>
                             </div>
-                            <div className="p-4">
-                                <p className="text-sm text-gray-600 line-clamp-2 mb-3">{o.description}</p>
-                                <div className="flex items-center justify-between">
-                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${o.is_active ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                                        {o.is_active ? 'Active' : 'Inactive'}
-                                    </span>
-                                </div>
+                            <div className="p-6">
+                                <p className="text-sm text-gray-500 line-clamp-2 mb-4 font-bold">{o.description}</p>
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${o.is_active ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                    {o.is_active ? 'Active' : 'Inactive'}
+                                </span>
                             </div>
                         </div>
                     ))}
-                    {!loading && offers.length === 0 && <div className="col-span-full py-20 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 text-gray-400">No offers found. Start by creating one!</div>}
                 </div>
             </main>
 
             {showForm && (
                 <div className="admin-modal-overlay" onClick={() => setShowForm(false)}>
-                    <div className="admin-modal" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-black text-gray-900">{editing ? 'Edit Offer' : 'Create New Offer'}</h2>
-                            <button onClick={() => setShowForm(false)}><X size={20} className="text-gray-400" /></button>
+                    <div className="admin-modal max-w-2xl" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-xl font-black text-gray-900">{editing ? 'Edit Offer' : 'New Offer'}</h2>
+                            <button onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-full"><X size={20} /></button>
                         </div>
-                        <form onSubmit={handleSave} className="admin-form">
-                            <div className="form-group"><label>Offer Title *</label><input name="title" value={form.title} onChange={handleChange} placeholder="e.g. Summer Bonanza" required /></div>
-                            <div className="form-group"><label>Description *</label><textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="Offer details..." required /></div>
+                        <form onSubmit={handleSave} className="space-y-6">
+                            <div>
+                               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Offer Title *</label>
+                               <input name="title" value={form.title} onChange={handleChange} placeholder="e.g. Summer Bonanza" className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-black font-black" required />
+                            </div>
+                            <div>
+                               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Description *</label>
+                               <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="Offer details..." className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-black font-bold" required />
+                            </div>
                             
-                            <div className="form-row">
-                                <div className="form-group"><label>Promo Code (Optional)</label><input name="code" value={form.code} onChange={handleChange} placeholder="CHASH20" /></div>
-                                <div className="form-group"><label>Background Color Preset</label>
-                                    <select name="color_preset" value={form.color_preset} onChange={handleChange}>
-                                        {COLOR_PRESETS.map(p => <option key={p.value} value={p.value}>{p.name}</option>)}
-                                    </select>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Promo Code</label>
+                                   <input name="code" value={form.code} onChange={handleChange} placeholder="CHASH20" className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-black font-black" />
+                                </div>
+                                <div>
+                                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Color Theme</label>
+                                   <select name="color_preset" value={form.color_preset} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-black font-bold">
+                                       {COLOR_PRESETS.map(p => <option key={p.value} value={p.value}>{p.name}</option>)}
+                                   </select>
                                 </div>
                             </div>
 
-                            <div className="form-group">
-                                <label>Background Image</label>
-                                <div className="flex items-center gap-3">
-                                    {form.bg_image && <img src={form.bg_image} alt="Preview" className="w-16 h-10 object-cover rounded border" />}
-                                    <input type="file" accept="image/*" onChange={handleFileChange} />
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Background Image</label>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-32 h-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative">
+                                       {form.bg_image ? <img src={form.bg_image} className="w-full h-full object-cover" /> : <X className="text-gray-300" />}
+                                       <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase">Click to change background image</p>
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-2 cursor-pointer py-2"><input type="checkbox" name="is_active" checked={form.is_active} onChange={handleChange} /><span className="text-sm font-bold">Active and Visible</span></label>
+                            <label className="flex items-center gap-2 cursor-pointer py-2">
+                               <input type="checkbox" name="is_active" checked={form.is_active} onChange={handleChange} className="w-4 h-4 accent-black" />
+                               <span className="text-xs font-black uppercase tracking-widest">Active and Visible</span>
+                            </label>
 
-                            <div className="flex gap-3 mt-4">
-                                <button type="submit" disabled={saving} className="admin-action-btn flex-1">{saving ? 'Saving...' : 'Save Offer'}</button>
-                                <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-full font-bold text-sm">Cancel</button>
-                            </div>
+                            <button type="submit" disabled={saving} className="w-full py-4 bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest">
+                                {saving ? 'Saving...' : 'Save Offer'}
+                            </button>
                         </form>
                     </div>
                 </div>

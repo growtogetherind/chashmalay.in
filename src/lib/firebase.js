@@ -2,7 +2,6 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, limit, serverTimestamp, increment, runTransaction } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,7 +17,6 @@ const app = initializeApp(firebaseConfig);
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);
 
 // --- Products ---
 export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatured, sortBy = 'created_at', adminFilter = false } = {}) => {
@@ -63,7 +61,12 @@ export const saveProduct = async (product, id = null) => {
     if (id) {
       await updateDoc(doc(db, "products", id), { ...product, updated_at: serverTimestamp() });
     } else {
-      await addDoc(collection(db, "products"), { ...product, created_at: serverTimestamp(), sku: `SKU-${Date.now()}` });
+      await addDoc(collection(db, "products"), { 
+        ...product, 
+        created_at: serverTimestamp(), 
+        sku: product.sku || `SKU-${Date.now()}`,
+        status: product.status || 'active'
+      });
     }
     return { error: null };
   } catch (error) { return { error }; }
@@ -76,17 +79,7 @@ export const deleteProduct = async (id) => {
   } catch (error) { return { error }; }
 };
 
-export const uploadProductImage = async (file, path) => {
-  if (!file) return { url: null, error: "No file provided" };
-  try {
-    const storageRef = ref(storage, `products/${path}/${file.name}`);
-    const snapshot = await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(snapshot.ref);
-    return { url, error: null };
-  } catch (error) {
-    return { url: null, error };
-  }
-};
+
 
 // --- Cart ---
 export const getCartItems = async (userId) => {
@@ -272,7 +265,7 @@ export const getAllOrders = async () => {
       const itemsQ = query(collection(db, "order_items"), where("order_id", "==", d.id));
       const itemsSnap = await getDocs(itemsQ);
       order.order_items = await Promise.all(itemsSnap.docs.map(async (itemDoc) => {
-        const item = itemDoc.data();
+        const item = { id: itemDoc.id, ...itemDoc.data() };
         let pSnap = await getDoc(doc(db, "products", item.product_id));
         if (!pSnap.exists() && item.product_id?.includes('_')) {
           const actualId = item.product_id.split('_')[1];
@@ -326,14 +319,14 @@ export const getDashboardStats = async () => {
       getDocs(collection(db, "profiles"))
     ]);
 
-    const orders = await Promise.all(ordersSnap.docs.map(async (d) => {
-      const order = { id: d.id, ...d.data() };
-      const pSnap = await getDoc(doc(db, "profiles", order.user_id));
-      order.profiles = pSnap.exists() ? pSnap.data() : null;
-      return order;
+    const ordersRaw = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const orders = await Promise.all(ordersRaw.map(async (o) => {
+       const pSnap = await getDoc(doc(db, "profiles", o.user_id));
+       return { ...o, profiles: pSnap.exists() ? pSnap.data() : null };
     }));
-
     const revenue = orders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+    const pendingOrders = orders.filter(o => o.status === 'pending').length;
+    const lowStockProducts = productsSnap.docs.filter(d => (d.data().stock_quantity || 0) <= 10).length;
 
     return {
       data: {
@@ -341,7 +334,9 @@ export const getDashboardStats = async () => {
         orderCount: orders.length,
         productCount: productsSnap.size,
         profileCount: profilesSnap.size,
-        revenue
+        revenue,
+        pendingOrders,
+        lowStockProducts
       },
       error: null
     };
@@ -350,10 +345,106 @@ export const getDashboardStats = async () => {
   }
 };
 
+// --- Categories ---
+export const getCategories = async () => {
+  try {
+    const q = query(collection(db, "categories"), orderBy("name", "asc"));
+    const snap = await getDocs(q);
+    return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
+  } catch (error) { return { data: [], error }; }
+};
+
+export const saveCategory = async (category, id = null) => {
+  try {
+    if (id) await updateDoc(doc(db, "categories", id), { ...category, updated_at: serverTimestamp() });
+    else await addDoc(collection(db, "categories"), { ...category, created_at: serverTimestamp() });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+export const deleteCategory = async (id) => {
+  try {
+    await deleteDoc(doc(db, "categories", id));
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+// --- Brands ---
+export const getBrands = async () => {
+  try {
+    const q = query(collection(db, "brands"), orderBy("name", "asc"));
+    const snap = await getDocs(q);
+    return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
+  } catch (error) { return { data: [], error }; }
+};
+
+export const saveBrand = async (brand, id = null) => {
+  try {
+    if (id) await updateDoc(doc(db, "brands", id), { ...brand, updated_at: serverTimestamp() });
+    else await addDoc(collection(db, "brands"), { ...brand, created_at: serverTimestamp() });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+export const deleteBrand = async (id) => {
+  try {
+    await deleteDoc(doc(db, "brands", id));
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+// --- Prescriptions ---
+export const getPrescriptions = async (userId = null) => {
+  try {
+    let q = collection(db, "prescriptions");
+    if (userId) q = query(q, where("user_id", "==", userId));
+    const snap = await getDocs(query(q, orderBy("created_at", "desc")));
+    return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
+  } catch (error) { return { data: [], error }; }
+};
+
+export const savePrescription = async (data, id = null) => {
+  try {
+    if (id) await updateDoc(doc(db, "prescriptions", id), { ...data, updated_at: serverTimestamp() });
+    else await addDoc(collection(db, "prescriptions"), { ...data, created_at: serverTimestamp() });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+// --- Settings ---
+export const getSettings = async () => {
+  try {
+    const docSnap = await getDoc(doc(db, "settings", "global"));
+    return { data: docSnap.exists() ? docSnap.data() : {}, error: null };
+  } catch (error) { return { data: {}, error }; }
+};
+
+export const saveSettings = async (settings) => {
+  try {
+    await setDoc(doc(db, "settings", "global"), { ...settings, updated_at: serverTimestamp() }, { merge: true });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+export const toggleUserBlock = async (userId, isBlocked) => {
+  try {
+    await updateDoc(doc(db, "profiles", userId), {
+      is_blocked: isBlocked,
+      updated_at: serverTimestamp()
+    });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
 export const getAllProfiles = async () => {
   try {
-    const querySnapshot = await getDocs(query(collection(db, "profiles"), orderBy("created_at", "desc")));
+    const querySnapshot = await getDocs(collection(db, "profiles"));
     const profiles = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Manual sort if needed
+    profiles.sort((a, b) => {
+      const dateA = a.created_at?.seconds || 0;
+      const dateB = b.created_at?.seconds || 0;
+      return dateB - dateA;
+    });
     return { data: profiles, error: null };
   } catch (error) { return { data: null, error }; }
 };
@@ -434,13 +525,19 @@ export const getCoupons = async () => {
   }
 };
 
-export const createCoupon = async (couponData) => {
+export const saveCoupon = async (couponData, id = null) => {
   try {
-    await addDoc(collection(db, "coupons"), {
+    const data = {
       ...couponData,
       code: couponData.code.toUpperCase(),
-      created_at: serverTimestamp()
-    });
+      updated_at: serverTimestamp()
+    };
+    if (id) {
+      await updateDoc(doc(db, "coupons", id), data);
+    } else {
+      data.created_at = serverTimestamp();
+      await addDoc(collection(db, "coupons"), data);
+    }
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -517,14 +614,17 @@ export const deleteCarouselItem = async (id) => {
   } catch (error) { return { error }; }
 };
 
-export const uploadGenericImage = async (file, folder) => {
-  if (!file) return { url: null, error: "No file provided" };
+
+
+export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
   try {
-    const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
-    const snapshot = await uploadBytes(storageRef, file);
-    return { url: await getDownloadURL(snapshot.ref), error: null };
-  } catch (error) { 
-    console.error("DEBUG: Upload Error:", error);
-    return { url: null, error: error.message || error }; 
+    const itemRef = doc(db, "order_items", itemId);
+    await updateDoc(itemRef, {
+      lens_selection: updatedLensSelection,
+    });
+    return { error: null };
+  } catch (error) {
+    return { error };
   }
 };
+

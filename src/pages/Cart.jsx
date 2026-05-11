@@ -122,8 +122,20 @@ const Cart = () => {
                         <ChevronDown size={16} />
                       </div>
                       
-                      <div className="selection-row power" onClick={() => toast('Final power will be confirmed via WhatsApp/Email')}>
-                        <span>Eye power for {user?.displayName || 'you'}</span>
+                      <div className="selection-row power" onClick={() => toast('Your power details are saved and will be reviewed after order.')}>
+                        <div className="flex flex-col gap-1">
+                          <span>Eye power for {user?.displayName || 'you'}</span>
+                          {item.lensSelection?.powerOption && (
+                            <span className="text-[10px] font-black uppercase text-primary-blue">
+                              Mode: {item.lensSelection.powerOption === 'later' ? 'Submit Later' : item.lensSelection.powerOption === 'upload' ? 'Prescription Uploaded' : 'Manual Entry'}
+                            </span>
+                          )}
+                          {item.lensSelection?.prescriptionUrl && (
+                            <div className="mt-1 w-20 h-12 rounded border border-gray-100 overflow-hidden">
+                              <img src={item.lensSelection.prescriptionUrl} alt="Prescription" className="w-full h-full object-cover" />
+                            </div>
+                          )}
+                        </div>
                         <ChevronDown size={16} />
                       </div>
 

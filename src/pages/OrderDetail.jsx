@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Check, Package, Truck, Home, MapPin, Receipt, ShieldCheck, Download } from 'lucide-react';
 import { getOrderById, updateOrderStatus } from '../lib/firebase';
 import { generateInvoice } from '../lib/invoiceGenerator';
+import { useConfirm } from '../context/ConfirmContext';
 import toast from 'react-hot-toast';
 import Loader from '../components/ui/Loader';
 import './OrderDetail.css';
@@ -18,6 +19,7 @@ const OrderDetail = () => {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { confirm } = useConfirm();
 
   const fetchOrder = () => {
     setLoading(true);
@@ -32,7 +34,7 @@ const OrderDetail = () => {
   }, [orderId]);
 
   const handleCancelOrder = async () => {
-    if (!window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) return;
+    if (!(await confirm({ title: 'Cancel Order', message: 'Are you sure you want to cancel this order? This action cannot be undone.' }))) return;
     
     setLoading(true);
     const { error } = await updateOrderStatus(orderId, 'cancelled');

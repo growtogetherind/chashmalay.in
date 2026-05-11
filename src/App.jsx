@@ -2,6 +2,7 @@ import { useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 import { ProtectedRoute, AdminRoute } from './components/ui/ProtectedRoute';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar.jsx';
@@ -34,6 +35,11 @@ const AdminCustomers = lazy(() => import('./pages/Admin/Customers.jsx'));
 const AdminCoupons   = lazy(() => import('./pages/Admin/Coupons.jsx'));
 const AdminOffers    = lazy(() => import('./pages/Admin/Offers.jsx'));
 const AdminCarousel  = lazy(() => import('./pages/Admin/Carousel.jsx'));
+const AdminCategories = lazy(() => import('./pages/Admin/Categories.jsx'));
+const AdminBrands     = lazy(() => import('./pages/Admin/Brands.jsx'));
+const AdminPrescriptions = lazy(() => import('./pages/Admin/Prescriptions.jsx'));
+const AdminReviews       = lazy(() => import('./pages/Admin/Reviews.jsx'));
+const AdminSettings      = lazy(() => import('./pages/Admin/Settings.jsx'));
 
 // ─── Page-level Suspense fallback ─────────────────────────────────────────────
 const PageLoader = () => (
@@ -55,8 +61,9 @@ function App() {
         touchMultiplier: 2,
         infinite: false 
       }}>
-        <AuthProvider>
-          <ScrollToTop />
+        <ConfirmProvider>
+          <AuthProvider>
+            <ScrollToTop />
             <ErrorBoundary>
               <div className="app-container">
                 {isLoading && <Loader onLoadingComplete={() => setIsLoading(false)} />}
@@ -87,6 +94,11 @@ function App() {
                   <Route path="/admin/coupons" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCoupons /></Suspense></AdminRoute>} />
                   <Route path="/admin/offers" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminOffers /></Suspense></AdminRoute>} />
                   <Route path="/admin/carousel" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCarousel /></Suspense></AdminRoute>} />
+                  <Route path="/admin/categories" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCategories /></Suspense></AdminRoute>} />
+                  <Route path="/admin/brands" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminBrands /></Suspense></AdminRoute>} />
+                  <Route path="/admin/prescriptions" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminPrescriptions /></Suspense></AdminRoute>} />
+                  <Route path="/admin/reviews" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminReviews /></Suspense></AdminRoute>} />
+                  <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminSettings /></Suspense></AdminRoute>} />
 
                   {/* ── Public / Customer routes ── */}
                   <Route path="*" element={
@@ -120,7 +132,8 @@ function App() {
                 </Routes>
               </div>
             </ErrorBoundary>
-        </AuthProvider>
+          </AuthProvider>
+        </ConfirmProvider>
       </ReactLenis>
     </Router>
   );

@@ -370,6 +370,132 @@
   color: var(--oa-accent);
 }
 
+/* Eye Power Step Styles */
+.power-option-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 1.25rem;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: left;
+}
+
+.power-option-card:hover {
+  border-color: var(--oa-accent);
+  background-color: #f8fafc;
+}
+
+.power-option-card.active {
+  border-color: var(--oa-accent);
+  background-color: #f0fdf4;
+}
+
+.power-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.power-icon-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.manual-form-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--oa-charcoal);
+  margin-bottom: 1rem;
+}
+
+.manual-form-subtitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--oa-accent);
+  margin-bottom: 0.75rem;
+}
+
+.checkbox-group {
+  margin-bottom: 1rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--oa-charcoal);
+  cursor: pointer;
+}
+
+.power-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.power-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--oa-accent);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.power-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--oa-charcoal);
+  outline: none;
+  background: white;
+}
+
+.power-select:focus {
+  border-color: var(--oa-accent);
+}
+
+.power-input-text {
+  width: 100%;
+  padding: 0.875rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  outline: none;
+}
+
+.power-input-text:focus {
+  border-color: var(--oa-accent);
+}
+
+.file-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+}
+
 @keyframes slideRight {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
