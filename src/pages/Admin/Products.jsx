@@ -276,7 +276,11 @@ const AdminProducts = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.price) { toast.error('Name and price are required.'); return; }
+    if (!form.name || !form.price || !form.category || !form.brand) { 
+      setActiveTab('basic');
+      toast.error('Name, Category, Brand and Price are required.'); 
+      return; 
+    }
 
     const isNew = !editing;
     const confirmMessage = isNew
@@ -586,7 +590,7 @@ const AdminProducts = () => {
               )}
 
               {activeTab === 'details' && (
-                <div className="space-y-10 pb-6 max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar">
+                <div className="space-y-10 pb-6 pr-4">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Who is it for?</label>
