@@ -43,6 +43,7 @@ const ProductDetail = () => {
   const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [activeColor, setActiveColor] = useState(0);
   const [activeSize, setActiveSize] = useState('M');
@@ -85,6 +86,10 @@ const ProductDetail = () => {
     fetchProduct();
     window.scrollTo(0, 0);
   }, [id]);
+
+  useEffect(() => {
+    setImageLoading(true);
+  }, [activeImage]);
 
   useEffect(() => {
     if (!product) return;
@@ -181,15 +186,22 @@ const ProductDetail = () => {
                 <button className="image-nav-btn next" onClick={nextImage}><ChevronRight size={20} /></button>
 
                 <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImage}
-                    src={product.gallery[activeImage]}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.05 }}
-                    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                    className="w-full max-w-[90%] h-auto object-contain"
-                  />
+                  <div className="relative w-full h-full flex items-center justify-center min-h-[400px]">
+                    {imageLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center z-10">
+                        <div className="w-12 h-12 border-4 border-slate-100 border-t-slate-900 rounded-full animate-spin" />
+                      </div>
+                    )}
+                    <motion.img
+                      key={activeImage}
+                      src={product.gallery[activeImage]}
+                      onLoad={() => setImageLoading(false)}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: imageLoading ? 0 : 1, scale: imageLoading ? 0.9 : 1 }}
+                      transition={{ duration: 0.5, ease: TRANSITIONS.ease }}
+                      className="w-full max-w-[90%] h-auto object-contain"
+                    />
+                  </div>
                 </AnimatePresence>
               </div>
             </div>
@@ -265,7 +277,17 @@ const ProductDetail = () => {
                 </div>
                 <div className="flex flex-wrap gap-4">
                   {(product.colors && product.colors.length > 0) ? product.colors.map((c, i) => (
-                    <button key={i} onClick={() => setActiveColor(i)} className={`relative w-14 h-14 rounded-full border-2 transition-all p-1.5 ${activeColor === i ? 'border-slate-900 scale-110 shadow-xl' : 'border-slate-100 hover:border-slate-300'}`}>
+                    <button 
+                      key={i} 
+                      onClick={() => {
+                        setActiveColor(i);
+                        if (c.image) {
+                          const galleryIdx = product.gallery.indexOf(c.image);
+                          if (galleryIdx !== -1) setActiveImage(galleryIdx);
+                        }
+                      }} 
+                      className={`relative w-14 h-14 rounded-full border-2 transition-all p-1.5 ${activeColor === i ? 'border-slate-900 scale-110 shadow-xl' : 'border-slate-100 hover:border-slate-300'}`}
+                    >
                       <div className="w-full h-full rounded-full border border-black/5" style={{ background: c.hex }} title={c.name} />
                       {activeColor === i && <div className="absolute -top-1 -right-1 w-5 h-5 bg-slate-900 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg"><CheckCircle size={10} /></div>}
                     </button>
