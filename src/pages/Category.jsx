@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ui/ProductCard';
 import { FadeIn, RevealText, StaggerContainer, StaggerItem, TRANSITIONS } from '../components/ui/Motion';
 
-import { getProducts } from '../lib/firebase';
+import { subscribeProducts } from '../lib/firebase';
 
 const FrameIcons = {
     // Shapes
@@ -15,11 +15,22 @@ const FrameIcons = {
     'Cat Eye': () => <svg viewBox="0 0 100 40" className="w-12 h-6" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 20c0-8 15-12 30-5 0 0 5 0 5 0s5 0 5 0c15-7 30-3 30 5-5 8-15 10-30 5 0 0-5 0-5 0s-5 0-5 0c-15 5-25 3-30-5z"/><path d="M45 20h10"/></svg>,
     Aviator: () => <svg viewBox="0 0 100 40" className="w-12 h-6" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 10c15 0 25 15 25 22 0 5-10 8-25 0-15-8-15-22 0-22zM85 10c-15 0-25 15-25 22 0 5 10 8 25 0 15-8 15-22 0-22z"/><path d="M40 15h20M40 22h20"/></svg>,
     Geometric: () => <svg viewBox="0 0 100 40" className="w-12 h-6" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 20l10-10h20l10 10-10 10h-20zM90 20l-10-10h-20l-10 10 10 10h20z"/><path d="M40 20h20"/></svg>,
-    
+
     // Types
     'Full Rim': () => <svg viewBox="0 0 100 40" className="w-12 h-6" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="30" cy="20" r="14"/><circle cx="70" cy="20" r="14"/><path d="M44 20h12"/></svg>,
     'Rimless': () => <svg viewBox="0 0 100 40" className="w-12 h-6" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2"><circle cx="30" cy="20" r="14"/><circle cx="70" cy="20" r="14"/><path d="M44 20h12" strokeDasharray="0"/></svg>,
     'Half Rim': () => <svg viewBox="0 0 100 40" className="w-12 h-6" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 20a14 14 0 0 1 28 0M56 20a14 14 0 0 1 28 0"/><path d="M44 20h12"/></svg>,
+};
+
+const COLOR_MAP = {
+    'Black': '#000000',
+    'Gold': '#D4AF37',
+    'Silver': '#C0C0C0',
+    'Gunmetal': '#2C3539',
+    'Transparent': '#F1F5F9',
+    'Brown': '#5C4033',
+    'Blue': '#1E3A8A',
+    'Rose Gold': '#B76E79'
 };
 
 const Category = () => {
@@ -37,48 +48,51 @@ const Category = () => {
   const categoryTitle = name ? name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'Eyeglasses';
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const unsubscribe = subscribeProducts({ category: null }, (data) => {
       setLoading(true);
-      // Fetch products. If 'all', fetch everything.
-      // If a specific category, we fetch all active and filter in JS to avoid case-sensitivity issues with Firestore
-      const { data, error } = await getProducts({ category: null }); 
-      
-      if (!error && data) {
         let filteredByCat = data;
         if (name && name !== 'all') {
           const normalizedName = name.replace(/-/g, ' ').toLowerCase();
-          filteredByCat = data.filter(p => 
-            p.category?.toLowerCase() === normalizedName || 
-            p.category?.toLowerCase().replace(/\s+/g, '-') === name
-          );
+          filteredByCat = data.filter(p => {
+            const pCat = p.category?.toLowerCase() || '';
+            // Handle variations: contact-lenses, contacts, contact lens
+            if (normalizedName.includes('contact') || normalizedName === 'contacts') {
+                return pCat.includes('contact');
+            }
+            return pCat === normalizedName || pCat.replace(/\s+/g, '-') === name;
+          });
         }
 
         // Real-time Inference Fallback
         const processedProducts = filteredByCat.map(p => ({
           ...p,
-          color: p.color || (p.name.toLowerCase().includes('gold') ? 'Gold' : 
-                           p.name.toLowerCase().includes('silver') ? 'Silver' : 
-                           p.name.toLowerCase().includes('black') ? 'Black' : 
-                           p.name.toLowerCase().includes('brown') ? 'Brown' : 
-                           p.name.toLowerCase().includes('blue') ? 'Blue' : 
-                           p.name.toLowerCase().includes('transparent') ? 'Transparent' : 
+          color: p.color || (p.name.toLowerCase().includes('gold') ? 'Gold' :
+                           p.name.toLowerCase().includes('silver') ? 'Silver' :
+                           p.name.toLowerCase().includes('black') ? 'Black' :
+                           p.name.toLowerCase().includes('brown') ? 'Brown' :
+                           p.name.toLowerCase().includes('blue') ? 'Blue' :
+                           p.name.toLowerCase().includes('transparent') ? 'Transparent' :
                            p.name.toLowerCase().includes('gunmetal') ? 'Gunmetal' : 'Black'),
-          frame_shape: p.frame_shape || p.shape || (p.name.toLowerCase().includes('aviator') ? 'Aviator' : 
-                                                   p.name.toLowerCase().includes('round') ? 'Round' : 
-                                                   p.name.toLowerCase().includes('square') ? 'Square' : 
-                                                   p.name.toLowerCase().includes('rectangle') ? 'Rectangle' : 
-                                                   p.name.toLowerCase().includes('geometric') ? 'Geometric' : 
+          frame_shape: p.frame_shape || p.shape || (p.name.toLowerCase().includes('aviator') ? 'Aviator' :
+                                                   p.name.toLowerCase().includes('round') ? 'Round' :
+                                                   p.name.toLowerCase().includes('square') ? 'Square' :
+                                                   p.name.toLowerCase().includes('rectangle') ? 'Rectangle' :
+                                                   p.name.toLowerCase().includes('geometric') ? 'Geometric' :
                                                    p.name.toLowerCase().includes('cat eye') ? 'Cat Eye' : 'Rectangle'),
-          frame_type: p.frame_type || (p.name.toLowerCase().includes('rimless') ? 'Rimless' : 
-                                      p.name.toLowerCase().includes('half') ? 'Half Rim' : 'Full Rim')
+          frame_type: p.frame_type || (p.name.toLowerCase().includes('rimless') ? 'Rimless' :
+                                      p.name.toLowerCase().includes('half') ? 'Half Rim' : 'Full Rim'),
+          theme: p.theme || (p.name.toLowerCase().includes('classic') ? 'Classic' :
+                            p.name.toLowerCase().includes('luxury') ? 'Luxury' :
+                            p.name.toLowerCase().includes('modern') ? 'Modern' :
+                            p.name.toLowerCase().includes('vintage') ? 'Vintage' :
+                            p.name.toLowerCase().includes('minimal') ? 'Minimalist' : 'Modern')
         }));
         setProducts(processedProducts);
         setFilteredProducts(processedProducts);
-      }
       setLoading(false);
-    };
-    fetchProducts();
+    }, () => setLoading(false));
     window.scrollTo(0, 0);
+    return unsubscribe;
   }, [name]);
 
   const handleThemeChange = (theme) => {
@@ -125,53 +139,45 @@ const Category = () => {
     setFilteredProducts(result);
   }, []);
 
-  // Memoized counts for performance
-  const filterCounts = React.useMemo(() => {
-    const counts = {
-      types: {},
-      shapes: {},
-      colors: {},
-      themes: {}
-    };
+  // Faceted filtering counts
+  const getFacetedCount = React.useCallback((attr, value, currentFilters) => {
+    const { shapes, types, colors, themes } = currentFilters;
 
-    products.forEach(p => {
-      const type = p.frame_type;
-      const shape = p.frame_shape || p.shape;
-      const color = p.color;
-      const theme = p.theme;
+    return products.filter(p => {
+        const matchesShape = attr === 'shape' ? true : (shapes.length === 0 || shapes.includes(p.frame_shape || p.shape));
+        const matchesType = attr === 'type' ? true : (types.length === 0 || types.includes(p.frame_type));
+        const matchesColor = attr === 'color' ? true : (colors.length === 0 || colors.includes(p.color));
+        const matchesTheme = attr === 'theme' ? true : (themes.length === 0 || themes.includes(p.theme));
 
-      if (type) counts.types[type] = (counts.types[type] || 0) + 1;
-      if (shape) counts.shapes[shape] = (counts.shapes[shape] || 0) + 1;
-      if (color) counts.colors[color] = (counts.colors[color] || 0) + 1;
-      if (theme) counts.themes[theme] = (counts.themes[theme] || 0) + 1;
-    });
+        const pValue = attr === 'shape' ? (p.frame_shape || p.shape) :
+                       attr === 'type' ? p.frame_type :
+                       attr === 'color' ? p.color : p.theme;
 
-    return counts;
+        return matchesShape && matchesType && matchesColor && matchesTheme && pValue === value;
+    }).length;
   }, [products]);
 
   return (
     <div className="bg-background text-primary min-h-screen relative overflow-x-hidden">
       {/* Editorial Header */}
-      <header className="pt-32 pb-20 border-b border-divider">
+      <header className="pt-6 pb-4 border-b border-divider">
         <div className="container">
            <div className="flex flex-col md:flex-row justify-between items-end gap-8">
               <div>
-                 <FadeIn delay={0}>
-                    <span className="text-xs font-sans font-semibold uppercase tracking-[0.3em] text-accent mb-6 block">
-                       Collection / Archive
-                    </span>
-                 </FadeIn>
-                  <h1 className="text-5xl md:text-7xl leading-tight tracking-tighter text-heading break-words font-medium">
-                     <RevealText text={categoryTitle.toUpperCase()} delay={0.1} />
-                     <RevealText text="." delay={0.2} className="italic text-body" />
-                  </h1>
+                <FadeIn delay={0}>
+                  <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-accent mb-2 block">
+                    Collection / Archive
+                  </span>
+                </FadeIn>
+                <h1 className="text-3xl md:text-5xl leading-tight tracking-tighter text-heading break-words font-medium uppercase">
+                  <RevealText text={categoryTitle} delay={0.1} />
+                </h1>
               </div>
-              
-               <FadeIn delay={0.3} className="flex flex-col items-start md:items-end gap-4 text-xs font-sans font-semibold uppercase tracking-widest text-body">
-                  <span>{filteredProducts.length} Objects Found</span>
-                  <div className="w-12 h-px bg-divider" />
+
+               <FadeIn delay={0.3} className="flex flex-col items-start md:items-end gap-2 text-[10px] font-sans font-semibold uppercase tracking-widest text-body">
+                  <span>{filteredProducts.length} Objects</span>
                   <div className="flex items-center gap-2">
-                     <span>Sort</span>
+                     <span className="opacity-50">Sort</span>
                      <select
                        className="bg-transparent border-none outline-none text-heading font-bold cursor-pointer"
                        value={sortBy}
@@ -188,38 +194,39 @@ const Category = () => {
         </div>
       </header>
 
-      <div className="container py-20">
+
+      <div className="container py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
            {/* Minimal Sidebar */}
             {/* Advanced Filters Sidebar */}
             <aside className="hidden lg:block lg:col-span-3">
                <FadeIn delay={0.4} className="sticky top-32 space-y-12">
-                  
+
                   {/* Frame Type */}
                   <div>
-                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Frame Type</h4>
+                    <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Type</h4>
                     <div className="grid grid-cols-2 gap-3">
                         {['Full Rim', 'Rimless', 'Half Rim'].map(type => {
                             const Icon = FrameIcons[type];
                             const isSelected = selectedTypes.includes(type);
                             // Count across total results, respecting other category filters
-                            const count = filterCounts.types[type] || 0;
+                            const count = getFacetedCount('type', type, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
 
                             return (
-                                <button 
+                                <button
                                     key={type}
                                     onClick={() => handleTypeChange(type)}
                                     disabled={count === 0 && !isSelected}
-                                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 group ${
-                                        isSelected ? 'border-primary bg-primary text-white scale-[1.02]' : 'border-divider hover:border-accent text-body hover:text-primary'
-                                    } ${count === 0 && !isSelected ? 'opacity-30 grayscale cursor-not-allowed' : ''}`}
+                                    className={`flex flex-col items-center justify-center p-5 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
+                                        isSelected ? 'border-primary bg-primary text-white scale-[1.05] shadow-xl shadow-primary/20' : 'border-slate-200 hover:border-primary/30 text-slate-500 hover:text-primary hover:bg-slate-50'
+                                    } ${count === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
                                 >
-                                    <div className={`mb-2 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
+                                    <div className={`mb-3 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
                                         <Icon />
                                     </div>
                                     <div className="flex flex-col items-center">
-                                       <span className="text-[9px] font-bold uppercase tracking-widest">{type}</span>
-                                       <span className="text-[8px] opacity-40 font-mono">({count})</span>
+                                       <span className="text-[11px] font-black uppercase tracking-widest leading-none">{type}</span>
+                                       <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({getFacetedCount('type', type, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes })})</span>
                                     </div>
                                 </button>
                             );
@@ -229,29 +236,28 @@ const Category = () => {
 
                   {/* Frame Shape */}
                   <div>
-                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Frame Shape</h4>
+                    <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Shape</h4>
                     <div className="grid grid-cols-2 gap-3">
                         {['Round', 'Square', 'Rectangle', 'Cat Eye', 'Geometric', 'Aviator'].map(shape => {
                             const Icon = FrameIcons[shape];
                             const isSelected = selectedShapes.includes(shape);
-                             // Count across total results, respecting other category filters
-                             const count = filterCounts.shapes[shape] || 0;
+                             const count = getFacetedCount('shape', shape, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
 
                             return (
-                                <button 
+                                <button
                                     key={shape}
                                     onClick={() => handleShapeChange(shape)}
                                     disabled={count === 0 && !isSelected}
-                                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 group ${
-                                        isSelected ? 'border-primary bg-primary text-white scale-[1.02]' : 'border-divider hover:border-accent text-body hover:text-primary'
-                                    } ${count === 0 && !isSelected ? 'opacity-30 grayscale cursor-not-allowed' : ''}`}
+                                    className={`flex flex-col items-center justify-center p-5 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
+                                        isSelected ? 'border-primary bg-primary text-white scale-[1.05] shadow-xl shadow-primary/20' : 'border-slate-200 hover:border-primary/30 text-slate-500 hover:text-primary hover:bg-slate-50'
+                                    } ${count === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
                                 >
-                                    <div className={`mb-2 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
+                                    <div className={`mb-3 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
                                         <Icon />
                                     </div>
                                     <div className="flex flex-col items-center">
-                                       <span className="text-[9px] font-bold uppercase tracking-widest">{shape}</span>
-                                       <span className="text-[8px] opacity-40 font-mono">({count})</span>
+                                       <span className="text-[11px] font-black uppercase tracking-widest leading-none">{shape}</span>
+                                       <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({count})</span>
                                     </div>
                                 </button>
                             );
@@ -261,33 +267,28 @@ const Category = () => {
 
                   {/* Frame Colors */}
                   <div>
-                    <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Frame Color</h4>
+                    <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Color</h4>
                     <div className="space-y-4 max-h-60 overflow-y-auto pr-4 custom-scrollbar">
                         {['Black', 'Gold', 'Silver', 'Gunmetal', 'Transparent', 'Brown', 'Blue', 'Rose Gold'].map(color => {
                             const isSelected = selectedColors.includes(color);
-                            // Predictive count
-                            const count = products.filter(p => {
-                                const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
-                                const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
-                                return matchesShape && matchesType && p.color === color;
-                            }).length;
+                            const count = getFacetedCount('color', color, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
 
                             return (
-                                <button 
+                                <button
                                     key={color}
                                     onClick={() => handleColorChange(color)}
                                     disabled={count === 0 && !isSelected}
-                                    className={`flex items-center justify-between w-full group transition-colors ${count === 0 && !isSelected ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                    className={`flex items-center justify-between w-full group transition-all p-3 rounded-xl hover:bg-slate-100/50 ${count === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-4 h-4 rounded-full border transition-all flex items-center justify-center ${isSelected ? 'border-accent bg-accent' : 'border-divider'}`}>
-                                            {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center shadow-inner ${isSelected ? 'border-primary' : 'border-slate-200 group-hover:border-primary'}`} style={{ backgroundColor: COLOR_MAP[color] }}>
+                                            {isSelected && <div className={`w-1.5 h-1.5 rounded-full ${color === 'Black' || color === 'Blue' || color === 'Brown' ? 'bg-white' : 'bg-black'}`} />}
                                         </div>
-                                        <span className={`text-[11px] font-medium tracking-wide transition-colors ${isSelected ? 'text-accent' : 'text-body group-hover:text-primary'}`}>
+                                        <span className={`text-[12px] font-black tracking-wide transition-colors ${isSelected ? 'text-primary' : 'text-slate-600 group-hover:text-primary'}`}>
                                             {color}
                                         </span>
                                     </div>
-                                    <span className="text-[9px] text-secondary/40 font-mono">({count})</span>
+                                    <span className={`text-[11px] font-mono font-black ${isSelected ? 'text-primary' : 'text-slate-400'}`}>({count})</span>
                                 </button>
                             );
                         })}
@@ -296,23 +297,20 @@ const Category = () => {
 
                 {/* Themes */}
                 <div className="pt-8">
-                  <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-body mb-6 border-b border-divider pb-2">Style Theme</h4>
-                  <div className="grid grid-cols-2 gap-2">
+                  <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Style Theme</h4>
+                  <div className="grid grid-cols-2 gap-3">
                       {['Classic', 'Modern', 'Luxury', 'Minimalist', 'Sport', 'Vintage'].map(theme => {
                           const isSelected = selectedThemes.includes(theme);
-                          const count = products.filter(p => {
-                               const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
-                               const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
-                               const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-                               return matchesShape && matchesType && matchesColor && p.theme === theme;
-                           }).length;
+                          const count = getFacetedCount('theme', theme, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+
                           return (
-                              <button 
+                              <button
                                   key={theme}
                                   onClick={() => handleThemeChange(theme)}
-                                  className={`px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider border transition-all ${
-                                      isSelected ? 'bg-primary text-white border-primary' : 'border-divider text-body hover:border-accent hover:text-primary'
-                                  }`}
+                                  disabled={count === 0 && !isSelected}
+                                  className={`px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 transition-all shadow-sm ${
+                                      isSelected ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'border-slate-200 text-slate-500 hover:border-primary/30 hover:text-primary hover:bg-slate-50'
+                                  } ${count === 0 && !isSelected ? 'opacity-10 cursor-not-allowed' : ''}`}
                               >
                                   {theme} ({count})
                               </button>
@@ -348,7 +346,7 @@ const Category = () => {
       <AnimatePresence>
         {isMobileFilterOpen && (
           <>
-            <motion.div 
+            <motion.div
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
@@ -356,7 +354,7 @@ const Category = () => {
                onClick={() => setIsMobileFilterOpen(false)}
                className="fixed inset-0 bg-primary/20 backdrop-blur-md z-[2000]"
             />
-            <motion.div 
+            <motion.div
                initial={{ x: '-100%' }}
                animate={{ x: 0 }}
                exit={{ x: '-100%' }}
@@ -375,18 +373,16 @@ const Category = () => {
                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Type</h4>
                       <div className="grid grid-cols-2 gap-3">
                          {['Full Rim', 'Rimless', 'Half Rim'].map(type => {
-                            const Icon = FrameIcons[type];
                             const isSelected = selectedTypes.includes(type);
-                            const count = filterCounts.types[type] || 0;
+                            const count = getFacetedCount('type', type, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
                             return (
-                                <button 
-                                   key={type} 
+                                <button
+                                   key={type}
                                    onClick={() => handleTypeChange(type)}
                                    disabled={count === 0 && !isSelected}
-                                   className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'} ${count === 0 && !isSelected ? 'opacity-30' : ''}`}
+                                   className={`p-4 border rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${isSelected ? 'bg-primary text-white border-primary' : 'border-divider text-secondary'} ${count === 0 && !isSelected ? 'opacity-30' : ''}`}
                                 >
-                                   <div className={`mb-2 ${isSelected ? 'text-white' : 'text-primary'}`}><Icon /></div>
-                                   <span className="text-[9px] font-bold uppercase tracking-widest">{type} ({count})</span>
+                                   {type} ({count})
                                 </button>
                             );
                          })}
@@ -399,10 +395,10 @@ const Category = () => {
                          {['Round', 'Square', 'Rectangle', 'Cat Eye', 'Geometric', 'Aviator'].map(shape => {
                             const Icon = FrameIcons[shape];
                             const isSelected = selectedShapes.includes(shape);
-                             const count = filterCounts.shapes[shape] || 0;
+                             const count = getFacetedCount('shape', shape, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
                             return (
-                                <button 
-                                   key={shape} 
+                                <button
+                                   key={shape}
                                    onClick={() => handleShapeChange(shape)}
                                    disabled={count === 0 && !isSelected}
                                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'} ${count === 0 && !isSelected ? 'opacity-30' : ''}`}
@@ -416,38 +412,36 @@ const Category = () => {
                    </div>
 
                    <div>
-                      <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Color</h4>
-                      <div className="grid grid-cols-2 gap-3">
-                         {['Black', 'Gold', 'Silver', 'Gunmetal', 'Transparent', 'Brown', 'Blue', 'Rose Gold'].map(color => {
-                            const isSelected = selectedColors.includes(color);
-                            const count = products.filter(p => {
-                                const matchesShape = selectedShapes.length === 0 || selectedShapes.includes(p.frame_shape);
-                                const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.frame_type);
-                                return matchesShape && matchesType && p.color === color;
-                            }).length;
-                            return (
-                                <button 
-                                   key={color} 
-                                   onClick={() => handleColorChange(color)}
-                                   disabled={count === 0 && !isSelected}
-                                   className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'} ${count === 0 && !isSelected ? 'opacity-30' : ''}`}
-                                >
-                                   <span className="text-[10px] font-bold uppercase tracking-widest">{color} ({count})</span>
-                                </button>
-                            );
-                         })}
-                      </div>
-                   </div>
+                       <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Color</h4>
+                       <div className="grid grid-cols-2 gap-3">
+                          {['Black', 'Gold', 'Silver', 'Gunmetal', 'Transparent', 'Brown', 'Blue', 'Rose Gold'].map(color => {
+                             const isSelected = selectedColors.includes(color);
+                             const count = getFacetedCount('color', color, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+                             return (
+                                 <button
+                                    key={color}
+                                    onClick={() => handleColorChange(color)}
+                                    disabled={count === 0 && !isSelected}
+                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white scale-[1.05]' : 'border-slate-200 text-slate-600'} ${count === 0 && !isSelected ? 'opacity-10' : ''}`}
+                                 >
+                                    <div className={`w-5 h-5 rounded-full border mb-2`} style={{ backgroundColor: COLOR_MAP[color] }} />
+                                    <span className="text-[11px] font-black uppercase tracking-widest leading-none">{color}</span>
+                                    <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({count})</span>
+                                 </button>
+                             );
+                          })}
+                       </div>
+                    </div>
 
                    <div>
                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Style Theme</h4>
                       <div className="grid grid-cols-2 gap-3">
                          {['Classic', 'Modern', 'Luxury', 'Minimalist', 'Sport', 'Vintage'].map(theme => {
                             const isSelected = selectedThemes.includes(theme);
-                            const count = filterCounts.themes[theme] || 0;
+                            const count = getFacetedCount('theme', theme, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
                             return (
-                                <button 
-                                   key={theme} 
+                                <button
+                                   key={theme}
                                    onClick={() => handleThemeChange(theme)}
                                    disabled={count === 0 && !isSelected}
                                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'} ${count === 0 && !isSelected ? 'opacity-30' : ''}`}
@@ -459,7 +453,7 @@ const Category = () => {
                       </div>
                    </div>
 
-                   <button 
+                   <button
                      onClick={() => setIsMobileFilterOpen(false)}
                      className="w-full bg-primary text-white py-6 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl"
                    >

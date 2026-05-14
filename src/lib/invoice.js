@@ -6,42 +6,48 @@ export const generateInvoice = (order) => {
   const pageWidth = doc.internal.pageSize.getWidth();
 
   // Header
-  doc.setFontSize(22);
+  try {
+    doc.addImage("/logo.png", "PNG", 20, 10, 30, 30); // Add logo
+  } catch (e) {
+    console.error("Logo not found", e);
+  }
+
+  doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(30, 63, 138); // Primary Blue
-  doc.text("CHASHMALY", 20, 25);
+  doc.text("CHASHMALAY.IN", 20, 50); // Move down for logo
   
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.setFont("helvetica", "normal");
-  doc.text("Premium Optical & Eyewear Store", 20, 32);
-  doc.text("GSTIN: 27AABCM1234E1Z5", 20, 37);
+  doc.text("Premium Optical & Eyewear Store", 20, 57);
+  doc.text("GSTIN: 27AABCM1234E1Z5", 20, 62);
 
   doc.setFontSize(20);
   doc.setTextColor(0);
-  doc.text("INVOICE", pageWidth - 60, 25);
-
+  doc.text("INVOICE", pageWidth - 60, 50); // Shifted down
+  
   // Divider
   doc.setDrawColor(230);
-  doc.line(20, 45, pageWidth - 20, 45);
+  doc.line(20, 70, pageWidth - 20, 70); // Shifted down
 
   // Info
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text("Bill To:", 20, 55);
+  doc.text("Bill To:", 20, 80); // Shifted down
   doc.setFont("helvetica", "normal");
-  doc.text(order.shipping_address?.name || "Customer", 20, 60);
-  doc.text(order.shipping_address?.line1 || "", 20, 65);
-  doc.text(`${order.shipping_address?.city}, ${order.shipping_address?.state} - ${order.shipping_address?.pincode}`, 20, 70);
-  doc.text(`Phone: ${order.shipping_address?.phone}`, 20, 75);
+  doc.text(order.shipping_address?.name || "Customer", 20, 85);
+  doc.text(order.shipping_address?.line1 || "", 20, 90);
+  doc.text(`${order.shipping_address?.city}, ${order.shipping_address?.state} - ${order.shipping_address?.pincode}`, 20, 95);
+  doc.text(`Phone: ${order.shipping_address?.phone}`, 20, 100);
 
   doc.setFont("helvetica", "bold");
-  doc.text("Order Details:", pageWidth - 80, 55);
+  doc.text("Order Details:", pageWidth - 80, 80); // Shifted down
   doc.setFont("helvetica", "normal");
-  doc.text(`Invoice No: INV-${order.id?.slice(0, 8).toUpperCase()}`, pageWidth - 80, 60);
-  doc.text(`Date: ${new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleDateString()}`, pageWidth - 80, 65);
-  doc.text(`Payment: ${order.payment_method || 'Online'}`, pageWidth - 80, 70);
-  doc.text(`Status: ${order.status?.toUpperCase()}`, pageWidth - 80, 75);
+  doc.text(`Invoice No: INV-${order.id?.slice(0, 8).toUpperCase()}`, pageWidth - 80, 85);
+  doc.text(`Date: ${new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleDateString()}`, pageWidth - 80, 90);
+  doc.text(`Payment: ${order.payment_method || 'Online'}`, pageWidth - 80, 95);
+  doc.text(`Status: ${order.status?.toUpperCase()}`, pageWidth - 80, 100);
 
   // Table
   const tableData = order.order_items.map((item, index) => [
@@ -53,7 +59,7 @@ export const generateInvoice = (order) => {
   ]);
 
   autoTable(doc, {
-    startY: 85,
+    startY: 110, // Shifted down
     head: [['#', 'Item Description', 'Unit Price', 'Qty', 'Total']],
     body: tableData,
     headStyles: { fillColor: [30, 63, 138], textColor: 255, fontStyle: 'bold' },

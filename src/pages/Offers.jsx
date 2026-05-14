@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, Sparkles, Copy, ChevronRight } from 'lucide-react';
-import { getOffers } from '../lib/firebase';
+import { subscribeOffers } from '../lib/firebase';
 import toast from 'react-hot-toast';
 import './Category.css'; // Reuse some grid styles
 
@@ -10,13 +10,12 @@ const Offers = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadOffers = async () => {
-            const { data } = await getOffers();
+        const unsubscribe = subscribeOffers((data) => {
             setOffers(data?.filter(o => o.is_active) || []);
             setLoading(false);
-        };
-        loadOffers();
+        }, () => setLoading(false));
         window.scrollTo(0, 0);
+        return unsubscribe;
     }, []);
 
     const copyCode = (code) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tag, Zap, Gift, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getOffers } from '../../lib/firebase';
+import { subscribeOffers } from '../../lib/firebase';
 
 const OffersSection = () => {
   const [offers, setOffers] = useState([]);
@@ -9,12 +9,11 @@ const OffersSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchOffers = async () => {
-      const { data } = await getOffers();
+    const unsubscribe = subscribeOffers((data) => {
       setOffers(data?.filter(o => o.is_active) || []);
       setLoading(false);
-    };
-    fetchOffers();
+    }, () => setLoading(false));
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

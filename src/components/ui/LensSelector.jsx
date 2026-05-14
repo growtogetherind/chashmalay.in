@@ -154,29 +154,20 @@ const LensSelector = ({ isOpen, onClose, product }) => {
       <div className="lens-modal-container animate-slide-right">
         <header className="lens-modal-header">
           <div className="header-info">
-            <h2>Select Lenses</h2>
-            <p>{product?.name}</p>
+            <h2 className="text-sm font-black uppercase tracking-[0.2em]">{product?.name || 'Configuration'}</h2>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Select your vision protocol</p>
           </div>
-          <button className="close-modal" onClick={onClose}><X size={24} /></button>
+          <button className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-50 text-slate-900 hover:bg-slate-100 transition-colors" onClick={onClose}><X size={20} /></button>
         </header>
 
         <div className="lens-modal-steps">
-          <div className={`step-item ${step === 1 ? 'active' : step > 1 ? 'completed' : ''}`}>
-            <span className="step-circle">{step > 1 ? <Check size={14} /> : '1'}</span>
-            Vision Type
-          </div>
-          <div className={`step-item ${step === 2 ? 'active' : step > 2 ? 'completed' : ''}`}>
-             <span className="step-circle">{step > 2 ? <Check size={14} /> : '2'}</span>
-             Lens Package
-          </div>
-          <div className={`step-item ${step === 3 ? 'active' : step > 3 ? 'completed' : ''}`}>
-             <span className="step-circle">{step > 3 ? <Check size={14} /> : '3'}</span>
-             Add Power
-          </div>
-          <div className={`step-item ${step === 4 ? 'active' : ''}`}>
-             <span className="step-circle">4</span>
-             Summary
-          </div>
+          {[1, 2, 3, 4].map((s) => (
+            <div key={s} className={`step-item ${step === s ? 'active' : step > s ? 'completed' : ''}`}>
+              <div className="step-circle">
+                {step > s ? <Check size={12} strokeWidth={3} /> : s}
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="lens-modal-content" data-lenis-prevent>

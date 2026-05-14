@@ -1,100 +1,119 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Heart } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import './ProductCard.css';
+import { Heart, ShoppingCart, Star } from 'lucide-react';
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Parse prices and calculate discount
   const price = parseInt((product.consumersPrice || product.price || "0").toString().replace(/,/g, ''));
-  const originalPrice = product.originalPrice ? parseInt(product.originalPrice.toString().replace(/,/g, '')) : Math.round(price * 1.3);
+  const originalPrice = product.original_price || product.originalPrice
+    ? parseInt((product.original_price || product.originalPrice).toString().replace(/,/g, ''))
+    : Math.round(price * 1.3);
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+
+  const frontImage = product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image';
+  const hoverImage = product.images?.model || product.model_image || product.images?.gallery?.[1] || frontImage;
 
   const colors = product.colors || [];
 
   return (
-    <Link 
-      to={`/product/${product.id}`} 
-      className="product-card-oa group block"
+    <div
+      className="group bg-white border border-gray-100 rounded overflow-hidden hover:shadow-md transition-shadow"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="product-card-image-wrapper aspect-[4/3] p-6 relative overflow-hidden">
-        {/* Wishlist Button - Handled with preventDefault to avoid navigation */}
-        <button 
-          className="wishlist-btn z-20"
+      {/* Image Area */}
+      <Link to={`/product/${product.id}`} className="block relative overflow-hidden aspect-[4/3] bg-gray-50">
+        {/* Discount Badge */}
+        {discountPercent > 0 && (
+          <span className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+            -{discountPercent}%
+          </span>
+        )}
+
+        {/* Wishlist */}
+        <button
+          className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-600 hover:border-red-200 transition-colors shadow-sm"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setIsWishlisted(!isWishlisted);
           }}
         >
-          <Heart 
-            size={20} 
-            fill={isWishlisted ? "#ff4d4d" : "none"} 
-            color={isWishlisted ? "#ff4d4d" : "#1a1a1a"} 
-            strokeWidth={1.5} 
+          <Heart
+            size={13}
+            fill={isWishlisted ? '#dc2626' : 'none'}
+            className={isWishlisted ? 'text-red-600' : ''}
           />
         </button>
 
-        {/* Rating Badge */}
-        {(product.rating || product.reviewCount > 0 || (product.reviews && product.reviews.length > 0)) && (
-          <div className="rating-badge z-10">
-            {product.rating || '5.0'} <Star size={10} fill="currentColor" /> 
-            <div className="w-px h-2.5 bg-divider mx-0.5" />
-            <span className="rating-count">{product.reviewCount || product.reviews?.length || 0}</span>
-          </div>
-        )}
-        
-        {/* Simplified Image - No AnimatePresence for faster response */}
-        <img 
-          src={isHovered ? (product.images?.model || product.model_image || product.images?.gallery?.[1] || product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/800x600/f8fafc/94a3b8?text=No+Image') : (product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/800x600/f8fafc/94a3b8?text=No+Image')} 
-          alt={product.name} 
-          className="w-full h-full object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+        {/* Product Image */}
+        <img
+          src={isHovered ? hoverImage : frontImage}
+          alt={product.name}
+          className="w-full h-full object-contain mix-blend-multiply p-3 transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
-          onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/800x600/f8fafc/94a3b8?text=No+Image'; }}
+          onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image'; }}
         />
 
-        {/* New Arrival Badge */}
-        {(product.isNew || product.is_new) && (
-          <div className="absolute top-4 left-4 z-10">
-            <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-accent px-2 py-1 bg-white/80 backdrop-blur-sm rounded border border-accent/20">
-              New
-            </span>
+        {/* Quick Add overlay on hover */}
+        <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2 bg-white/90 py-2 text-xs font-semibold text-gray-700 transition-all duration-200 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+          <button
+            className="flex items-center gap-1.5 bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-red-700 transition-colors"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // In a real app, this might trigger a quick-add function
+            }}
+          >
+            <ShoppingCart size={12} /> ADD TO CART
+          </button>
+        </div>
+      </Link>
+
+      {/* Info Area */}
+      <div className="p-3">
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
+          {product.brand || 'Chashmaly'}
+        </p>
+        <Link to={`/product/${product.id}`} className="block">
+          <h4 className="text-sm font-semibold text-gray-800 line-clamp-1 hover:text-red-600 transition-colors mb-1">
+            {product.name}
+          </h4>
+        </Link>
+        <p className="text-[10px] text-gray-400 mb-2 capitalize">{product.frame_shape || product.frameShape || product.category || 'Eyeglasses'}</p>
+
+        {/* Colors */}
+        {colors.length > 0 && (
+          <div className="flex gap-1 mb-2">
+            {colors.slice(0, 4).map((c, i) => (
+              <span
+                key={i}
+                className="w-3 h-3 rounded-full border border-gray-200 inline-block"
+                style={{ backgroundColor: c.hex || c }}
+                title={c.name || c}
+              />
+            ))}
           </div>
         )}
-      </div>
-      
-      <div className="product-info-v2">
-        <h4 className="product-brand">{product.brand || 'Chashmaly'}</h4>
-        <p className="product-details-subtitle truncate">
-          {product.name} • {product.category || 'Eyewear'} • {product.size || 'Medium'}
-        </p>
 
-        {/* Color Swatches */}
-        <div className="color-swatches">
-          {(product.colors || []).slice(0, 3).map((c, i) => (
-            <div 
-              key={i} 
-              className="color-dot" 
-              style={{ backgroundColor: c.hex || '#1a1a1a' }} 
-            />
-          ))}
-          {product.colors?.length > 3 && (
-            <span className="color-more">+{product.colors.length - 3}</span>
-          )}
-        </div>
-
-        <div className="pricing-row">
-          <span className="current-price">₹{price.toLocaleString()}</span>
-          <span className="original-price">₹{originalPrice.toLocaleString()}</span>
-          <span className="discount-tag">({discountPercent}% OFF)</span>
+        {/* Price Row */}
+        <div className="flex items-center justify-between mt-1">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm font-bold text-gray-900">₹{price.toLocaleString()}</span>
+            {originalPrice > price && (
+              <span className="text-xs text-gray-400 line-through">₹{originalPrice.toLocaleString()}</span>
+            )}
+          </div>
+          {/* Stock indicator dots (like the reference) */}
+          <div className="flex gap-1 items-center">
+            <span className="w-2 h-2 rounded-full bg-green-500 inline-block" title="In Stock" />
+            <span className="w-2 h-2 rounded-full bg-red-400 inline-block" title="Limited" />
+          </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

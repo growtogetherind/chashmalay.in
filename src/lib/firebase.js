@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, limit, serverTimestamp, increment, runTransaction } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, limit, serverTimestamp, increment, runTransaction, onSnapshot } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,16 +18,99 @@ export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : nul
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
+const toNumber = (value, fallback = 0) => {
+  if (value === null || value === undefined || value === '') return fallback;
+  const parsed = Number(value.toString().replace(/,/g, ''));
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const mapDoc = (snapshot) => ({ id: snapshot.id, ...snapshot.data() });
+
+const byCreatedDesc = (a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0);
+const byNameAsc = (a, b) => (a.name || '').localeCompare(b.name || '');
+
+export const getProductImage = (product = {}) => (
+  product.images?.front ||
+  product.frame_image ||
+  product.frameImage ||
+  product.image ||
+  product.images?.gallery?.[0] ||
+  product.gallery?.[0] ||
+  ''
+);
+
+export const normalizeProduct = (product = {}) => {
+  const gallery = Array.isArray(product.images?.gallery)
+    ? product.images.gallery.filter(Boolean)
+    : Array.isArray(product.gallery)
+      ? product.gallery.filter(Boolean)
+      : [];
+  const front = product.images?.front || product.frame_image || product.frameImage || product.image || gallery[0] || '';
+  const side = product.images?.side || '';
+  const model = product.images?.model || product.model_image || '';
+  const zoom = product.images?.zoom || '';
+
+  return {
+    ...product,
+    price: toNumber(product.price ?? product.consumersPrice),
+    original_price: product.original_price ? toNumber(product.original_price) : (product.originalPrice ? toNumber(product.originalPrice) : null),
+    discount_price: product.discount_price ? toNumber(product.discount_price) : null,
+    stock_quantity: toNumber(product.stock_quantity, 0),
+    is_active: product.is_active !== false,
+    available_sizes: Array.isArray(product.available_sizes) && product.available_sizes.length ? product.available_sizes : ['M'],
+    available_lenses: Array.isArray(product.available_lenses) ? product.available_lenses : [],
+    colors: Array.isArray(product.colors) ? product.colors : [],
+    images: {
+      ...(product.images || {}),
+      front,
+      side,
+      model,
+      zoom,
+      gallery,
+    },
+    frame_image: front,
+    frameImage: front,
+    gallery: Array.from(new Set([front, side, model, zoom, ...gallery].filter(Boolean))),
+  };
+};
+
+const productPayload = (product = {}) => {
+  const normalized = normalizeProduct(product);
+  const { id, gallery, frameImage, originalPrice, consumersPrice, ...payload } = normalized;
+  return payload;
+};
+
+const subscribeToQuery = (q, onData, onError, mapper = mapDoc) => onSnapshot(
+  q,
+  (snapshot) => onData(snapshot.docs.map((d) => mapper(d))),
+  (error) => {
+    console.error("Firestore subscription error:", error);
+    if (onError) onError(error);
+  }
+);
+
+// --- Client-Side Rate Limiter ---
+// Prevents rapid duplicate requests from the same client session
+const actionLimits = new Map();
+const checkRateLimit = (action, limitMs = 5000) => {
+  const now = Date.now();
+  const lastAction = actionLimits.get(action) || 0;
+  if (now - lastAction < limitMs) return false;
+  actionLimits.set(action, now);
+  return true;
+};
+
 // --- Products ---
-export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatured, sortBy = 'created_at', adminFilter = false } = {}) => {
+export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false } = {}) => {
   try {
     let q = adminFilter ? query(collection(db, "products")) : query(collection(db, "products"), where("is_active", "==", true));
     if (category) q = query(q, where("category", "==", category));
     if (shape) q = query(q, where("shape", "==", shape));
     if (isFeatured !== undefined) q = query(q, where("is_featured", "==", isFeatured));
-    
+    if (isNew !== undefined) q = query(q, where("is_new", "==", isNew));
+
     const querySnapshot = await getDocs(q);
-    let products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let products = querySnapshot.docs.map(doc => normalizeProduct({ id: doc.id, ...doc.data() }));
 
     if (priceMin) products = products.filter(p => p.price >= priceMin);
     if (priceMax) products = products.filter(p => p.price <= priceMax);
@@ -43,14 +126,34 @@ export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatu
   }
 };
 
+export const subscribeProducts = ({ category, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false } = {}, onData, onError) => {
+  let q = adminFilter ? query(collection(db, "products")) : query(collection(db, "products"), where("is_active", "==", true));
+  if (category) q = query(q, where("category", "==", category));
+  if (shape) q = query(q, where("shape", "==", shape));
+  if (isFeatured !== undefined) q = query(q, where("is_featured", "==", isFeatured));
+  if (isNew !== undefined) q = query(q, where("is_new", "==", isNew));
+
+  return subscribeToQuery(q, (items) => {
+    let products = items.map(normalizeProduct);
+    if (priceMin) products = products.filter(p => p.price >= priceMin);
+    if (priceMax) products = products.filter(p => p.price <= priceMax);
+    if (sortBy === 'price_asc') products.sort((a, b) => a.price - b.price);
+    else if (sortBy === 'price_desc') products.sort((a, b) => b.price - a.price);
+    else products.sort(byCreatedDesc);
+    onData(products);
+  }, onError);
+};
+
 export const getProductById = async (id) => {
   try {
     const docSnap = await getDoc(doc(db, "products", id));
     if (docSnap.exists()) {
       const reviewsQ = query(collection(db, "reviews"), where("product_id", "==", id));
       const reviewsSnap = await getDocs(reviewsQ);
-      const reviews = reviewsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      return { data: { ...docSnap.data(), id: docSnap.id, reviews }, error: null };
+      const reviews = reviewsSnap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter((review) => review.status === 'approved');
+      return { data: normalizeProduct({ ...docSnap.data(), id: docSnap.id, reviews }), error: null };
     }
     return { data: null, error: "Product not found" };
   } catch (error) { return { data: null, error }; }
@@ -58,14 +161,15 @@ export const getProductById = async (id) => {
 
 export const saveProduct = async (product, id = null) => {
   try {
+    const payload = productPayload(product);
     if (id) {
-      await updateDoc(doc(db, "products", id), { ...product, updated_at: serverTimestamp() });
+      await updateDoc(doc(db, "products", id), { ...payload, updated_at: serverTimestamp() });
     } else {
-      await addDoc(collection(db, "products"), { 
-        ...product, 
-        created_at: serverTimestamp(), 
-        sku: product.sku || `SKU-${Date.now()}`,
-        status: product.status || 'active'
+      await addDoc(collection(db, "products"), {
+        ...payload,
+        created_at: serverTimestamp(),
+        sku: payload.sku || `SKU-${Date.now()}`,
+        status: payload.status || 'active'
       });
     }
     return { error: null };
@@ -89,7 +193,7 @@ export const getCartItems = async (userId) => {
     const items = await Promise.all(querySnapshot.docs.map(async (d) => {
       const item = d.data();
       const productSnap = await getDoc(doc(db, "products", item.product_id));
-      return { id: d.id, ...item, products: productSnap.data() };
+      return { id: d.id, ...item, products: productSnap.exists() ? normalizeProduct({ id: productSnap.id, ...productSnap.data() }) : null };
     }));
     return { data: items, error: null };
   } catch (error) { return { data: null, error }; }
@@ -143,6 +247,9 @@ export const updateProfile = async (userId, updates) => {
 
 // --- Orders ---
 export const createOrder = async ({ userId, items, total, address, paymentId }) => {
+  if (!checkRateLimit(`createOrder_${userId}`, 10000)) {
+    throw new Error("Please wait before placing another order.");
+  }
   try {
     const orderData = {
       user_id: userId,
@@ -194,7 +301,9 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
         quantity: qty,
         price: finalItemPrice,
         product_name: item.name || 'Premium Eyewear',
-        frame_image: item.frame_image || item.frameImage || item.gallery?.[0] || '',
+        frame_image: getProductImage(item),
+        category: item.category || '',
+        brand: item.brand || '',
         lens_selection: item.lensSelection || null
       });
     });
@@ -214,14 +323,14 @@ export const getUserOrders = async (userId) => {
       order.order_items = await Promise.all(itemsSnap.docs.map(async (itemDoc) => {
         const item = itemDoc.data();
         let pSnap = await getDoc(doc(db, "products", item.product_id));
-        
+
         // Resilience: If product not found, check if ID was a composite userId_productId
         if (!pSnap.exists() && item.product_id?.includes('_')) {
           const actualId = item.product_id.split('_')[1];
           pSnap = await getDoc(doc(db, "products", actualId));
         }
 
-        return { ...item, products: pSnap.exists() ? pSnap.data() : null };
+        return { ...item, products: pSnap.exists() ? normalizeProduct({ id: pSnap.id, ...pSnap.data() }) : null };
       }));
       return order;
     }));
@@ -240,14 +349,14 @@ export const getOrderById = async (orderId) => {
       order.order_items = await Promise.all(itemsSnap.docs.map(async (itemDoc) => {
         const item = itemDoc.data();
         let pSnap = await getDoc(doc(db, "products", item.product_id));
-        
+
         // Resilience: If product not found, check if ID was a composite userId_productId
         if (!pSnap.exists() && item.product_id?.includes('_')) {
           const actualId = item.product_id.split('_')[1];
           pSnap = await getDoc(doc(db, "products", actualId));
         }
 
-        return { ...item, products: pSnap.exists() ? pSnap.data() : null };
+        return { ...item, products: pSnap.exists() ? normalizeProduct({ id: pSnap.id, ...pSnap.data() }) : null };
       }));
       return { data: order, error: null };
     }
@@ -258,37 +367,54 @@ export const getOrderById = async (orderId) => {
 export const getAllOrders = async () => {
   try {
     const querySnapshot = await getDocs(query(collection(db, "orders"), orderBy("created_at", "desc")));
-    const orders = await Promise.all(querySnapshot.docs.map(async (d) => {
-      const order = { id: d.id, ...d.data() };
-      const pSnap = await getDoc(doc(db, "profiles", order.user_id));
-      order.profiles = pSnap.exists() ? pSnap.data() : null;
-      const itemsQ = query(collection(db, "order_items"), where("order_id", "==", d.id));
-      const itemsSnap = await getDocs(itemsQ);
-      order.order_items = await Promise.all(itemsSnap.docs.map(async (itemDoc) => {
-        const item = { id: itemDoc.id, ...itemDoc.data() };
-        let pSnap = await getDoc(doc(db, "products", item.product_id));
-        if (!pSnap.exists() && item.product_id?.includes('_')) {
-          const actualId = item.product_id.split('_')[1];
-          pSnap = await getDoc(doc(db, "products", actualId));
-        }
-        return { ...item, products: pSnap.exists() ? pSnap.data() : null };
-      }));
-      return order;
-    }));
+    const orders = await Promise.all(querySnapshot.docs.map((d) => hydrateOrder(mapDoc(d))));
     return { data: orders, error: null };
   } catch (error) { return { data: null, error }; }
 };
 
+const hydrateOrder = async (order) => {
+  const pSnap = order.user_id ? await getDoc(doc(db, "profiles", order.user_id)) : null;
+  const itemsQ = query(collection(db, "order_items"), where("order_id", "==", order.id));
+  const itemsSnap = await getDocs(itemsQ);
+  const order_items = await Promise.all(itemsSnap.docs.map(async (itemDoc) => {
+    const item = { id: itemDoc.id, ...itemDoc.data() };
+    let productSnap = item.product_id && !item.product_id.startsWith('custom-')
+      ? await getDoc(doc(db, "products", item.product_id))
+      : null;
+    if (productSnap && !productSnap.exists() && item.product_id?.includes('_')) {
+      const actualId = item.product_id.split('_')[1];
+      productSnap = await getDoc(doc(db, "products", actualId));
+    }
+    return { ...item, products: productSnap?.exists() ? normalizeProduct({ id: productSnap.id, ...productSnap.data() }) : null };
+  }));
+  return {
+    ...order,
+    profiles: pSnap?.exists() ? pSnap.data() : null,
+    order_items,
+  };
+};
+
+export const subscribeAllOrders = (onData, onError) => subscribeToQuery(
+  query(collection(db, "orders"), orderBy("created_at", "desc")),
+  async (orders) => {
+    const hydrated = await Promise.all(orders.map(hydrateOrder));
+    onData(hydrated);
+  },
+  onError
+);
+
 export const updateOrderStatus = async (orderId, status) => {
   try {
+    const orderSnap = await getDoc(doc(db, "orders", orderId));
+    const previousStatus = orderSnap.exists() ? orderSnap.data().status : null;
     // 1. Update the order status
     await updateDoc(doc(db, "orders", orderId), { status, updated_at: serverTimestamp() });
 
     // 2. If status is cancelled, restore stock
-    if (status === 'cancelled') {
+    if (status === 'cancelled' && previousStatus !== 'cancelled') {
       const itemsQ = query(collection(db, "order_items"), where("order_id", "==", orderId));
       const itemsSnap = await getDocs(itemsQ);
-      
+
       const batchPromises = itemsSnap.docs.map(async (itemDoc) => {
         const item = itemDoc.data();
         const pid = item.product_id;
@@ -304,10 +430,10 @@ export const updateOrderStatus = async (orderId, status) => {
       });
       await Promise.all(batchPromises);
     }
-    
-    return { error: null };
-  } catch (error) { 
-    return { error }; 
+
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error };
   }
 };
 
@@ -345,6 +471,33 @@ export const getDashboardStats = async () => {
   }
 };
 
+export const subscribeDashboardStats = (onData, onError) => {
+  let latestOrders = [];
+  let latestProducts = [];
+  let latestProfiles = [];
+
+  const emit = () => {
+    const revenue = latestOrders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+    onData({
+      orders: latestOrders,
+      orderCount: latestOrders.length,
+      productCount: latestProducts.length,
+      profileCount: latestProfiles.length,
+      revenue,
+      pendingOrders: latestOrders.filter(o => ['pending', 'confirmed'].includes(o.status)).length,
+      lowStockProducts: latestProducts.filter(p => (p.stock_quantity || 0) <= 10).length,
+    });
+  };
+
+  const unsubs = [
+    subscribeAllOrders((orders) => { latestOrders = orders; emit(); }, onError),
+    subscribeProducts({ adminFilter: true }, (products) => { latestProducts = products; emit(); }, onError),
+    subscribeAllProfiles((profiles) => { latestProfiles = profiles; emit(); }, onError),
+  ];
+
+  return () => unsubs.forEach((unsubscribe) => unsubscribe?.());
+};
+
 // --- Categories ---
 export const getCategories = async () => {
   try {
@@ -352,13 +505,19 @@ export const getCategories = async () => {
     const snap = await getDocs(q);
     const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     // Sort manually to avoid index requirement
-    data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    data.sort(byNameAsc);
     return { data, error: null };
-  } catch (error) { 
+  } catch (error) {
     console.error("getCategories Error:", error);
-    return { data: [], error }; 
+    return { data: [], error };
   }
 };
+
+export const subscribeCategories = (onData, onError) => subscribeToQuery(
+  collection(db, "categories"),
+  (items) => onData(items.sort(byNameAsc)),
+  onError
+);
 
 export const saveCategory = async (category, id = null) => {
   try {
@@ -383,6 +542,12 @@ export const getBrands = async () => {
     return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
   } catch (error) { return { data: [], error }; }
 };
+
+export const subscribeBrands = (onData, onError) => subscribeToQuery(
+  query(collection(db, "brands"), orderBy("name", "asc")),
+  onData,
+  onError
+);
 
 export const saveBrand = async (brand, id = null) => {
   try {
@@ -409,6 +574,12 @@ export const getPrescriptions = async (userId = null) => {
   } catch (error) { return { data: [], error }; }
 };
 
+export const subscribePrescriptions = (onData, onError, userId = null) => {
+  let q = collection(db, "prescriptions");
+  if (userId) q = query(q, where("user_id", "==", userId));
+  return subscribeToQuery(query(q, orderBy("created_at", "desc")), onData, onError);
+};
+
 export const savePrescription = async (data, id = null) => {
   try {
     if (id) await updateDoc(doc(db, "prescriptions", id), { ...data, updated_at: serverTimestamp() });
@@ -424,6 +595,15 @@ export const getSettings = async () => {
     return { data: docSnap.exists() ? docSnap.data() : {}, error: null };
   } catch (error) { return { data: {}, error }; }
 };
+
+export const subscribeSettings = (onData, onError) => onSnapshot(
+  doc(db, "settings", "global"),
+  (snapshot) => onData(snapshot.exists() ? snapshot.data() : {}),
+  (error) => {
+    console.error("Firestore settings subscription error:", error);
+    if (onError) onError(error);
+  }
+);
 
 export const saveSettings = async (settings) => {
   try {
@@ -454,6 +634,12 @@ export const getAllProfiles = async () => {
     return { data: profiles, error: null };
   } catch (error) { return { data: null, error }; }
 };
+
+export const subscribeAllProfiles = (onData, onError) => subscribeToQuery(
+  collection(db, "profiles"),
+  (profiles) => onData(profiles.sort(byCreatedDesc)),
+  onError
+);
 
 export const updateProductStock = async (productId, quantity) => {
   try {
@@ -487,6 +673,9 @@ export const addOrderNote = async (orderId, note) => {
 
 // ─── Reviews & Ratings ────────────────────────────────────────────────────────
 export const addReview = async (productId, userId, rating, comment, userInfo) => {
+  if (!checkRateLimit(`addReview_${userId}_${productId}`, 15000)) {
+    return { error: "You are submitting reviews too quickly. Please wait." };
+  }
   try {
     const reviewData = {
       product_id: productId,
@@ -495,23 +684,11 @@ export const addReview = async (productId, userId, rating, comment, userInfo) =>
       comment,
       // FIX: Only store display name — never email in a publicly readable collection
       reviewer_name: userInfo?.full_name || 'Anonymous Customer',
+      product_name: userInfo?.product_name || '',
+      status: 'pending',
       created_at: serverTimestamp()
     };
     await addDoc(collection(db, "reviews"), reviewData);
-    
-    const pSnap = await getDoc(doc(db, "products", productId));
-    if (pSnap.exists()) {
-      const pData = pSnap.data();
-      const currentCount = pData.reviewCount || 0;
-      const currentRating = pData.rating || 5;
-      const newCount = currentCount + 1;
-      const newRating = ((currentRating * currentCount) + Number(rating)) / newCount;
-      
-      await updateDoc(doc(db, "products", productId), {
-        reviewCount: newCount,
-        rating: Math.round(newRating * 10) / 10
-      });
-    }
 
     return { error: null };
   } catch (error) { return { error }; }
@@ -529,9 +706,15 @@ export const getReviews = async () => {
   }
 };
 
+export const subscribeReviews = (onData, onError) => subscribeToQuery(
+  query(collection(db, "reviews"), orderBy("created_at", "desc")),
+  onData,
+  onError
+);
+
 export const updateReviewStatus = async (id, status) => {
   try {
-    await updateDoc(doc(db, "reviews", id), { status });
+    await updateDoc(doc(db, "reviews", id), { status, updated_at: serverTimestamp() });
     return { error: null };
   } catch (error) {
     return { error };
@@ -555,11 +738,17 @@ export const getCoupons = async () => {
     // Sort locally to avoid index Requirement
     coupons.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
     return { data: coupons, error: null };
-  } catch (error) { 
+  } catch (error) {
     console.error("Firebase Coupon Error:", error);
-    return { data: null, error }; 
+    return { data: null, error };
   }
 };
+
+export const subscribeCoupons = (onData, onError) => subscribeToQuery(
+  collection(db, "coupons"),
+  (coupons) => onData(coupons.sort(byCreatedDesc)),
+  onError
+);
 
 export const saveCoupon = async (couponData, id = null) => {
   try {
@@ -590,7 +779,14 @@ export const validateCoupon = async (code) => {
     const q = query(collection(db, "coupons"), where("code", "==", code.toUpperCase()), where("is_active", "==", true));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      return { data: { id: snap.docs[0].id, ...snap.docs[0].data() }, error: null };
+      const coupon = { id: snap.docs[0].id, ...snap.docs[0].data() };
+      if (coupon.expiry_date) {
+        const expiry = new Date(`${coupon.expiry_date}T23:59:59`);
+        if (expiry.getTime() < Date.now()) {
+          return { data: null, error: "Coupon has expired" };
+        }
+      }
+      return { data: coupon, error: null };
     }
     return { data: null, error: "Invalid or expired coupon" };
   } catch (error) { return { data: null, error }; }
@@ -604,6 +800,12 @@ export const getOffers = async () => {
     return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
   } catch (error) { return { data: null, error }; }
 };
+
+export const subscribeOffers = (onData, onError) => subscribeToQuery(
+  query(collection(db, "offers"), orderBy("created_at", "desc")),
+  onData,
+  onError
+);
 
 export const saveOffer = async (offer, id = null) => {
   try {
@@ -632,6 +834,12 @@ export const getCarouselItems = async () => {
   } catch (error) { return { data: null, error }; }
 };
 
+export const subscribeCarouselItems = (onData, onError) => subscribeToQuery(
+  query(collection(db, "carousel"), orderBy("order", "asc")),
+  onData,
+  onError
+);
+
 export const saveCarouselItem = async (item, id = null) => {
   try {
     if (id) {
@@ -657,10 +865,10 @@ export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
     const itemRef = doc(db, "order_items", itemId);
     await updateDoc(itemRef, {
       lens_selection: updatedLensSelection,
+      updated_at: serverTimestamp(),
     });
     return { error: null };
   } catch (error) {
     return { error };
   }
 };
-

@@ -1,374 +1,391 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Package, ChevronDown, Eye, X, MessageSquare, MapPin, ExternalLink, Download, Truck, Clock, CheckCircle, Info, Search, Upload } from 'lucide-react';
-import { getAllOrders, updateOrderStatus as firebaseUpdateOrderStatus, addOrderNote, updateOrderItemPower } from '../../lib/firebase';
+import {
+  X,
+  Download,
+  Search,
+  Filter,
+  MoreVertical,
+  DownloadCloud,
+  Settings,
+  Bell
+} from 'lucide-react';
+import { subscribeAllOrders, updateOrderStatus as firebaseUpdateOrderStatus } from '../../lib/firebase';
 import { generateInvoice } from '../../lib/invoice';
-import { uploadImage } from '../../lib/cloudinary';
 import AdminSidebar from '../../components/layout/AdminSidebar';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 
 const STATUS_OPTIONS = ['pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled', 'returned'];
-const STATUS_COLORS = { 
-  pending: 'bg-gray-100 text-gray-700',
-  confirmed: 'bg-blue-100 text-blue-700', 
-  packed: 'bg-orange-100 text-orange-700', 
-  shipped: 'bg-purple-100 text-purple-700', 
-  delivered: 'bg-green-100 text-green-700', 
-  cancelled: 'bg-red-100 text-red-700',
-  returned: 'bg-gray-700 text-white'
-};
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
 
-  // Power Edit State
-  const [editingPowerItem, setEditingPowerItem] = useState(null); // { orderId, item, idx }
-  const [powerUpdateData, setPowerUpdateData] = useState({
-     leftSph: '',
-     rightSph: '',
-     name: '',
-     phone: ''
-  });
-  const [isUploadingPower, setIsUploadingPower] = useState(false);
-
-  useEffect(() => { loadOrders(); }, []);
-
-  const loadOrders = async () => {
+  useEffect(() => {
     setLoading(true);
-    const { data } = await getAllOrders();
-    setOrders(data || []);
-    setLoading(false);
-  };
+    const unsubscribe = subscribeAllOrders((data) => {
+      setOrders(data || []);
+      setFiltered(data || []);
+      setLoading(false);
+    }, () => setLoading(false));
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    let result = orders;
+    if (filter !== 'all') {
+      result = result.filter(o => o.status === filter);
+    }
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(o =>
+        o.id?.toLowerCase().includes(term) ||
+        o.profiles?.full_name?.toLowerCase().includes(term) ||
+        o.shipping_address?.name?.toLowerCase().includes(term)
+      );
+    }
+    setFiltered(result);
+  }, [searchTerm, filter, orders]);
 
   const updateStatus = async (orderId, newStatus) => {
     setUpdating(true);
-    const { error } = await firebaseUpdateOrderStatus(orderId, newStatus);
-    if (!error) {
+    const { success, error } = await firebaseUpdateOrderStatus(orderId, newStatus);
+    if (success) {
+      toast.success('Order status updated');
       setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-      if (selectedOrder && selectedOrder.id === orderId) {
-         setSelectedOrder({ ...selectedOrder, status: newStatus });
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
-      toast.success(`Order status updated to ${newStatus}`);
     } else {
-      toast.error('Failed to update status');
+      toast.error(error || 'Failed to update status');
     }
     setUpdating(false);
   };
 
-  const openPowerEdit = (orderId, item, idx) => {
-     setEditingPowerItem({ orderId, item, idx });
-     const existing = item.lens_selection?.manualDetails || {};
-     setPowerUpdateData({
-        leftSph: existing.leftSph || '',
-        rightSph: existing.rightSph || '',
-        name: existing.name || '',
-        phone: existing.phone || ''
-     });
+  const exportOrders = () => {
+    const rows = [
+      ['Order ID', 'Customer', 'Phone', 'Amount', 'Status', 'Payment ID', 'Date'],
+      ...filtered.map(order => [
+        order.id,
+        order.profiles?.full_name || order.shipping_address?.name || 'Guest',
+        order.shipping_address?.phone || '',
+        order.total_amount || 0,
+        order.status || '',
+        order.razorpay_payment_id || '',
+        new Date(order.created_at?.seconds * 1000 || order.created_at || Date.now()).toLocaleString('en-IN')
+      ])
+    ];
+    const csv = rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `chashmaly-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
-  const handleUpdatePower = async () => {
-      if (!editingPowerItem || !editingPowerItem.item.id) {
-          toast.error("Item ID is missing. Cannot update.");
-          return;
-      }
-      setIsUploadingPower(true);
-      try {
-         const updatedSelection = {
-            ...editingPowerItem.item.lens_selection,
-            powerOption: 'manual', // If admin updates it, it becomes a manual entry
-            manualDetails: {
-               samePower: powerUpdateData.leftSph === powerUpdateData.rightSph,
-               cylindrical: false,
-               leftSph: powerUpdateData.leftSph,
-               rightSph: powerUpdateData.rightSph,
-               name: powerUpdateData.name,
-               phone: powerUpdateData.phone
-            }
-         };
-
-         const { error } = await updateOrderItemPower(editingPowerItem.item.id, updatedSelection);
-         if (error) throw error;
-
-         // Update local state
-         const updatedOrderItems = [...selectedOrder.order_items];
-         updatedOrderItems[editingPowerItem.idx] = { ...updatedOrderItems[editingPowerItem.idx], lens_selection: updatedSelection };
-         
-         const updatedOrder = { ...selectedOrder, order_items: updatedOrderItems };
-         setSelectedOrder(updatedOrder);
-         setOrders(orders.map(o => o.id === updatedOrder.id ? updatedOrder : o));
-         
-         toast.success("Eye power details updated successfully!");
-         setEditingPowerItem(null);
-      } catch (err) {
-          console.error(err);
-          toast.error("Failed to update eye power.");
-      }
-      setIsUploadingPower(false);
+  // Stats for the top cards
+  const stats = {
+    new: orders.filter(o => o.status === 'pending').length,
+    await: orders.filter(o => o.status === 'confirmed' || o.status === 'packed').length,
+    onWay: orders.filter(o => o.status === 'shipped').length,
+    delivered: orders.filter(o => o.status === 'delivered').length,
   };
-
-  const handleAddNote = async (e) => {
-    e.preventDefault();
-    const note = e.target.note.value;
-    if (!note) return;
-    
-    const { error } = await addOrderNote(selectedOrder.id, note);
-    if (error) toast.error('Failed to add note');
-    else {
-      toast.success('Note added');
-      setOrders(prev => prev.map(o => o.id === selectedOrder.id ? { ...o, admin_note: note } : o));
-      setSelectedOrder(prev => ({ ...prev, admin_note: note }));
-      e.target.reset();
-    }
-  };
-
-  const filtered = orders.filter(o => {
-    const matchesStatus = filter === 'all' || o.status === filter;
-    const customerName = (o.profiles?.full_name || o.shipping_address?.name || '').toLowerCase();
-    const customerId = (o.id || '').toLowerCase();
-    const matchesSearch = customerName.includes(searchTerm.toLowerCase()) || customerId.includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
 
   return (
     <div className="admin-page">
       <AdminSidebar />
       <main className="admin-main">
-        <div className="admin-header">
-           <h1 className="admin-title">Order Management</h1>
-        </div>
-
-        <div className="flex flex-wrap gap-4 mb-6">
-           <div className="flex-1 min-w-[300px] relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-              <input type="text" placeholder="Search by Order ID or Customer Name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="admin-search-box pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl outline-none focus:border-primary-blue font-bold text-xs w-full" />
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+           <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Orders</h1>
+           <div className="flex items-center gap-4">
+              <button className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+                 <Settings size={20} />
+              </button>
+              <button className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+                 <Bell size={20} />
+              </button>
+              <div className="w-10 h-10 rounded-xl bg-purple-600 overflow-hidden">
+                 <img src="https://ui-avatars.com/api/?name=Admin&background=7C3AED&color=fff" alt="User" />
+              </div>
            </div>
-           <select value={filter} onChange={e => setFilter(e.target.value)} className="px-6 py-3 bg-white border border-gray-100 rounded-2xl font-black text-[10px] uppercase outline-none cursor-pointer">
-              <option value="all">All Orders</option>
-              {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-           </select>
         </div>
 
+        {/* Status Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+           <div className="admin-card !p-6 border-l-4 border-l-purple-500 relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                 <span className="text-[10px] font-bold uppercase tracking-[2px] text-purple-600 bg-purple-50 px-2 py-1 rounded-md">New orders</span>
+                 <div className="text-red-500 text-[10px] font-bold flex items-center gap-1">↓ 2.67% <span className="text-gray-400">Than last week</span></div>
+              </div>
+              <div className="text-4xl font-extrabold text-gray-900">{stats.new}</div>
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all"></div>
+           </div>
+
+           <div className="admin-card !p-6 border-l-4 border-l-orange-500 relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                 <span className="text-[10px] font-bold uppercase tracking-[2px] text-orange-600 bg-orange-50 px-2 py-1 rounded-md">Await accepting</span>
+                 <div className="text-green-500 text-[10px] font-bold flex items-center gap-1">↑ 2.67% <span className="text-gray-400">Than last week</span></div>
+              </div>
+              <div className="text-4xl font-extrabold text-gray-900">{stats.await}</div>
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-all"></div>
+           </div>
+
+           <div className="admin-card !p-6 border-l-4 border-l-yellow-500 relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                 <span className="text-[10px] font-bold uppercase tracking-[2px] text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md">On way orders</span>
+                 <div className="text-red-500 text-[10px] font-bold flex items-center gap-1">↓ 0.51% <span className="text-gray-400">Than last week</span></div>
+              </div>
+              <div className="text-4xl font-extrabold text-gray-900">{stats.onWay}</div>
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-yellow-500/5 rounded-full blur-2xl group-hover:bg-yellow-500/10 transition-all"></div>
+           </div>
+
+           <div className="admin-card !p-6 border-l-4 border-l-emerald-500 relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                 <span className="text-[10px] font-bold uppercase tracking-[2px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">Delivered orders</span>
+                 <div className="text-green-500 text-[10px] font-bold flex items-center gap-1">↑ 2.67% <span className="text-gray-400">Than last week</span></div>
+              </div>
+              <div className="text-4xl font-extrabold text-gray-900">{stats.delivered}</div>
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
+           </div>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+           <div className="flex items-center gap-4 w-full md:w-auto">
+              <div className="admin-search-wrapper !mb-0 min-w-[300px]">
+                 <Search size={18} className="text-gray-400" />
+                 <input type="text" placeholder="Search orders..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+              </div>
+              <span className="text-gray-400 text-xs font-bold whitespace-nowrap">{filtered.length} orders</span>
+           </div>
+
+           <div className="flex items-center gap-3 w-full md:w-auto">
+              <button onClick={exportOrders} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors">
+                 <DownloadCloud size={16} /> Export
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors">
+                 <Filter size={16} /> Sort: default
+              </button>
+           </div>
+        </div>
+
+        {/* Orders Table */}
         <div className="admin-card">
-           <div className="overflow-x-auto">
+           <div className="admin-table-container">
               <table className="admin-table">
                  <thead>
                     <tr>
-                       <th>Item</th>
-                       <th>Order ID</th>
+                       <th className="w-10"><input type="checkbox" className="rounded" /></th>
+                       <th>Order number</th>
                        <th>Customer</th>
-                       <th>Amount</th>
+                       <th>Category</th>
+                       <th>Price</th>
+                       <th>Date</th>
+                       <th>Payment</th>
                        <th>Status</th>
-                       <th>Actions</th>
+                       <th className="text-right">Actions</th>
                     </tr>
                  </thead>
                  <tbody>
-                    {loading ? <tr><td colSpan="6" className="text-center py-12 text-gray-400">Loading orders...</td></tr> : filtered.map(order => (
+                    {loading ? (
+                       <tr><td colSpan="9" className="text-center py-20 text-gray-400 font-bold">Fetching digital ledger...</td></tr>
+                    ) : filtered.length === 0 ? (
+                       <tr><td colSpan="9" className="text-center py-20 text-gray-400 font-bold">No orders found matching your criteria.</td></tr>
+                    ) : filtered.map(order => (
                        <tr key={order.id}>
+                          <td><input type="checkbox" className="rounded" /></td>
+                          <td><span className="font-mono text-xs font-bold text-gray-400 tracking-widest uppercase">#{order.id?.slice(0, 8)}</span></td>
                           <td>
-                             <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden border border-gray-100">
-                                {order.order_items?.[0]?.frame_image || order.order_items?.[0]?.product_image || order.order_items?.[0]?.image ? (
-                                   <img src={order.order_items[0].frame_image || order.order_items[0].product_image || order.order_items[0].image} className="w-full h-full object-contain" />
-                                ) : (
-                                   <Package size={16} className="text-gray-300" />
-                                )}
+                             <div className="flex flex-col">
+                                <span className="text-gray-900 font-bold leading-none">{order.profiles?.full_name || order.shipping_address?.name || 'Guest'}</span>
+                                <span className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tighter">{order.shipping_address?.phone}</span>
                              </div>
                           </td>
-                          <td><span className="font-mono font-black text-gray-600">#{order.id?.slice(0, 8).toUpperCase()}</span></td>
-                          <td>{order.profiles?.full_name || order.shipping_address?.name || 'Guest'}</td>
-                          <td className="font-black text-primary-blue">₹{Number(order.total_amount).toLocaleString()}</td>
                           <td>
-                             <span className={`px-2 py-1 rounded-full text-[9px] font-black uppercase ${STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-600'}`}>{order.status}</span>
+                             <span className="bg-gray-50 text-gray-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                                {order.order_items?.[0]?.category || order.order_items?.[0]?.products?.category || 'Eyewear'}
+                             </span>
                           </td>
+                          <td><span className="text-gray-900 font-extrabold">₹{Number(order.total_amount).toLocaleString()}</span></td>
+                          <td><span className="text-gray-500 text-xs font-bold">{new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleDateString('en-GB')}</span></td>
+                          <td><span className="text-gray-500 text-xs font-bold">{order.razorpay_payment_id ? 'Razorpay' : (order.payment_method || 'Pending')}</span></td>
                           <td>
-                             <button onClick={() => setSelectedOrder(order)} className="admin-table-btn edit"><Eye size={14} /></button>
+                             <span className={`status-chip ${
+                                order.status === 'delivered' ? 'status-delivered' :
+                                order.status === 'shipped' ? 'status-shipped' :
+                                order.status === 'cancelled' ? 'status-cancelled' :
+                                order.status === 'confirmed' ? 'status-packed' :
+                                'status-confirmed'
+                             }`}>
+                                {order.status === 'pending' ? 'on way' : order.status}
+                             </span>
+                          </td>
+                          <td className="text-right">
+                             <button onClick={() => setSelectedOrder(order)} className="p-2 text-gray-400 hover:text-gray-900 transition-colors"><MoreVertical size={18} /></button>
                           </td>
                        </tr>
                     ))}
                  </tbody>
               </table>
            </div>
+
+           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+              <span className="text-xs text-gray-400 font-bold">Showing {filtered.length} live orders</span>
+           </div>
         </div>
       </main>
 
-      {selectedOrder && (
-        <div className="admin-modal-overlay" onClick={() => setSelectedOrder(null)}>
-           <div className="admin-modal max-w-4xl" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-8 pb-4 border-b">
-                 <h2 className="text-xl font-black text-gray-900">Order Details <span className="text-gray-300 font-mono text-sm ml-2">#{selectedOrder.id?.toUpperCase()}</span></h2>
-                 <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-gray-100 rounded-full transition-all"><X size={20} /></button>
-              </div>
+      {/* Detail Sidebar (previous pop design) */}
+      <AnimatePresence>
+        {selectedOrder && (
+          <>
+            <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setSelectedOrder(null)}
+               className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[2000]"
+            />
+            <motion.div 
+               initial={{ x: '100%' }}
+               animate={{ x: 0 }}
+               exit={{ x: '100%' }}
+               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+               className="fixed top-0 right-0 h-screen w-full max-w-lg bg-white z-[2001] shadow-[-20px_0_40px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden"
+            >
+               {/* Sidebar Header */}
+               <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Order Details</h2>
+                  <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-gray-200 rounded-xl transition-all text-gray-400"><X size={20} /></button>
+               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 <div className="space-y-6">
-                    <div>
-                       <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Shipping Info</h3>
-                       <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                          <p className="font-black text-gray-800">{selectedOrder.shipping_address?.name}</p>
-                          <p className="text-sm text-gray-500 mt-1">{selectedOrder.shipping_address?.line1}, {selectedOrder.shipping_address?.city}</p>
-                          <p className="text-sm text-gray-500">{selectedOrder.shipping_address?.state} - {selectedOrder.shipping_address?.pincode}</p>
-                          <p className="text-sm font-black text-primary-blue mt-2 flex items-center gap-1"><MapPin size={12} /> {selectedOrder.shipping_address?.phone}</p>
-                       </div>
-                    </div>
-
-                    <div>
-                       <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Status Update</h3>
-                       <div className="grid grid-cols-2 gap-2">
-                           {STATUS_OPTIONS.map(s => {
-                              const isActive = selectedOrder.status === s;
-                              let activeClass = 'bg-black text-white'; // default
-                              if (s === 'confirmed') activeClass = 'bg-blue-600 text-white shadow-lg shadow-blue-200';
-                              if (s === 'shipped') activeClass = 'bg-purple-600 text-white shadow-lg shadow-purple-200';
-                              if (s === 'delivered') activeClass = 'bg-green-600 text-white shadow-lg shadow-green-200';
-                              if (s === 'cancelled') activeClass = 'bg-red-600 text-white shadow-lg shadow-red-200';
-                              if (s === 'packed') activeClass = 'bg-orange-500 text-white shadow-lg shadow-orange-200';
-                              if (s === 'returned') activeClass = 'bg-gray-800 text-white';
-
-                              return (
-                                 <button 
-                                    key={s} 
-                                    onClick={() => updateStatus(selectedOrder.id, s)} 
-                                    disabled={updating} 
-                                    className={`px-3 py-3 rounded-xl text-[9px] font-black uppercase transition-all duration-300 ${isActive ? activeClass : 'bg-gray-50 text-gray-400 hover:bg-gray-100 border border-transparent hover:border-gray-200'}`}
-                                 >
-                                    {s}
-                                 </button>
-                              );
-                           })}
-                       </div>
-                    </div>
-                 </div>
-
-                 <div>
-                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Items Summary</h3>
-                    <div className="space-y-3">
+               {/* Sidebar Content */}
+               <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                  {/* Items Summary */}
+                  <div className="mb-10">
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Items Summary</p>
+                     <div className="space-y-4">
                         {selectedOrder.order_items?.map((item, idx) => (
-                           <div key={idx} className="flex flex-col gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
-                              <div className="flex items-center gap-3">
-                                 <div className="w-14 h-14 bg-white rounded-xl flex-shrink-0 overflow-hidden border border-gray-100 flex items-center justify-center">
-                                    {item.frame_image || item.product_image || item.image ? <img src={item.frame_image || item.product_image || item.image} className="w-full h-full object-contain" /> : <Package size={20} className="text-gray-300" />}
+                           <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-purple-200 transition-colors">
+                              <div className="flex items-center gap-4">
+                                 <div className="w-14 h-14 bg-white rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden p-2 shadow-sm group-hover:shadow-md transition-all">
+                                    <img src={item.frame_image || item.product_image || item.image} alt="" className="w-full h-full object-contain" />
                                  </div>
-                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-black text-gray-800 truncate">{item.product_name}</p>
-                                    <p className="text-[10px] text-gray-400 font-bold">Qty: {item.quantity} × ₹{item.price}</p>
+                                 <div>
+                                    <p className="text-sm font-black text-gray-900">{item.product_name}</p>
+                                    <p className="text-[10px] font-bold text-gray-400 mt-0.5">Quantity: {item.quantity}</p>
+                                    {item.visionType && (
+                                       <span className="inline-block mt-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-[9px] font-black uppercase tracking-widest">{item.visionType.title}</span>
+                                    )}
                                  </div>
-                                 <p className="text-xs font-black text-primary-blue">₹{item.price * item.quantity}</p>
                               </div>
-
-                              {/* Lenses and Power */}
-                              {item.lens_selection && (
-                                   <div className="pt-2 border-t border-gray-200">
-                                       <p className="text-[10px] text-gray-600 font-bold flex justify-between">
-                                           <span>Lenses: {item.lens_selection.visionType?.title || 'None'} | {item.lens_selection.lensPackage?.name || 'None'}</span>
-                                       </p>
-                                       {item.lens_selection.powerOption && (
-                                          <div className="mt-1 flex justify-between items-center bg-white p-2 rounded-lg border border-gray-100">
-                                              <div>
-                                                  <span className="text-[10px] font-black uppercase text-primary-blue block">Eye Power: {item.lens_selection.powerOption}</span>
-                                                  {item.lens_selection.powerOption === 'manual' && item.lens_selection.manualDetails && (
-                                                      <span className="text-[10px] text-gray-500">
-                                                          L: {item.lens_selection.manualDetails.leftSph} | R: {item.lens_selection.manualDetails.rightSph}
-                                                      </span>
-                                                  )}
-                                                  {item.lens_selection.prescriptionUrl && (
-                                                      <div className="mt-2">
-                                                          <a href={item.lens_selection.prescriptionUrl} target="_blank" rel="noopener noreferrer" className="block border border-gray-200 rounded-lg overflow-hidden hover:border-blue-400 transition-colors">
-                                                              <img src={item.lens_selection.prescriptionUrl} alt="Prescription" className="w-full h-20 object-cover" />
-                                                              <div className="bg-gray-50 py-1 px-2 text-[8px] font-black uppercase text-gray-500 text-center flex items-center justify-center gap-1">
-                                                                  <Eye size={8} /> View Full Image
-                                                              </div>
-                                                          </a>
-                                                      </div>
-                                                  )}
-                                              </div>
-                                              <button onClick={() => openPowerEdit(selectedOrder.id, item, idx)} className="text-[9px] font-black uppercase bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200">Update</button>
-                                          </div>
-                                       )}
-                                       {!item.lens_selection.powerOption && item.lens_selection.visionType?.id !== 'frame' && item.lens_selection.visionType?.id !== 'zero' && (
-                                           <div className="mt-1 flex justify-between items-center bg-white p-2 rounded-lg border border-gray-100">
-                                              <span className="text-[10px] font-black uppercase text-red-500 flex items-center gap-1"><Info size={10}/> Power Missing</span>
-                                              <button onClick={() => openPowerEdit(selectedOrder.id, item, idx)} className="text-[9px] font-black uppercase bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200">Add Power</button>
-                                           </div>
-                                       )}
-                                   </div>
-                               )}
+                              <p className="text-sm font-black text-gray-900">₹{(item.price * item.quantity).toLocaleString()}</p>
                            </div>
                         ))}
-                       <div className="pt-4 border-t flex justify-between items-center">
-                          <span className="text-sm font-black text-gray-800 uppercase">Total Amount</span>
-                          <span className="text-lg font-black text-primary-blue">₹{selectedOrder.total_amount}</span>
-                       </div>
-                    </div>
-                    
-                    <button onClick={() => generateInvoice(selectedOrder)} className="w-full mt-8 py-4 bg-gray-900 text-white rounded-2xl flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest"><Download size={16} /> Download Invoice (PDF)</button>
-                 </div>
-              </div>
-           </div>
-        </div>
-      )}
+                     </div>
+                  </div>
 
-      {/* Power Edit Modal */}
-      {editingPowerItem && (
-         <div className="admin-modal-overlay" onClick={() => setEditingPowerItem(null)} style={{zIndex: 100}}>
-            <div className="admin-modal max-w-lg" onClick={e => e.stopPropagation()}>
-               <div className="flex items-center justify-between mb-6 pb-4 border-b">
-                  <h2 className="text-xl font-black text-gray-900">Update Eye Power</h2>
-                  <button onClick={() => setEditingPowerItem(null)} className="p-2 hover:bg-gray-100 rounded-full transition-all"><X size={20} /></button>
-               </div>
-               
-               {editingPowerItem.item.lens_selection?.prescriptionUrl && (
-                  <div className="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
-                     <div className="flex items-center justify-between mb-3">
-                        <div>
-                           <h4 className="text-sm font-bold text-blue-900">Customer Uploaded Rx</h4>
-                           <p className="text-xs text-blue-700">The customer provided a prescription file.</p>
+                  {/* Customer Info */}
+                  <div className="mb-10">
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Customer Information</p>
+                     <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                        <p className="font-extrabold text-gray-900 text-lg mb-1">{selectedOrder.shipping_address?.name}</p>
+                        <p className="text-sm text-gray-500 font-semibold">{selectedOrder.shipping_address?.line1}</p>
+                        <p className="text-sm text-gray-500 font-semibold">{selectedOrder.shipping_address?.city}, {selectedOrder.shipping_address?.pincode}</p>
+                        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center gap-2">
+                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phone:</span>
+                           <span className="text-sm font-bold text-gray-900">{selectedOrder.shipping_address?.phone}</span>
                         </div>
-                        <a href={editingPowerItem.item.lens_selection.prescriptionUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase rounded-lg shadow-md hover:bg-blue-700 flex items-center gap-2">
-                           <Eye size={12} /> Full View
-                        </a>
-                     </div>
-                     <div className="rounded-lg overflow-hidden border border-blue-200 bg-white">
-                        <img src={editingPowerItem.item.lens_selection.prescriptionUrl} alt="Prescription Preview" className="w-full max-h-48 object-contain" />
                      </div>
                   </div>
-               )}
 
-               <div className="space-y-4">
-                  <div className="flex gap-4">
-                     <div className="flex-1">
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">SPH Left</label>
-                        <input type="text" value={powerUpdateData.leftSph} onChange={(e) => setPowerUpdateData({...powerUpdateData, leftSph: e.target.value})} className="w-full border p-2 rounded-lg text-sm" placeholder="-1.00" />
+                  {/* Order Status */}
+                  <div className="mb-10">
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Update Order Status</p>
+                     <div className="flex flex-wrap gap-2">
+                        {STATUS_OPTIONS.map(s => (
+                           <button
+                              key={s}
+                              onClick={() => updateStatus(selectedOrder.id, s)}
+                              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border-2 ${
+                                 selectedOrder.status === s ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-100' : 'bg-white text-gray-400 border-gray-100 hover:border-gray-200 hover:text-gray-600'
+                              }`}
+                           >
+                              {s}
+                           </button>
+                        ))}
                      </div>
-                     <div className="flex-1">
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">SPH Right</label>
-                        <input type="text" value={powerUpdateData.rightSph} onChange={(e) => setPowerUpdateData({...powerUpdateData, rightSph: e.target.value})} className="w-full border p-2 rounded-lg text-sm" placeholder="-1.00" />
+                  </div>
+
+                  {/* Prescription Section (IF PRESENT) */}
+                  {selectedOrder.order_items?.some(item => item.lens_selection?.prescriptionUrl || item.lens_selection?.manualDetails) && (
+                     <div className="mb-10">
+                        <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                           <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
+                           Prescription Details
+                        </p>
+                        {selectedOrder.order_items.map((item, idx) => (
+                           (item.lens_selection?.prescriptionUrl || item.lens_selection?.manualDetails) && (
+                              <div key={idx} className="bg-purple-50 rounded-2xl p-6 border border-purple-100 mb-4">
+                                 <p className="text-xs font-black text-purple-900 mb-4 uppercase tracking-wide">For: {item.product_name}</p>
+                                 
+                                 {item.lens_selection?.prescriptionUrl && (
+                                    <div className="mb-4">
+                                       <p className="text-[10px] font-bold text-purple-400 uppercase mb-2">Uploaded Prescription</p>
+                                       <a href={item.lens_selection.prescriptionUrl} target="_blank" rel="noreferrer" className="block relative group rounded-xl overflow-hidden border-2 border-purple-200 bg-white aspect-video">
+                                          <img src={item.lens_selection.prescriptionUrl} alt="Prescription" className="w-full h-full object-contain" />
+                                          <div className="absolute inset-0 bg-purple-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                             <span className="text-white text-[10px] font-black uppercase tracking-widest bg-purple-600 px-4 py-2 rounded-full shadow-lg">View Full Image</span>
+                                          </div>
+                                       </a>
+                                    </div>
+                                 )}
+
+                                 {item.lens_selection?.manualDetails && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                       <div className="bg-white p-3 rounded-xl border border-purple-100">
+                                          <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Left Eye SPH</p>
+                                          <p className="font-black text-purple-900">{item.lens_selection.manualDetails.leftSph || '-'}</p>
+                                       </div>
+                                       <div className="bg-white p-3 rounded-xl border border-purple-100">
+                                          <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Right Eye SPH</p>
+                                          <p className="font-black text-purple-900">{item.lens_selection.manualDetails.rightSph || item.lens_selection.manualDetails.leftSph || '-'}</p>
+                                       </div>
+                                       <div className="col-span-2 bg-white p-3 rounded-xl border border-purple-100">
+                                          <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Patient Info</p>
+                                          <p className="font-black text-purple-900 text-xs">{item.lens_selection.manualDetails.name} ({item.lens_selection.manualDetails.phone})</p>
+                                       </div>
+                                    </div>
+                                 )}
+                              </div>
+                           )
+                        ))}
                      </div>
-                  </div>
-                  <div>
-                      <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Patient Name</label>
-                      <input type="text" value={powerUpdateData.name} onChange={(e) => setPowerUpdateData({...powerUpdateData, name: e.target.value})} className="w-full border p-2 rounded-lg text-sm" placeholder="John Doe" />
-                  </div>
-                  <div>
-                      <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Patient Phone</label>
-                      <input type="text" value={powerUpdateData.phone} onChange={(e) => setPowerUpdateData({...powerUpdateData, phone: e.target.value})} className="w-full border p-2 rounded-lg text-sm" placeholder="+91..." />
-                  </div>
+                  )}
                </div>
 
-               <button 
-                  onClick={handleUpdatePower} 
-                  disabled={isUploadingPower}
-                  className="w-full mt-6 py-3 bg-primary-blue text-white rounded-lg font-black uppercase tracking-widest text-xs flex justify-center items-center gap-2 disabled:opacity-50"
-               >
-                  {isUploadingPower ? 'Saving...' : 'Save Details'}
-               </button>
-            </div>
-         </div>
-      )}
+               {/* Sidebar Footer */}
+               <div className="p-6 border-t border-gray-100 bg-gray-50/50">
+                  <div className="flex items-center justify-between mb-6 px-2">
+                     <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Total Amount</span>
+                     <span className="text-2xl font-black text-gray-900">₹{Number(selectedOrder.total_amount).toLocaleString()}</span>
+                  </div>
+                  <button onClick={() => generateInvoice(selectedOrder)} className="w-full py-4 bg-purple-600 text-white rounded-2xl font-extrabold text-xs uppercase tracking-[3px] shadow-lg shadow-purple-200 flex items-center justify-center gap-3 hover:bg-purple-700 transition-all active:scale-[0.98]">
+                     <Download size={18} /> Download Invoice
+                  </button>
+               </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

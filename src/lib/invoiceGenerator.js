@@ -8,25 +8,29 @@ export const generateInvoice = (order) => {
     : new Date(order.created_at?.seconds * 1000 || order.created_at || Date.now());
 
   // Business Header
+  try {
+    doc.addImage("/logo.png", "PNG", 14, 5, 25, 25);
+  } catch (e) {}
+
   doc.setFontSize(22);
   doc.setTextColor(30, 63, 138); // primary-blue
-  doc.text('CHASHMALY.IN', 14, 22);
+  doc.text('CHASHMALAY.IN', 14, 40);
   
   doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text('Luxury Eyewear Store', 14, 28);
-  doc.text('GSTIN: 27AABCM1234F1Z5 (Mock)', 14, 33);
-  doc.text('Mumbai, India', 14, 38);
+  doc.text('Luxury Eyewear Store', 14, 46);
+  doc.text('GSTIN: 27AABCM1234F1Z5 (Mock)', 14, 51);
+  doc.text('Mumbai, India', 14, 56);
 
   // Invoice Title
   doc.setFontSize(20);
   doc.setTextColor(0);
-  doc.text('INVOICE', 140, 22);
+  doc.text('INVOICE', 140, 40);
   
   doc.setFontSize(10);
-  doc.text(`Invoice #: INV-${order.id?.slice(0, 8).toUpperCase()}`, 140, 30);
-  doc.text(`Date: ${date.toLocaleDateString('en-IN')}`, 140, 35);
-  doc.text(`Status: ${order.status?.toUpperCase()}`, 140, 40);
+  doc.text(`Invoice #: INV-${order.id?.slice(0, 8).toUpperCase()}`, 140, 48);
+  doc.text(`Date: ${date.toLocaleDateString('en-IN')}`, 140, 53);
+  doc.text(`Status: ${order.status?.toUpperCase()}`, 140, 58);
 
   // Bill To
   doc.setDrawColor(230);
@@ -56,7 +60,7 @@ export const generateInvoice = (order) => {
   ]) || [];
 
   autoTable(doc, {
-    startY: 90,
+    startY: 110,
     head: [['Product Details', 'Price', 'Qty', 'Total']],
     body: tableData,
     headStyles: { fillStyle: 'f3f4f6', textColor: [31, 41, 55], fontStyle: 'bold' },

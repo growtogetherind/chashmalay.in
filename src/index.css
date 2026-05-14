@@ -89,6 +89,37 @@
     background-color: rgba(255, 255, 255, 0.8);
     @apply backdrop-blur-xl border border-white/50 shadow-luxury;
   }
+
+  /* Eyejack Components */
+  .ej-btn {
+    @apply bg-ej-border text-ej-surface-muted font-sans text-ej-md py-ej-4 px-ej-6 rounded-ej-xs transition-all duration-300 flex items-center justify-center gap-2;
+  }
+  .ej-btn:hover {
+    @apply opacity-90;
+  }
+  .ej-btn:active {
+    @apply scale-[0.98];
+  }
+  .ej-btn:disabled {
+    @apply opacity-50 pointer-events-none;
+  }
+
+  .ej-card {
+    @apply bg-ej-surface-muted rounded-ej-xs shadow-ej-1 transition-all duration-300;
+  }
+
+  .ej-input {
+    @apply border border-ej-border text-ej-text-secondary bg-ej-surface-muted rounded-ej-xs px-ej-4 min-h-[44px] w-full outline-none transition-all;
+  }
+  .ej-input:focus {
+    @apply border-2 border-ej-border;
+  }
+}
+
+/* Global Focus-Visible for Eyejack */
+*:focus-visible {
+  outline: 2px solid theme('colors.ej-border');
+  outline-offset: 2px;
 }
 
 @layer utilities {
@@ -98,28 +129,39 @@
 
   .main-content {
     min-height: 100vh;
-    padding-top: 5rem; /* Matches navbar height (h-20 = 5rem) */
     @apply transition-all duration-500 ease-cinema;
   }
 }
 
-/* Custom Scrollbar (Hidden for cinematic feel) */
+/* Custom Scrollbar (Global) */
 ::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+  border: 2px solid #f8fafc;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-/* Custom Scrollbar for Filters */
+/* Custom Scrollbar for specific containers */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 2px;
+  width: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e5e5e5;
+  background: #f1f5f9;
   border-radius: 10px;
 }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 10px;
+  border: 2px solid #f1f5f9;
+}
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #161616;
+  background: #475569;
 }

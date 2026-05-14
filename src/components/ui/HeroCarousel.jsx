@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getCarouselItems } from '../../lib/firebase';
+import { subscribeCarouselItems } from '../../lib/firebase';
 
 const HeroCarousel = () => {
     const [items, setItems] = useState([]);
@@ -10,12 +10,11 @@ const HeroCarousel = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCarousel = async () => {
-            const { data } = await getCarouselItems();
+        const unsubscribe = subscribeCarouselItems((data) => {
             setItems(data?.filter(i => i.is_active) || []);
             setLoading(false);
-        };
-        fetchCarousel();
+        }, () => setLoading(false));
+        return unsubscribe;
     }, []);
 
     useEffect(() => {

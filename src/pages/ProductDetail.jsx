@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
-import { 
-  Star, Heart, Share2, MapPin, Box, RotateCcw, 
+import {
+  Star, Heart, Share2, MapPin, Box, RotateCcw,
   ShieldCheck, ChevronDown, ChevronUp, Map, Eye, Search, Layers,
-  ChevronRight, ChevronLeft, User, X
+  ChevronRight, ChevronLeft, User, X, CheckCircle
 } from 'lucide-react';
 import { getProductById, getProducts, addReview } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
@@ -24,7 +24,7 @@ const Accordion = ({ title, children }) => {
       </button>
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -55,54 +55,8 @@ const ProductDetail = () => {
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    if (!user) {
-      toast.error('Please sign in to write a review');
-      return;
-    }
-    if (!reviewForm.comment.trim()) {
-      toast.error('Please write a comment');
-      return;
-    }
-
-    setSubmittingReview(true);
-    const userInfo = { full_name: user.displayName || 'Anonymous Customer' };
-    const { error } = await addReview(product.id, user.uid, reviewForm.rating, reviewForm.comment, userInfo);
-    
-    if (error) {
-      toast.error('Failed to submit review');
-    } else {
-      toast.success('Review submitted successfully!');
-      setIsReviewModalOpen(false);
-      setReviewForm({ rating: 5, comment: '' });
-      
-      // Optimistic update
-      const newReview = {
-        id: Date.now().toString(),
-        product_id: product.id,
-        user_id: user.uid,
-        rating: reviewForm.rating,
-        comment: reviewForm.comment,
-        reviewer_name: userInfo.full_name,
-        created_at: { seconds: Math.floor(Date.now() / 1000) },
-        status: 'pending' // Just for UI completeness
-      };
-      
-      setProduct(prev => ({
-        ...prev,
-        reviews: [newReview, ...(prev.reviews || [])],
-        reviewCount: (prev.reviewCount || 0) + 1,
-        // Approximate new rating
-        rating: (((prev.rating || 5) * (prev.reviewCount || 0)) + reviewForm.rating) / ((prev.reviewCount || 0) + 1)
-      }));
-    }
-    setSubmittingReview(false);
-  };
-
-  // Functional States
   const [pincode, setPincode] = useState('');
-  const [pincodeStatus, setPincodeStatus] = useState(null); // 'checking', 'success', 'error'
+  const [pincodeStatus, setPincodeStatus] = useState(null);
   const sliderRef = useRef(null);
 
   useEffect(() => {
@@ -111,14 +65,13 @@ const ProductDetail = () => {
       const { data, error } = await getProductById(id);
       if (!error && data) {
         data.colors = data.colors || [];
-        // Combine new and old image fields for the gallery
         const newGallery = data.images?.gallery || [];
         const singleImages = [
-          data.images?.front, 
-          data.images?.side, 
-          data.images?.model, 
-          data.images?.zoom, 
-          data.frame_image, 
+          data.images?.front,
+          data.images?.side,
+          data.images?.model,
+          data.images?.zoom,
+          data.frame_image,
           data.model_image
         ].filter(Boolean);
         const colorImages = (data.colors || []).map(c => c.image).filter(Boolean);
@@ -173,373 +126,266 @@ const ProductDetail = () => {
     }, 1000);
   };
 
-  const scrollSlider = (direction) => {
-    if (sliderRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
-      sliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
-
   const nextImage = () => setActiveImage((prev) => (prev + 1) % product.gallery.length);
   const prevImage = () => setActiveImage((prev) => (prev - 1 + product.gallery.length) % product.gallery.length);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) { toast.error('Please sign in to write a review'); return; }
+    if (!reviewForm.comment.trim()) { toast.error('Please write a comment'); return; }
+
+    setSubmittingReview(true);
+    const userInfo = { full_name: user.displayName || 'Anonymous Customer', product_name: product.name };
+    const { error } = await addReview(product.id, user.uid, reviewForm.rating, reviewForm.comment, userInfo);
+
+    if (error) {
+      toast.error('Failed to submit review');
+    } else {
+      toast.success('Review submitted for approval.');
+      setIsReviewModalOpen(false);
+      setReviewForm({ rating: 5, comment: '' });
+    }
+    setSubmittingReview(false);
+  };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 rounded-full border-t-2 border-primary animate-spin" /></div>;
   if (!product) return <div className="min-h-screen flex items-center justify-center">Product Not Found.</div>;
 
   const price = parseInt((product.consumersPrice || product.price || "0").toString().replace(/,/g, ''));
-  const originalPrice = product.originalPrice ? parseInt(product.originalPrice.toString().replace(/,/g, '')) : Math.round(price * 1.3);
+  const originalPrice = product.original_price || product.originalPrice ? parseInt((product.original_price || product.originalPrice).toString().replace(/,/g, '')) : Math.round(price * 1.3);
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-
-  // Dynamic Rating Stats
   const reviews = product.reviews || [];
-  const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : (product.rating || 0);
-  const ratingDistribution = [5, 4, 3, 2, 1].map(star => {
-    const count = reviews.filter(r => Math.round(r.rating) === star).length;
-    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
-    return { star, percentage, count };
-  });
+  const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : (product.rating || 4.8);
 
   return (
     <div className="product-detail-page pt-28">
       <div className="container">
         <div className="product-detail-layout">
-          
-          {/* Left Column: Gallery & Content Sections */}
+
           <div className="space-y-12">
             <div className="gallery-container">
-              {/* Vertical Thumbnails */}
               <div className="vertical-thumbnails">
                 {product.gallery.map((img, idx) => (
-                  <button 
-                    key={idx} 
+                  <button
+                    key={idx}
                     onClick={() => setActiveImage(idx)}
                     className={`thumb-btn ${activeImage === idx ? 'active' : ''}`}
                   >
                     <img src={img} alt="" className="w-full h-full object-contain" />
                   </button>
                 ))}
-                {product.gallery.length > 5 && (
-                   <div className="thumb-btn bg-black flex items-center justify-center text-[8px] text-white font-bold">+{product.gallery.length - 5}</div>
-                )}
               </div>
 
-              {/* Main Image Viewport */}
               <div className="main-image-viewport group">
-                <div className="absolute top-4 right-4 bg-white/80 px-2 py-1 rounded text-[10px] font-bold text-teal-600 border border-teal-100 flex items-center gap-1 z-10">
-                  {avgRating} <Star size={8} fill="currentColor" /> | {reviews.length || '385'}
-                </div>
-                
-                {/* Navigation Arrows */}
-                <button className="image-nav-btn prev opacity-0 group-hover:opacity-100" onClick={prevImage}><ChevronLeft size={16} /></button>
-                <button className="image-nav-btn next opacity-0 group-hover:opacity-100" onClick={nextImage}><ChevronRight size={16} /></button>
+                <button className="image-nav-btn prev" onClick={prevImage}><ChevronLeft size={20} /></button>
+                <button className="image-nav-btn next" onClick={nextImage}><ChevronRight size={20} /></button>
 
                 <AnimatePresence mode="wait">
-                  <motion.img 
+                  <motion.img
                     key={activeImage}
-                    src={product.gallery[activeImage]} 
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full max-w-[85%] h-auto object-contain"
+                    src={product.gallery[activeImage]}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                    className="w-full max-w-[90%] h-auto object-contain"
                   />
                 </AnimatePresence>
               </div>
             </div>
-
-            {/* Content Sections (Actions removed by previous user request) */}
           </div>
 
-          {/* Right Column: Sticky Sidebar */}
           <aside className="sticky-sidebar">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h1 className="text-xl font-bold text-[#1a1a1a] mb-1">{product.name}</h1>
-                <p className="text-xs text-[#666] font-medium">{product.brand || 'Signature Series'} • {product.frame_shape || 'Square'}</p>
-              </div>
-              <div className="flex gap-3">
-                 <button className="hover:scale-110 transition-transform" onClick={toggleWishlist}>
-                   <Heart size={20} fill={isWishlisted ? 'red' : 'none'} color={isWishlisted ? 'red' : '#1a1a1a'} />
-                 </button>
-                 <button className="hover:scale-110 transition-transform" onClick={handleShare}><Share2 size={20} /></button>
-              </div>
-            </div>
+            <div className="flex flex-col gap-10">
+              <div className="brand-header">
+                <FadeIn delay={0.1}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">
+                      {product.brand || 'Chashmaly Luxury'}
+                    </span>
+                    <div className="w-1 h-1 rounded-full bg-slate-300" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                      ID: {product.sku || product.id?.slice(0, 8)}
+                    </span>
+                  </div>
+                </FadeIn>
 
-            <div className="flex items-baseline gap-3 mb-1">
-               <span className="text-2xl font-bold text-[#1a1a1a]">₹{price.toLocaleString()}</span>
-               <span className="text-xs text-[#666]">with Free Lenses</span>
-            </div>
-            <div className="text-[10px] font-bold text-teal-600 mb-6 flex items-center gap-1">
-               <div className="flex text-yellow-400"><Star size={10} fill="currentColor" /><Star size={10} fill="currentColor" /><Star size={10} fill="currentColor" /><Star size={10} fill="currentColor" /><Star size={10} fill="currentColor" /></div>
-               ({discountPercent}% OFF)
-            </div>
+                <div className="flex justify-between items-start gap-4">
+                  <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-slate-900 leading-[1.1] mb-4">
+                    {product.name}
+                  </h1>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      onClick={toggleWishlist}
+                      className={`w-12 h-12 rounded-full flex items-center justify-center border transition-all ${isWishlisted ? 'bg-red-50 border-red-100 text-red-500' : 'bg-white border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-900'}`}
+                    >
+                      <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
+                    </button>
+                  </div>
+                </div>
 
-            {/* Frame Color */}
-            <div className="mb-6">
-               <p className="text-[11px] font-bold mb-3 uppercase tracking-wider text-[#1a1a1a]">Frame Color: <span className="font-medium text-[#666] ml-1">{(product.colors && product.colors.length > 0) ? product.colors[activeColor]?.name : ((product.available_colors && product.available_colors.length > 0) ? product.available_colors[activeColor] : 'Standard')}</span></p>
-                <div className="flex gap-3">
-                  {(product.colors && product.colors.length > 0) ? product.colors.map((c, i) => (
-                    <button 
-                      key={i} 
-                      onClick={() => {
-                        setActiveColor(i);
-                        if (c.image) {
-                          const idx = product.gallery.findIndex(img => img === c.image);
-                          if (idx !== -1) setActiveImage(idx);
-                        }
-                      }}
-                      className={`w-8 h-8 rounded-full border-2 p-0.5 transition-all ${activeColor === i ? 'border-primary' : 'border-transparent'}`}
-                    >
-                       <div className="w-full h-full rounded-full border border-black/10 shadow-sm" style={{ background: c.hex }} title={c.name} />
-                    </button>
-                  )) : (product.available_colors && product.available_colors.length > 0) ? product.available_colors.map((c, i) => (
-                    <button 
-                      key={i} 
-                      onClick={() => setActiveColor(i)}
-                      className={`px-3 py-1 rounded-full border text-[10px] font-bold transition-all ${activeColor === i ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'}`}
-                    >
-                       {c}
-                    </button>
-                  )) : (
-                    <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border-2 border-primary p-0.5"><div className="w-full h-full rounded-full border border-black/10 shadow-sm" /></div>
+                <div className="flex items-center gap-4 mt-2">
+                   <div className="flex items-center gap-1.5">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={12} fill={i < Math.floor(avgRating) ? "#EAB308" : "none"} className={i < Math.floor(avgRating) ? "text-yellow-500" : "text-slate-200"} />
+                        ))}
+                      </div>
+                      <span className="text-[11px] font-black text-slate-900">{avgRating}</span>
+                   </div>
+                   <div className="w-px h-3 bg-slate-200" />
+                   <button onClick={() => setIsReviewModalOpen(true)} className="text-[11px] text-slate-500 font-black uppercase tracking-widest hover:text-accent transition-colors">{reviews.length} Verified Reviews</button>
+                </div>
+              </div>
+
+              <div className="pricing-section border-y border-slate-100 py-8">
+                <div className="flex items-baseline gap-4 mb-3">
+                  <span className="text-4xl font-black text-slate-900 tracking-tighter">₹{price.toLocaleString()}</span>
+                  {originalPrice > price && (
+                    <span className="text-lg font-bold text-slate-300 line-through decoration-slate-300">₹{originalPrice.toLocaleString()}</span>
                   )}
-               </div>
-               {activeColor === 0 && <span className="text-[9px] text-red-600 font-bold mt-2 block">Few Left</span>}
-            </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                      Save {discountPercent}% Today
+                    </span>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400">Tax Included • Free Lens Kit</p>
+                </div>
+              </div>
 
-            {/* Frame Size */}
-            <div className="mb-8">
-               <p className="text-[11px] font-bold mb-3 uppercase tracking-wider text-[#1a1a1a]">Frame Size: <span className="font-medium text-[#666] ml-1">{activeSize}</span></p>
-               <div className="size-btn-group">
+              <div className="option-section">
+                <div className="flex justify-between items-end mb-5">
+                   <label className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">
+                     Select Color
+                   </label>
+                   <span className="text-[11px] font-black text-slate-900">{(product.colors && product.colors.length > 0) ? product.colors[activeColor]?.name : 'Standard Edition'}</span>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  {(product.colors && product.colors.length > 0) ? product.colors.map((c, i) => (
+                    <button key={i} onClick={() => setActiveColor(i)} className={`relative w-14 h-14 rounded-full border-2 transition-all p-1.5 ${activeColor === i ? 'border-slate-900 scale-110 shadow-xl' : 'border-slate-100 hover:border-slate-300'}`}>
+                      <div className="w-full h-full rounded-full border border-black/5" style={{ background: c.hex }} title={c.name} />
+                      {activeColor === i && <div className="absolute -top-1 -right-1 w-5 h-5 bg-slate-900 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg"><CheckCircle size={10} /></div>}
+                    </button>
+                  )) : <div className="w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-900 p-1.5 scale-110 shadow-lg"><div className="w-full h-full rounded-full" /></div>}
+                </div>
+              </div>
+
+              <div className="option-section">
+                <div className="flex justify-between items-center mb-5">
+                  <label className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Select Size</label>
+                  <button className="text-[10px] font-black uppercase tracking-widest text-slate-900 border-b-2 border-slate-900 pb-0.5">Size Guide</button>
+                </div>
+                <div className="flex gap-4">
                   {(product.available_sizes || ['S', 'M', 'L']).map(size => (
-                    <button 
-                      key={size}
-                      onClick={() => setActiveSize(size)}
-                      className={`size-pill ${activeSize === size ? 'active' : ''}`}
-                    >
+                    <button key={size} onClick={() => setActiveSize(size)} className={`flex-1 py-4 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] border-2 transition-all ${activeSize === size ? 'bg-slate-900 text-white border-slate-900 shadow-2xl shadow-slate-900/20' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'}`}>
                       {size}
                     </button>
                   ))}
-               </div>
-            </div>
+                </div>
+              </div>
 
-            {/* Desktop Action Button */}
-            <button 
-              onClick={() => setIsLensModalOpen(true)} 
-              className="sidebar-cta-btn"
-            >
-              Select Lenses
-            </button>
+              <div className="action-stack space-y-4 pt-4">
+                <button onClick={() => setIsLensModalOpen(true)} className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-black transition-all shadow-2xl shadow-slate-900/30">
+                  Select Lenses
+                </button>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:border-slate-200 transition-all">
+                    <ShieldCheck size={20} className="text-slate-900" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">1 Year Warranty</span>
+                    <p className="text-[9px] text-slate-400 font-bold leading-relaxed">Full coverage for manufacturing defects.</p>
+                  </div>
+                  <div className="flex flex-col gap-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:border-slate-200 transition-all">
+                    <RotateCcw size={20} className="text-slate-900" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">14-Day Returns</span>
+                    <p className="text-[9px] text-slate-400 font-bold leading-relaxed">Hassle-free exchange & refund policy.</p>
+                  </div>
+                </div>
+              </div>
 
-            {/* Delivery Details */}
-            <div className="mb-8">
-               <p className="text-[11px] font-bold mb-3 uppercase tracking-wider text-[#1a1a1a]">Delivery Details</p>
-               <div className="pincode-box">
-                  <input 
-                    type="text" 
-                    placeholder="Enter pincode" 
-                    className="pincode-input"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  />
-                  <button className="pincode-btn" onClick={checkPincode} disabled={pincodeStatus === 'checking'}>
+              <div className="logistics-box p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                <div className="flex items-center gap-3 mb-6">
+                   <MapPin size={20} className="text-slate-900" />
+                   <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Check Delivery</h4>
+                </div>
+                <div className="relative group">
+                  <input type="text" placeholder="Enter Pincode" className="w-full px-6 py-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-slate-900 transition-all text-slate-900 placeholder:text-slate-300" value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))} />
+                  <button onClick={checkPincode} disabled={pincodeStatus === 'checking'} className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-slate-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all">
                     {pincodeStatus === 'checking' ? '...' : 'Check'}
                   </button>
-               </div>
-               {pincodeStatus === 'success' && <p className="delivery-status-msg success">Deliverable to your location! Estimated: 2-3 Days</p>}
-               {pincodeStatus === 'error' && <p className="delivery-status-msg error">Please enter a valid 6-digit pincode.</p>}
-               
-               <div className="delivery-check-card">
-                  <MapPin size={18} className="text-teal-600" />
-                  <div>
-                    <p className="text-[10px] font-bold text-[#1a1a1a]">Check delivery details</p>
-                    <p className="text-[9px] text-[#666]">Express delivery might be applicable</p>
+                </div>
+                {pincodeStatus === 'success' && <FadeIn><div className="flex items-center gap-2 mt-6 text-emerald-600"><CheckCircle size={14} /><span className="text-[10px] font-black uppercase tracking-widest">Express Delivery within 3-4 Days</span></div></FadeIn>}
+              </div>
+
+              <div className="specs-accordion space-y-4">
+                <Accordion title="Technical Details">
+                  <div className="grid grid-cols-2 gap-x-12 gap-y-6 py-4">
+                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Material</span><p className="text-[12px] font-black text-slate-900">{product.frame_material || 'TR90 Ultra'}</p></div>
+                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Style</span><p className="text-[12px] font-black text-slate-900">{product.frame_type || 'Full Rim'}</p></div>
+                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Shape</span><p className="text-[12px] font-black text-slate-900">{product.frame_shape || 'Rectangle'}</p></div>
+                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Weight</span><p className="text-[12px] font-black text-slate-900">22g (Featherlight)</p></div>
                   </div>
-               </div>
+                </Accordion>
+                <Accordion title="Protection Protocol">
+                  <div className="space-y-4 py-4">
+                    <div className="flex items-start gap-3">
+                       <ShieldCheck size={16} className="text-slate-900 mt-0.5" />
+                       <p className="text-[11px] font-bold text-slate-600 leading-relaxed"><strong>UV400 Shield</strong>: Maximum protection against UVA/UVB rays.</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                       <Layers size={16} className="text-slate-900 mt-0.5" />
+                       <p className="text-[11px] font-bold text-slate-600 leading-relaxed"><strong>Anti-Scratch Coating</strong>: Multi-layer protection for lens durability.</p>
+                    </div>
+                  </div>
+                </Accordion>
+              </div>
             </div>
-
-            {/* Trust Section */}
-            <div className="mb-8">
-               <p className="text-[11px] font-bold mb-4 uppercase tracking-wider text-[#1a1a1a]">We Assure you</p>
-               <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="w-10 h-10 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-2"><RotateCcw size={18} className="text-green-600" /></div>
-                    <p className="text-[8px] font-bold leading-tight">No Questions Asked Returns</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-10 h-10 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-2"><Layers size={18} className="text-green-600" /></div>
-                    <p className="text-[8px] font-bold leading-tight">Easy 14-day Exchange</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-10 h-10 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-2"><ShieldCheck size={18} className="text-green-600" /></div>
-                    <p className="text-[8px] font-bold leading-tight">365-day Warranty</p>
-                  </div>
-               </div>
-            </div>
-
-            {/* Reviews Summary */}
-            <div className="review-summary-box">
-               <div className="flex justify-between items-baseline mb-6">
-                  <h3 className="text-sm font-bold text-[#1a1a1a]">Rating & Reviews</h3>
-                  <div className="text-xs font-bold text-teal-600">{avgRating} <Star size={10} fill="currentColor" /></div>
-               </div>
-               
-               <div className="flex gap-8 items-center mb-8">
-                  <div className="text-center">
-                     <p className="text-3xl font-bold">{avgRating} <Star size={18} className="inline mb-1" fill="currentColor" /></p>
-                     <p className="text-[9px] text-[#666]">{reviews.length} Reviews</p>
-                  </div>
-                  <div className="flex-grow space-y-1">
-                     {ratingDistribution.map(({ star, percentage }) => (
-                       <div key={star} className="rating-row">
-                          <span className="text-[9px] w-2">{star}</span>
-                          <div className="rating-bar-container">
-                            <motion.div 
-                              initial={{ width: 0 }}
-                              whileInView={{ width: `${percentage}%` }}
-                              viewport={{ once: true }}
-                              className="rating-bar-fill" 
-                            />
-                          </div>
-                       </div>
-                     ))}
-                  </div>
-               </div>
-
-               <button 
-                 onClick={() => setIsReviewModalOpen(true)}
-                 className="w-full py-3 bg-black text-white rounded text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors mb-6"
-               >
-                 Write a Review
-               </button>
-
-               {reviews.length > 0 && (
-                 <>
-                   <p className="text-[10px] font-bold mb-3">User Photos</p>
-                   <div className="user-photos-strip">
-                      {reviews.slice(0, 5).map((rev, i) => rev.photoUrl && (
-                        <div key={i} className="user-photo-thumb"><img src={rev.photoUrl} alt="" className="w-full h-full object-cover" /></div>
-                      ))}
-                      {/* Fallback photos if none */}
-                      <div className="user-photo-thumb"><img src={product.model_image} alt="" className="w-full h-full object-cover opacity-50" /></div>
-                   </div>
-
-                   <div className="space-y-4 mb-6">
-                      {reviews.slice(0, 3).map((rev, i) => (
-                        <div key={i} className="py-3 border-b border-divider">
-                           <div className="flex justify-between items-center mb-1">
-                              <p className="text-[10px] font-bold flex items-center gap-2"><User size={10} /> {rev.full_name || 'Verified Buyer'}</p>
-                              <span className="text-[9px] font-bold">{rev.rating} <Star size={8} fill="currentColor" className="inline" /></span>
-                           </div>
-                           <p className="text-[9px] text-[#666] mb-1">{rev.created_at ? new Date(rev.created_at.seconds * 1000).toLocaleDateString() : 'Recent'}</p>
-                           <p className="text-[10px] text-[#1a1a1a]">{rev.comment}</p>
-                        </div>
-                      ))}
-                   </div>
-                   <button className="w-full py-2 border border-black rounded text-[10px] font-bold">Read All Reviews</button>
-                 </>
-               )}
-            </div>
-
-            {/* Accordions */}
-            <Accordion title="Frequently asked questions">
-               <div className="space-y-4">
-                  <p><strong>How do I know my frame size?</strong><br/>You can check our frame size guide or use our virtual try-on feature.</p>
-                  <p><strong>What is the return policy?</strong><br/>We offer a no-questions-asked 14-day return and exchange policy.</p>
-               </div>
-            </Accordion>
-            <Accordion title="Product Details">
-               <div className="grid grid-cols-2 gap-y-4">
-                  <div><p className="text-[10px] text-[#666]">Frame Type</p><p className="text-[10px] font-bold">{product.frame_type || 'Full Rim'}</p></div>
-                  <div><p className="text-[10px] text-[#666]">Material</p><p className="text-[10px] font-bold">{product.material || 'Acetate'}</p></div>
-                  <div><p className="text-[10px] text-[#666]">Weight</p><p className="text-[10px] font-bold">24 gm</p></div>
-                  <div><p className="text-[10px] text-[#666]">Shape</p><p className="text-[10px] font-bold">{product.frame_shape || 'Rectangle'}</p></div>
-               </div>
-            </Accordion>
           </aside>
         </div>
 
-        {/* Similar Products Section */}
         <section className="mt-32 pt-16 border-t border-divider">
            <div className="flex justify-between items-end mb-12">
-              <h2 className="text-2xl font-bold text-[#1a1a1a]">Similar Products</h2>
-              <div className="flex gap-4">
-                 <button className="w-10 h-10 rounded-full border border-divider flex items-center justify-center hover:bg-surface-flat" onClick={() => scrollSlider('left')}><ChevronLeft size={20} /></button>
-                 <button className="w-10 h-10 rounded-full border border-divider flex items-center justify-center hover:bg-surface-flat" onClick={() => scrollSlider('right')}><ChevronRight size={20} /></button>
-              </div>
+              <h2 className="text-2xl font-bold text-primary">Similar Products</h2>
            </div>
            <div className="similar-grid-container" ref={sliderRef}>
-              {relatedProducts.map(p => (
-                <div key={p.id} className="w-full">
-                  <ProductCard product={p} />
-                </div>
-              ))}
+              {relatedProducts.map(p => <div key={p.id} className="w-full"><ProductCard product={p} /></div>)}
            </div>
         </section>
       </div>
 
-      {/* Sticky Bottom CTA */}
       <div className="pdp-sticky-cta">
          <button onClick={() => setIsLensModalOpen(true)} className="cta-main-btn">Select Lenses</button>
       </div>
 
-      <LensSelector 
-        isOpen={isLensModalOpen} 
-        onClose={() => setIsLensModalOpen(false)}
-        product={product}
-      />
+      <LensSelector isOpen={isLensModalOpen} onClose={() => setIsLensModalOpen(false)} product={product} />
 
-      {/* Review Modal */}
       <AnimatePresence>
         {isReviewModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative"
-            >
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <h3 className="text-lg font-black text-gray-900">Write a Review</h3>
-                <button onClick={() => setIsReviewModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-                  <X size={20} />
-                </button>
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-[35px] w-full max-w-md overflow-hidden shadow-2xl relative">
+              <div className="p-8 border-b border-gray-100 flex justify-between items-center">
+                <h3 className="text-lg font-black text-gray-900">Post Review</h3>
+                <button onClick={() => setIsReviewModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20} /></button>
               </div>
-
-              <form onSubmit={handleReviewSubmit} className="p-6">
-                <div className="mb-6">
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 text-center">Your Rating</label>
-                  <div className="flex justify-center gap-2">
+              <form onSubmit={handleReviewSubmit} className="p-8">
+                <div className="mb-8 text-center">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Your Rating</label>
+                  <div className="flex justify-center gap-3">
                     {[1, 2, 3, 4, 5].map(star => (
-                      <button 
-                        key={star} 
-                        type="button"
-                        onClick={() => setReviewForm({ ...reviewForm, rating: star })}
-                        className="hover:scale-110 transition-transform"
-                      >
+                      <button key={star} type="button" onClick={() => setReviewForm({ ...reviewForm, rating: star })} className="hover:scale-110 transition-transform">
                         <Star size={32} fill={star <= reviewForm.rating ? '#FBBF24' : 'none'} color={star <= reviewForm.rating ? '#FBBF24' : '#E5E7EB'} />
                       </button>
                     ))}
                   </div>
                 </div>
-
                 <div className="mb-8">
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Your Experience</label>
-                  <textarea 
-                    value={reviewForm.comment}
-                    onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
-                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all resize-none min-h-[120px]"
-                    placeholder="Tell us what you loved about this product..."
-                    required
-                  />
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Technical Feedback</label>
+                  <textarea value={reviewForm.comment} onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })} className="w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-black transition-all resize-none min-h-[120px]" placeholder="Tell us about the quality and fit..." required />
                 </div>
-
-                <button 
-                  type="submit" 
-                  disabled={submittingReview}
-                  className="w-full py-4 bg-black text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50"
-                >
-                  {submittingReview ? 'Submitting...' : 'Post Review'}
+                <button type="submit" disabled={submittingReview} className="w-full py-5 bg-black text-white rounded-[35px] text-[11px] font-black uppercase tracking-[3px] hover:bg-slate-800 transition-all disabled:opacity-50">
+                  {submittingReview ? 'Processing...' : 'Execute Submission'}
                 </button>
               </form>
             </motion.div>

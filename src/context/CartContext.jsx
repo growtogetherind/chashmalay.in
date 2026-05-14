@@ -112,7 +112,7 @@ export const CartProvider = ({ children }) => {
         return updated;
       });
     }
-    toast.success(`${product.name || 'Item'} added to cart!`, { icon: '🛍️' });
+    toast.success(`${product.name || 'Item'} added to cart!`);
   };
 
   // ─── Remove from Cart ─────────────────────────────────────────────────────────
@@ -173,8 +173,17 @@ export const CartProvider = ({ children }) => {
     const { data: coupon, error } = await validateCoupon(code);
     
     if (coupon) {
-      const pct = coupon.discount_percentage; // E.g. 0.25
-      const amount = cartTotal * pct;
+      const minPurchase = Number(coupon.min_purchase || 0);
+      if (cartTotal < minPurchase) {
+        return { success: false, message: `Add ₹${(minPurchase - cartTotal).toFixed(0)} more to use this coupon.` };
+      }
+
+      const rawPct = Number(coupon.discount_percentage || 0);
+      const pct = rawPct > 1 ? rawPct / 100 : rawPct;
+      let amount = cartTotal * pct;
+      const maxDiscount = Number(coupon.max_discount || 0);
+      if (maxDiscount > 0) amount = Math.min(amount, maxDiscount);
+
       setDiscount({ amount, code: code.toUpperCase() });
       return { success: true, message: `Coupon applied! You save ₹${amount.toFixed(0)}` };
     }

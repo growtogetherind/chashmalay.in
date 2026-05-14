@@ -1,8 +1,9 @@
-import { useState, Suspense, lazy } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ConfirmProvider } from './context/ConfirmContext';
+import { CartProvider } from './context/CartContext';
 import { ProtectedRoute, AdminRoute } from './components/ui/ProtectedRoute';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar.jsx';
@@ -11,6 +12,7 @@ import Footer from './components/layout/Footer.jsx';
 import Loader from './components/ui/Loader.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
 import { ReactLenis } from '@studio-freight/react-lenis';
+import { subscribeSettings } from './lib/firebase';
 import './index.css';
 
 // ─── Lazy-load all route-level pages ─────────────────────────────────────────
@@ -50,6 +52,12 @@ const PageLoader = () => (
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    const unsubscribe = subscribeSettings(setSettings);
+    return unsubscribe;
+  }, []);
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -63,9 +71,10 @@ function App() {
       }}>
         <ConfirmProvider>
           <AuthProvider>
-            <ScrollToTop />
-            <ErrorBoundary>
-              <div className="app-container">
+            <CartProvider>
+              <ScrollToTop />
+              <ErrorBoundary>
+                <div className="app-container">
                 {isLoading && <Loader onLoadingComplete={() => setIsLoading(false)} />}
 
                 <Toaster
@@ -73,13 +82,14 @@ function App() {
                   toastOptions={{
                     duration: 3000,
                     style: {
-                      background: '#161616',
-                      color: '#ffffff',
+                      background: '#ffffff',
+                      color: '#0f172a',
                       fontWeight: 700,
-                      fontSize: '0.875rem',
-                      borderRadius: '999px',
-                      padding: '0.75rem 1.25rem',
-                      border: '1px solid rgba(255,255,255,0.1)'
+                      fontSize: '0.8125rem',
+                      borderRadius: '16px',
+                      padding: '12px 20px',
+                      border: '1px solid #f1f5f9',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
                     }
                   }}
                 />
@@ -107,7 +117,12 @@ function App() {
                       <main className="main-content">
                         <ErrorBoundary>
                           <Suspense fallback={<PageLoader />}>
-                            <Routes>
+                            {settings.maintenance_mode && window.location.pathname !== '/auth' ? (
+                              <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+                                <h1 className="text-3xl md:text-5xl font-black text-gray-900 mb-4">We’ll Be Back Soon</h1>
+                                <p className="text-gray-500 max-w-xl">The store is temporarily under maintenance. Please check back shortly.</p>
+                              </div>
+                            ) : <Routes>
                               <Route path="/"                         element={<Home />} />
                               <Route path="/auth"                     element={<Auth />} />
                               <Route path="/cart"                     element={<Cart />} />
@@ -121,7 +136,7 @@ function App() {
                               <Route path="/account/orders"           element={<ProtectedRoute><Account /></ProtectedRoute>} />
                               <Route path="/account/orders/:orderId"  element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
                               <Route path="*"                         element={<NotFound />} />
-                            </Routes>
+                            </Routes>}
                           </Suspense>
                         </ErrorBoundary>
                       </main>
@@ -130,8 +145,9 @@ function App() {
                     </>
                   } />
                 </Routes>
-              </div>
-            </ErrorBoundary>
+                </div>
+              </ErrorBoundary>
+            </CartProvider>
           </AuthProvider>
         </ConfirmProvider>
       </ReactLenis>

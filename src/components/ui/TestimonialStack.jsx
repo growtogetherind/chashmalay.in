@@ -1,84 +1,88 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
-import './TestimonialStack.css';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FadeIn } from './Motion';
 
 const testimonials = [
   {
     id: 1,
     name: "Arjun Sharma",
     role: "Verified Buyer",
+    avatar: "https://i.pravatar.cc/80?img=12",
     rating: 5,
-    comment: "The Titan EyeX is a game changer. The audio quality for pods and calls is surprisingly good for something built into glasses.",
-    date: "2 days ago"
+    comment: "Absolutely love these glasses! High quality frames and excellent lens clarity. Will definitely buy again.",
   },
   {
     id: 2,
     name: "Priya Patel",
-    role: "Studio Collection",
+    role: "Verified Buyer",
+    avatar: "https://i.pravatar.cc/80?img=47",
     rating: 5,
-    comment: "Absolutely love the architectural frames. They feel premium and look stunning with everything.",
-    date: "1 week ago"
+    comment: "Fast delivery, perfect fit and the prescription accuracy is spot on. Best eyewear I've ever bought online.",
   },
   {
     id: 3,
     name: "Vikram Singh",
-    role: "Tech Enthusiast",
+    role: "Verified Buyer",
+    avatar: "https://i.pravatar.cc/80?img=8",
     rating: 4,
-    comment: "Precision lens fitting and smooth overall experience. Hands-free calling is super useful during my commute.",
-    date: "2 weeks ago"
+    comment: "Premium packaging and great customer support. The frames look even better in person. Highly recommended!",
   }
 ];
 
 const TestimonialStack = () => {
   return (
-    <section className="testimonial-section py-40 bg-white">
-      <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-           <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#009688] mb-4 block">Our Community</span>
-              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-[#161616] mb-12">
-                WHAT THEY <br /> <span className="serif-oa italic text-black/30">EXPERIENCE.</span>
-              </h2>
-              <div className="flex gap-2 mb-8">
-                 {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#009688" color="#009688" />)}
-              </div>
-              <p className="text-black/40 text-lg uppercase tracking-widest font-black">
-                4.8/5 based on 2,500+ reviews
-              </p>
-           </div>
+    <section className="py-10 bg-white border-t border-gray-100">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Our customers</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Our Testimonials</h2>
+          </div>
+          {/* Navigation dots styled like screenshot */}
+          <div className="flex gap-2">
+            <button className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-red-600 hover:text-red-600 transition-colors">
+              <ChevronLeft size={14} />
+            </button>
+            <button className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-red-600 hover:text-red-600 transition-colors">
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
 
-           <div className="testimonial-stack-container relative h-[400px]">
-              {testimonials.map((t, i) => (
-                <motion.div
-                  key={t.id}
-                  initial={{ opacity: 0, y: 50, rotate: 0 }}
-                  whileInView={{ 
-                    opacity: 1, 
-                    y: i * 40 - (testimonials.length * 20),
-                    rotate: i % 2 === 0 ? 2 : -2,
-                    scale: 1 - i * 0.05
-                  }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.2, duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
-                  className="testimonial-card absolute inset-0 m-auto h-fit"
-                  style={{ zIndex: testimonials.length - i }}
-                >
-                  <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-black/5">
-                     <div className="flex justify-between items-start mb-8">
-                        <div>
-                           <h4 className="text-sm font-black uppercase tracking-widest">{t.name}</h4>
-                           <p className="text-[10px] text-black/40 uppercase tracking-widest">{t.role}</p>
-                        </div>
-                        <span className="text-[10px] font-bold text-black/20 uppercase">{t.date}</span>
-                     </div>
-                     <p className="text-[#161616] text-xl font-medium leading-relaxed italic">
-                       "{t.comment}"
-                     </p>
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {testimonials.map((t, idx) => (
+            <FadeIn key={t.id} delay={idx * 0.1}>
+              <div className="bg-gray-50 border border-gray-100 rounded-lg p-6 hover:shadow-md transition-shadow">
+                {/* Stars */}
+                <div className="flex gap-0.5 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={14}
+                      className={i < t.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}
+                    />
+                  ))}
+                </div>
+                {/* Comment */}
+                <p className="text-gray-600 text-sm leading-relaxed mb-5">"{t.comment}"</p>
+                {/* Author */}
+                <div className="flex items-center gap-3 border-t border-gray-200 pt-4">
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${t.name}&background=f3f4f6&color=374151&size=80`; }}
+                  />
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">{t.name}</p>
+                    <p className="text-xs text-gray-400">{t.role}</p>
                   </div>
-                </motion.div>
-              ))}
-           </div>
+                </div>
+              </div>
+            </FadeIn>
+          ))}
         </div>
       </div>
     </section>

@@ -53,32 +53,30 @@
 .lens-modal-steps {
   display: flex;
   justify-content: center;
-  padding: 1.25rem 2rem;
+  padding: 20px 24px;
   background-color: #fff;
-  border-bottom: 1px solid #eee;
-  gap: 0;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 12px;
 }
 
 .step-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   flex: 1;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #ccc;
   position: relative;
 }
 
 .step-item::after {
   content: '';
   position: absolute;
-  top: 12px;
-  right: -50%;
-  width: 100%;
+  top: 50%;
+  left: calc(50% + 20px);
+  width: calc(100% - 40px);
   height: 2px;
-  background-color: #eee;
+  background-color: #f1f5f9;
   z-index: 1;
+  transform: translateY(-50%);
 }
 
 .step-item:last-child::after {
@@ -86,18 +84,18 @@
 }
 
 .step-circle {
-  width: 24px;
-  height: 24px;
-  background-color: #eee;
-  color: #999;
+  width: 32px;
+  height: 32px;
+  background-color: #f1f5f9;
+  color: #94a3b8;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
-  position: relative;
   z-index: 2;
-  font-size: 0.75rem;
+  font-size: 11px;
+  font-weight: 900;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .step-item.active {
@@ -105,8 +103,10 @@
 }
 
 .step-item.active .step-circle {
-  background-color: var(--oa-accent);
+  background-color: #1a1a1a;
   color: white;
+  transform: scale(1.1);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
 .step-item.completed {
@@ -114,18 +114,19 @@
 }
 
 .step-item.completed .step-circle {
-  background-color: #16a34a;
+  background-color: #1a1a1a;
   color: white;
 }
 
 .step-item.completed::after {
-  background-color: #16a34a;
+  background-color: #1a1a1a;
 }
 
 .lens-modal-content {
-  padding: 2rem;
+  padding: 24px;
   overflow-y: auto;
   flex-grow: 1;
+  background-color: #ffffff;
 }
 
 .step-title {
@@ -144,30 +145,29 @@
 .vision-card {
   display: flex;
   align-items: center;
-  padding: 1.25rem 1.5rem;
-  border: 2px solid #161616;
-  border-radius: 1.25rem;
+  padding: 20px;
+  border: 1px solid #f1f5f9;
+  border-radius: 20px;
   text-align: left;
-  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
 }
 
 .vision-card:hover {
-  border-color: var(--oa-accent);
+  border-color: #1a1a1a;
   background-color: #f8fafc;
-  transform: translateX(5px);
 }
 
 .vision-image-wrapper {
-  background-color: #f1f5f9;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  background-color: #f8fafc;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1.25rem;
+  margin-right: 20px;
   flex-shrink: 0;
 }
 
@@ -183,14 +183,18 @@
 }
 
 .vision-info h4 {
-  font-size: 1.125rem;
-  color: var(--oa-charcoal);
-  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
 }
 
 .vision-info p {
-  font-size: 0.8125rem;
-  color: var(--oa-gray);
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
 }
 
 .arrow {
@@ -203,10 +207,13 @@
 
 /* Step 2: Package Grid */
 .back-btn {
-  font-size: 0.875rem;
-  color: var(--oa-accent);
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+  display: block;
 }
 
 .package-grid {
@@ -217,20 +224,20 @@
 
 .package-card {
   position: relative;
-  padding: 2rem 1.5rem;
-  border: 1px solid var(--oa-border);
-  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  border: 1px solid #f1f5f9;
+  border-radius: 32px;
   text-align: center;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
 }
 
 .package-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--oa-accent);
-  box-shadow: var(--shadow-lg);
+  border-color: #1a1a1a;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.04);
 }
 
 .package-tag {
