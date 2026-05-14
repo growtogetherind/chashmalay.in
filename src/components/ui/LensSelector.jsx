@@ -337,7 +337,6 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                   }
                   addToCart(product, { ...selections, manualDetails, prescriptionUrl });
                   onClose();
-                  navigate('/cart');
                 }} 
                 style={{marginTop: '2rem'}}
               >

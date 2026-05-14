@@ -12,6 +12,7 @@ import Footer from './components/layout/Footer.jsx';
 import Loader from './components/ui/Loader.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
 import { ReactLenis } from '@studio-freight/react-lenis';
+import CartDrawer from './components/ui/CartDrawer.jsx';
 import { subscribeSettings } from './lib/firebase';
 import './index.css';
 
@@ -26,7 +27,9 @@ const OrderSuccess = lazy(() => import('./pages/OrderSuccess.jsx'));
 const Account      = lazy(() => import('./pages/Account.jsx'));
 const OrderDetail  = lazy(() => import('./pages/OrderDetail.jsx'));
 const Offers       = lazy(() => import('./pages/Offers.jsx'));
-const FindStore    = lazy(() => import('./pages/FindStore.jsx'));
+const ContactLens       = lazy(() => import('./pages/ContactLens.jsx'));
+const ContactLensDetail = lazy(() => import('./pages/ContactLensDetail.jsx'));
+const FindStore         = lazy(() => import('./pages/FindStore.jsx'));
 const NotFound     = lazy(() => import('./pages/NotFound.jsx'));
 
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard.jsx'));
@@ -72,6 +75,7 @@ function App() {
         <ConfirmProvider>
           <AuthProvider>
             <CartProvider>
+              <CartDrawer />
               <ScrollToTop />
               <ErrorBoundary>
                 <div className="app-container">
@@ -127,6 +131,8 @@ function App() {
                               <Route path="/auth"                     element={<Auth />} />
                               <Route path="/cart"                     element={<Cart />} />
                               <Route path="/category/:name"           element={<Category />} />
+                              <Route path="/contact-lenses"           element={<ContactLens />} />
+                              <Route path="/contact-lens/:id"         element={<ContactLensDetail />} />
                               <Route path="/offers"                   element={<Offers />} />
                               <Route path="/product/:id"              element={<ProductDetail />} />
                               <Route path="/find-store"               element={<FindStore />} />

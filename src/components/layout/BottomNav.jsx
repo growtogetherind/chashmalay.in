@@ -5,7 +5,7 @@ import { useCart } from '../../context/CartContext';
 import './BottomNav.css';
 
 const BottomNav = () => {
-  const { cartCount } = useCart();
+  const { cartCount, toggleCart, isCartOpen } = useCart();
   const location = useLocation();
 
   // Hide BottomNav on Product Detail & Cart Page to avoid overlapping with CTAs
@@ -23,13 +23,16 @@ const BottomNav = () => {
         <Grid size={20} />
         <span>Shop</span>
       </NavLink>
-      <NavLink to="/cart" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+      <button 
+        onClick={toggleCart} 
+        className={`bottom-nav-item bg-transparent border-none p-0 cursor-pointer ${isCartOpen ? 'active' : ''}`}
+      >
         <div className="bottom-nav-cart">
           <ShoppingBag size={20} />
           {cartCount > 0 && <span className="bottom-nav-badge">{cartCount}</span>}
         </div>
         <span>Cart</span>
-      </NavLink>
+      </button>
       <NavLink to="/account" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <User size={20} />
         <span>Account</span>

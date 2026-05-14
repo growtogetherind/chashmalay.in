@@ -12,7 +12,7 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { cartCount } = useCart();
+  const { cartCount, toggleCart } = useCart();
   const { user, profile, signOut } = useAuth();
   const profileRef = useRef(null);
   const navigate = useNavigate();
@@ -44,7 +44,8 @@ const Navbar = () => {
   const navLinks = [
     { name: 'EYEGLASSES',     path: '/category/eyeglasses' },
     { name: 'SUNGLASSES',     path: '/category/sunglasses' },
-    { name: 'CONTACT LENSES', path: '/category/contact-lenses' },
+    { name: 'CONTACT LENSES', path: '/contact-lenses' },
+    { name: 'TRACK ORDER',     path: '/account' },
     { name: 'STORE LOCATOR',  path: '/find-store' },
   ];
 
@@ -110,9 +111,9 @@ const Navbar = () => {
               </Link>
 
               {/* Cart */}
-              <Link
-                to="/cart"
-                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all duration-200 relative"
+              <button
+                onClick={toggleCart}
+                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all duration-200 relative bg-transparent border-none cursor-pointer"
                 aria-label="Cart"
               >
                 <ShoppingBag size={18} strokeWidth={1.5} />
@@ -121,7 +122,7 @@ const Navbar = () => {
                     {cartCount}
                   </span>
                 )}
-              </Link>
+              </button>
 
               {/* ── Profile Avatar / Popup (desktop) ── */}
               <div className="hidden md:block relative" ref={profileRef}>
@@ -175,6 +176,7 @@ const Navbar = () => {
                             {[
                               { label: 'My Account', path: '/account', icon: <User size={15} /> },
                               { label: 'My Orders', path: '/account/orders', icon: <Package size={15} /> },
+                              { label: 'Track Order', path: '/account', icon: <Package size={15} /> },
                             ].map((item) => (
                               <Link
                                 key={item.path}

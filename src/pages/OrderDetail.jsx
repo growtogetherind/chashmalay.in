@@ -161,7 +161,17 @@ const OrderDetail = () => {
                   <td>
                     {item.lens_selection ? (
                       <div>
-                        <p className="text-sm text-gray-800 font-medium">{item.lens_selection.visionType?.title || 'Frame Only'}</p>
+                        {item.lens_selection?.visionType && (
+                          <p className="text-sm text-gray-800 font-medium">{item.lens_selection.visionType.title}</p>
+                        )}
+                        {item.lens_selection?.isContactLens && (
+                          <p className="text-sm text-gray-800 font-medium">Contact Lenses</p>
+                        )}
+                        {!item.lens_selection && (
+                          <p className="text-sm text-gray-400 font-medium italic">
+                            {item.category?.toLowerCase().includes('contact') ? 'Contact Lens' : 'Frame Only'}
+                          </p>
+                        )}
                         <p className="text-xs text-primary-blue font-bold mt-1">{item.lens_selection.lensPackage?.name}</p>
                       </div>
                     ) : (

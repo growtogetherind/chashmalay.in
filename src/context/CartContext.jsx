@@ -11,7 +11,12 @@ const CART_STORAGE_KEY = 'chashmaly_guest_cart';
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const toggleCart = () => setIsCartOpen(prev => !prev);
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
   const [discount, setDiscount] = useState({ amount: 0, code: null });
 
   // ─── Unified price reader ─────────────────────────────────────────────────────
@@ -70,7 +75,8 @@ export const CartProvider = ({ children }) => {
 
   // ─── Add to Cart ──────────────────────────────────────────────────────────────
   const addToCart = async (product, lensSelection = null) => {
-    // Sanitize to avoid circular refs from React elements which break Firebase (Internal Assertion Failed: Symbol)
+    openCart();
+    // Sanitize to avoid circular refs from React elements which break Firebase
     const sanitizedLenses = lensSelection ? {
       visionType: lensSelection.visionType
         ? { id: lensSelection.visionType.id, title: lensSelection.visionType.title, price: lensSelection.visionType.price }
@@ -79,85 +85,124 @@ export const CartProvider = ({ children }) => {
         ? { id: lensSelection.lensPackage.id, name: lensSelection.lensPackage.name, price: lensSelection.lensPackage.price }
         : null,
       powerOption: lensSelection.powerOption || null,
+      selectedColor: lensSelection.selectedColor || null,
       manualDetails: lensSelection.manualDetails || null,
-      prescriptionUrl: lensSelection.prescriptionUrl || null
+      prescriptionUrl: lensSelection.prescriptionUrl || null,
+      isContactLens: lensSelection.isContactLens || false
     } : null;
 
-    if (user) {
-      const existing = cart.find(item => (item.product_id || item.id) === product.id);
-      const qty = existing ? (existing.quantity || 1) + 1 : 1;
-      const { error } = await upsertCartItem(user.uid, product.id, qty, sanitizedLenses);
-      if (error) { toast.error('Could not add to cart.'); return; }
-      await loadCart();
-    } else {
+    let targetQty = 1;
 
-      setCart(prev => {
-        const existingIdx = prev.findIndex(item => (item.id || item.product_id) === product.id);
-        let updated;
-        if (existingIdx >= 0) {
-          updated = prev.map((item, i) =>
-            i === existingIdx ? { ...item, quantity: (item.quantity || 1) + 1 } : item
-          );
-        } else {
-          updated = [...prev, {
-            // Preserve all product fields at root level
-            ...product,
-            product_id: product.id,
-            quantity: 1,
-            lensSelection: sanitizedLenses,
-            cartId: `${product.id}-${Date.now()}`
-          }];
-        }
+    // Optimistic UI Update
+    setCart(prev => {
+      const existingIdx = prev.findIndex(item => (item.id || item.product_id) === product.id);
+      let updated;
+      if (existingIdx >= 0) {
+        targetQty = (prev[existingIdx].quantity || 1) + 1;
+        updated = prev.map((item, i) =>
+          i === existingIdx ? { ...item, quantity: targetQty } : item
+        );
+      } else {
+        targetQty = 1;
+        updated = [...prev, {
+          ...product,
+          product_id: product.id,
+          quantity: 1,
+          lensSelection: sanitizedLenses,
+          cartId: `${product.id}-${Date.now()}`
+        }];
+      }
+      
+      if (!user) {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updated));
-        return updated;
+      }
+      return updated;
+    });
+
+    toast.success(`${product.name || 'Item'} added to cart!`);
+
+    // Async Firebase Sync
+    if (user) {
+      upsertCartItem(user.uid, product.id, targetQty, sanitizedLenses).then(({ error }) => {
+        if (error) {
+          toast.error('Sync failed, refreshing cart.');
+          loadCart();
+        }
       });
     }
-    toast.success(`${product.name || 'Item'} added to cart!`);
+  };
+
+  const updateLensSelection = async (identifier, lensSelection) => {
+    const pid = cart.find(i => i.cartId === identifier || i.product_id === identifier || i.id === identifier)?.product_id || identifier;
+
+    setCart(prev => {
+      const updated = prev.map(item => 
+        (item.cartId === identifier || item.product_id === identifier || item.id === identifier)
+          ? { ...item, lensSelection: { ...(item.lensSelection || {}), ...lensSelection } }
+          : item
+      );
+      if (!user) localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+
+    if (user) {
+      const item = cart.find(i => i.cartId === identifier || i.product_id === identifier || i.id === identifier);
+      const fullLenses = { ...(item?.lensSelection || {}), ...lensSelection };
+      upsertCartItem(user.uid, pid, item?.quantity || 1, fullLenses).catch(() => loadCart());
+    }
   };
 
   // ─── Remove from Cart ─────────────────────────────────────────────────────────
-  // Accepts any identifier: cartId, product_id, or id
   const removeFromCart = async (identifier) => {
     const findItem = (list) => list.find(
       item => item.cartId === identifier || item.product_id === identifier || item.id === identifier
     );
 
-    if (user) {
-      const item = findItem(cart);
-      const pid = item?.product_id || item?.id || identifier;
-      await removeCartItem(user.uid, pid);
-      setCart(prev => prev.filter(i =>
+    const item = findItem(cart);
+    const pid = item?.product_id || item?.id || identifier;
+
+    // Optimistic UI Update
+    setCart(prev => {
+      const updated = prev.filter(i =>
         i.cartId !== identifier && i.product_id !== identifier && i.id !== identifier
-      ));
-    } else {
-      setCart(prev => {
-        const updated = prev.filter(i =>
-          i.cartId !== identifier && i.product_id !== identifier && i.id !== identifier
-        );
+      );
+      if (!user) {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updated));
-        return updated;
-      });
+      }
+      return updated;
+    });
+
+    // Async Firebase Sync
+    if (user && pid) {
+      removeCartItem(user.uid, pid).catch(() => loadCart());
     }
   };
 
   // ─── Update Quantity ──────────────────────────────────────────────────────────
   const updateQuantity = async (identifier, quantity) => {
     if (quantity < 1) { removeFromCart(identifier); return; }
-    const item = cart.find(i =>
-      i.cartId === identifier || i.product_id === identifier || i.id === identifier
-    );
-    if (user && item) {
-      await upsertCartItem(user.uid, item.product_id || item.id, quantity);
-    }
+    
+    // Optimistic UI Update
     setCart(prev => {
       const updated = prev.map(i =>
         (i.cartId === identifier || i.product_id === identifier || i.id === identifier)
           ? { ...i, quantity }
           : i
       );
-      if (!user) localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updated));
+      if (!user) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updated));
+      }
       return updated;
     });
+
+    // Async Firebase Sync
+    const item = cart.find(i =>
+      i.cartId === identifier || i.product_id === identifier || i.id === identifier
+    );
+    if (user && item) {
+      const pid = item.product_id || item.id;
+      upsertCartItem(user.uid, pid, quantity).catch(() => loadCart());
+    }
   };
 
   // ─── Clear Cart ───────────────────────────────────────────────────────────────
@@ -211,9 +256,14 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider value={{
       cart,
       loading,
+      isCartOpen,
+      toggleCart,
+      openCart,
+      closeCart,
       addToCart,
       removeFromCart,
       updateQuantity,
+      updateLensSelection,
       emptyCart,
       getItemPrice,
       cartCount,

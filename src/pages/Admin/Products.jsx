@@ -14,6 +14,29 @@ const MATERIALS = ['Acetate', 'Metal', 'Titanium', 'TR90', 'Ultem', 'Carbon Fibe
 const LENS_TYPES = ['Single Vision', 'Bifocal', 'Progressive', 'Zero Power', 'Blue Cut', 'Photochromic'];
 const SHAPES = ['Aviator', 'Rectangle', 'Round', 'Cat Eye', 'Wayfarer', 'Oval', 'Square', 'Geometric'];
 
+const DISPOSABLE_TYPES = ['Daily', 'Bi-weekly', 'Monthly', 'Yearly', 'Quarterly'];
+const CONTACT_LENS_TYPES = ['Spherical', 'Toric', 'Multifocal', 'Colored'];
+const PACK_SIZES = ['1 Lens', '2 Lenses', '6 Lenses', '10 Lenses', '30 Lenses', '90 Lenses'];
+const CONTACT_LENS_COLORS = ['Clear', 'Blue', 'Brown', 'Green', 'Hazel', 'Gray', 'Honey', 'Turquoise'];
+
+const DEFAULT_CATEGORIES = [
+  { id: 'def-c1', name: 'Eyeglasses' },
+  { id: 'def-c2', name: 'Sunglasses' },
+  { id: 'def-c3', name: 'Computer Glasses' },
+  { id: 'def-c4', name: 'Contact Lenses' },
+  { id: 'def-c5', name: 'Reading Glasses' }
+];
+
+const DEFAULT_BRANDS = [
+  { id: 'def-b1', name: 'Chashmalay' },
+  { id: 'def-b2', name: 'Ray-Ban' },
+  { id: 'def-b3', name: 'Oakley' },
+  { id: 'def-b4', name: 'Vincent Chase' },
+  { id: 'def-b5', name: 'Carrera' },
+  { id: 'def-b6', name: 'Vogue' },
+  { id: 'def-b7', name: 'Fossil' }
+];
+
 const EMPTY_PRODUCT = {
   name: '',
   brand: '',
@@ -43,7 +66,17 @@ const EMPTY_PRODUCT = {
     zoom: '',
     gallery: []
   },
-  colors: []
+  colors: [],
+  // Contact Lens specific fields
+  disposable_type: 'Monthly',
+  contact_lens_type: 'Spherical',
+  pack_size: '6 Lenses',
+  contact_lens_color: 'Clear',
+  material: 'Silicone Hydrogel',
+  water_content: '38%',
+  uv_protection: 'Yes',
+  base_curve: '8.6',
+  diameter: '14.2'
 };
 const SIZES = ['S', 'M', 'L'];
 
@@ -118,8 +151,12 @@ const AdminProducts = () => {
       setProducts(data || []);
       setLoading(false);
     }, () => setLoading(false));
-    const unCategories = subscribeCategories((data) => setCategories(data || []));
-    const unBrands = subscribeBrands((data) => setBrands(data || []));
+    const unCategories = subscribeCategories((data) => {
+      setCategories(data && data.length > 0 ? data : DEFAULT_CATEGORIES);
+    });
+    const unBrands = subscribeBrands((data) => {
+      setBrands(data && data.length > 0 ? data : DEFAULT_BRANDS);
+    });
     return () => {
       unProducts?.();
       unCategories?.();
@@ -142,16 +179,22 @@ const AdminProducts = () => {
       // Smart Fallback: If categories/brands collections are empty,
       // extract unique values from existing products
       let fetchedCats = cRes.data || [];
-      if (fetchedCats.length === 0 && fetchedProducts.length > 0) {
-        const uniqueCats = [...new Set(fetchedProducts.map(p => p.category).filter(Boolean))];
-        fetchedCats = uniqueCats.map((name, i) => ({ id: `ext-${i}`, name }));
+      if (fetchedCats.length === 0) {
+        if (fetchedProducts.length > 0) {
+          const uniqueCats = [...new Set(fetchedProducts.map(p => p.category).filter(Boolean))];
+          fetchedCats = uniqueCats.map((name, i) => ({ id: `ext-${i}`, name }));
+        }
+        if (fetchedCats.length === 0) fetchedCats = DEFAULT_CATEGORIES;
       }
       setCategories(fetchedCats);
 
       let fetchedBrands = bRes.data || [];
-      if (fetchedBrands.length === 0 && fetchedProducts.length > 0) {
-        const uniqueBrands = [...new Set(fetchedProducts.map(p => p.brand).filter(Boolean))];
-        fetchedBrands = uniqueBrands.map((name, i) => ({ id: `ext-b-${i}`, name }));
+      if (fetchedBrands.length === 0) {
+        if (fetchedProducts.length > 0) {
+          const uniqueBrands = [...new Set(fetchedProducts.map(p => p.brand).filter(Boolean))];
+          fetchedBrands = uniqueBrands.map((name, i) => ({ id: `ext-b-${i}`, name }));
+        }
+        if (fetchedBrands.length === 0) fetchedBrands = DEFAULT_BRANDS;
       }
       setBrands(fetchedBrands);
     } catch (err) {
@@ -475,9 +518,9 @@ const AdminProducts = () => {
               <div className="flex items-center justify-between p-8 border-b border-slate-100 shrink-0 bg-white z-20">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900">{editing ? 'Edit Product' : 'Add New Product'}</h2>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] mt-2 flex items-center gap-2">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] mt-2 flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Adding products to your store
-                  </p>
+                  </div>
                 </div>
                 <button onClick={() => setShowForm(false)} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-900 border border-slate-100"><X size={20} /></button>
               </div>
@@ -495,25 +538,25 @@ const AdminProducts = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="form-group md:col-span-2">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Product Name *</label>
-                      <input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Titanium Aviator Gold Edition" required className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
+                      <input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Titanium Aviator Gold Edition" required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">SKU</label>
-                      <input name="sku" value={form.sku} onChange={handleChange} placeholder="CHM-PRD-XXXX" className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-mono font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm uppercase" />
+                      <input name="sku" value={form.sku} onChange={handleChange} placeholder="CHM-PRD-XXXX" className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-mono font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm uppercase" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Category *</label>
-                      <select name="category" value={form.category} onChange={handleChange} required className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none cursor-pointer">
-                        <option value="">Select Category</option>
+                      <select name="category" value={form.category} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
+                        <option value="">{categories.length === 0 ? 'No Categories Found - Add One First' : 'Select Category'}</option>
                         {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Brand *</label>
-                      <select name="brand" value={form.brand} onChange={handleChange} required className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none cursor-pointer">
+                      <select name="brand" value={form.brand} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         <option value="">Select Brand</option>
                         {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                       </select>
@@ -523,21 +566,21 @@ const AdminProducts = () => {
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Selling Price (₹) *</label>
-                      <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="0.00" required className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-black focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
+                      <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="0.00" required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-black focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Original Price (MRP) (₹)</label>
-                      <input type="number" name="original_price" value={form.original_price} onChange={handleChange} placeholder="0.00" className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
+                      <input type="number" name="original_price" value={form.original_price} onChange={handleChange} placeholder="0.00" className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Stock Quantity</label>
-                      <input type="number" name="stock_quantity" value={form.stock_quantity} onChange={handleChange} className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
+                      <input type="number" name="stock_quantity" value={form.stock_quantity} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
                     </div>
                   </div>
 
                   <div className="form-group">
                     <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Technical Narrative</label>
-                    <textarea name="description" value={form.description} onChange={handleChange} rows={5} placeholder="Compose a compelling narrative for this asset..." className="bg-slate-50 border border-slate-200 p-5 rounded-2xl text-slate-700 text-sm font-medium focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm resize-none leading-relaxed" />
+                    <textarea name="description" value={form.description} onChange={handleChange} rows={5} placeholder="Compose a compelling narrative for this asset..." className="w-full bg-slate-50 border border-slate-200 p-5 rounded-2xl text-slate-700 text-sm font-medium focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm resize-none leading-relaxed" />
                   </div>
                 </div>
               )}
@@ -547,13 +590,13 @@ const AdminProducts = () => {
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Who is it for?</label>
-                      <select name="gender" value={form.gender} onChange={handleChange} className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none cursor-pointer">
+                      <select name="gender" value={form.gender} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Frame Type</label>
-                      <select name="frame_type" value={form.frame_type} onChange={handleChange} className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none cursor-pointer">
+                      <select name="frame_type" value={form.frame_type} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         {FRAME_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
                     </div>
@@ -562,13 +605,13 @@ const AdminProducts = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Product Shape</label>
-                      <select name="frame_shape" value={form.frame_shape} onChange={handleChange} className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none cursor-pointer">
+                      <select name="frame_shape" value={form.frame_shape} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         {SHAPES.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Frame Material</label>
-                      <select name="frame_material" value={form.frame_material} onChange={handleChange} className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none cursor-pointer">
+                      <select name="frame_material" value={form.frame_material} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         {MATERIALS.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
                     </div>
@@ -577,15 +620,86 @@ const AdminProducts = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Lens Category</label>
-                      <select name="lens_type" value={form.lens_type} onChange={handleChange} className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none cursor-pointer">
+                      <select name="lens_type" value={form.lens_type} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         {LENS_TYPES.map(l => <option key={l} value={l}>{l}</option>)}
                       </select>
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Search Tags (Separated by comma)</label>
-                      <input name="tags" value={form.tags} onChange={handleChange} placeholder="e.g. premium, red, round" className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
+                      <input name="tags" value={form.tags} onChange={handleChange} placeholder="e.g. premium, red, round" className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
                     </div>
                   </div>
+
+                  {/* ── Contact Lens Specialized Fields ── */}
+                  {(form.category?.toLowerCase().includes('contact') || form.category?.toLowerCase() === 'contacts') && (
+                    <div className="p-8 bg-emerald-50/30 rounded-[24px] border border-emerald-100/50 space-y-8">
+                       <div className="flex items-center gap-3 mb-2">
+                          <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                          <h4 className="text-[11px] font-black uppercase tracking-[2px] text-emerald-800">Contact Lens Specifications</h4>
+                       </div>
+                       
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Disposable Type</label>
+                            <select name="disposable_type" value={form.disposable_type} onChange={handleChange} className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm cursor-pointer">
+                               {DISPOSABLE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                          </div>
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Lens Material/Type</label>
+                            <select name="contact_lens_type" value={form.contact_lens_type} onChange={handleChange} className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm cursor-pointer">
+                               {CONTACT_LENS_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                          </div>
+                       </div>
+
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Pack Size</label>
+                            <select name="pack_size" value={form.pack_size} onChange={handleChange} className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm cursor-pointer">
+                               {PACK_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                          </div>
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Lens Color (Clear/Tinted)</label>
+                            <select name="contact_lens_color" value={form.contact_lens_color} onChange={handleChange} className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm cursor-pointer">
+                               {CONTACT_LENS_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                          </div>
+                       </div>
+
+                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Material</label>
+                            <input name="material" value={form.material} onChange={handleChange} placeholder="e.g. Silicone Hydrogel" className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm" />
+                          </div>
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Water Content</label>
+                            <input name="water_content" value={form.water_content} onChange={handleChange} placeholder="e.g. 38%" className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm" />
+                          </div>
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">UV Protection</label>
+                            <select name="uv_protection" value={form.uv_protection} onChange={handleChange} className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm cursor-pointer">
+                               <option value="Yes">Yes</option>
+                               <option value="No">No</option>
+                               <option value="Class 1">Class 1</option>
+                               <option value="Class 2">Class 2</option>
+                            </select>
+                          </div>
+                       </div>
+
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Base Curve (BC)</label>
+                            <input name="base_curve" value={form.base_curve} onChange={handleChange} placeholder="e.g. 8.6" className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm" />
+                          </div>
+                          <div className="form-group">
+                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Diameter (DIA)</label>
+                            <input name="diameter" value={form.diameter} onChange={handleChange} placeholder="e.g. 14.2" className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 outline-none transition-all shadow-sm" />
+                          </div>
+                       </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="form-group">
@@ -705,7 +819,7 @@ const AdminProducts = () => {
                       { id: 'front', label: 'Primary Front' },
                       { id: 'side', label: 'Side Profile' },
                       { id: 'model', label: 'Face Display' },
-                      { id: 'zoom', label: 'Macro Detail' }
+                      { id: 'zoom', label: form.category?.toLowerCase().includes('contact') ? 'Packaging Display' : 'Macro Detail' }
                     ].map(img => (
                       <div key={img.id} className="form-group space-y-4">
                         <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[2px] text-center block">{img.label}</label>

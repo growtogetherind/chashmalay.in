@@ -1,6 +1,37 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
+
+const COLOR_SWATCH_MAP = {
+  Black: '#000000',
+  Gold: '#D4AF37',
+  Silver: '#C0C0C0',
+  Gunmetal: '#2C3539',
+  Transparent: '#F1F5F9',
+  Brown: '#5C4033',
+  Blue: '#1E3A8A',
+  'Rose Gold': '#B76E79',
+  Green: '#16A34A',
+  Gray: '#9CA3AF',
+  Grey: '#9CA3AF',
+  Clear: '#FFFFFF',
+  Honey: '#D97706',
+  Hazel: '#8B5E34',
+};
+
+const getColorLabel = (color) => {
+  if (!color) return '';
+  return typeof color === 'string'
+    ? color
+    : color.name || color.label || color.color || color.hex || '';
+};
+
+const getColorValue = (color) => {
+  const label = getColorLabel(color);
+  if (!label) return '#E5E7EB';
+  if (typeof color === 'object' && color.hex) return color.hex;
+  return COLOR_SWATCH_MAP[label] || (/^#[0-9a-f]{3,8}$/i.test(label) ? label : '#E5E7EB');
+};
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -14,8 +45,16 @@ const ProductCard = ({ product }) => {
 
   const frontImage = product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image';
   const hoverImage = product.images?.model || product.model_image || product.images?.gallery?.[1] || frontImage;
+  const colorCandidates = Array.isArray(product.colors) && product.colors.length
+    ? product.colors
+    : [product.color || product.frame_color || product.frameColor].filter(Boolean);
+  const colors = colorCandidates.filter((color) => {
+    const label = getColorLabel(color).trim().toLowerCase();
+    return label && label !== 'standard' && label !== 'default';
+  });
 
-  const colors = product.colors || [];
+  const isContactLens = product.category?.toLowerCase().includes('contact');
+  const productPath = isContactLens ? `/contact-lens/${product.id}` : `/product/${product.id}`;
 
   return (
     <div
@@ -24,7 +63,7 @@ const ProductCard = ({ product }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Area */}
-      <Link to={`/product/${product.id}`} className="block relative overflow-hidden aspect-[4/3] bg-gray-50">
+      <Link to={productPath} className="block relative overflow-hidden aspect-[4/3] bg-gray-50">
         {/* Discount Badge */}
         {discountPercent > 0 && (
           <span className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
@@ -77,12 +116,16 @@ const ProductCard = ({ product }) => {
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
           {product.brand || 'Chashmaly'}
         </p>
-        <Link to={`/product/${product.id}`} className="block">
+        <Link to={productPath} className="block">
           <h4 className="text-sm font-semibold text-gray-800 line-clamp-1 hover:text-red-600 transition-colors mb-1">
             {product.name}
           </h4>
         </Link>
-        <p className="text-[10px] text-gray-400 mb-2 capitalize">{product.frame_shape || product.frameShape || product.category || 'Eyeglasses'}</p>
+        <p className="text-[10px] text-gray-400 mb-2 capitalize">
+          {product.category?.toLowerCase().includes('contact')
+            ? `${product.disposable_type || 'Monthly'} • ${product.pack_size || '6 Lenses'}`
+            : (product.frame_shape || product.frameShape || product.category || 'Eyeglasses')}
+        </p>
 
         {/* Colors */}
         {colors.length > 0 && (
@@ -91,8 +134,8 @@ const ProductCard = ({ product }) => {
               <span
                 key={i}
                 className="w-3 h-3 rounded-full border border-gray-200 inline-block"
-                style={{ backgroundColor: c.hex || c }}
-                title={c.name || c}
+                style={{ backgroundColor: getColorValue(c) }}
+                title={getColorLabel(c)}
               />
             ))}
           </div>

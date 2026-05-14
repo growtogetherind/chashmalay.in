@@ -29,6 +29,20 @@ const mapDoc = (snapshot) => ({ id: snapshot.id, ...snapshot.data() });
 const byCreatedDesc = (a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0);
 const byNameAsc = (a, b) => (a.name || '').localeCompare(b.name || '');
 
+const DEFAULT_SETTINGS = {
+  store_name: 'Chashmaly',
+  contact_email: 'info@chashmaly.in',
+  contact_phone: '+91-9319484119',
+  address: 'Karol Bagh, New Delhi - 110005, India',
+  instagram: '#',
+  facebook: '#',
+  twitter: '#',
+  free_shipping_min: 0,
+  maintenance_mode: false,
+  store_logo: '',
+  carousel_interval: 5
+};
+
 export const getProductImage = (product = {}) => (
   product.images?.front ||
   product.frame_image ||
@@ -592,18 +606,25 @@ export const savePrescription = async (data, id = null) => {
 export const getSettings = async () => {
   try {
     const docSnap = await getDoc(doc(db, "settings", "global"));
-    return { data: docSnap.exists() ? docSnap.data() : {}, error: null };
-  } catch (error) { return { data: {}, error }; }
+    return { data: docSnap.exists() ? { ...DEFAULT_SETTINGS, ...docSnap.data() } : DEFAULT_SETTINGS, error: null };
+  } catch (error) { return { data: DEFAULT_SETTINGS, error }; }
 };
 
-export const subscribeSettings = (onData, onError) => onSnapshot(
-  doc(db, "settings", "global"),
-  (snapshot) => onData(snapshot.exists() ? snapshot.data() : {}),
-  (error) => {
-    console.error("Firestore settings subscription error:", error);
-    if (onError) onError(error);
-  }
-);
+export const subscribeSettings = (onData, onError) => {
+  onData(DEFAULT_SETTINGS);
+
+  return onSnapshot(
+    doc(db, "settings", "global"),
+    (snapshot) => onData(snapshot.exists() ? { ...DEFAULT_SETTINGS, ...snapshot.data() } : DEFAULT_SETTINGS),
+    (error) => {
+      if (error?.code !== 'permission-denied') {
+        console.error("Firestore settings subscription error:", error);
+      }
+      onData(DEFAULT_SETTINGS);
+      if (onError) onError(error);
+    }
+  );
+};
 
 export const saveSettings = async (settings) => {
   try {

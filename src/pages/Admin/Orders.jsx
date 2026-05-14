@@ -282,8 +282,29 @@ const AdminOrders = () => {
                                  <div>
                                     <p className="text-sm font-black text-gray-900">{item.product_name}</p>
                                     <p className="text-[10px] font-bold text-gray-400 mt-0.5">Quantity: {item.quantity}</p>
-                                    {item.visionType && (
-                                       <span className="inline-block mt-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-[9px] font-black uppercase tracking-widest">{item.visionType.title}</span>
+                                    {item.lens_selection && (
+                                       <div className="mt-2 flex flex-wrap gap-2">
+                                          {item.lens_selection.visionType && (
+                                             <span className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded text-[9px] font-black uppercase tracking-widest border border-purple-100">
+                                                {item.lens_selection.visionType.title}
+                                             </span>
+                                          )}
+                                          {item.lens_selection.lensPackage && (
+                                             <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[9px] font-black uppercase tracking-widest border border-emerald-100">
+                                                {item.lens_selection.lensPackage.name}
+                                             </span>
+                                          )}
+                                          {item.lens_selection.isContactLens && (
+                                             <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-black uppercase tracking-widest border border-blue-100">
+                                                Contact Lenses
+                                             </span>
+                                          )}
+                                       </div>
+                                    )}
+                                    {!item.lens_selection && (
+                                       <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-400 rounded text-[9px] font-black uppercase tracking-widest">
+                                          {item.category?.toLowerCase().includes('contact') ? 'Contact Lens' : 'Frame Only'}
+                                       </span>
                                     )}
                                  </div>
                               </div>
@@ -359,6 +380,18 @@ const AdminOrders = () => {
                                           <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Right Eye SPH</p>
                                           <p className="font-black text-purple-900">{item.lens_selection.manualDetails.rightSph || item.lens_selection.manualDetails.leftSph || '-'}</p>
                                        </div>
+                                       {item.lens_selection.manualDetails.bc && (
+                                         <div className="bg-white p-3 rounded-xl border border-purple-100">
+                                            <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Base Curve (BC)</p>
+                                            <p className="font-black text-purple-900">{item.lens_selection.manualDetails.bc}</p>
+                                         </div>
+                                       )}
+                                       {item.lens_selection.manualDetails.dia && (
+                                         <div className="bg-white p-3 rounded-xl border border-purple-100">
+                                            <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Diameter (DIA)</p>
+                                            <p className="font-black text-purple-900">{item.lens_selection.manualDetails.dia}</p>
+                                         </div>
+                                       )}
                                        <div className="col-span-2 bg-white p-3 rounded-xl border border-purple-100">
                                           <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Patient Info</p>
                                           <p className="font-black text-purple-900 text-xs">{item.lens_selection.manualDetails.name} ({item.lens_selection.manualDetails.phone})</p>

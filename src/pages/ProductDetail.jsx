@@ -10,6 +10,7 @@ import { getProductById, getProducts, addReview } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ui/ProductCard';
 import LensSelector from '../components/ui/LensSelector';
+import ContactLensSelector from '../components/ui/ContactLensSelector';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
 import toast from 'react-hot-toast';
 import './ProductDetail.css';
@@ -48,6 +49,7 @@ const ProductDetail = () => {
   const [activeColor, setActiveColor] = useState(0);
   const [activeSize, setActiveSize] = useState('M');
   const [isLensModalOpen, setIsLensModalOpen] = useState(false);
+  const [isCLModalOpen, setIsCLModalOpen] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
@@ -161,6 +163,7 @@ const ProductDetail = () => {
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
   const reviews = product.reviews || [];
   const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : (product.rating || 4.8);
+  const isContactLens = product.category?.toLowerCase().includes('contact') || product.category?.toLowerCase() === 'contacts';
 
   return (
     <div className="product-detail-page pt-28">
@@ -310,8 +313,11 @@ const ProductDetail = () => {
               </div>
 
               <div className="action-stack space-y-4 pt-4">
-                <button onClick={() => setIsLensModalOpen(true)} className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-black transition-all shadow-2xl shadow-slate-900/30">
-                  Select Lenses
+                <button 
+                  onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} 
+                  className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-black transition-all shadow-2xl shadow-slate-900/30"
+                >
+                  {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
                 </button>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:border-slate-200 transition-all">
@@ -344,10 +350,21 @@ const ProductDetail = () => {
               <div className="specs-accordion space-y-4">
                 <Accordion title="Technical Details">
                   <div className="grid grid-cols-2 gap-x-12 gap-y-6 py-4">
-                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Material</span><p className="text-[12px] font-black text-slate-900">{product.frame_material || 'TR90 Ultra'}</p></div>
-                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Style</span><p className="text-[12px] font-black text-slate-900">{product.frame_type || 'Full Rim'}</p></div>
-                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Shape</span><p className="text-[12px] font-black text-slate-900">{product.frame_shape || 'Rectangle'}</p></div>
-                    <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Weight</span><p className="text-[12px] font-black text-slate-900">22g (Featherlight)</p></div>
+                    {isContactLens ? (
+                      <>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Disposable</span><p className="text-[12px] font-black text-slate-900">{product.disposable_type || 'Monthly'}</p></div>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Pack Size</span><p className="text-[12px] font-black text-slate-900">{product.pack_size || '6 Lenses'}</p></div>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Lens Color</span><p className="text-[12px] font-black text-slate-900">{product.contact_lens_color || 'Clear'}</p></div>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Type</span><p className="text-[12px] font-black text-slate-900">{product.contact_lens_type || 'Spherical'}</p></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Material</span><p className="text-[12px] font-black text-slate-900">{product.frame_material || 'TR90 Ultra'}</p></div>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Style</span><p className="text-[12px] font-black text-slate-900">{product.frame_type || 'Full Rim'}</p></div>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Shape</span><p className="text-[12px] font-black text-slate-900">{product.frame_shape || 'Rectangle'}</p></div>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Weight</span><p className="text-[12px] font-black text-slate-900">22g (Featherlight)</p></div>
+                      </>
+                    )}
                   </div>
                 </Accordion>
                 <Accordion title="Protection Protocol">
@@ -378,10 +395,13 @@ const ProductDetail = () => {
       </div>
 
       <div className="pdp-sticky-cta">
-         <button onClick={() => setIsLensModalOpen(true)} className="cta-main-btn">Select Lenses</button>
+         <button onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} className="cta-main-btn">
+           {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
+         </button>
       </div>
 
       <LensSelector isOpen={isLensModalOpen} onClose={() => setIsLensModalOpen(false)} product={product} />
+      <ContactLensSelector isOpen={isCLModalOpen} onClose={() => setIsCLModalOpen(false)} product={product} />
 
       <AnimatePresence>
         {isReviewModalOpen && (
