@@ -69,8 +69,50 @@ export const generateInvoice = (order) => {
     margin: { left: 20, right: 20 }
   });
 
+  // Prescription Section
+  const prescriptionItems = order.order_items.filter(item => item.lens_selection?.manualDetails);
+  
+  if (prescriptionItems.length > 0) {
+    const rxStartY = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 63, 138);
+    doc.text("PRESCRIPTION DETAILS", 20, rxStartY);
+    
+    let rxCurrentY = rxStartY + 5;
+    
+    prescriptionItems.forEach((item) => {
+      const details = item.lens_selection.manualDetails;
+      const rxData = [
+        ['RIGHT (OD)', details.rightSph || '-', details.rightCyl || '-', details.rightAxis || '-', details.rightAddlPower || '-'],
+        ['LEFT (OS)', details.leftSph || '-', details.leftCyl || '-', details.leftAxis || '-', details.leftAddlPower || '-']
+      ];
+      
+      autoTable(doc, {
+        startY: rxCurrentY,
+        head: [['Eye', 'SPH', 'CYL', 'Axis', 'Addl. Power']],
+        body: rxData,
+        headStyles: { fillColor: [70, 70, 70], textColor: 255, fontStyle: 'bold' },
+        theme: 'grid',
+        margin: { left: 20 },
+        styles: { fontSize: 9, halign: 'center' },
+        columnStyles: { 0: { halign: 'left', fontStyle: 'bold' } }
+      });
+
+      rxCurrentY = doc.lastAutoTable.finalY + 5;
+
+      // Patient Info if available
+      if (details.name || details.phone) {
+         doc.setFontSize(8);
+         doc.setTextColor(100);
+         doc.text(`Patient: ${details.name || '-'} | Phone: ${details.phone || '-'}`, 20, rxCurrentY + 2);
+         rxCurrentY += 8;
+      }
+    });
+  }
+
   // Footer
-  const finalY = doc.lastAutoTable?.finalY || 200;
+  const finalY = doc.lastAutoTable?.finalY + 20 || 200;
   doc.setFontSize(8);
   doc.setTextColor(150);
   doc.text("Terms & Conditions:", 20, finalY);

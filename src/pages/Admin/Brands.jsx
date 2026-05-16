@@ -143,7 +143,7 @@ const AdminBrands = () => {
 
       {showForm && (
         <div className="admin-modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="admin-modal max-w-lg" onClick={e => e.stopPropagation()}>
+          <div className="admin-modal max-w-lg p-8 md:p-10" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-10 pb-6 border-b border-slate-100">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">{editing ? 'Technical Modification' : 'Entity Initialization'}</h2>

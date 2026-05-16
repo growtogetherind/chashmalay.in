@@ -3,8 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/ui/Logo';
-import { auth } from '../lib/firebase';
-import { sendPasswordResetEmail } from 'firebase/auth';
 import toast from 'react-hot-toast';
 import './Auth.css';
 
@@ -13,7 +11,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ fullName: '', email: '', password: '' });
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [resetLoading, setResetLoading] = useState(false);
@@ -57,20 +55,18 @@ const Auth = () => {
     catch (err) { toast.error(err.message); }
   };
 
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = async (e) => {
+    if (e) e.preventDefault();
     if (!form.email.trim()) {
       toast.error('Please enter your email address first.');
       return;
     }
     setResetLoading(true);
     try {
-      await sendPasswordResetEmail(auth, form.email.trim());
-      toast.success('Password reset email sent! Check your inbox.');
+      await resetPassword(form.email.trim());
+      setMode('login'); // Go back to login after sending
     } catch (err) {
-      // Firebase returns a generic error for non-existent emails to prevent enumeration
-      toast.error(err.code === 'auth/user-not-found'
-        ? 'No account found with this email.'
-        : err.message || 'Failed to send reset email.');
+      // Error is handled in AuthContext toast
     } finally {
       setResetLoading(false);
     }
@@ -101,12 +97,48 @@ const Auth = () => {
         <div className="auth-form-panel">
           <div className="auth-card glass-panel">
             {/* Tabs */}
-            <div className="auth-tabs">
-              <button className={`auth-tab ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>LOGIN</button>
-              <button className={`auth-tab ${mode === 'register' ? 'active' : ''}`} onClick={() => setMode('register')}>REGISTER</button>
-            </div>
+            {mode !== 'forgot' && (
+              <div className="auth-tabs">
+                <button className={`auth-tab ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>LOGIN</button>
+                <button className={`auth-tab ${mode === 'register' ? 'active' : ''}`} onClick={() => setMode('register')}>REGISTER</button>
+              </div>
+            )}
 
-            <form onSubmit={handleSubmit} className="auth-form">
+            {mode === 'forgot' ? (
+              <div className="animate-fade-in">
+                <h3 className="text-xl font-black text-gray-900 mb-2">Reset Password</h3>
+                <p className="text-sm text-gray-500 mb-6">Enter your email address and we'll send you a link to reset your password.</p>
+                
+                <form onSubmit={handleForgotPassword} className="auth-form">
+                  <div className="form-group">
+                    <label>Email Address</label>
+                    <div className={`input-wrap ${mode === 'forgot' ? 'opacity-60 bg-gray-50 cursor-not-allowed' : ''}`}>
+                      <span className="input-icon text-sm">@</span>
+                      <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="you@example.com" 
+                        value={form.email} 
+                        onChange={handleChange} 
+                        required 
+                        disabled={mode === 'forgot'}
+                      />
+                    </div>
+                  </div>
+
+                  <button type="submit" className="auth-submit-btn" disabled={resetLoading}>
+                    {resetLoading ? <span className="loading-dots">...</span> : (
+                      <>SEND RESET LINK <ArrowRight size={16} /></>
+                    )}
+                  </button>
+
+                  <button type="button" onClick={() => setMode('login')} className="w-full text-center text-xs font-bold text-gray-500 hover:text-primary-blue mt-4">
+                    Back to Login
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="auth-form">
               {mode === 'register' && (
                 <div className="form-group">
                   <label>Full Name</label>
@@ -135,39 +167,47 @@ const Auth = () => {
                 </div>
               </div>
 
-              {mode === 'login' && (
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    onClick={handleForgotPassword}
-                    disabled={resetLoading}
-                    className="text-xs text-primary font-bold hover:underline disabled:opacity-50"
+                    onClick={() => {
+                      if (!form.email.trim()) {
+                        toast.error('Please enter your email address first.');
+                        return;
+                      }
+                      setMode('forgot');
+                    }}
+                    className="text-xs text-primary font-bold hover:underline"
                   >
-                    {resetLoading ? 'Sending...' : 'Forgot Password?'}
+                    Forgot Password?
                   </button>
                 </div>
-              )}
 
               <button type="submit" className="auth-submit-btn" disabled={loading}>
                 {loading ? <span className="loading-dots">...</span> : (
                   <>{mode === 'login' ? 'LOGIN' : 'CREATE ACCOUNT'} <ArrowRight size={16} /></>
                 )}
               </button>
-            </form>
+              </form>
+            )}
 
-            <div className="auth-divider"><span>or continue with</span></div>
+            {mode !== 'forgot' && (
+              <>
+                <div className="auth-divider"><span>or continue with</span></div>
 
-            <button onClick={handleGoogle} className="google-btn">
-              <Globe size={18} />
-              <span>Continue with Google</span>
-            </button>
+                <button onClick={handleGoogle} className="google-btn">
+                  <Globe size={18} />
+                  <span>Continue with Google</span>
+                </button>
 
-            <p className="auth-switch">
-              {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
-              <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="ml-2 text-primary font-black underline">
-                {mode === 'login' ? 'Register' : 'Login'}
-              </button>
-            </p>
+                <p className="auth-switch">
+                  {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
+                  <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="ml-2 text-primary font-black underline">
+                    {mode === 'login' ? 'Register' : 'Login'}
+                  </button>
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -24,6 +24,7 @@
 @media (max-width: 768px) {
   .product-detail-page {
     padding-top: 80px;
+    overflow-x: hidden;
   }
 }
 
@@ -262,6 +263,40 @@
 .cta-main-btn:hover {
   background: #000;
   transform: translateY(-2px);
+}
+
+.inline-cta-desktop {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .inline-cta-desktop {
+    display: block !important;
+    margin-bottom: 20px;
+  }
+  
+  .spec-grid-mobile {
+    gap-x: 16px !important;
+  }
+  
+  .product-detail-page {
+     padding-top: 60px;
+  }
+
+  .gallery-container {
+    padding: 0 4px;
+  }
+
+  .main-image-viewport {
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {

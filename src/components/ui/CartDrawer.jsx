@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   X, ChevronDown, Tag, Shield, ArrowRight, Zap, 
@@ -8,6 +8,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { uploadImage } from '../../lib/cloudinary';
+import { subscribeCoupons } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import './CartDrawer.css';
 
@@ -23,12 +24,23 @@ const CartDrawer = () => {
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [couponInput, setCouponInput] = useState('');
   const [uploadingId, setUploadingId] = useState(null);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
 
-  const availableCoupons = [
-    { code: 'CHASH25', desc: 'Flat 25% OFF on all orders', discount: 0.25 },
-    { code: 'BOGO50', desc: 'Buy 1 Get 1 at 50% OFF', discount: 0.5 },
-    { code: 'FIRST500', desc: 'Flat ₹500 OFF on first order', discount: 500 }
-  ];
+  // Fetch real coupons from backend
+  useEffect(() => {
+    if (isCartOpen) {
+      const unsubscribe = subscribeCoupons((coupons) => {
+        // Only show active coupons and hide demo ones (e.g., ones with 'demo' in description or specific IDs)
+        const activeCoupons = coupons.filter(c => 
+          c.is_active !== false && 
+          !c.description?.toLowerCase().includes('demo') &&
+          !c.code?.toLowerCase().includes('demo')
+        );
+        setAvailableCoupons(activeCoupons);
+      });
+      return unsubscribe;
+    }
+  }, [isCartOpen]);
 
   const handleApplyCoupon = async (code) => {
     const result = await applyCoupon(code);
@@ -137,7 +149,14 @@ const CartDrawer = () => {
                               <h3 className="item-name">{getItemName(item)}</h3>
                               <button onClick={() => removeFromCart(itemId)} className="remove-item-btn"><X size={14} /></button>
                             </div>
-                            <p className="item-meta">{item.products?.brand || 'Premium Edition'} • {item.products?.frame_shape || 'Medium'}</p>
+                            <p className="item-meta">
+                              {item.products?.brand || 'Premium Edition'} • {item.products?.frame_shape || 'Medium'}
+                              {item.lensSelection?.lensPackage && (
+                                <span className="block mt-1 text-indigo-600 font-bold">
+                                  Lens: {item.lensSelection.lensPackage.name}
+                                </span>
+                              )}
+                            </p>
                             
                             <div className="item-price-qty">
                               <span className="item-price">₹{currentPrice.toLocaleString()}</span>
@@ -157,6 +176,34 @@ const CartDrawer = () => {
                               <Eye size={12} className="text-slate-400" />
                               <span className="text-[10px] font-black uppercase tracking-widest">Vision Protocol</span>
                             </div>
+
+                            {/* Manual Power Summary if exists */}
+                            {item.lensSelection.manualDetails && (
+                               <div className="manual-rx-preview mb-3 p-2.5 bg-slate-50/50 rounded-xl border border-slate-100">
+                                  <div className="grid grid-cols-5 gap-1 text-[8px] font-black text-slate-400 uppercase mb-1 px-1">
+                                     <span className="col-span-1">Eye</span>
+                                     <span>SPH</span>
+                                     <span>CYL</span>
+                                     <span>Axis</span>
+                                     <span>Addl.</span>
+                                  </div>
+                                  <div className="grid grid-cols-5 gap-1 text-[9px] text-slate-700 py-1 border-b border-slate-100/50">
+                                     <span className="font-black text-indigo-600">R</span>
+                                     <span>{item.lensSelection.manualDetails.rightSph || '-'}</span>
+                                     <span>{item.lensSelection.manualDetails.rightCyl || '-'}</span>
+                                     <span>{item.lensSelection.manualDetails.rightAxis || '-'}</span>
+                                     <span>{item.lensSelection.manualDetails.rightAddlPower || '-'}</span>
+                                  </div>
+                                  <div className="grid grid-cols-5 gap-1 text-[9px] text-slate-700 py-1">
+                                     <span className="font-black text-indigo-600">L</span>
+                                     <span>{item.lensSelection.manualDetails.leftSph || '-'}</span>
+                                     <span>{item.lensSelection.manualDetails.leftCyl || '-'}</span>
+                                     <span>{item.lensSelection.manualDetails.leftAxis || '-'}</span>
+                                     <span>{item.lensSelection.manualDetails.leftAddlPower || '-'}</span>
+                                  </div>
+                               </div>
+                            )}
+
                             <div className="rx-status-box">
                               {item.lensSelection.prescriptionUrl ? (
                                 <div className="flex items-center justify-between w-full">
@@ -174,7 +221,7 @@ const CartDrawer = () => {
                               ) : (
                                 <div className="flex items-center justify-between w-full">
                                   <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">
-                                    {item.lensSelection.powerOption === 'later' ? 'Submission Pending' : 'Missing Prescription'}
+                                    {item.lensSelection.powerOption === 'later' ? 'Submission Pending' : item.lensSelection.manualDetails ? 'Manual Power Selected' : 'Missing Prescription'}
                                   </span>
                                   <label className="upload-rx-btn">
                                     {uploadingId === itemId ? '...' : <><UploadCloud size={12} /> Upload Now</>}
@@ -272,9 +319,9 @@ const CartDrawer = () => {
                   </div>
                   <div className="mini-coupons-list">
                     {availableCoupons.map(c => (
-                      <div key={c.code} className="mini-coupon-item" onClick={() => handleApplyCoupon(c.code)}>
+                      <div key={c.id || c.code} className="mini-coupon-item" onClick={() => handleApplyCoupon(c.code)}>
                         <span className="code">{c.code}</span>
-                        <span className="desc">{c.desc}</span>
+                        <span className="desc">{c.description || `${c.discount_value}${c.discount_type === 'percentage' ? '%' : ' INR'} OFF`}</span>
                       </div>
                     ))}
                   </div>

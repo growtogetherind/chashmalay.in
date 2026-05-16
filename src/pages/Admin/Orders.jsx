@@ -371,28 +371,57 @@ const AdminOrders = () => {
                                  )}
 
                                  {item.lens_selection?.manualDetails && (
-                                    <div className="grid grid-cols-2 gap-4">
-                                       <div className="bg-white p-3 rounded-xl border border-purple-100">
-                                          <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Left Eye SPH</p>
-                                          <p className="font-black text-purple-900">{item.lens_selection.manualDetails.leftSph || '-'}</p>
+                                    <div className="space-y-4">
+                                       <div className="grid grid-cols-4 gap-2 text-[9px] font-black uppercase text-purple-400 tracking-widest px-1">
+                                          <div>Power</div>
+                                          <div className="text-center">SPH</div>
+                                          <div className="text-center">CYL</div>
+                                          <div className="text-center">Axis</div>
                                        </div>
-                                       <div className="bg-white p-3 rounded-xl border border-purple-100">
-                                          <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Right Eye SPH</p>
-                                          <p className="font-black text-purple-900">{item.lens_selection.manualDetails.rightSph || item.lens_selection.manualDetails.leftSph || '-'}</p>
+                                       <div className="grid grid-cols-4 gap-2 items-center bg-white p-3 rounded-xl border border-purple-100 shadow-sm">
+                                          <div className="text-[10px] font-black text-purple-900 uppercase">Right</div>
+                                          <div className="text-center font-black text-purple-900 text-sm">{item.lens_selection.manualDetails.rightSph || '-'}</div>
+                                          <div className="text-center font-black text-purple-900 text-sm">{item.lens_selection.manualDetails.rightCyl || '-'}</div>
+                                          <div className="text-center font-black text-purple-900 text-sm">{item.lens_selection.manualDetails.rightAxis || '-'}</div>
                                        </div>
-                                       {item.lens_selection.manualDetails.bc && (
-                                         <div className="bg-white p-3 rounded-xl border border-purple-100">
-                                            <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Base Curve (BC)</p>
-                                            <p className="font-black text-purple-900">{item.lens_selection.manualDetails.bc}</p>
-                                         </div>
+                                       <div className="grid grid-cols-4 gap-2 items-center bg-white p-3 rounded-xl border border-purple-100 shadow-sm">
+                                          <div className="text-[10px] font-black text-purple-900 uppercase">Left</div>
+                                          <div className="text-center font-black text-purple-900 text-sm">{item.lens_selection.manualDetails.leftSph || '-'}</div>
+                                          <div className="text-center font-black text-purple-900 text-sm">{item.lens_selection.manualDetails.leftCyl || '-'}</div>
+                                          <div className="text-center font-black text-purple-900 text-sm">{item.lens_selection.manualDetails.leftAxis || '-'}</div>
+                                       </div>
+
+                                       {(item.lens_selection.manualDetails.rightAddlPower || item.lens_selection.manualDetails.leftAddlPower) && (
+                                          <div className="grid grid-cols-2 gap-4">
+                                             <div className="bg-white p-3 rounded-xl border border-purple-100 shadow-sm">
+                                                <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Addl. Power (R)</p>
+                                                <p className="font-black text-purple-900">{item.lens_selection.manualDetails.rightAddlPower || '-'}</p>
+                                             </div>
+                                             <div className="bg-white p-3 rounded-xl border border-purple-100 shadow-sm">
+                                                <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Addl. Power (L)</p>
+                                                <p className="font-black text-purple-900">{item.lens_selection.manualDetails.leftAddlPower || '-'}</p>
+                                             </div>
+                                          </div>
                                        )}
-                                       {item.lens_selection.manualDetails.dia && (
-                                         <div className="bg-white p-3 rounded-xl border border-purple-100">
-                                            <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Diameter (DIA)</p>
-                                            <p className="font-black text-purple-900">{item.lens_selection.manualDetails.dia}</p>
-                                         </div>
+
+                                       {(item.lens_selection.manualDetails.bc || item.lens_selection.manualDetails.dia) && (
+                                          <div className="grid grid-cols-2 gap-4">
+                                             {item.lens_selection.manualDetails.bc && (
+                                                <div className="bg-white p-3 rounded-xl border border-purple-100">
+                                                   <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Base Curve (BC)</p>
+                                                   <p className="font-black text-purple-900">{item.lens_selection.manualDetails.bc}</p>
+                                                </div>
+                                             )}
+                                             {item.lens_selection.manualDetails.dia && (
+                                                <div className="bg-white p-3 rounded-xl border border-purple-100">
+                                                   <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Diameter (DIA)</p>
+                                                   <p className="font-black text-purple-900">{item.lens_selection.manualDetails.dia}</p>
+                                                </div>
+                                             )}
+                                          </div>
                                        )}
-                                       <div className="col-span-2 bg-white p-3 rounded-xl border border-purple-100">
+
+                                       <div className="bg-white p-3 rounded-xl border border-purple-100 shadow-sm">
                                           <p className="text-[9px] font-bold text-purple-400 uppercase mb-1">Patient Info</p>
                                           <p className="font-black text-purple-900 text-xs">{item.lens_selection.manualDetails.name} ({item.lens_selection.manualDetails.phone})</p>
                                        </div>

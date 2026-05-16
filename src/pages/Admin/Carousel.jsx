@@ -159,7 +159,7 @@ const AdminCarousel = () => {
 
       {showForm && (
         <div className="admin-modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="admin-modal max-w-5xl" onClick={e => e.stopPropagation()}>
+          <div className="admin-modal max-w-5xl p-10 md:p-12" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-10 pb-6 border-b border-slate-100">
                <div>
                   <h2 className="text-2xl font-black text-slate-900">{editing ? 'Edit Visual Artifact' : 'New Visual Artifact'}</h2>

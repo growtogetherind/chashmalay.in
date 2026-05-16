@@ -112,7 +112,7 @@ const AdminPrescriptions = () => {
 
       {selected && (
         <div className="admin-modal-overlay" onClick={() => setSelected(null)}>
-          <div className="admin-modal max-w-5xl" onClick={e => e.stopPropagation()}>
+          <div className="admin-modal max-w-5xl p-10 md:p-12" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-10 pb-6 border-b border-slate-100">
                <div>
                   <h2 className="text-2xl font-black text-slate-900">Clinical Audit: Rx Detailed View</h2>

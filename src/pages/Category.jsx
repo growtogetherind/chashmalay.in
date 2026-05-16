@@ -611,7 +611,7 @@ const Category = () => {
                                    disabled={availabilityCount === 0 && !isSelected}
                                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'} ${availabilityCount === 0 && !isSelected ? 'opacity-30' : ''}`}
                                 >
-                                   <span className="text-[10px] font-bold uppercase tracking-widest">{theme} ({count})</span>
+                                   <span className="text-[10px] font-bold uppercase tracking-widest">{theme} ({availabilityCount})</span>
                                 </button>
                             );
                          })}

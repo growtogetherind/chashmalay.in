@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Mail, Phone, ShoppingBag, X, ShieldAlert, ShieldCheck, ExternalLink, Search } from 'lucide-react';
+import { Users, Mail, Phone, ShoppingBag, X, ShieldAlert, ShieldCheck, ExternalLink, Search, Download } from 'lucide-react';
 import { toggleUserBlock, getUserOrders, subscribeAllProfiles } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -35,7 +35,7 @@ const AdminCustomers = () => {
     if (error) toast.error('Action failed');
     else {
       toast.success(newStatus ? 'User blocked' : 'User unblocked');
-      setCustomers(prev => prev.map(c => c.id === customer.id ? { ...c, is_blocked: newStatus } : c));
+      // No manual setCustomers call needed as we have a real-time subscription
       if (selectedCustomer?.id === customer.id) {
         setSelectedCustomer(prev => ({ ...prev, is_blocked: newStatus }));
       }
@@ -50,6 +50,33 @@ const AdminCustomers = () => {
     setLoadingOrders(false);
   };
 
+  const downloadCSV = () => {
+    const headers = ['Full Name', 'Email', 'Phone', 'Created At', 'Status'];
+    const data = filtered.map(c => [
+      c.full_name || 'Anonymous',
+      c.email || 'N/A',
+      c.phone || 'N/A',
+      c.created_at ? new Date(c.created_at?.seconds * 1000).toLocaleDateString() : 'N/A',
+      c.is_blocked ? 'Blocked' : 'Active'
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `customers_crm_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('CRM Data Exported');
+  };
+
   const filtered = customers.filter(c =>
     (c.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (c.email || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -59,12 +86,15 @@ const AdminCustomers = () => {
     <div className="admin-page">
       <AdminSidebar />
       <main className="admin-main">
-        <div className="admin-header">
-          <div>
-            <h1 className="admin-title">Customers</h1>
-            <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">{customers.length} customer profiles</p>
+          <div className="flex items-center gap-4">
+            <button onClick={downloadCSV} className="p-4 bg-white border border-slate-200 text-slate-600 rounded-2xl flex items-center gap-3 hover:bg-slate-50 hover:border-slate-300 transition-all font-bold text-xs shadow-sm">
+              <Download size={18} className="text-emerald-500" /> Export CRM Data
+            </button>
+            <div>
+              <h1 className="admin-title">Customers</h1>
+              <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">{customers.length} customer profiles</p>
+            </div>
           </div>
-        </div>
 
         <div className="flex flex-wrap gap-4 mb-10">
            <div className="flex-1 min-w-[300px] relative group">
@@ -153,16 +183,16 @@ const AdminCustomers = () => {
 
         {selectedCustomer && (
           <div className="admin-modal-overlay" onClick={() => setSelectedCustomer(null)}>
-            <div className="admin-modal max-w-5xl" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-12 pb-6 border-b border-slate-100">
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Identity Dossier: Profile Overview</h2>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] mt-2 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Secure Access Protocol Active
-                  </p>
-                </div>
-                <button onClick={() => setSelectedCustomer(null)} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-900 border border-slate-100 shadow-sm"><X size={20} /></button>
+          <div className="admin-modal max-w-5xl p-10 md:p-12" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-10 pb-6 border-b border-slate-100">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Identity Dossier: Profile Overview</h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] mt-2 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Secure Access Protocol Active
+                </p>
               </div>
+              <button onClick={() => setSelectedCustomer(null)} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-900 border border-slate-100 shadow-sm"><X size={20} /></button>
+            </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div className="lg:col-span-4 space-y-8">

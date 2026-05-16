@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db, getProfile as fetchFirebaseProfile, updateProfile as updateFirebaseProfile } from '../lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
@@ -7,7 +8,8 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
-  updateProfile as updateAuthProfile
+  updateProfile as updateAuthProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
@@ -30,8 +32,39 @@ export const AuthProvider = ({ children }) => {
       setUser(currentUser);
       if (currentUser) {
         setProfileLoading(true);
-        await fetchProfile(currentUser.uid);
-        setProfileLoading(false);
+        try {
+          // Check for existing profile
+          const { data, error } = await fetchFirebaseProfile(currentUser.uid);
+          
+          if (error) {
+            console.error("Error fetching profile during auth sync:", error);
+          } else if (!data) {
+            // Create missing profile for both normal and Google users
+            const profileData = {
+              email: currentUser.email,
+              full_name: currentUser.displayName || 'Customer',
+              is_admin: false,
+              created_at: new Date()
+            };
+            await updateFirebaseProfile(currentUser.uid, profileData);
+            setProfile(profileData);
+          } else {
+            // Profile exists, set it
+            setProfile(data);
+            
+            // Optional: If it's a Google user, ensure display name/email is up to date
+            if (currentUser.providerData.some(p => p.providerId === 'google.com')) {
+               if (!data.full_name && currentUser.displayName) {
+                 await updateFirebaseProfile(currentUser.uid, { full_name: currentUser.displayName });
+                 setProfile(prev => ({ ...prev, full_name: currentUser.displayName }));
+               }
+            }
+          }
+        } catch (err) {
+          console.error("Auth sync error:", err);
+        } finally {
+          setProfileLoading(false);
+        }
       } else {
         setProfile(null);
         setProfileLoading(false);
@@ -78,7 +111,10 @@ export const AuthProvider = ({ children }) => {
       toast.success(`Welcome back!`);
       return { user: result.user, profile: profileResult.data };
     } catch (error) {
-      toast.error(error.message);
+      const errorMessage = (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password')
+        ? 'Invalid user or password'
+        : error.message;
+      toast.error(errorMessage);
       throw error;
     }
   };
@@ -115,6 +151,25 @@ export const AuthProvider = ({ children }) => {
     toast.success('Logged out successfully.');
   };
 
+  const resetPassword = async (email) => {
+    try {
+      // 1. Check if user exists in Firestore profiles
+      const q = query(collection(db, "profiles"), where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        throw new Error('No account found with this email address.');
+      }
+
+      // 2. If exists, send reset email
+      await sendPasswordResetEmail(auth, email);
+      toast.success('Password reset email sent! Check your inbox.');
+    } catch (error) {
+      toast.error(error.message);
+      throw error;
+    }
+  };
+
   const updateProfile = async (updates) => {
     if (!user) return;
     const { error } = await updateFirebaseProfile(user.uid, updates);
@@ -134,7 +189,8 @@ export const AuthProvider = ({ children }) => {
     signInWithGoogle,
     signOut,
     updateProfile,
-    fetchProfile
+    fetchProfile,
+    resetPassword
   };
 
   return (

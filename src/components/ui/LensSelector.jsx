@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Check, ChevronRight, Eye, Zap, Shield, Sparkles, UploadCloud } from 'lucide-react';
+import { X, Check, ChevronRight, Eye, Zap, Shield, Sparkles, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { uploadImage } from '../../lib/cloudinary';
@@ -22,6 +22,12 @@ const LensSelector = ({ isOpen, onClose, product }) => {
     cylindrical: false,
     leftSph: '',
     rightSph: '',
+    leftCyl: '',
+    rightCyl: '',
+    leftAxis: '',
+    rightAxis: '',
+    leftAddlPower: '',
+    rightAddlPower: '',
     name: '',
     phone: ''
   });
@@ -32,7 +38,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
       setStep(1);
       setIsPowerModalOpen(false);
       setSelections({ visionType: null, lensPackage: null, powerOption: null, prescriptionFile: null });
-      setManualDetails({ samePower: false, cylindrical: false, leftSph: '', rightSph: '', name: '', phone: '' });
+      setManualDetails({ samePower: false, cylindrical: false, leftSph: '', rightSph: '', leftCyl: '', rightCyl: '', leftAxis: '', rightAxis: '', leftAddlPower: '', rightAddlPower: '', name: '', phone: '' });
     }
   }, [isOpen]);
 
@@ -224,28 +230,12 @@ const LensSelector = ({ isOpen, onClose, product }) => {
               <p style={{textAlign: 'center', marginBottom: '2rem', color: '#64748b'}}>Need help with power option? <span style={{color: '#16a34a', cursor: 'pointer', fontWeight: 'bold'}}>Learn more</span></p>
 
               <div style={{marginBottom: '2rem'}}>
-                 <h4 style={{fontSize: '1rem', marginBottom: '1rem', color: '#0f172a', fontWeight: 'bold'}}>I don't know my power</h4>
-                 <button className={`power-option-card ${selections.powerOption === 'later' ? 'active' : ''}`} onClick={() => handlePowerSelect('later')}>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
-                       <div className="power-icon-wrapper">
-                          <img src="/assets/im/select_lens/call_girl.png" alt="Submit Later" onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100'; }} />
-                       </div>
-                       <div style={{textAlign: 'left'}}>
-                          <h5 style={{fontSize: '1rem', fontWeight: 'bold', color: '#0f172a'}}>Submit Power Later within 15 days</h5>
-                          <p style={{fontSize: '0.875rem', color: '#64748b'}}>After placing the order</p>
-                       </div>
-                    </div>
-                    <ChevronRight size={20} className="arrow" />
-                 </button>
-              </div>
-
-              <div>
                  <h4 style={{fontSize: '1rem', marginBottom: '1rem', color: '#0f172a', fontWeight: 'bold'}}>I know my power</h4>
                  <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
                      <button className={`power-option-card ${selections.powerOption === 'upload' ? 'active' : ''}`} onClick={() => handlePowerSelect('upload')}>
                         <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
                            <div className="power-icon-wrapper">
-                              <Sparkles size={24} color="#1E3A8A" />
+                              <Camera size={24} color="#1E3A8A" />
                            </div>
                            <div style={{textAlign: 'left'}}>
                               <h5 style={{fontSize: '1rem', fontWeight: 'bold', color: '#0f172a'}}>Upload Prescription</h5>
@@ -270,6 +260,22 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                  </div>
               </div>
 
+              <div>
+                 <h4 style={{fontSize: '1rem', marginBottom: '1rem', color: '#0f172a', fontWeight: 'bold'}}>I don't know my power</h4>
+                 <button className={`power-option-card ${selections.powerOption === 'later' ? 'active' : ''}`} onClick={() => handlePowerSelect('later')}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                       <div className="power-icon-wrapper">
+                          <img src="/assets/im/select_lens/call_girl.png" alt="Submit Later" onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100'; }} />
+                       </div>
+                       <div style={{textAlign: 'left'}}>
+                          <h5 style={{fontSize: '1rem', fontWeight: 'bold', color: '#0f172a'}}>I don't know my power</h5>
+                          <p style={{fontSize: '0.875rem', color: '#64748b'}}>Submit later after placing the order</p>
+                       </div>
+                    </div>
+                    <ChevronRight size={20} className="arrow" />
+                 </button>
+              </div>
+
               {/* Inline forms removed, logic moved to a popup sub-modal */}
             </div>
           )}
@@ -283,6 +289,32 @@ const LensSelector = ({ isOpen, onClose, product }) => {
               <div className="success-icon"><Check size={48} /></div>
               <h3 className="step-title">Lenses Selected Successfully!</h3>
               <div className="summary-card">
+                <div className="summary-preview-grid" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem'}}>
+                   {/* Frame Preview */}
+                   <div style={{background: '#f8fafc', borderRadius: '12px', padding: '0.75rem', border: '1px solid #e2e8f0', textAlign: 'center'}}>
+                       <p style={{fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px', letterSpacing: '1px'}}>Selected Frame</p>
+                       <img 
+                         src={product?.gallery?.[0] || product?.image || product?.frame_image || product?.images?.[0] || product?.images?.front} 
+                         alt="Frame" 
+                         style={{width: '100%', height: '60px', objectFit: 'contain'}} 
+                         onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&q=80&w=200';
+                         }}
+                       />
+                       <p style={{fontSize: '11px', fontWeight: 'bold', color: '#0f172a', marginTop: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{product?.name}</p>
+                   </div>
+                   {/* Lens Preview */}
+                   {selections.lensPackage && (
+                       <div style={{background: '#f8fafc', borderRadius: '12px', padding: '0.75rem', border: '1px solid #e2e8f0', textAlign: 'center'}}>
+                           <p style={{fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px', letterSpacing: '1px'}}>Selected Lens</p>
+                           <div style={{width: '100%', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                              <img src={selections.lensPackage.image} alt="Lens" style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}} />
+                           </div>
+                           <p style={{fontSize: '11px', fontWeight: 'bold', color: '#0f172a', marginTop: '6px'}}>{selections.lensPackage.name}</p>
+                       </div>
+                   )}
+                </div>
                 <div className="summary-row">
                   <span>Frame Price</span>
                   <span>₹{product?.consumersPrice || product?.price}</span>
@@ -301,10 +333,45 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                 )}
                 {selections.powerOption && (
                   <div className="summary-row" style={{borderTop: '1px solid #e2e8f0', paddingTop: '0.5rem', marginTop: '0.5rem', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem'}}>
-                    <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                    <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: selections.powerOption === 'manual' ? '1rem' : '0'}}>
                         <span>Eye Power</span>
                         <span style={{color: '#16a34a', fontWeight: 'bold'}}>{selections.powerOption === 'later' ? 'Submit Later' : selections.powerOption === 'upload' ? 'Prescription Uploaded' : 'Manual Entry'}</span>
                     </div>
+                    {selections.powerOption === 'manual' && manualDetails && (
+                        <div style={{width: '100%', background: 'white', borderRadius: '12px', padding: '1rem', border: '1px solid #e2e8f0', fontSize: '11px'}}>
+                            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '4px', marginBottom: '8px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase'}}>
+                                <span>Detail</span>
+                                <span style={{textAlign: 'center'}}>Right</span>
+                                <span style={{textAlign: 'center'}}>Left</span>
+                            </div>
+                            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '4px'}}>
+                                <span style={{fontWeight: 'bold', color: '#64748b'}}>SPH</span>
+                                <span style={{textAlign: 'center'}}>{manualDetails.rightSph}</span>
+                                <span style={{textAlign: 'center'}}>{manualDetails.leftSph}</span>
+                            </div>
+                            {manualDetails.cylindrical && (
+                                <>
+                                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '4px'}}>
+                                        <span style={{fontWeight: 'bold', color: '#64748b'}}>CYL</span>
+                                        <span style={{textAlign: 'center'}}>{manualDetails.rightCyl || '-'}</span>
+                                        <span style={{textAlign: 'center'}}>{manualDetails.leftCyl || '-'}</span>
+                                    </div>
+                                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '4px'}}>
+                                        <span style={{fontWeight: 'bold', color: '#64748b'}}>Axis</span>
+                                        <span style={{textAlign: 'center'}}>{manualDetails.rightAxis || '-'}</span>
+                                        <span style={{textAlign: 'center'}}>{manualDetails.leftAxis || '-'}</span>
+                                    </div>
+                                </>
+                            )}
+                            {selections.visionType?.id === 'bifocal' && (
+                                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '4px', paddingTop: '4px', borderTop: '1px solid #f1f5f9'}}>
+                                    <span style={{fontWeight: 'bold', color: '#64748b'}}>Addl.</span>
+                                    <span style={{textAlign: 'center'}}>{manualDetails.rightAddlPower || '-'}</span>
+                                    <span style={{textAlign: 'center'}}>{manualDetails.leftAddlPower || '-'}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     {selections.powerOption === 'upload' && selections.prescriptionFile && (
                         <div style={{width: '100%', height: '100px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0'}}>
                             <img 
@@ -378,7 +445,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <UploadCloud className="w-10 h-10 mb-3 text-gray-400 group-hover:text-primary transition-colors" />
+                            <Camera className="w-10 h-10 mb-3 text-gray-400 group-hover:text-primary transition-colors" />
                             <p className="mb-2 text-sm text-gray-500"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
                             <p className="text-xs text-gray-400">SVG, PNG, JPG or PDF</p>
                         </div>
@@ -401,51 +468,232 @@ const LensSelector = ({ isOpen, onClose, product }) => {
 
               {selections.powerOption === 'manual' && (
                  <div className="manual-power-form">
-                    <div className="flex gap-4 mb-6">
-                       <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-600">
-                          <input type="checkbox" className="accent-black w-4 h-4" onChange={(e) => setManualDetails({...manualDetails, samePower: e.target.checked})} /> Same power for both eyes
+                    <div className="flex flex-col gap-4 mb-8">
+                       <label className="flex items-center gap-3 cursor-pointer group">
+                          <div className="relative flex items-center justify-center">
+                            <input type="checkbox" className="sr-only peer" checked={manualDetails.samePower} onChange={(e) => setManualDetails({...manualDetails, samePower: e.target.checked})} />
+                            <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-black peer-checked:border-black transition-all"></div>
+                            <Check size={14} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
+                          </div>
+                          <span className="text-[13px] font-bold text-gray-700 group-hover:text-black transition-colors">I have same power for both eyes</span>
                        </label>
-                       <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-600">
-                          <input type="checkbox" className="accent-black w-4 h-4" onChange={(e) => setManualDetails({...manualDetails, cylindrical: e.target.checked})} /> Cylindrical power
+                       <label className="flex items-center gap-3 cursor-pointer group">
+                          <div className="relative flex items-center justify-center">
+                            <input type="checkbox" className="sr-only peer" checked={manualDetails.cylindrical} onChange={(e) => setManualDetails({...manualDetails, cylindrical: e.target.checked})} />
+                            <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-black peer-checked:border-black transition-all"></div>
+                            <Check size={14} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
+                          </div>
+                          <span className="text-[13px] font-bold text-gray-700 group-hover:text-black transition-colors">I have cylindrical power</span>
                        </label>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                       <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                          <label className="block text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2">SPH (Left Eye)</label>
-                          <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black" onChange={(e) => setManualDetails({...manualDetails, leftSph: e.target.value})}>
-                             <option value="">Select Power</option>
-                             {Array.from({length: 41}, (_, i) => -10 + i * 0.25).map(val => (
-                                <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
-                             ))}
-                          </select>
-                       </div>
-                       <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                          <label className="block text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2">SPH (Right Eye)</label>
-                          <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black" onChange={(e) => setManualDetails({...manualDetails, rightSph: e.target.value})}>
-                             <option value="">Select Power</option>
-                             {Array.from({length: 41}, (_, i) => -10 + i * 0.25).map(val => (
-                                <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
-                             ))}
-                          </select>
-                       </div>
                     </div>
 
-                    <div className="border-t border-gray-100 pt-6">
-                      <h5 className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-4">Patient Details</h5>
+                    <div className="mb-8">
+                      <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center`}>
+                        <div className="text-[11px] font-black uppercase text-gray-400 tracking-widest">Power</div>
+                        {manualDetails.samePower ? (
+                           <div className="text-[11px] font-black uppercase text-gray-400 tracking-widest text-center">Left & Right</div>
+                        ) : (
+                           <>
+                             <div className="text-[11px] font-black uppercase text-gray-400 tracking-widest text-center">Right</div>
+                             <div className="text-[11px] font-black uppercase text-gray-400 tracking-widest text-center">Left</div>
+                           </>
+                        )}
+                      </div>
+
+                      {/* SPH Row */}
+                      <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center`}>
+                        <div className="text-[13px] font-black text-gray-700 uppercase">SPH</div>
+                        
+                        {/* Right Eye SPH (or Combined) */}
+                        <div className="relative">
+                          <select 
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
+                            value={manualDetails.rightSph}
+                            onChange={(e) => {
+                               const val = e.target.value;
+                               if (manualDetails.samePower) {
+                                  setManualDetails({...manualDetails, rightSph: val, leftSph: val});
+                               } else {
+                                  setManualDetails({...manualDetails, rightSph: val});
+                               }
+                            }}
+                          >
+                            <option value="">Select</option>
+                            {Array.from({length: 81}, (_, i) => -10 + i * 0.25).map(val => (
+                              <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
+                            ))}
+                          </select>
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"><ChevronRight size={14} className="rotate-90" /></div>
+                        </div>
+
+                        {/* Left Eye SPH (Only if not samePower) */}
+                        {!manualDetails.samePower && (
+                           <div className="relative">
+                             <select 
+                               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
+                               value={manualDetails.leftSph}
+                               onChange={(e) => setManualDetails({...manualDetails, leftSph: e.target.value})}
+                             >
+                               <option value="">Select</option>
+                               {Array.from({length: 81}, (_, i) => -10 + i * 0.25).map(val => (
+                                 <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
+                               ))}
+                             </select>
+                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"><ChevronRight size={14} className="rotate-90" /></div>
+                           </div>
+                        )}
+                      </div>
+
+                      {/* CYL Row - Only if cylindrical checked */}
+                      {manualDetails.cylindrical && (
+                        <>
+                          <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center animate-fade-in`}>
+                            <div className="text-[13px] font-black text-gray-700 uppercase">CYL</div>
+                            
+                            {/* Right Eye CYL (or Combined) */}
+                            <div className="relative">
+                              <select 
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
+                                value={manualDetails.rightCyl}
+                                onChange={(e) => {
+                                   const val = e.target.value;
+                                   if (manualDetails.samePower) {
+                                      setManualDetails({...manualDetails, rightCyl: val, leftCyl: val});
+                                   } else {
+                                      setManualDetails({...manualDetails, rightCyl: val});
+                                   }
+                                }}
+                              >
+                                <option value="">Select</option>
+                                {Array.from({length: 49}, (_, i) => -6 + i * 0.25).map(val => (
+                                  <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
+                                ))}
+                              </select>
+                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"><ChevronRight size={14} className="rotate-90" /></div>
+                            </div>
+
+                            {/* Left Eye CYL (Only if not samePower) */}
+                            {!manualDetails.samePower && (
+                               <div className="relative">
+                                 <select 
+                                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
+                                   value={manualDetails.leftCyl}
+                                   onChange={(e) => setManualDetails({...manualDetails, leftCyl: e.target.value})}
+                                 >
+                                   <option value="">Select</option>
+                                   {Array.from({length: 49}, (_, i) => -6 + i * 0.25).map(val => (
+                                     <option key={val} value={val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}>{val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</option>
+                                   ))}
+                                 </select>
+                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"><ChevronRight size={14} className="rotate-90" /></div>
+                               </div>
+                            )}
+                          </div>
+
+                          {/* Axis Row */}
+                          <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center animate-fade-in`}>
+                            <div className="text-[13px] font-black text-gray-700 uppercase">Axis</div>
+                            <input 
+                              type="text" 
+                              placeholder="0-180" 
+                              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black transition-all"
+                              value={manualDetails.rightAxis}
+                              onChange={(e) => {
+                                 const val = e.target.value;
+                                 if (manualDetails.samePower) {
+                                    setManualDetails({...manualDetails, rightAxis: val, leftAxis: val});
+                                 } else {
+                                    setManualDetails({...manualDetails, rightAxis: val});
+                                 }
+                              }}
+                            />
+                            {!manualDetails.samePower && (
+                               <input 
+                                 type="text" 
+                                 placeholder="0-180" 
+                                 className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black transition-all"
+                                 value={manualDetails.leftAxis}
+                                 onChange={(e) => setManualDetails({...manualDetails, leftAxis: e.target.value})}
+                               />
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {/* Addl. Power Row - Only if Bifocal */}
+                      {selections.visionType?.id === 'bifocal' && (
+                        <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center animate-fade-in`}>
+                          <div className="text-[13px] font-black text-gray-700 uppercase">Addl. Power</div>
+                          
+                          {/* Right Eye Addl. Power (or Combined) */}
+                          <div className="relative">
+                            <select 
+                              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
+                              value={manualDetails.rightAddlPower}
+                              onChange={(e) => {
+                                 const val = e.target.value;
+                                 if (manualDetails.samePower) {
+                                    setManualDetails({...manualDetails, rightAddlPower: val, leftAddlPower: val});
+                                 } else {
+                                    setManualDetails({...manualDetails, rightAddlPower: val});
+                                 }
+                              }}
+                            >
+                              <option value="">Select</option>
+                              {Array.from({length: 9}, (_, i) => 1 + i * 0.25).map(val => (
+                                <option key={val} value={`+${val.toFixed(2)}`}>+{val.toFixed(2)}</option>
+                              ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"><ChevronRight size={14} className="rotate-90" /></div>
+                          </div>
+
+                          {/* Left Eye Addl. Power (Only if not samePower) */}
+                          {!manualDetails.samePower && (
+                             <div className="relative">
+                               <select 
+                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
+                                 value={manualDetails.leftAddlPower}
+                                 onChange={(e) => setManualDetails({...manualDetails, leftAddlPower: e.target.value})}
+                               >
+                                 <option value="">Select</option>
+                                 {Array.from({length: 9}, (_, i) => 1 + i * 0.25).map(val => (
+                                   <option key={val} value={`+${val.toFixed(2)}`}>+{val.toFixed(2)}</option>
+                                 ))}
+                               </select>
+                               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"><ChevronRight size={14} className="rotate-90" /></div>
+                             </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="border-t border-gray-100 pt-8 mt-4">
+                      <h5 className="text-[11px] font-black uppercase text-gray-400 tracking-widest mb-4">Patient Details</h5>
                       <div className="space-y-4">
-                        <input type="text" placeholder="Full Name *" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors" onChange={(e) => setManualDetails({...manualDetails, name: e.target.value})} />
-                        <input type="tel" placeholder="Phone Number *" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors" onChange={(e) => setManualDetails({...manualDetails, phone: e.target.value})} />
+                        <input 
+                          type="text" 
+                          placeholder="Full Name *" 
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all" 
+                          value={manualDetails.name}
+                          onChange={(e) => setManualDetails({...manualDetails, name: e.target.value})} 
+                        />
+                        <input 
+                          type="tel" 
+                          placeholder="Phone Number *" 
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all" 
+                          value={manualDetails.phone}
+                          onChange={(e) => setManualDetails({...manualDetails, phone: e.target.value})} 
+                        />
                       </div>
                     </div>
                     
                     <button 
-                      className="w-full py-4 bg-black text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors mt-6 disabled:opacity-50" 
+                      className="w-full py-4.5 bg-black text-white rounded-2xl text-[13px] font-black uppercase tracking-widest hover:bg-gray-800 transition-all mt-8 shadow-lg shadow-black/10 disabled:opacity-50" 
                       onClick={() => {
                         setIsPowerModalOpen(false);
                         setStep(4);
                       }} 
-                      disabled={!manualDetails.name || !manualDetails.phone || !manualDetails.leftSph || (!manualDetails.samePower && !manualDetails.rightSph)}
+                      disabled={!manualDetails.name || !manualDetails.phone || !manualDetails.leftSph || !manualDetails.rightSph}
                     >
                       Save Details & Proceed
                     </button>

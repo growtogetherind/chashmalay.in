@@ -22,6 +22,13 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Request notification permission on mount
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
+    let lastOrderId = null;
+
     const unsubscribe = subscribeDashboardStats((data) => {
       setStats({
         orders: data.orderCount,
@@ -31,7 +38,27 @@ const AdminDashboard = () => {
         pendingOrders: data.pendingOrders,
         lowStockProducts: data.lowStockProducts
       });
-      setRecentOrders(data.orders.slice(0, 6));
+
+      const currentOrders = data.orders || [];
+      setRecentOrders(currentOrders.slice(0, 6));
+
+      // Trigger notification for new order
+      if (currentOrders.length > 0) {
+        const latestOrder = currentOrders[0];
+        if (lastOrderId && latestOrder.id !== lastOrderId) {
+          if (Notification.permission === "granted") {
+            new Notification("🚀 New Order Received!", {
+              body: `Order #${latestOrder.id.slice(0, 8).toUpperCase()} for ₹${Number(latestOrder.total_amount).toLocaleString()}`,
+              icon: "/favicon.ico"
+            });
+            // Play a subtle sound if you have one, or just the alert
+          }
+        }
+        lastOrderId = latestOrder.id;
+      } else if (currentOrders.length > 0 && !lastOrderId) {
+        lastOrderId = currentOrders[0].id;
+      }
+
       setLoading(false);
     }, () => setLoading(false));
     return unsubscribe;
@@ -44,6 +71,8 @@ const AdminDashboard = () => {
     delivered: 'status-delivered',
     cancelled: 'status-cancelled'
   };
+
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   if (loading) {
     return (
@@ -74,9 +103,54 @@ const AdminDashboard = () => {
                 <span className="text-purple-600 font-extrabold text-xs uppercase tracking-wider">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
                 <span className="text-gray-400 text-[10px] font-bold">Live store data</span>
              </div>
-             <button className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
-                <Bell size={20} />
-             </button>
+             <div className="relative">
+                <button 
+                  onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                  className="relative w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
+                >
+                    <Bell size={20} />
+                    {stats.pendingOrders > 0 && (
+                      <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full" />
+                    )}
+                </button>
+
+                {isNotificationOpen && (
+                  <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl border border-gray-100 shadow-2xl z-[100] overflow-hidden">
+                    <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-900">Notifications</span>
+                      <span className="px-2 py-0.5 bg-purple-100 text-purple-600 rounded-full text-[9px] font-black uppercase tracking-widest">{stats.pendingOrders} Pending</span>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto custom-scrollbar">
+                      {recentOrders.length > 0 ? recentOrders.map((order) => (
+                        <Link 
+                          key={order.id} 
+                          to="/admin/orders" 
+                          onClick={() => setIsNotificationOpen(false)}
+                          className="flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
+                        >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${order.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-purple-50 text-purple-600'}`}>
+                            <ShoppingBag size={14} />
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-bold text-gray-900">New Order #{order.id.slice(0, 8).toUpperCase()}</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5">₹{Number(order.total_amount).toLocaleString()} • {order.profiles?.full_name || 'Guest User'}</p>
+                            <p className="text-[9px] text-gray-400 mt-1 font-medium">{new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          </div>
+                          {order.status === 'pending' && <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />}
+                        </Link>
+                      )) : (
+                        <div className="p-8 text-center">
+                          <Bell size={24} className="text-gray-200 mx-auto mb-2" />
+                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">No Recent Activity</p>
+                        </div>
+                      )}
+                    </div>
+                    <Link to="/admin/orders" onClick={() => setIsNotificationOpen(false)} className="block p-3 text-center text-[10px] font-black uppercase tracking-widest text-purple-600 hover:bg-purple-50 transition-colors">
+                      View All Orders
+                    </Link>
+                  </div>
+                )}
+             </div>
              <div className="w-10 h-10 rounded-xl bg-purple-600 border border-purple-500 overflow-hidden shadow-lg shadow-purple-200">
                 <img src="https://ui-avatars.com/api/?name=Admin&background=7C3AED&color=fff" alt="Profile" />
              </div>

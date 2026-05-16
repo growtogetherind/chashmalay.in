@@ -96,19 +96,6 @@ const ProductCard = ({ product }) => {
           onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image'; }}
         />
 
-        {/* Quick Add overlay on hover */}
-        <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2 bg-white/90 py-2 text-xs font-semibold text-gray-700 transition-all duration-200 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
-          <button
-            className="flex items-center gap-1.5 bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-red-700 transition-colors"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // In a real app, this might trigger a quick-add function
-            }}
-          >
-            <ShoppingCart size={12} /> ADD TO CART
-          </button>
-        </div>
       </Link>
 
       {/* Info Area */}

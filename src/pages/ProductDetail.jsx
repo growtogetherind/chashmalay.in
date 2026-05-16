@@ -6,7 +6,7 @@ import {
   ShieldCheck, ChevronDown, ChevronUp, Map, Eye, Search, Layers,
   ChevronRight, ChevronLeft, User, X, CheckCircle
 } from 'lucide-react';
-import { getProductById, getProducts, addReview } from '../lib/firebase';
+import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ui/ProductCard';
 import LensSelector from '../components/ui/LensSelector';
@@ -54,6 +54,7 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Review States
+  const [realTimeReviews, setRealTimeReviews] = useState([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -86,7 +87,15 @@ const ProductDetail = () => {
       setLoading(false);
     };
     fetchProduct();
+    
+    const unsubscribeReviews = subscribeProductReviews(id, (data) => {
+      setRealTimeReviews(data || []);
+    }, (err) => console.error("Review sync error:", err));
+
     window.scrollTo(0, 0);
+    return () => {
+      unsubscribeReviews();
+    };
   }, [id]);
 
   useEffect(() => {
@@ -161,8 +170,12 @@ const ProductDetail = () => {
   const price = parseInt((product.consumersPrice || product.price || "0").toString().replace(/,/g, ''));
   const originalPrice = product.original_price || product.originalPrice ? parseInt((product.original_price || product.originalPrice).toString().replace(/,/g, '')) : Math.round(price * 1.3);
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-  const reviews = product.reviews || [];
-  const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : (product.rating || 4.8);
+  
+  // Use real-time reviews for counts and ratings
+  const reviews = realTimeReviews.length > 0 ? realTimeReviews : (product.reviews || []);
+  const avgRating = reviews.length > 0 
+    ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) 
+    : 0; // Remove demo 4.8 fallback
   const isContactLens = product.category?.toLowerCase().includes('contact') || product.category?.toLowerCase() === 'contacts';
 
   return (
@@ -239,18 +252,26 @@ const ProductDetail = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 mt-2">
-                   <div className="flex items-center gap-1.5">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={12} fill={i < Math.floor(avgRating) ? "#EAB308" : "none"} className={i < Math.floor(avgRating) ? "text-yellow-500" : "text-slate-200"} />
-                        ))}
-                      </div>
-                      <span className="text-[11px] font-black text-slate-900">{avgRating}</span>
-                   </div>
-                   <div className="w-px h-3 bg-slate-200" />
-                   <button onClick={() => setIsReviewModalOpen(true)} className="text-[11px] text-slate-500 font-black uppercase tracking-widest hover:text-accent transition-colors">{reviews.length} Verified Reviews</button>
-                </div>
+                   <div className="flex items-center gap-4 mt-2">
+                     {avgRating > 0 ? (
+                       <>
+                         <div className="flex items-center gap-1.5">
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={12} fill={i < Math.floor(avgRating) ? "#EAB308" : "none"} className={i < Math.floor(avgRating) ? "text-yellow-500" : "text-slate-200"} />
+                              ))}
+                            </div>
+                            <span className="text-[11px] font-black text-slate-900">{avgRating}</span>
+                         </div>
+                         <div className="w-px h-3 bg-slate-200" />
+                       </>
+                     ) : (
+                       <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">New Collection</span>
+                     )}
+                     <button onClick={() => setIsReviewModalOpen(true)} className="text-[11px] text-slate-500 font-black uppercase tracking-widest hover:text-accent transition-colors">
+                       {reviews.length} Verified Reviews
+                     </button>
+                  </div>
               </div>
 
               <div className="pricing-section border-y border-slate-100 py-8">
@@ -315,7 +336,7 @@ const ProductDetail = () => {
               <div className="action-stack space-y-4 pt-4">
                 <button 
                   onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} 
-                  className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-black transition-all shadow-2xl shadow-slate-900/30"
+                  className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-black transition-all shadow-2xl shadow-slate-900/30 inline-cta-desktop"
                 >
                   {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
                 </button>
@@ -349,7 +370,7 @@ const ProductDetail = () => {
 
               <div className="specs-accordion space-y-4">
                 <Accordion title="Technical Details">
-                  <div className="grid grid-cols-2 gap-x-12 gap-y-6 py-4">
+                  <div className="grid grid-cols-2 gap-x-12 gap-y-6 py-4 spec-grid-mobile">
                     {isContactLens ? (
                       <>
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Disposable</span><p className="text-[12px] font-black text-slate-900">{product.disposable_type || 'Monthly'}</p></div>
@@ -377,6 +398,39 @@ const ProductDetail = () => {
                        <Layers size={16} className="text-slate-900 mt-0.5" />
                        <p className="text-[11px] font-bold text-slate-600 leading-relaxed"><strong>Anti-Scratch Coating</strong>: Multi-layer protection for lens durability.</p>
                     </div>
+                  </div>
+                </Accordion>
+                
+                <Accordion title={`Reviews (${reviews.length})`}>
+                  <div className="py-4 space-y-6">
+                    {reviews.length > 0 ? (
+                      reviews.map((review, idx) => (
+                        <div key={review.id || idx} className="review-card p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-black uppercase">
+                                {review.reviewer_name?.[0] || 'A'}
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-black text-slate-900">{review.reviewer_name || 'Anonymous Customer'}</p>
+                                <p className="text-[9px] text-slate-400 font-bold">{review.created_at?.toDate ? review.created_at.toDate().toLocaleDateString() : new Date().toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={10} fill={i < review.rating ? "#EAB308" : "none"} className={i < review.rating ? "text-yellow-500" : "text-slate-200"} />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed italic">"{review.comment}"</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4">
+                        <p className="text-xs text-slate-400 font-bold">No reviews yet. Be the first to review!</p>
+                        <button onClick={() => setIsReviewModalOpen(true)} className="mt-2 text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Write Review</button>
+                      </div>
+                    )}
                   </div>
                 </Accordion>
               </div>

@@ -26,8 +26,18 @@ const toNumber = (value, fallback = 0) => {
 
 const mapDoc = (snapshot) => ({ id: snapshot.id, ...snapshot.data() });
 
-const byCreatedDesc = (a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0);
-const byNameAsc = (a, b) => (a.name || '').localeCompare(b.name || '');
+const getTimestamp = (val) => {
+  if (!val) return 0;
+  if (typeof val.toMillis === 'function') return val.toMillis();
+  if (val.seconds) return val.seconds * 1000 + (val.nanoseconds || 0) / 1000000;
+  if (val instanceof Date) return val.getTime();
+  if (typeof val === 'number') return val;
+  if (val.toDate && typeof val.toDate === 'function') return val.toDate().getTime();
+  return 0;
+};
+
+const byCreatedDesc = (a, b) => getTimestamp(b.created_at) - getTimestamp(a.created_at);
+const byNameAsc = (a, b) => (a.full_name || a.name || '').localeCompare(b.full_name || b.name || '');
 
 const DEFAULT_SETTINGS = {
   store_name: 'Chashmaly',
@@ -274,6 +284,9 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
       created_at: serverTimestamp()
     };
     const orderRef = await addDoc(collection(db, "orders"), orderData);
+
+    // Send Telegram Notification (Optional but recommended)
+    sendTelegramNotification(`🚀 *New Order Received!*\n\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Amount:* ₹${Number(total).toLocaleString()}\n*Customer:* ${address.name}\n*City:* ${address.city}`);
 
     const batchPromises = items.map(async (item) => {
       const pid = item.product_id || item.id;
@@ -656,11 +669,21 @@ export const getAllProfiles = async () => {
   } catch (error) { return { data: null, error }; }
 };
 
-export const subscribeAllProfiles = (onData, onError) => subscribeToQuery(
-  collection(db, "profiles"),
-  (profiles) => onData(profiles.sort(byCreatedDesc)),
-  onError
-);
+export const subscribeAllProfiles = (onData, onError) => {
+  return onSnapshot(
+    collection(db, "profiles"),
+    (snapshot) => {
+      const data = snapshot.docs.map(mapDoc);
+      // Sort in-memory to ensure documents missing 'created_at' are still shown (at the end)
+      data.sort(byCreatedDesc);
+      onData(data);
+    },
+    (error) => {
+      console.error("subscribeAllProfiles error:", error);
+      if (onError) onError(error);
+    }
+  );
+};
 
 export const updateProductStock = async (productId, quantity) => {
   try {
@@ -729,6 +752,17 @@ export const getReviews = async () => {
 
 export const subscribeReviews = (onData, onError) => subscribeToQuery(
   query(collection(db, "reviews"), orderBy("created_at", "desc")),
+  onData,
+  onError
+);
+
+export const subscribeProductReviews = (productId, onData, onError) => subscribeToQuery(
+  query(
+    collection(db, "reviews"), 
+    where("product_id", "==", productId), 
+    where("status", "==", "approved"),
+    orderBy("created_at", "desc")
+  ),
   onData,
   onError
 );
@@ -891,5 +925,32 @@ export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
     return { error: null };
   } catch (error) {
     return { error };
+  }
+};
+
+/**
+ * Sends a notification to a Telegram bot.
+ * To get started:
+ * 1. Create a bot via @BotFather on Telegram to get your BOT_TOKEN.
+ * 2. Message @userinfobot to get your CHAT_ID.
+ */
+const sendTelegramNotification = async (message) => {
+  const BOT_TOKEN = ""; // ADD YOUR BOT TOKEN HERE
+  const CHAT_ID = "";    // ADD YOUR CHAT ID HERE
+  
+  if (!BOT_TOKEN || !CHAT_ID) return;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+  } catch (error) {
+    console.error("Telegram Notification Error:", error);
   }
 };

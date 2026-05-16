@@ -28,6 +28,7 @@ const Checkout = () => {
   const [address, setAddress] = useState({
     name: profile?.full_name || '',
     phone: profile?.phone || '',
+    dob: profile?.dob || '',
     line1: profile?.address?.line1 || '',
     line2: profile?.address?.line2 || '',
     city: profile?.address?.city || '',
@@ -39,8 +40,8 @@ const Checkout = () => {
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
-    if (!address.name || !address.phone || !address.line1 || !address.city || !address.pincode) {
-      toast.error('Please fill in all required fields.');
+    if (!address.name || !address.phone || !address.dob || !address.line1 || !address.city || !address.pincode) {
+      toast.error('All fields including Date of Birth are compulsory.');
       return;
     }
     
@@ -49,6 +50,7 @@ const Checkout = () => {
       updateProfile(user.uid, { 
         full_name: address.name,
         phone: address.phone,
+        dob: address.dob,
         address: {
           line1: address.line1,
           line2: address.line2,
@@ -176,6 +178,10 @@ const Checkout = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        <InputField label="Full Name" name="name" value={address.name} onChange={handleAddressChange} placeholder="First & Last Name" required />
                        <InputField label="Contact Number" name="phone" value={address.phone} onChange={handleAddressChange} placeholder="Mobile Number" required />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                       <InputField label="Date of Birth" name="dob" type="date" value={address.dob} onChange={handleAddressChange} required />
+                       <div className="hidden md:block" /> 
                     </div>
                     <InputField label="Address Line 1" name="line1" value={address.line1} onChange={handleAddressChange} placeholder="House / Flat No., Street Name" required />
                     <InputField label="Address Line 2" name="line2" value={address.line2} onChange={handleAddressChange} placeholder="Landmark, Area (Optional)" />

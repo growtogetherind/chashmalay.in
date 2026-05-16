@@ -28,6 +28,8 @@ body {
   min-height: 100vh;
   background: var(--admin-bg);
   color: var(--admin-text);
+  align-items: flex-start;
+  overflow-x: clip;
 }
 
 .admin-sidebar {
@@ -88,9 +90,9 @@ body {
 
 .admin-main {
   flex: 1;
-  padding: 2.5rem;
+  padding: 5.5rem 1rem 1.5rem;
   max-width: 1600px;
-  margin: 0 auto;
+  margin: 0;
   width: 100%;
 }
 
@@ -370,6 +372,7 @@ body {
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: modalSlideUp 0.3s ease-out;
+  overflow: hidden;
 }
 
 @keyframes modalSlideUp {
@@ -444,4 +447,18 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #D1D5DB;
+}
+
+@media (min-width: 640px) {
+  .admin-main {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-bottom: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-main {
+    padding: 2.5rem;
+  }
 }

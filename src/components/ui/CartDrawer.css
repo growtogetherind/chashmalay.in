@@ -364,20 +364,25 @@
 
 /* Mini Coupon Modal */
 .mini-coupon-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
   z-index: 2100;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
 }
 
 .mini-coupon-content {
   width: 100%;
+  max-width: 420px;
   background: #fff;
-  border-radius: 32px 32px 0 0;
-  padding: 2rem;
-  box-shadow: 0 -20px 50px rgba(0,0,0,0.1);
+  border-radius: 32px;
+  padding: 2.5rem;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+  position: relative;
 }
 
 .mini-coupon-input {
@@ -462,4 +467,97 @@
   font-size: 9px;
   font-weight: 600;
   color: #94a3b8;
+}
+
+.manual-rx-preview {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.manual-rx-preview::-webkit-scrollbar {
+  display: none;
+}
+
+.manual-rx-preview .grid {
+  min-width: 280px;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+  .cart-drawer-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden;
+  }
+
+  .cart-drawer-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .cart-drawer-content {
+    padding: 1rem;
+    overflow-x: hidden;
+  }
+
+  .drawer-item-card {
+    padding: 1rem;
+    border-radius: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .item-img-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .item-details {
+    min-width: 0;
+  }
+
+  .item-name {
+    font-size: 0.8125rem;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .mini-coupon-content {
+    padding: 1.5rem;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 400px;
+    box-sizing: border-box;
+  }
+
+  .mini-coupon-input {
+    margin-bottom: 1.5rem;
+  }
+
+  .mini-coupon-input input {
+    font-size: 11px;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .mini-coupon-input button {
+    padding: 0 0.75rem;
+  }
+
+  .cart-drawer-footer {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .checkout-proceed-btn {
+    padding: 0.875rem;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+
+  .cart-summary-section {
+    padding: 1.25rem;
+    border-radius: 20px;
+    margin-top: 1.5rem;
+  }
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Package, MapPin, Edit3, LogOut, ChevronRight } from 'lucide-react';
+import { User, Package, MapPin, Edit3, LogOut, ChevronRight, Cake } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getUserOrders } from '../lib/firebase';
 import './Account.css';
@@ -18,10 +18,14 @@ const Account = () => {
   const [activeTab, setActiveTab] = useState('orders');
   const [orders, setOrders] = useState([]);
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({ full_name: '', phone: '' });
+  const [form, setForm] = useState({ full_name: '', phone: '', dob: '' });
 
   useEffect(() => {
-    if (profile) setForm({ full_name: profile.full_name || '', phone: profile.phone || '' });
+    if (profile) setForm({ 
+      full_name: profile.full_name || '', 
+      phone: profile.phone || '',
+      dob: profile.dob || ''
+    });
   }, [profile]);
 
   useEffect(() => {
@@ -31,6 +35,10 @@ const Account = () => {
   }, [user]);
 
   const handleProfileSave = async () => {
+    if (!form.full_name || !form.phone || !form.dob) {
+      toast.error('All profile fields including DOB are compulsory for special offers!');
+      return;
+    }
     await updateProfile(form);
     setEditMode(false);
   };
@@ -127,6 +135,22 @@ const Account = () => {
               <div className="form-group">
                 <label>Phone Number</label>
                 <input name="phone" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} disabled={!editMode} placeholder="Add phone number" />
+              </div>
+              <div className="form-group">
+                <label className="flex items-center gap-2">Date of Birth <span className="text-red-500 font-bold">*</span></label>
+                <div className="relative group">
+                   <Cake className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-blue transition-colors" size={18} />
+                   <input 
+                     type="date"
+                     name="dob" 
+                     value={form.dob} 
+                     onChange={e => setForm(p => ({ ...p, dob: e.target.value }))} 
+                     disabled={!editMode} 
+                     className="pl-12 w-full bg-white border border-gray-200 p-3 rounded-xl outline-none focus:border-primary-blue transition-all font-bold text-sm"
+                     required
+                   />
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">Compulsory for special birthday offers & rewards</p>
               </div>
             </div>
           </div>
