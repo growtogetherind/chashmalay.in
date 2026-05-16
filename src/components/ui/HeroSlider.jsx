@@ -15,7 +15,7 @@ const FALLBACK_SLIDES = [
     cta: 'Shop Now',
     ctaLink: '/category/sunglasses',
     image: '/assets/im/all_img/WEBSITE_BANNER_1.jpg.jpeg',
-    bg: '#cc0000',
+    bg: '#1E3A8A',
   },
   {
     id: 'f2',
@@ -72,7 +72,7 @@ const HeroSlider = () => {
 
   if (loading) return (
     <div className="h-64 bg-gray-100 flex items-center justify-center mx-3 my-3 rounded-2xl">
-      <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
@@ -86,7 +86,7 @@ const HeroSlider = () => {
       ═══════════════════════════════════════ */}
       <div
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl"
-        style={{ background: slide.bg || '#cc0000', minHeight: 'clamp(200px, 35vw, 380px)' }}
+        style={{ background: slide.bg || '#1E3A8A', minHeight: 'clamp(200px, 35vw, 380px)' }}
       >
         <AnimatePresence initial={false} mode="wait">
           <motion.div
@@ -144,7 +144,7 @@ const HeroSlider = () => {
               {slide.cta && (
                 <Link
                   to={slide.ctaLink || '/category/all'}
-                  className="mt-5 sm:mt-7 inline-flex items-center gap-2 bg-white text-red-600 font-bold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-md"
+                  className="mt-5 sm:mt-7 inline-flex items-center gap-2 bg-white text-primary font-bold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-md"
                 >
                   {slide.cta}
                 </Link>
@@ -211,13 +211,13 @@ const HeroSlider = () => {
             className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700"
           />
           {/* Bottom red gradient accent */}
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-red-800/70 via-red-700/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-blue-900/70 via-blue-800/20 to-transparent" />
         </div>
 
         {/* ─ Cell B: Red promo card ─ */}
         <Link
           to="/category/sunglasses"
-          className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-red-600 flex items-center h-36 sm:h-44 md:h-48"
+          className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-primary flex items-center h-36 sm:h-44 md:h-48"
         >
           {/* Text */}
           <div className="flex-1 px-5 sm:px-7 py-5 z-10 min-w-0">

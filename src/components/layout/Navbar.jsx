@@ -118,7 +118,7 @@ const Navbar = () => {
               >
                 <ShoppingBag size={18} strokeWidth={1.5} />
                 {cartCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 bg-red-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold leading-none">
+                  <span className="absolute top-0.5 right-0.5 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold leading-none">
                     {cartCount}
                   </span>
                 )}

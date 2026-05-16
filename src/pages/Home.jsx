@@ -110,12 +110,12 @@ const Home = () => {
               <p className="text-gray-500 text-xs leading-relaxed mb-4 max-w-md font-medium">
                 If you are the sunglasses person who wants to find the best deal, we carry the top performing sunglasses from top brands and manufacturers.
               </p>
-              <p className="text-sm font-bold text-red-600 mb-6">
+              <p className="text-sm font-bold text-primary mb-6">
                 Best selling price at ₹590
               </p>
               <Link
                 to="/category/sunglasses"
-                className="inline-flex items-center justify-center w-fit border border-red-600 text-red-600 bg-white text-xs font-bold px-8 py-2.5 rounded hover:bg-red-50 transition-colors tracking-wide"
+                className="inline-flex items-center justify-center w-fit border border-primary text-primary bg-white text-xs font-bold px-8 py-2.5 rounded hover:bg-blue-50 transition-colors tracking-wide"
               >
                 SHOP NOW
               </Link>
@@ -159,10 +159,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { icon: <Truck size={28} className="text-red-600" />, title: 'Speedy delivery', desc: 'Fast shipping nationwide' },
-              { icon: <RotateCcw size={28} className="text-red-600" />, title: 'Return policy', desc: 'Easy 30-day returns' },
-              { icon: <HeadphonesIcon size={28} className="text-red-600" />, title: 'Custom support', desc: '24/7 customer service' },
-              { icon: <CreditCard size={28} className="text-red-600" />, title: 'Secure payment', desc: 'Encrypted transactions' },
+              { icon: <Truck size={28} className="text-primary" />, title: 'Speedy delivery', desc: 'Fast shipping nationwide' },
+              { icon: <RotateCcw size={28} className="text-primary" />, title: 'Return policy', desc: 'Easy 30-day returns' },
+              { icon: <HeadphonesIcon size={28} className="text-primary" />, title: 'Custom support', desc: '24/7 customer service' },
+              { icon: <CreditCard size={28} className="text-primary" />, title: 'Secure payment', desc: 'Encrypted transactions' },
             ].map((f, i) => (
               <div key={i} className="flex flex-col items-center text-center gap-2 p-4">
                 {f.icon}

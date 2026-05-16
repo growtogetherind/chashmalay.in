@@ -346,7 +346,7 @@
 }
 
 .proceed-btn {
-  background: #000033;
+  background: #1E3A8A;
   color: white;
   padding: 14px 40px;
   border-radius: 12px;
@@ -358,7 +358,7 @@
 }
 
 .proceed-btn:hover {
-  background: #000066;
+  background: #1E3A8A;
   transform: translateY(-2px);
 }
 
@@ -442,7 +442,7 @@
 }
 
 .coupon-manual-input button {
-  background: #000033;
+  background: #1E3A8A;
   color: white;
   padding: 0 24px;
   border-radius: 12px;

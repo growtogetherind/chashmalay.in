@@ -64,7 +64,7 @@ const CategoryBentoGrid = () => {
         </div>
         <Link
           to="/category/all"
-          className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:underline"
+          className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
         >
           View All <ArrowRight size={14} />
         </Link>
@@ -83,7 +83,7 @@ const CategoryBentoGrid = () => {
             <Link to={cat.link} className="group flex flex-col items-center gap-3 sm:gap-4 focus-visible:outline-none">
               {/* Circle image */}
               <div
-                className="relative w-full aspect-square rounded-full overflow-hidden flex items-center justify-center border-2 border-transparent group-hover:border-red-400 group-hover:shadow-lg transition-all duration-300"
+                className="relative w-full aspect-square rounded-full overflow-hidden flex items-center justify-center border-2 border-transparent group-hover:border-blue-400 group-hover:shadow-lg transition-all duration-300"
                 style={{ background: cat.color }}
               >
                 <img
@@ -94,12 +94,12 @@ const CategoryBentoGrid = () => {
                   decoding="async"
                 />
                 {/* Subtle inner shadow ring on hover */}
-                <div className="absolute inset-0 rounded-full ring-0 group-hover:ring-2 group-hover:ring-red-300/50 transition-all duration-300" />
+                <div className="absolute inset-0 rounded-full ring-0 group-hover:ring-2 group-hover:ring-blue-300/50 transition-all duration-300" />
               </div>
 
               {/* Label */}
               <div className="text-center">
-                <h3 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 group-hover:text-red-600 transition-colors leading-tight mb-0.5">
+                <h3 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 group-hover:text-primary transition-colors leading-tight mb-0.5">
                   {cat.name}
                 </h3>
                 <p className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider font-medium">
@@ -115,7 +115,7 @@ const CategoryBentoGrid = () => {
       <div className="flex justify-center mt-8 sm:hidden">
         <Link
           to="/category/all"
-          className="flex items-center gap-1.5 text-sm font-semibold text-red-600 border border-red-200 px-5 py-2 rounded-full hover:bg-red-50 transition-colors"
+          className="flex items-center gap-1.5 text-sm font-semibold text-primary border border-blue-200 px-5 py-2 rounded-full hover:bg-blue-50 transition-colors"
         >
           View All Categories <ArrowRight size={14} />
         </Link>

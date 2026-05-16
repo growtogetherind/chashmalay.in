@@ -66,14 +66,14 @@ const ProductCard = ({ product }) => {
       <Link to={productPath} className="block relative overflow-hidden aspect-[4/3] bg-gray-50">
         {/* Discount Badge */}
         {discountPercent > 0 && (
-          <span className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+          <span className="absolute top-2 left-2 z-10 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
             -{discountPercent}%
           </span>
         )}
 
         {/* Wishlist */}
         <button
-          className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-600 hover:border-red-200 transition-colors shadow-sm"
+          className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-primary hover:border-blue-200 transition-colors shadow-sm"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -83,7 +83,7 @@ const ProductCard = ({ product }) => {
           <Heart
             size={13}
             fill={isWishlisted ? '#dc2626' : 'none'}
-            className={isWishlisted ? 'text-red-600' : ''}
+            className={isWishlisted ? 'text-primary' : ''}
           />
         </button>
 
@@ -104,7 +104,7 @@ const ProductCard = ({ product }) => {
           {product.brand || 'Chashmaly'}
         </p>
         <Link to={productPath} className="block">
-          <h4 className="text-sm font-semibold text-gray-800 line-clamp-1 hover:text-red-600 transition-colors mb-1">
+          <h4 className="text-sm font-semibold text-gray-800 line-clamp-1 hover:text-primary transition-colors mb-1">
             {product.name}
           </h4>
         </Link>

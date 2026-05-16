@@ -336,7 +336,7 @@ const ProductDetail = () => {
               <div className="action-stack space-y-4 pt-4">
                 <button 
                   onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} 
-                  className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-black transition-all shadow-2xl shadow-slate-900/30 inline-cta-desktop"
+                  className="w-full py-6 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-blue-900 transition-all shadow-2xl shadow-slate-900/30 inline-cta-desktop"
                 >
                   {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
                 </button>

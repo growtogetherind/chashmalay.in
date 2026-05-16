@@ -38,7 +38,7 @@ const Footer = () => {
           {/* Column 1 - Brand */}
           <div>
             <h3 className="text-base font-bold text-gray-900 mb-1">
-              {settings.store_name || 'Chashmaly'}<span className="text-red-600">.in</span>
+              {settings.store_name || 'Chashmaly'}<span className="text-primary">.in</span>
             </h3>
             <p className="text-xs text-gray-500 mb-5 leading-relaxed">
               Optical precision meets everyday style. Premium eyewear for every face and every occasion.
@@ -53,7 +53,7 @@ const Footer = () => {
                 <a
                   key={i}
                   href={s.href}
-                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-red-600 hover:text-red-600 transition-colors"
+                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-primary hover:text-primary transition-colors"
                 >
                   {s.icon}
                 </a>
@@ -66,16 +66,16 @@ const Footer = () => {
             <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4">Contact us</h4>
             <ul className="flex flex-col gap-3 text-xs text-gray-500">
               <li className="flex items-start gap-2">
-                <MapPin size={13} className="text-red-600 mt-0.5 flex-shrink-0" />
+                <MapPin size={13} className="text-primary mt-0.5 flex-shrink-0" />
                 <span>{address}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone size={13} className="text-red-600 flex-shrink-0" />
-                <a href={`tel:${phone}`} className="hover:text-red-600 transition-colors">{phone}</a>
+                <Phone size={13} className="text-primary flex-shrink-0" />
+                <a href={`tel:${phone}`} className="hover:text-primary transition-colors">{phone}</a>
               </li>
               <li className="flex items-center gap-2">
-                <Mail size={13} className="text-red-600 flex-shrink-0" />
-                <a href={`mailto:${email}`} className="hover:text-red-600 transition-colors">{email}</a>
+                <Mail size={13} className="text-primary flex-shrink-0" />
+                <a href={`mailto:${email}`} className="hover:text-primary transition-colors">{email}</a>
               </li>
             </ul>
           </div>
@@ -92,7 +92,7 @@ const Footer = () => {
                 { label: 'Contact Us', href: '/contact' },
               ].map((l) => (
                 <li key={l.label}>
-                  <Link to={l.href} className="hover:text-red-600 transition-colors">{l.label}</Link>
+                  <Link to={l.href} className="hover:text-primary transition-colors">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -108,7 +108,7 @@ const Footer = () => {
                 { label: 'Shipping Policy', href: '/shipping' },
               ].map((l) => (
                 <li key={l.label}>
-                  <Link to={l.href} className="hover:text-red-600 transition-colors">{l.label}</Link>
+                  <Link to={l.href} className="hover:text-primary transition-colors">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -125,7 +125,7 @@ const Footer = () => {
                   placeholder="Your email address"
                   className="text-xs px-3 py-2 flex-1 outline-none"
                 />
-                <button className="bg-red-600 text-white px-3 flex items-center hover:bg-red-700 transition-colors">
+                <button className="bg-primary text-white px-3 flex items-center hover:bg-blue-900 transition-colors">
                   <Send size={13} />
                 </button>
               </div>
