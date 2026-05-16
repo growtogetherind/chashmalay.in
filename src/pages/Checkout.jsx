@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, MapPin, CreditCard, ShoppingBag, Shield, CheckCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -38,6 +38,29 @@ const Checkout = () => {
   });
 
   const handleAddressChange = (e) => setAddress(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+  useEffect(() => {
+    const fetchPincodeData = async () => {
+      if (address.pincode.length === 6) {
+        try {
+          const res = await fetch(`https://api.postalpincode.in/pincode/${address.pincode}`);
+          const data = await res.json();
+          if (data[0].Status === "Success") {
+            const { District, State } = data[0].PostOffice[0];
+            setAddress(prev => ({
+              ...prev,
+              city: District,
+              state: State
+            }));
+            toast.success(`Auto-filled: ${District}, ${State}`);
+          }
+        } catch (err) {
+          console.error("Pincode fetch error:", err);
+        }
+      }
+    };
+    fetchPincodeData();
+  }, [address.pincode]);
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
