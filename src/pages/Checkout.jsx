@@ -10,7 +10,8 @@ import { FadeIn } from '../components/ui/Motion';
 const STEPS = ['Shipping', 'Review', 'Secure Payment'];
 
 const InputField = ({ label, ...props }) => (
-  <div className="flex flex-col gap-2">
+  <div className="flex flex-col gap-1">
+     {label && <label className="text-[10px] font-sans font-bold uppercase tracking-widest text-secondary opacity-70">{label}</label>}
      <input 
        {...props} 
        className="w-full bg-transparent border-b border-divider py-3 outline-none focus:border-[#2FA4B7] transition-colors text-heading font-sans placeholder-body/50"
