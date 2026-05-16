@@ -40,8 +40,8 @@ const byCreatedDesc = (a, b) => getTimestamp(b.created_at) - getTimestamp(a.crea
 const byNameAsc = (a, b) => (a.full_name || a.name || '').localeCompare(b.full_name || b.name || '');
 
 const DEFAULT_SETTINGS = {
-  store_name: 'Chashmaly',
-  contact_email: 'info@chashmaly.in',
+  store_name: 'Chashmalay',
+  contact_email: 'info@chashmalay.in',
   contact_phone: '+91-9319484119',
   address: 'Karol Bagh, New Delhi - 110005, India',
   instagram: '#',

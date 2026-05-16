@@ -25,7 +25,7 @@ const Footer = () => {
   }, []);
 
   const phone = settings.contact_phone || '+91-9319484119';
-  const email = settings.contact_email || 'info@chashmaly.in';
+  const email = settings.contact_email || 'info@chashmalay.in';
   const address = settings.address || 'Karol Bagh, New Delhi - 110005, India';
 
   return (
@@ -38,7 +38,7 @@ const Footer = () => {
           {/* Column 1 - Brand */}
           <div>
             <h3 className="text-base font-bold text-gray-900 mb-1">
-              {settings.store_name || 'Chashmaly'}<span className="text-primary">.in</span>
+              {settings.store_name || 'Chashmalay'}<span className="text-primary">.in</span>
             </h3>
             <p className="text-xs text-gray-500 mb-5 leading-relaxed">
               Optical precision meets everyday style. Premium eyewear for every face and every occasion.
@@ -137,7 +137,7 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="border-t border-gray-100 py-4">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} Chashmaly.in. All Rights Reserved.
+          © {new Date().getFullYear()} Chashmalay.in. All Rights Reserved.
         </div>
       </div>
     </footer>

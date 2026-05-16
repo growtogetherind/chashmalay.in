@@ -36,7 +36,7 @@ const Offers = () => {
                     >
                         <Sparkles size={14} /> Exclusive Promotions
                     </motion.div>
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 mb-4">THE CHASHMALY OFFERS</h1>
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 mb-4">THE CHASHMALAY OFFERS</h1>
                     <p className="text-slate-500 max-w-2xl mx-auto font-medium">Discover premium luxury at unbeatable prices. From seasonal sales to first-order specials, we clear the way for your style.</p>
                 </header>
 

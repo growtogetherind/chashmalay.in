@@ -292,7 +292,7 @@ const Navbar = () => {
               {/* Drawer Header */}
               <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100">
                 <span className="font-bold text-base text-gray-900 tracking-tight">
-                  Chashmaly<span className="text-gray-400">.in</span>
+                  Chashmalay<span className="text-gray-400">.in</span>
                 </span>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -401,7 +401,7 @@ const Navbar = () => {
 
               <div className="px-6 py-4 border-t border-gray-100">
                 <p className="text-[10px] text-gray-400 font-medium tracking-widest uppercase">
-                  © {new Date().getFullYear()} Chashmaly.in
+                  © {new Date().getFullYear()} Chashmalay.in
                 </p>
               </div>
             </motion.div>

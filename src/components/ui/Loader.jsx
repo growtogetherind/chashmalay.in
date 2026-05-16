@@ -38,7 +38,7 @@ const Loader = ({ onLoadingComplete }) => {
               className="perspective-[1000px]"
             >
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-[#161616]">
-                CHASHMALY<span className="text-[#009688]">.IN</span>
+                CHASHMALAY<span className="text-[#009688]">.IN</span>
               </h1>
             </motion.div>
             

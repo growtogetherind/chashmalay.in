@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 const CartContext = createContext({});
 export const useCart = () => useContext(CartContext);
 
-const CART_STORAGE_KEY = 'chashmaly_guest_cart';
+const CART_STORAGE_KEY = 'chashmalay_guest_cart';
 
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();

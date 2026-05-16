@@ -29,7 +29,7 @@ const OrderSuccess = () => {
         </div>
         
         <h1 className="text-3xl font-black text-gray-900 mb-2">Order Confirmed! 🎉</h1>
-        <p className="text-gray-500 mb-6">Thank you for shopping with Chashmaly.in. Your frames are being prepared with love.</p>
+        <p className="text-gray-500 mb-6">Thank you for shopping with Chashmalay.in. Your frames are being prepared with love.</p>
 
         {order && (
           <div className="bg-gray-50 rounded-2xl p-5 mb-6 text-left">

@@ -95,7 +95,7 @@ export const generateInvoice = (order) => {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(150);
   doc.text('This is a computer generated invoice and does not require a physical signature.', 105, 280, { align: 'center' });
-  doc.text('Thank you for shopping with Chashmaly.in!', 105, 285, { align: 'center' });
+  doc.text('Thank you for shopping with Chashmalay.in!', 105, 285, { align: 'center' });
 
-  doc.save(`Invoice_Chashmaly_${order.id?.slice(0, 8).toUpperCase()}.pdf`);
+  doc.save(`Invoice_Chashmalay_${order.id?.slice(0, 8).toUpperCase()}.pdf`);
 };

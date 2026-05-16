@@ -104,21 +104,21 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!product) return;
-    const wishlist = JSON.parse(localStorage.getItem('chashmaly_wishlist') || '[]');
+    const wishlist = JSON.parse(localStorage.getItem('chashmalay_wishlist') || '[]');
     setIsWishlisted(wishlist.includes(product.id));
   }, [product]);
 
   const toggleWishlist = () => {
-    const wishlist = JSON.parse(localStorage.getItem('chashmaly_wishlist') || '[]');
+    const wishlist = JSON.parse(localStorage.getItem('chashmalay_wishlist') || '[]');
     const exists = wishlist.includes(product.id);
     const updated = exists ? wishlist.filter(item => item !== product.id) : [...wishlist, product.id];
-    localStorage.setItem('chashmaly_wishlist', JSON.stringify(updated));
+    localStorage.setItem('chashmalay_wishlist', JSON.stringify(updated));
     setIsWishlisted(!exists);
     toast.success(exists ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
   const handleShare = async () => {
-    const shareData = { title: product.name, text: `Check out ${product.name} on Chashmaly!`, url: window.location.href };
+    const shareData = { title: product.name, text: `Check out ${product.name} on Chashmalay!`, url: window.location.href };
     try {
       if (navigator.share) await navigator.share(shareData);
       else {
@@ -229,7 +229,7 @@ const ProductDetail = () => {
                 <FadeIn delay={0.1}>
                   <div className="flex items-center gap-3 mb-3">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">
-                      {product.brand || 'Chashmaly Luxury'}
+                      {product.brand || 'Chashmalay Luxury'}
                     </span>
                     <div className="w-1 h-1 rounded-full bg-slate-300" />
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">

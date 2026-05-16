@@ -100,7 +100,7 @@ async function seedEverything() {
             const sku = `SKU-CL-${file.split('.')[0].toUpperCase()}`;
             await db.collection("products").add({
                 name: file.split('.')[0].replace(/_/g, ' ').toUpperCase() + ' Lens',
-                brand: 'Chashmaly Vision',
+                brand: 'Chashmalay Vision',
                 category: 'contacts',
                 shape: 'Circular',
                 theme: 'Healthcare',
@@ -130,7 +130,7 @@ async function seedEverything() {
         if (!file.match(/\.(jpg|jpeg|png|webp|avif)$/i)) continue;
 
         const sku = `SKU-${file.split('.')[0].toUpperCase()}`;
-        let brand = "Chashmaly Elite", category = "eyeglasses", shape = "Rectangle";
+        let brand = "Chashmalay Elite", category = "eyeglasses", shape = "Rectangle";
         let name = file.split('.')[0].replace(/_/g, ' ').toUpperCase();
 
         if (file.startsWith('0rb')) { brand = "Ray-Ban"; category = "sunglasses"; }

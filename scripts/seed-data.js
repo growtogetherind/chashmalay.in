@@ -48,7 +48,7 @@ const products = [
   },
   {
     name: "Retro Gold Round",
-    brand: "Chashmaly Elite",
+    brand: "Chashmalay Elite",
     category: "eyeglasses",
     shape: "Round",
     theme: "Vintage",
@@ -78,7 +78,7 @@ const products = [
   },
   {
     name: "Round Matte Gunmetal",
-    brand: "Chashmaly Elite",
+    brand: "Chashmalay Elite",
     category: "eyeglasses",
     shape: "Round",
     theme: "Modern",

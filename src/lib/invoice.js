@@ -122,7 +122,7 @@ export const generateInvoice = (order) => {
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(30, 63, 138);
-  doc.text("Thank you for shopping with Chashmaly!", pageWidth / 2, finalY + 25, { align: 'center' });
+  doc.text("Thank you for shopping with Chashmalay!", pageWidth / 2, finalY + 25, { align: 'center' });
 
-  doc.save(`Invoice_Chashmaly_${order.id?.slice(0, 8).toUpperCase()}.pdf`);
+  doc.save(`Invoice_Chashmalay_${order.id?.slice(0, 8).toUpperCase()}.pdf`);
 };

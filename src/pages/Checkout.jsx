@@ -120,7 +120,7 @@ const Checkout = () => {
       key: razorpayKey,
       amount: amountInPaise,
       currency: 'INR',
-      name: 'Chashmaly.in',
+      name: 'Chashmalay.in',
       description: `Order for ${cart.length} item(s)`,
       image: '/logo.png', // Ideally your logo
       handler: async function (response) {

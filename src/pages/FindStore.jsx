@@ -7,7 +7,7 @@ const STORES = [
     {
         id: 1,
         city: 'Lonavala',
-        name: 'Chashmaly - Ch. Shivaji Maharaj Chouk',
+        name: 'Chashmalay - Ch. Shivaji Maharaj Chouk',
         address: 'Opp. Nakoda Complex, Lonavala, Maharashtra - 410401',
         phone: '8956951884',
         hours: '10:30 AM - 8:30 PM',
@@ -16,7 +16,7 @@ const STORES = [
     {
         id: 2,
         city: 'Somatane Phata',
-        name: 'Chashmaly - Trumurti Plaza',
+        name: 'Chashmalay - Trumurti Plaza',
         address: 'Shop No. 7, Somatane Phata, Maharashtra - 410506',
         phone: '7620681884',
         hours: '10:30 AM - 8:30 PM',
@@ -25,7 +25,7 @@ const STORES = [
     {
         id: 3,
         city: 'Rahatani',
-        name: 'Chashmaly - Dattanagar',
+        name: 'Chashmalay - Dattanagar',
         address: 'Opp. Amardeep Colony, Rahatani, Pune - 411017',
         phone: '9272151202',
         hours: '10:30 AM - 8:30 PM',
@@ -34,7 +34,7 @@ const STORES = [
     {
         id: 4,
         city: 'Wakad',
-        name: 'Chashmaly - Dattamandir Road',
+        name: 'Chashmalay - Dattamandir Road',
         address: 'Shop No. 2, Near Vitalife Clinic, Wakad, Pune - 411057',
         phone: '93735 88873',
         hours: '10:30 AM - 9:00 PM',
@@ -43,7 +43,7 @@ const STORES = [
     {
         id: 5,
         city: 'Shirur',
-        name: 'Chashmaly - Nirman Plaza',
+        name: 'Chashmalay - Nirman Plaza',
         address: 'Shop No. 2, C T Bora College Road, Shirur, Maharashtra - 412210',
         phone: '9028275574',
         hours: '10:30 AM - 8:30 PM',
@@ -52,7 +52,7 @@ const STORES = [
     {
         id: 6,
         city: 'Talegaon Dabhade',
-        name: 'Chashmaly - P L Khandge Plaza',
+        name: 'Chashmalay - P L Khandge Plaza',
         address: 'Shop No. 4, Near Saraswat Bank, Talegaon Dabhade, Maharashtra - 410506',
         phone: '7620681884',
         hours: '10:30 AM - 8:30 PM',
@@ -228,7 +228,7 @@ const FindStore = () => {
                             height="100%" 
                             frameBorder="0" 
                             style={{ border: 0 }}
-                            src={`https://maps.google.com/maps?q=${encodeURIComponent(STORES.find(s => s.id === nearestStoreId)?.name || 'chashmaly.in boutique ' + selectedCity)}&output=embed`}
+                            src={`https://maps.google.com/maps?q=${encodeURIComponent(STORES.find(s => s.id === nearestStoreId)?.name || 'chashmalay.in boutique ' + selectedCity)}&output=embed`}
                             allowFullScreen
                             className="grayscale contrast-125 opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                         />

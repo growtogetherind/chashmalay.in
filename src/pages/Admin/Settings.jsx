@@ -7,7 +7,7 @@ import '../Admin.css';
 
 const AdminSettings = () => {
   const [form, setForm] = useState({
-    store_name: 'Chashmaly',
+    store_name: 'Chashmalay',
     contact_email: '',
     contact_phone: '',
     address: '',
@@ -146,7 +146,7 @@ const AdminSettings = () => {
                 <div className="space-y-8">
                   <div className="form-group">
                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Instagram Meta-Data Stream</label>
-                     <input value={form.instagram} onChange={e => setForm({...form, instagram: e.target.value})} placeholder="https://instagram.com/chashmaly" className="w-full bg-slate-50 border border-slate-100 p-5 rounded-[20px] text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-inner" />
+                     <input value={form.instagram} onChange={e => setForm({...form, instagram: e.target.value})} placeholder="https://instagram.com/chashmalay" className="w-full bg-slate-50 border border-slate-100 p-5 rounded-[20px] text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-inner" />
                   </div>
                   <div className="form-group">
                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Facebook Public Interface</label>

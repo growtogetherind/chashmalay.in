@@ -85,11 +85,11 @@ const Auth = () => {
         <div className="auth-brand-panel">
           <Link to="/" className="auth-logo flex flex-col items-center">
             <Logo className="h-20 w-auto mb-4" />
-            <span>Chashmaly.in</span>
+            <span>Chashmalay.in</span>
           </Link>
           <div className="auth-brand-content">
             <h2>See the world clearly.<br />Look amazing doing it.</h2>
-            <p>Join 1M+ happy customers who trust Chashmaly for their eyewear.</p>
+            <p>Join 1M+ happy customers who trust Chashmalay for their eyewear.</p>
           </div>
         </div>
 

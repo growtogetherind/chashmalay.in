@@ -101,7 +101,7 @@ const ProductCard = ({ product }) => {
       {/* Info Area */}
       <div className="p-3">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
-          {product.brand || 'Chashmaly'}
+          {product.brand || 'Chashmalay'}
         </p>
         <Link to={productPath} className="block">
           <h4 className="text-sm font-semibold text-gray-800 line-clamp-1 hover:text-primary transition-colors mb-1">

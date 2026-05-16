@@ -54,7 +54,7 @@ const AdminSidebar = () => {
               <Logo className="w-6 h-6 invert brightness-0" />
            </div>
            <div className="flex flex-col">
-              <span className="text-gray-900 font-extrabold text-sm tracking-tight leading-none uppercase">Chashmaly</span>
+              <span className="text-gray-900 font-extrabold text-sm tracking-tight leading-none uppercase">Chashmalay</span>
               <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mt-1">Admin Panel</span>
            </div>
         </div>
@@ -110,7 +110,7 @@ const AdminSidebar = () => {
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 h-16 flex items-center justify-between px-4 z-[1000]">
          <div className="flex items-center gap-2">
             <Logo className="w-8 h-8" />
-            <span className="text-gray-900 font-black text-sm uppercase tracking-tight">Chashmaly Admin</span>
+            <span className="text-gray-900 font-black text-sm uppercase tracking-tight">Chashmalay Admin</span>
          </div>
          <button onClick={toggleMenu} className="p-2 text-gray-900 hover:bg-gray-50 rounded-xl">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
