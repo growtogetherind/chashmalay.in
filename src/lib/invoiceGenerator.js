@@ -1,10 +1,26 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+const getSelectedColorName = (item) => {
+  const selectedColor = item?.selected_color || item?.lens_selection?.selectedColor;
+  if (!selectedColor) return null;
+  return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+};
+
+const getSelectedSize = (item) => item?.selected_size || item?.lens_selection?.selectedSize;
+
+const getVariantDescription = (item) => {
+  const color = getSelectedColorName(item);
+  const size = getSelectedSize(item);
+  if (!color && !size) return '';
+  return `
+Frame: ${color || 'Standard'}${size ? ` / Size: ${size}` : ''}`;
+};
+
 export const generateInvoice = (order) => {
   const doc = new jsPDF();
-  const date = order.created_at?.toDate 
-    ? order.created_at.toDate() 
+  const date = order.created_at?.toDate
+    ? order.created_at.toDate()
     : new Date(order.created_at?.seconds * 1000 || order.created_at || Date.now());
 
   // Business Header
@@ -15,7 +31,7 @@ export const generateInvoice = (order) => {
   doc.setFontSize(22);
   doc.setTextColor(30, 63, 138); // primary-blue
   doc.text('CHASHMALAY.IN', 14, 40);
-  
+
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.text('Luxury Eyewear Store', 14, 46);
@@ -26,7 +42,7 @@ export const generateInvoice = (order) => {
   doc.setFontSize(20);
   doc.setTextColor(0);
   doc.text('INVOICE', 140, 40);
-  
+
   doc.setFontSize(10);
   doc.text(`Invoice #: INV-${order.id?.slice(0, 8).toUpperCase()}`, 140, 48);
   doc.text(`Date: ${date.toLocaleDateString('en-IN')}`, 140, 53);
@@ -35,11 +51,11 @@ export const generateInvoice = (order) => {
   // Bill To
   doc.setDrawColor(230);
   doc.line(14, 45, 196, 45);
-  
+
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.text('BILL TO:', 14, 55);
-  
+
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(order.shipping_address?.name || 'Customer', 14, 62);
@@ -50,9 +66,9 @@ export const generateInvoice = (order) => {
 
   // Table
   const tableData = order.order_items?.map(item => [
-    { 
-      content: `${item.products?.name || item.product_name}\nLenses: ${item.lens_selection?.visionType?.title || 'Frame Only'} (${item.lens_selection?.lensPackage?.name || 'Standard'})`, 
-      styles: { cellPadding: 3 } 
+    {
+      content: `${item.products?.name || item.product_name}${getVariantDescription(item)}\nLenses: ${item.lens_selection?.visionType?.title || 'Frame Only'} (${item.lens_selection?.lensPackage?.name || 'Standard'})`,
+      styles: { cellPadding: 3 }
     },
     `INR ${Number(item.price).toLocaleString()}`,
     item.quantity,
@@ -75,16 +91,16 @@ export const generateInvoice = (order) => {
 // ...
   const finalY = (doc).lastAutoTable?.finalY || 200;
   doc.setFontSize(10);
-  
+
   const subtotal = Number(order.total_amount) / 1.18;
   const gst = Number(order.total_amount) - subtotal;
-  
+
   doc.text('Subtotal:', 140, finalY);
   doc.text(`INR ${subtotal.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 196, finalY, { align: 'right' });
-  
+
   doc.text('GST (18%):', 140, finalY + 7);
   doc.text(`INR ${gst.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 196, finalY + 7, { align: 'right' });
-  
+
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.text('TOTAL AMOUNT:', 140, finalY + 15);

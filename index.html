@@ -9,8 +9,180 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://firebasestorage.googleapis.com">
     <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      #global-preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
+        /* No background — page shows through the moment shutter exits */
+        background: transparent;
+      }
+
+      /* Side rails — thin, stay put */
+      #preloader-rail-left,
+      #preloader-rail-right {
+        position: absolute;
+        top: 0; bottom: 0;
+        width: 13px;
+        background: linear-gradient(90deg, #8fcece, #b2dfdf, #8fcece);
+        z-index: 10;
+        /* Rails fade when JS removes them */
+      }
+      #preloader-rail-left  { left: 0; }
+      #preloader-rail-right { right: 0; }
+
+      /* ── Shutter: track + slats + logo — ALL roll UP together ── */
+      #preloader-shutter {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        /* Shutter starts 0.2s after page loads, takes 1.8s → done at 2.0s */
+        transform: translateY(0%);
+        animation: shutterRollUp 1.8s cubic-bezier(0.38, 0, 0.12, 1) forwards 0.2s;
+        will-change: transform;
+      }
+
+      /* Dot track at the top of the shutter */
+      #preloader-track {
+        width: 100%;
+        flex-shrink: 0;
+        height: 20px;
+        background: #a8d8d8;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        padding: 0 16px;
+        border-bottom: 2px solid #7bbebe;
+      }
+      .preloader-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #2aafaf;
+        border: 1.5px solid #199999;
+        flex-shrink: 0;
+      }
+
+      /* Slats */
+      #preloader-slats {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .preloader-slat {
+        flex: 1;
+        background: linear-gradient(
+          180deg,
+          #f2fafa 0%,
+          #e6f5f5 40%,
+          #daeeee 55%,
+          #e6f5f5 70%,
+          #f2fafa 100%
+        );
+        border-top: 1.5px solid #ffffff;
+        border-bottom: 1.5px solid #cae8e8;
+        position: relative;
+      }
+      .preloader-slat::after {
+        content: '';
+        position: absolute;
+        left: 0; right: 0;
+        top: 42%;
+        height: 1px;
+        background: rgba(160, 210, 210, 0.45);
+      }
+
+      /* Logo INSIDE the shutter — moves up with it */
+      #preloader-logo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+      #preloader-logo img {
+        /* Mobile: 58vw | Tablet: 35vw | Desktop: up to 380px */
+        width: clamp(160px, 58vw, 380px);
+        height: auto;
+        object-fit: contain;
+        display: block;
+        filter: drop-shadow(0 6px 24px rgba(0, 130, 130, 0.22));
+      }
+
+      /* Floor bar */
+      #preloader-floor {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 10px;
+        background: #8fcece;
+        border-top: 2px solid #6daeae;
+        z-index: 5;
+      }
+
+      @keyframes shutterRollUp {
+        0%   { transform: translateY(0%); }
+        100% { transform: translateY(-102%); } /* 102% ensures it fully clears the viewport */
+      }
+    </style>
   </head>
   <body>
+
+    <div id="global-preloader">
+      <div id="preloader-rail-left"></div>
+      <div id="preloader-rail-right"></div>
+
+      <div id="preloader-shutter">
+        <div id="preloader-track"></div>
+        <div id="preloader-slats">
+          <div id="preloader-logo">
+            <img src="/logo.png" alt="Chashmalay.in" />
+          </div>
+        </div>
+      </div>
+
+      <div id="preloader-floor"></div>
+    </div>
+
+    <script>
+      (function () {
+        var SLAT_COUNT = 30;
+        var DOT_COUNT  = 22;
+
+        var slatsEl = document.getElementById('preloader-slats');
+        var trackEl = document.getElementById('preloader-track');
+        var logoEl  = document.getElementById('preloader-logo');
+
+        for (var i = 0; i < SLAT_COUNT; i++) {
+          var s = document.createElement('div');
+          s.className = 'preloader-slat';
+          slatsEl.insertBefore(s, logoEl); // slats go behind logo
+        }
+        for (var j = 0; j < DOT_COUNT; j++) {
+          var d = document.createElement('div');
+          d.className = 'preloader-dot';
+          trackEl.appendChild(d);
+        }
+
+        // Shutter starts at 0.2s, runs 1.8s → finishes at 2.0s
+        // Remove the entire preloader element right at 2.0s so the hero page shows immediately
+        setTimeout(function () {
+          var el = document.getElementById('global-preloader');
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+        }, 2050);
+      })();
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -47,7 +47,12 @@ const Cart = () => {
     'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9Ijc1IiB2aWV3Qm94PSIwIDAgMTAwIDc1IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iNzUiIGZpbGw9IiNGMUY1RjkiLz48cGF0aCBkPSJNMzUgMzBIMjVhNSA1IDAgMCAwLTUgNXYxMGE1IDUgMCAwIDAgNSA1aDEwYTUgNSAoIDAgMCA1LTV2LTEwYTUgNSAwIDAgMC01LTV6TTY1IDMwSDU1YTUgNSAwIDAgMC01IDV2MTBhNSA1IDAgMCAwIDUgNWgxMGE1IDUgMCAwIDAgNS01di0xMGE1IDUgMCAwIDAtNS01ek00NSAzN2gxMCIgc3Ryb2tlPSIjOTRBM0I4IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==';
 
   const getItemName = (item) => item?.products?.name || item?.name || 'Premium Eyewear';
-  const getItemId = (item) => item?.cartId || item?.product_id || item?.id;
+  const getItemId = (item) => item?.cartId || item?.firebaseId || item?.cartVariantKey || item?.product_id || item?.id;
+  const getSelectedColorName = (item) => {
+    const selectedColor = item?.lensSelection?.selectedColor;
+    if (!selectedColor) return null;
+    return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+  };
 
   if (cart.length === 0) {
     return (
@@ -115,7 +120,10 @@ const Cart = () => {
 
                     <div className="item-info">
                       <h3>{getItemName(item)}</h3>
-                      <p className="item-variant">{item.products?.frame_shape || 'Medium'}</p>
+                      <p className="item-variant">
+                        {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : (item.products?.frame_shape || 'Medium')}
+                        {item.lensSelection?.selectedSize ? ` / Size: ${item.lensSelection.selectedSize}` : ''}
+                      </p>
 
                       <div className="selection-row" onClick={() => toast.success('You have selected premium lenses!')}>
                         <span>{item.lensSelection?.lensPackage?.name || 'Standard Lenses'}</span>

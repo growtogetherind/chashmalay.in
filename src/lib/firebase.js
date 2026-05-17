@@ -223,14 +223,15 @@ export const getCartItems = async (userId) => {
   } catch (error) { return { data: null, error }; }
 };
 
-export const upsertCartItem = async (userId, productId, quantity, lensSelection = null) => {
+export const upsertCartItem = async (userId, productId, quantity, lensSelection = null, cartVariantKey = null) => {
   try {
-    const id = `${userId}_${productId}`;
+    const id = cartVariantKey?.startsWith(`${userId}_`) ? cartVariantKey : `${userId}_${cartVariantKey || productId}`;
     await setDoc(doc(db, "cart_items", id), {
       user_id: userId,
       product_id: productId,
       quantity,
       lens_selection: lensSelection,
+      cart_variant_key: id,
       updated_at: serverTimestamp()
     }, { merge: true });
     return { error: null };
@@ -239,7 +240,7 @@ export const upsertCartItem = async (userId, productId, quantity, lensSelection 
 
 export const removeCartItem = async (userId, productId) => {
   try {
-    const id = `${userId}_${productId}`;
+    const id = productId?.startsWith(`${userId}_`) ? productId : `${userId}_${productId}`;
     await deleteDoc(doc(db, "cart_items", id));
     return { error: null };
   } catch (error) { return { error }; }
@@ -331,7 +332,10 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
         frame_image: getProductImage(item),
         category: item.category || '',
         brand: item.brand || '',
-        lens_selection: item.lensSelection || null
+        lens_selection: item.lensSelection || null,
+        selected_color: item.lensSelection?.selectedColor || null,
+        selected_size: item.lensSelection?.selectedSize || null,
+        cart_variant_key: item.cartVariantKey || item.firebaseId || null
       });
     });
     await Promise.all(batchPromises);

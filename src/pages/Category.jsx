@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { SlidersHorizontal, ChevronDown, X } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown, X, Filter, ArrowUpDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ui/ProductCard';
 import { FadeIn, RevealText, StaggerContainer, StaggerItem, TRANSITIONS } from '../components/ui/Motion';
@@ -209,6 +209,51 @@ const mergeOptions = (baseOptions, values) => {
 
 const getColorSwatch = (color) => COLOR_MAP[color] || (/^#[0-9a-f]{3,8}$/i.test(color) ? color : '#CBD5E1');
 
+// Dual-color map: color name → [top color, bottom color]
+const DUAL_COLOR_MAP = {
+  'Tortoise':     ['#8B5E34', '#1a1a1a'],
+  'Black Gold':   ['#000000', '#D4AF37'],
+  'Blue Gold':    ['#1E3A8A', '#D4AF37'],
+  'Black Silver': ['#000000', '#C0C0C0'],
+  'Brown Gold':   ['#5C4033', '#D4AF37'],
+  'Transparent Blue': ['#EFF6FF', '#1E3A8A'],
+  'Grey Blue':    ['#9CA3AF', '#1E3A8A'],
+  'Pink Gold':    ['#F9A8D4', '#D4AF37'],
+  'Multicolor':   ['#E53E3E', '#3182CE'],
+};
+
+// ColorSwatch: renders a split circle for dual colors, solid for single
+const ColorSwatch = ({ color, isSelected, size = 'w-5 h-5' }) => {
+  const dual = DUAL_COLOR_MAP[color];
+  const borderCls = isSelected ? 'border-2 border-primary shadow-md' : 'border border-slate-200';
+
+  if (dual) {
+    return (
+      <div
+        className={`${size} rounded-full overflow-hidden flex-shrink-0 ${borderCls}`}
+        title={color}
+      >
+        {/* Top half */}
+        <div style={{ background: dual[0], height: '50%', width: '100%' }} />
+        {/* Bottom half */}
+        <div style={{ background: dual[1], height: '50%', width: '100%' }} />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`${size} rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center ${borderCls}`}
+      style={{ background: getColorSwatch(color) }}
+      title={color}
+    >
+      {isSelected && (
+        <div className={`w-1.5 h-1.5 rounded-full ${['Black','Blue','Brown','Gunmetal'].includes(color) ? 'bg-white' : 'bg-slate-800'}`} />
+      )}
+    </div>
+  );
+};
+
 const Category = () => {
   const { name } = useParams();
   const [products, setProducts] = useState([]);
@@ -217,8 +262,29 @@ const Category = () => {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedThemes, setSelectedThemes] = useState([]);
+
+  // Pending filter states for deferred 'Apply' button flow
+  const [pendingShapes, setPendingShapes] = useState([]);
+  const [pendingTypes, setPendingTypes] = useState([]);
+  const [pendingColors, setPendingColors] = useState([]);
+  const [pendingThemes, setPendingThemes] = useState([]);
+
   const [sortBy, setSortBy] = useState('recommended');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  const [expandedFilters, setExpandedFilters] = useState({
+    type: true, // Frame Type is unfolded by default
+    shape: false,
+    color: false,
+    theme: false,
+  });
+
+  const toggleFilter = (key) => {
+    setExpandedFilters((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
 
   const categoryTitle = name ? name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'Eyeglasses';
 
@@ -241,9 +307,28 @@ const Category = () => {
     setSelectedTypes([]);
     setSelectedColors([]);
     setSelectedThemes([]);
+    setPendingShapes([]);
+    setPendingTypes([]);
+    setPendingColors([]);
+    setPendingThemes([]);
     setSortBy('recommended');
     setIsMobileFilterOpen(false);
+    setExpandedFilters({
+      type: true,
+      shape: false,
+      color: false,
+      theme: false,
+    });
   }, [name]);
+
+  useEffect(() => {
+    if (isMobileFilterOpen) {
+      setPendingShapes(selectedShapes);
+      setPendingTypes(selectedTypes);
+      setPendingColors(selectedColors);
+      setPendingThemes(selectedThemes);
+    }
+  }, [isMobileFilterOpen]);
 
   const filteredProducts = React.useMemo(() => {
     const selected = {
@@ -277,19 +362,39 @@ const Category = () => {
   );
 
   const handleThemeChange = (theme) => {
-    setSelectedThemes((current) => current.includes(theme) ? current.filter(t => t !== theme) : [...current, theme]);
+    setPendingThemes((current) => current.includes(theme) ? current.filter(t => t !== theme) : [...current, theme]);
   };
 
   const handleShapeChange = (shape) => {
-    setSelectedShapes((current) => current.includes(shape) ? current.filter(s => s !== shape) : [...current, shape]);
+    setPendingShapes((current) => current.includes(shape) ? current.filter(s => s !== shape) : [...current, shape]);
   };
 
   const handleTypeChange = (type) => {
-    setSelectedTypes((current) => current.includes(type) ? current.filter(t => t !== type) : [...current, type]);
+    setPendingTypes((current) => current.includes(type) ? current.filter(t => t !== type) : [...current, type]);
   };
 
   const handleColorChange = (color) => {
-    setSelectedColors((current) => current.includes(color) ? current.filter(c => c !== color) : [...current, color]);
+    setPendingColors((current) => current.includes(color) ? current.filter(c => c !== color) : [...current, color]);
+  };
+
+  const handleApplyFilters = () => {
+    setSelectedShapes(pendingShapes);
+    setSelectedTypes(pendingTypes);
+    setSelectedColors(pendingColors);
+    setSelectedThemes(pendingThemes);
+    setIsMobileFilterOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleClearAll = () => {
+    setPendingShapes([]);
+    setPendingTypes([]);
+    setPendingColors([]);
+    setPendingThemes([]);
+    setSelectedShapes([]);
+    setSelectedTypes([]);
+    setSelectedColors([]);
+    setSelectedThemes([]);
   };
 
   const handleSortChange = (newSort) => {
@@ -312,168 +417,280 @@ const Category = () => {
   }, [products]);
 
   return (
-    <div className="bg-background text-primary min-h-screen relative overflow-x-hidden">
+    <div className="bg-[#fbfaff] text-primary min-h-screen relative">
       {/* Editorial Header */}
-      <header className="pt-6 pb-4 border-b border-divider">
+      <header className="pt-3 md:pt-6 pb-4 border-b border-divider bg-white">
         <div className="container">
-           <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+           <div className="flex flex-col md:flex-row justify-between items-baseline gap-8">
               <div>
                 <FadeIn delay={0}>
                   <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-accent mb-2 block">
                     Collection / Archive
                   </span>
                 </FadeIn>
-                <h1 className="text-3xl md:text-5xl leading-tight tracking-tighter text-heading break-words font-medium uppercase">
+                <h1 className="text-3xl md:text-5xl leading-tight tracking-tighter text-heading break-words font-medium uppercase flex items-baseline gap-3 flex-wrap">
                   <RevealText text={categoryTitle} delay={0.1} />
+                  <span className="text-sm md:text-base font-normal text-slate-400 normal-case">
+                    {filteredProducts.length} items
+                  </span>
                 </h1>
               </div>
-
-               <FadeIn delay={0.3} className="flex flex-col items-start md:items-end gap-2 text-[10px] font-sans font-semibold uppercase tracking-widest text-body">
-                  <span>{filteredProducts.length} Objects</span>
-                  <div className="flex items-center gap-2">
-                     <span className="opacity-50">Sort</span>
-                     <select
-                       className="bg-transparent border-none outline-none text-heading font-bold cursor-pointer"
-                       value={sortBy}
-                       onChange={(e) => handleSortChange(e.target.value)}
-                     >
-                       <option value="recommended">Best Sellers</option>
-                       <option value="price-low">Price Low</option>
-                       <option value="price-high">Price High</option>
-                       <option value="newest">Newest</option>
-                     </select>
-                  </div>
-               </FadeIn>
            </div>
         </div>
       </header>
 
 
-      <div className="container py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+      <div className="w-full max-w-[1920px] mx-auto py-6 md:py-12 px-4 lg:px-8 lg:pl-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
            {/* Minimal Sidebar */}
             {/* Advanced Filters Sidebar */}
             <aside className="hidden lg:block lg:col-span-3">
-               <FadeIn delay={0.4} className="sticky top-32 space-y-12">
-
-                  {/* Frame Type */}
-                  <div>
-                    <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Type</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                        {typeOptions.map(type => {
-                            const Icon = FrameIcons[type] || FrameIcons['Full Rim'];
-                            const isSelected = selectedTypes.includes(type);
-                            const availabilityCount = getAvailabilityCount('type', type, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
-
-                            return (
-                                <button
-                                    key={type}
-                                    onClick={() => handleTypeChange(type)}
-                                    disabled={availabilityCount === 0 && !isSelected}
-                                    className={`flex flex-col items-center justify-center p-5 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
-                                        isSelected ? 'border-primary bg-primary text-white scale-[1.05] shadow-xl shadow-primary/20' : 'border-slate-200 hover:border-primary/30 text-slate-500 hover:text-primary hover:bg-slate-50'
-                                    } ${availabilityCount === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
-                                >
-                                    <div className={`mb-3 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
-                                        <Icon />
-                                    </div>
-                                    <div className="flex flex-col items-center">
-                                       <span className="text-[11px] font-black uppercase tracking-widest leading-none">{type}</span>
-                                       <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({availabilityCount})</span>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
+               <FadeIn delay={0.4} className="sticky top-28 bg-white border-r border-gray-100 p-6 h-[calc(100vh-112px)] max-h-[calc(100vh-112px)] overflow-y-auto custom-scrollbar pr-6">
+                  {/* Sort By Section */}
+                  <div className="flex justify-between items-center pb-4 mb-4 border-b border-gray-100">
+                     <div className="flex items-center gap-2 text-slate-900 hover:text-primary transition-colors cursor-pointer">
+                        <ArrowUpDown size={16} className="text-slate-700" />
+                        <span className="text-sm md:text-base font-extrabold text-slate-900 uppercase tracking-wide">Sort By</span>
+                     </div>
+                     <select
+                       value={sortBy}
+                       onChange={(e) => handleSortChange(e.target.value)}
+                       className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 font-semibold text-slate-700 outline-none hover:border-slate-300 transition-all cursor-pointer min-w-[120px]"
+                     >
+                       <option value="recommended">Recommended</option>
+                       <option value="price-low">Price Low</option>
+                       <option value="price-high">Price High</option>
+                       <option value="newest">Newest</option>
+                     </select>
                   </div>
 
-                  <div>
-                    <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Shape</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                        {shapeOptions.map(shape => {
-                            const Icon = FrameIcons[shape] || FrameIcons.Rectangle;
-                            const isSelected = selectedShapes.includes(shape);
-                            const availabilityCount = getAvailabilityCount('shape', shape, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
-
-                            return (
-                                <button
-                                    key={shape}
-                                    onClick={() => handleShapeChange(shape)}
-                                    disabled={availabilityCount === 0 && !isSelected}
-                                    className={`flex flex-col items-center justify-center p-5 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
-                                        isSelected ? 'border-primary bg-primary text-white scale-[1.05] shadow-xl shadow-primary/20' : 'border-slate-200 hover:border-primary/30 text-slate-500 hover:text-primary hover:bg-slate-50'
-                                    } ${availabilityCount === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
-                                >
-                                    <div className={`mb-3 transition-transform duration-500 group-hover:scale-110 ${isSelected ? 'text-white' : 'text-primary'}`}>
-                                        <Icon />
-                                    </div>
-                                    <div className="flex flex-col items-center">
-                                       <span className="text-[11px] font-black uppercase tracking-widest leading-none">{shape}</span>
-                                       <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({availabilityCount})</span>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
+                  {/* Filters Header (funnel icon + bold title) */}
+                  <div className="flex items-center gap-2.5 pb-4 mb-4 border-b border-gray-100">
+                     <Filter className="text-slate-900" size={20} strokeWidth={2.5} />
+                     <span className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Filters</span>
                   </div>
 
-                  <div>
-                    <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Color</h4>
-                    <div className="space-y-4 max-h-60 overflow-y-auto pr-4 custom-scrollbar">
-                        {colorOptions.map(color => {
-                            const isSelected = selectedColors.includes(color);
-                            const availabilityCount = getAvailabilityCount('color', color, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+                  <div className="space-y-2">
+                     {/* Frame Type Accordion */}
+                     <div className="border-b border-gray-100 pb-2">
+                        <button
+                          onClick={() => toggleFilter('type')}
+                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
+                        >
+                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Frame Type</span>
+                          <ChevronDown
+                            size={18}
+                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.type ? 'transform rotate-180 text-primary' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {expandedFilters.type && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-2 pb-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    {typeOptions.map(type => {
+                                        const Icon = FrameIcons[type] || FrameIcons['Full Rim'];
+                                        const isSelected = pendingTypes.includes(type);
+                                        const availabilityCount = getAvailabilityCount('type', type, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
 
-                            return (
-                                <button
-                                    key={color}
-                                    onClick={() => handleColorChange(color)}
-                                    disabled={availabilityCount === 0 && !isSelected}
-                                    className={`flex items-center justify-between w-full group transition-all p-3 rounded-xl hover:bg-slate-100/50 ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center shadow-inner ${isSelected ? 'border-primary' : 'border-slate-200 group-hover:border-primary'}`} style={{ backgroundColor: getColorSwatch(color) }}>
-                                            {isSelected && <div className={`w-1.5 h-1.5 rounded-full ${color === 'Black' || color === 'Blue' || color === 'Brown' ? 'bg-white' : 'bg-black'}`} />}
-                                        </div>
-                                        <span className={`text-[12px] font-black tracking-wide transition-colors ${isSelected ? 'text-primary' : 'text-slate-600 group-hover:text-primary'}`}>
-                                            {color}
-                                        </span>
-                                    </div>
-                                    <span className={`text-[11px] font-mono font-black ${isSelected ? 'text-primary' : 'text-slate-400'}`}>({availabilityCount})</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                                        return (
+                                            <button
+                                                key={type}
+                                                onClick={() => handleTypeChange(type)}
+                                                disabled={availabilityCount === 0 && !isSelected}
+                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
+                                                    isSelected ? 'border-primary bg-primary text-white scale-[1.03] shadow-lg shadow-primary/10' : 'border-slate-200 hover:border-primary/20 text-slate-500 hover:text-primary hover:bg-slate-50'
+                                                } ${availabilityCount === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
+                                            >
+                                                <div className={`mb-2.5 transition-transform duration-500 group-hover:scale-105 ${isSelected ? 'text-white' : 'text-primary'}`}>
+                                                    <Icon />
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                   <span className="text-[10px] font-black uppercase tracking-wider leading-none text-center">{type}</span>
+                                                   <span className={`text-[8px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({availabilityCount})</span>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                     </div>
 
-                <div className="pt-8">
-                  <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Style Theme</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                      {themeOptions.map(theme => {
-                          const isSelected = selectedThemes.includes(theme);
-                          const availabilityCount = getAvailabilityCount('theme', theme, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+                     {/* Frame Shape Accordion */}
+                     <div className="border-b border-gray-100 pb-2">
+                        <button
+                          onClick={() => toggleFilter('shape')}
+                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
+                        >
+                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Shape & Style</span>
+                          <ChevronDown
+                            size={18}
+                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.shape ? 'transform rotate-180 text-primary' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {expandedFilters.shape && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-2 pb-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    {shapeOptions.map(shape => {
+                                        const Icon = FrameIcons[shape] || FrameIcons.Rectangle;
+                                        const isSelected = pendingShapes.includes(shape);
+                                        const availabilityCount = getAvailabilityCount('shape', shape, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
 
-                          return (
-                              <button
-                                  key={theme}
-                                  onClick={() => handleThemeChange(theme)}
-                                  disabled={availabilityCount === 0 && !isSelected}
-                                  className={`px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 transition-all shadow-sm ${
-                                      isSelected ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'border-slate-200 text-slate-500 hover:border-primary/30 hover:text-primary hover:bg-slate-50'
-                                  } ${availabilityCount === 0 && !isSelected ? 'opacity-10 cursor-not-allowed' : ''}`}
-                              >
-                                  {theme} ({availabilityCount})
-                              </button>
-                          );
-                      })}
+                                        return (
+                                            <button
+                                                key={shape}
+                                                onClick={() => handleShapeChange(shape)}
+                                                disabled={availabilityCount === 0 && !isSelected}
+                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
+                                                    isSelected ? 'border-primary bg-primary text-white scale-[1.03] shadow-lg shadow-primary/10' : 'border-slate-200 hover:border-primary/20 text-slate-500 hover:text-primary hover:bg-slate-50'
+                                                } ${availabilityCount === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
+                                            >
+                                                <div className={`mb-2.5 transition-transform duration-500 group-hover:scale-105 ${isSelected ? 'text-white' : 'text-primary'}`}>
+                                                    <Icon />
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                   <span className="text-[10px] font-black uppercase tracking-wider leading-none text-center">{shape}</span>
+                                                   <span className={`text-[8px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({availabilityCount})</span>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                     </div>
+
+                     {/* Frame Color Accordion */}
+                     <div className="border-b border-gray-100 pb-2">
+                        <button
+                          onClick={() => toggleFilter('color')}
+                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
+                        >
+                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Frame Color</span>
+                          <ChevronDown
+                            size={18}
+                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.color ? 'transform rotate-180 text-primary' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {expandedFilters.color && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-2 pb-4">
+                                <div className="space-y-1.5 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                                    {colorOptions.map(color => {
+                                        const isSelected = pendingColors.includes(color);
+                                        const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
+
+                                        return (
+                                            <button
+                                                key={color}
+                                                onClick={() => handleColorChange(color)}
+                                                disabled={availabilityCount === 0 && !isSelected}
+                                                className={`flex items-center justify-between w-full group transition-all p-2.5 rounded-xl hover:bg-slate-50 ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <ColorSwatch color={color} isSelected={isSelected} />
+                                                    <span className={`text-xs font-bold tracking-wide transition-colors ${isSelected ? 'text-primary' : 'text-slate-600 group-hover:text-primary'}`}>
+                                                        {color}
+                                                    </span>
+                                                </div>
+                                                <span className={`text-[10px] font-mono font-bold ${isSelected ? 'text-primary' : 'text-slate-400'}`}>({availabilityCount})</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                     </div>
+
+                     {/* Style Theme Accordion */}
+                     <div className="border-b border-gray-100 pb-2">
+                        <button
+                          onClick={() => toggleFilter('theme')}
+                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
+                        >
+                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Style Theme</span>
+                          <ChevronDown
+                            size={18}
+                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.theme ? 'transform rotate-180 text-primary' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {expandedFilters.theme && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-2 pb-4">
+                                <div className="grid grid-cols-2 gap-2">
+                                    {themeOptions.map(theme => {
+                                        const isSelected = pendingThemes.includes(theme);
+                                        const availabilityCount = getAvailabilityCount('theme', theme, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
+
+                                        return (
+                                            <button
+                                                key={theme}
+                                                onClick={() => handleThemeChange(theme)}
+                                                disabled={availabilityCount === 0 && !isSelected}
+                                                className={`px-3 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all text-center ${
+                                                    isSelected ? 'bg-primary text-white border-primary shadow-md shadow-primary/10' : 'border-slate-200 text-slate-500 hover:border-primary/30 hover:text-primary hover:bg-slate-50'
+                                                } ${availabilityCount === 0 && !isSelected ? 'opacity-10 cursor-not-allowed' : ''}`}
+                                            >
+                                                {theme} ({availabilityCount})
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                     </div>
                   </div>
-                </div>
-             </FadeIn>
+
+                  {/* Mockup Lavender Apply Button */}
+                  <button
+                    onClick={handleApplyFilters}
+                    className="w-full mt-6 py-4 bg-[#8e90af] hover:bg-[#7e809e] text-white font-bold rounded-2xl transition-all shadow-lg shadow-[#8e90af]/20 hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wider"
+                  >
+                    Apply
+                  </button>
+               </FadeIn>
             </aside>
 
-           <main className="lg:col-span-9">
+            <main className="lg:col-span-9">
               {loading ? (
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-8">
                     {[...Array(6)].map((_, i) => (
                        <div key={i} className="aspect-[3/4] bg-surface-flat rounded-2xl animate-pulse" />
                     ))}
@@ -481,20 +698,20 @@ const Category = () => {
               ) : (
                   filteredProducts.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-32 text-center">
-                      <span className="text-6xl mb-6">🔍</span>
-                      <h3 className="text-lg font-black uppercase tracking-widest text-slate-800 mb-2">No Results</h3>
-                      <p className="text-sm text-slate-400 font-medium mb-8">No products match the selected filters.</p>
-                      <button
-                        onClick={() => { setSelectedShapes([]); setSelectedTypes([]); setSelectedColors([]); setSelectedThemes([]); }}
-                        className="px-8 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-black transition-all"
-                      >
-                        Clear All Filters
-                      </button>
+                       <span className="text-6xl mb-6">🔍</span>
+                       <h3 className="text-lg font-black uppercase tracking-widest text-slate-800 mb-2">No Results</h3>
+                       <p className="text-sm text-slate-400 font-medium mb-8">No products match the selected filters.</p>
+                       <button
+                         onClick={handleClearAll}
+                         className="px-8 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-black transition-all"
+                       >
+                         Clear All Filters
+                       </button>
                     </div>
                   ) : (
                     <div
                       key={`${selectedShapes.join('|')}-${selectedTypes.join('|')}-${selectedColors.join('|')}-${selectedThemes.join('|')}-${sortBy}`}
-                      className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-12 gap-y-12 md:gap-y-24"
+                      className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-8"
                     >
                       {filteredProducts.map((product) => (
                         <div key={product.id}>
@@ -504,7 +721,7 @@ const Category = () => {
                     </div>
                   )
                )}
-           </main>
+            </main>
         </div>
       </div>
 
@@ -538,8 +755,8 @@ const Category = () => {
                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Type</h4>
                       <div className="grid grid-cols-2 gap-3">
                          {typeOptions.map(type => {
-                            const isSelected = selectedTypes.includes(type);
-                            const availabilityCount = getAvailabilityCount('type', type, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+                            const isSelected = pendingTypes.includes(type);
+                            const availabilityCount = getAvailabilityCount('type', type, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
                             return (
                                 <button
                                    key={type}
@@ -559,8 +776,8 @@ const Category = () => {
                       <div className="grid grid-cols-2 gap-3">
                          {shapeOptions.map(shape => {
                             const Icon = FrameIcons[shape] || FrameIcons.Rectangle;
-                            const isSelected = selectedShapes.includes(shape);
-                            const availabilityCount = getAvailabilityCount('shape', shape, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+                            const isSelected = pendingShapes.includes(shape);
+                            const availabilityCount = getAvailabilityCount('shape', shape, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
                             return (
                                 <button
                                    key={shape}
@@ -580,18 +797,18 @@ const Category = () => {
                        <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Color</h4>
                        <div className="grid grid-cols-2 gap-3">
                           {colorOptions.map(color => {
-                             const isSelected = selectedColors.includes(color);
-                             const availabilityCount = getAvailabilityCount('color', color, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+                             const isSelected = pendingColors.includes(color);
+                             const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
                              return (
                                  <button
                                     key={color}
                                     onClick={() => handleColorChange(color)}
                                     disabled={availabilityCount === 0 && !isSelected}
-                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white scale-[1.05]' : 'border-slate-200 text-slate-600'} ${availabilityCount === 0 && !isSelected ? 'opacity-10' : ''}`}
+                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary/10 text-primary scale-[1.05]' : 'border-slate-200 text-slate-600'} ${availabilityCount === 0 && !isSelected ? 'opacity-10' : ''}`}
                                  >
-                                    <div className={`w-5 h-5 rounded-full border mb-2`} style={{ backgroundColor: getColorSwatch(color) }} />
-                                    <span className="text-[11px] font-black uppercase tracking-widest leading-none">{color}</span>
-                                    <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({availabilityCount})</span>
+                                    <ColorSwatch color={color} isSelected={isSelected} size="w-6 h-6" />
+                                    <span className="text-[11px] font-black uppercase tracking-widest leading-none mt-2">{color}</span>
+                                    <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-primary/60' : 'text-slate-400'}`}>({availabilityCount})</span>
                                  </button>
                              );
                           })}
@@ -602,8 +819,8 @@ const Category = () => {
                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Style Theme</h4>
                       <div className="grid grid-cols-2 gap-3">
                          {themeOptions.map(theme => {
-                            const isSelected = selectedThemes.includes(theme);
-                            const availabilityCount = getAvailabilityCount('theme', theme, { shapes: selectedShapes, types: selectedTypes, colors: selectedColors, themes: selectedThemes });
+                            const isSelected = pendingThemes.includes(theme);
+                            const availabilityCount = getAvailabilityCount('theme', theme, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
                             return (
                                 <button
                                    key={theme}
@@ -619,7 +836,7 @@ const Category = () => {
                    </div>
 
                    <button
-                     onClick={() => setIsMobileFilterOpen(false)}
+                     onClick={handleApplyFilters}
                      className="w-full bg-primary text-white py-6 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl"
                    >
                      Show Results ({filteredProducts.length})

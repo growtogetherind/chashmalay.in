@@ -9,6 +9,12 @@ import { FadeIn } from '../components/ui/Motion';
 
 const STEPS = ['Shipping', 'Review', 'Secure Payment'];
 
+const getSelectedColorName = (item) => {
+  const selectedColor = item?.lensSelection?.selectedColor;
+  if (!selectedColor) return null;
+  return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+};
+
 const InputField = ({ label, ...props }) => (
   <div className="flex flex-col gap-1">
      {label && <label className="text-[10px] font-sans font-bold uppercase tracking-widest text-secondary opacity-70">{label}</label>}
@@ -250,6 +256,11 @@ const Checkout = () => {
                           <div className="flex-1">
                              <h4 className="text-lg font-sans font-bold tracking-tight">{item.name}</h4>
                              <p className="text-sm font-sans text-secondary mb-1">Qty: {item.quantity}</p>
+                             {(getSelectedColorName(item) || item.lensSelection?.selectedSize) && (
+                               <p className="text-xs font-sans text-secondary mb-1">
+                                 {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : 'Color: Standard'}{item.lensSelection?.selectedSize ? ` / Size: ${item.lensSelection.selectedSize}` : ''}
+                               </p>
+                             )}
                              {(item.lensSelection?.visionType || item.lensSelection?.lensPackage) && (
                                <p className="text-xs font-sans text-accent">Includes Lens Package</p>
                              )}

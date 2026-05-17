@@ -1,6 +1,22 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+const getSelectedColorName = (item) => {
+  const selectedColor = item?.selected_color || item?.lens_selection?.selectedColor;
+  if (!selectedColor) return null;
+  return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+};
+
+const getSelectedSize = (item) => item?.selected_size || item?.lens_selection?.selectedSize;
+
+const getVariantDescription = (item) => {
+  const color = getSelectedColorName(item);
+  const size = getSelectedSize(item);
+  if (!color && !size) return '';
+  return `
+Frame: ${color || 'Standard'}${size ? ` / Size: ${size}` : ''}`;
+};
+
 export const generateInvoice = (order) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -52,7 +68,7 @@ export const generateInvoice = (order) => {
   // Table
   const tableData = order.order_items.map((item, index) => [
     index + 1,
-    item.product_name,
+    `${item.product_name}${getVariantDescription(item)}`,
     `INR ${Number(item.price).toLocaleString()}`,
     item.quantity,
     `INR ${(item.price * item.quantity).toLocaleString()}`

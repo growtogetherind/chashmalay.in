@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { X, Check, Eye, UploadCloud, Sparkles, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/cloudinary';
 import toast from 'react-hot-toast';
 import './LensSelector.css'; // Reuse the same CSS for consistency
 
-const ContactLensSelector = ({ isOpen, onClose, product }) => {
+const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, selectedSize = null }) => {
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selections, setSelections] = useState({
@@ -32,10 +34,12 @@ const ContactLensSelector = ({ isOpen, onClose, product }) => {
         rightPower: '',
         bc: product?.base_curve || '8.6',
         dia: product?.diameter || '14.2',
-        quantity: 1
+        quantity: 1,
+        selectedColor,
+        selectedSize
       });
     }
-  }, [isOpen, product]);
+  }, [isOpen, product, selectedColor, selectedSize]);
 
   if (!isOpen) return null;
 
@@ -72,6 +76,8 @@ const ContactLensSelector = ({ isOpen, onClose, product }) => {
       ...selections, 
       prescriptionUrl, 
       manualDetails,
+      selectedColor,
+      selectedSize,
       isContactLens: true 
     });
     toast.success("Added to cart!");
@@ -209,6 +215,9 @@ const ContactLensSelector = ({ isOpen, onClose, product }) => {
                  <div className="summary-row"><span>Product</span><span className="font-bold">{product?.name}</span></div>
                  <div className="summary-row"><span>Disposable</span><span className="font-bold">{product?.disposable_type || 'Monthly'}</span></div>
                  <div className="summary-row"><span>Pack Size</span><span className="font-bold">{product?.pack_size || '6 Lenses'}</span></div>
+                 {(selectedColor || selectedSize) && (
+                   <div className="summary-row"><span>Variant</span><span className="font-bold">{selectedColor?.name || selectedColor || 'Standard'}{selectedSize ? ` / ${selectedSize}` : ''}</span></div>
+                 )}
                  
                  <div className="border-t border-slate-100 my-4 pt-4">
                     <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Vision Protocol</h5>

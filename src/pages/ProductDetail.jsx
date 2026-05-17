@@ -177,6 +177,7 @@ const ProductDetail = () => {
     ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) 
     : 0; // Remove demo 4.8 fallback
   const isContactLens = product.category?.toLowerCase().includes('contact') || product.category?.toLowerCase() === 'contacts';
+  const selectedFrameColor = (product.colors && product.colors.length > 0) ? product.colors[activeColor] : null;
 
   return (
     <div className="product-detail-page pt-28">
@@ -454,8 +455,8 @@ const ProductDetail = () => {
          </button>
       </div>
 
-      <LensSelector isOpen={isLensModalOpen} onClose={() => setIsLensModalOpen(false)} product={product} />
-      <ContactLensSelector isOpen={isCLModalOpen} onClose={() => setIsCLModalOpen(false)} product={product} />
+      <LensSelector isOpen={isLensModalOpen} onClose={() => setIsLensModalOpen(false)} product={product} selectedColor={selectedFrameColor} selectedSize={activeSize} />
+      <ContactLensSelector isOpen={isCLModalOpen} onClose={() => setIsCLModalOpen(false)} product={product} selectedColor={selectedFrameColor} selectedSize={activeSize} />
 
       <AnimatePresence>
         {isReviewModalOpen && (

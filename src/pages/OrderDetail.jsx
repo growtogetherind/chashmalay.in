@@ -8,6 +8,14 @@ import toast from 'react-hot-toast';
 import Loader from '../components/ui/Loader';
 import './OrderDetail.css';
 
+const getSelectedColorName = (item) => {
+  const selectedColor = item?.selected_color || item?.lens_selection?.selectedColor;
+  if (!selectedColor) return null;
+  return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+};
+
+const getSelectedSize = (item) => item?.selected_size || item?.lens_selection?.selectedSize;
+
 const TIMELINE = [
   { id: 'confirmed', label: 'Order Placed', icon: Receipt },
   { id: 'packed', label: 'Packed', icon: Package },
@@ -155,12 +163,22 @@ const OrderDetail = () => {
                       <div>
                         <p className="font-bold text-gray-900">{item.products?.name || item.product_name}</p>
                         <p className="text-xs text-gray-500 mt-1">ID: {item.product_id?.slice(0, 8)}</p>
+                        {(getSelectedColorName(item) || getSelectedSize(item)) && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : 'Color: Standard'}{getSelectedSize(item) ? ` / Size: ${getSelectedSize(item)}` : ''}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </td>
                   <td>
                     {item.lens_selection ? (
                       <div>
+                        {(getSelectedColorName(item) || getSelectedSize(item)) && (
+                          <p className="text-sm text-gray-800 font-medium">
+                            {getSelectedColorName(item) ? `Frame: ${getSelectedColorName(item)}` : 'Frame: Standard'}{getSelectedSize(item) ? ` / ${getSelectedSize(item)}` : ''}
+                          </p>
+                        )}
                         {item.lens_selection?.visionType && (
                           <p className="text-sm text-gray-800 font-medium">{item.lens_selection.visionType.title}</p>
                         )}

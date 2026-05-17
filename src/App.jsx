@@ -9,7 +9,6 @@ import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar.jsx';
 import BottomNav from './components/layout/BottomNav.jsx';
 import Footer from './components/layout/Footer.jsx';
-import Loader from './components/ui/Loader.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
 import { ReactLenis } from '@studio-freight/react-lenis';
 import CartDrawer from './components/ui/CartDrawer.jsx';
@@ -54,7 +53,6 @@ const PageLoader = () => (
 );
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
   const [settings, setSettings] = useState({});
 
   useEffect(() => {
@@ -79,7 +77,6 @@ function App() {
               <ScrollToTop />
               <ErrorBoundary>
                 <div className="app-container">
-                {isLoading && <Loader onLoadingComplete={() => setIsLoading(false)} />}
 
                 <Toaster
                   position="top-right"

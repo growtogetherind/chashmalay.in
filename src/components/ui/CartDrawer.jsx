@@ -82,7 +82,12 @@ const CartDrawer = () => {
     'https://via.placeholder.com/150';
 
   const getItemName = (item) => item?.products?.name || item?.name || 'Premium Eyewear';
-  const getItemId = (item) => item?.cartId || item?.product_id || item?.id;
+  const getItemId = (item) => item?.cartId || item?.firebaseId || item?.cartVariantKey || item?.product_id || item?.id;
+  const getSelectedColorName = (item) => {
+    const selectedColor = item?.lensSelection?.selectedColor;
+    if (!selectedColor) return null;
+    return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+  };
 
   return (
     <AnimatePresence>
@@ -150,7 +155,7 @@ const CartDrawer = () => {
                               <button onClick={() => removeFromCart(itemId)} className="remove-item-btn"><X size={14} /></button>
                             </div>
                             <p className="item-meta">
-                              {item.products?.brand || 'Premium Edition'} • {item.products?.frame_shape || 'Medium'}
+                              {item.products?.brand || item.brand || 'Premium Edition'} • {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : (item.products?.frame_shape || item.frame_shape || 'Medium')}{item.lensSelection?.selectedSize ? ` / Size: ${item.lensSelection.selectedSize}` : ''}
                               {item.lensSelection?.lensPackage && (
                                 <span className="block mt-1 text-indigo-600 font-bold">
                                   Lens: {item.lensSelection.lensPackage.name}

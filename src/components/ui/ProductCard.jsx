@@ -58,7 +58,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div
-      className="group bg-white border border-gray-100 rounded overflow-hidden hover:shadow-md transition-shadow"
+      className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-gray-200/50 transition-all duration-300 transform hover:-translate-y-1.5"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -66,14 +66,14 @@ const ProductCard = ({ product }) => {
       <Link to={productPath} className="block relative overflow-hidden aspect-[4/3] bg-gray-50">
         {/* Discount Badge */}
         {discountPercent > 0 && (
-          <span className="absolute top-2 left-2 z-10 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+          <span className="absolute top-3 left-3 z-10 bg-primary text-white text-[11px] md:text-xs font-extrabold px-2.5 py-1 rounded-md shadow-sm">
             -{discountPercent}%
           </span>
         )}
 
         {/* Wishlist */}
         <button
-          className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-primary hover:border-blue-200 transition-colors shadow-sm"
+          className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:border-red-100 hover:bg-white transition-all duration-300 shadow-md hover:scale-110"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -81,7 +81,7 @@ const ProductCard = ({ product }) => {
           }}
         >
           <Heart
-            size={13}
+            size={16}
             fill={isWishlisted ? '#dc2626' : 'none'}
             className={isWishlisted ? 'text-primary' : ''}
           />
@@ -91,7 +91,7 @@ const ProductCard = ({ product }) => {
         <img
           src={isHovered ? hoverImage : frontImage}
           alt={product.name}
-          className="w-full h-full object-contain mix-blend-multiply p-3 transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-contain mix-blend-multiply p-4 md:p-5 transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
           onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image'; }}
         />
@@ -99,16 +99,16 @@ const ProductCard = ({ product }) => {
       </Link>
 
       {/* Info Area */}
-      <div className="p-3">
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
+      <div className="p-3 md:p-6">
+        <p className="text-[9px] md:text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-1 md:mb-2">
           {product.brand || 'Chashmalay'}
         </p>
         <Link to={productPath} className="block">
-          <h4 className="text-sm font-semibold text-gray-800 line-clamp-1 hover:text-primary transition-colors mb-1">
+          <h4 className="text-xs md:text-xl font-black text-slate-900 line-clamp-2 hover:text-primary transition-colors mb-1 md:mb-2">
             {product.name}
           </h4>
         </Link>
-        <p className="text-[10px] text-gray-400 mb-2 capitalize">
+        <p className="text-[10px] md:text-base text-slate-500 font-bold mb-2 md:mb-4 capitalize">
           {product.category?.toLowerCase().includes('contact')
             ? `${product.disposable_type || 'Monthly'} • ${product.pack_size || '6 Lenses'}`
             : (product.frame_shape || product.frameShape || product.category || 'Eyeglasses')}
@@ -116,11 +116,11 @@ const ProductCard = ({ product }) => {
 
         {/* Colors */}
         {colors.length > 0 && (
-          <div className="flex gap-1 mb-2">
+          <div className="flex gap-2 mb-4">
             {colors.slice(0, 4).map((c, i) => (
               <span
                 key={i}
-                className="w-3 h-3 rounded-full border border-gray-200 inline-block"
+                className="w-4 h-4 rounded-full border border-gray-200 inline-block transition-transform hover:scale-110"
                 style={{ backgroundColor: getColorValue(c) }}
                 title={getColorLabel(c)}
               />
@@ -129,17 +129,17 @@ const ProductCard = ({ product }) => {
         )}
 
         {/* Price Row */}
-        <div className="flex items-center justify-between mt-1">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-bold text-gray-900">₹{price.toLocaleString()}</span>
+        <div className="flex items-center justify-between mt-2 md:mt-2.5 pt-2 border-t border-gray-50">
+          <div className="flex items-baseline gap-1.5 md:gap-2.5">
+            <span className="text-sm md:text-2xl font-black text-slate-900">₹{price.toLocaleString()}</span>
             {originalPrice > price && (
-              <span className="text-xs text-gray-400 line-through">₹{originalPrice.toLocaleString()}</span>
+              <span className="text-[9px] md:text-sm text-slate-400 line-through">₹{originalPrice.toLocaleString()}</span>
             )}
           </div>
           {/* Stock indicator dots (like the reference) */}
-          <div className="flex gap-1 items-center">
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block" title="In Stock" />
-            <span className="w-2 h-2 rounded-full bg-red-400 inline-block" title="Limited" />
+          <div className="flex gap-1.5 items-center">
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block animate-pulse" title="In Stock" />
+            <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block" title="Limited" />
           </div>
         </div>
       </div>

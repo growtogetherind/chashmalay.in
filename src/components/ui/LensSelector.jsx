@@ -6,7 +6,7 @@ import { uploadImage } from '../../lib/cloudinary';
 import toast from 'react-hot-toast';
 import './LensSelector.css';
 
-const LensSelector = ({ isOpen, onClose, product }) => {
+const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selectedSize = null }) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -29,7 +29,8 @@ const LensSelector = ({ isOpen, onClose, product }) => {
     leftAddlPower: '',
     rightAddlPower: '',
     name: '',
-    phone: ''
+    phone: '',
+    age: ''
   });
 
   // Reset to step 1 every time the modal is opened
@@ -37,45 +38,45 @@ const LensSelector = ({ isOpen, onClose, product }) => {
     if (isOpen) {
       setStep(1);
       setIsPowerModalOpen(false);
-      setSelections({ visionType: null, lensPackage: null, powerOption: null, prescriptionFile: null });
-      setManualDetails({ samePower: false, cylindrical: false, leftSph: '', rightSph: '', leftCyl: '', rightCyl: '', leftAxis: '', rightAxis: '', leftAddlPower: '', rightAddlPower: '', name: '', phone: '' });
+      setSelections({ visionType: null, lensPackage: null, powerOption: null, prescriptionFile: null, selectedColor, selectedSize });
+      setManualDetails({ samePower: false, cylindrical: false, leftSph: '', rightSph: '', leftCyl: '', rightCyl: '', leftAxis: '', rightAxis: '', leftAddlPower: '', rightAddlPower: '', name: '', phone: '', age: '' });
     }
-  }, [isOpen]);
+  }, [isOpen, selectedColor, selectedSize]);
 
   if (!isOpen) return null;
 
   const visionTypes = [
-    { 
-      id: 'single', 
-      title: 'Single Vision', 
-      desc: 'For Distance or Near Vision', 
+    {
+      id: 'single',
+      title: 'Single Vision',
+      desc: 'For Distance or Near Vision',
       image: '/assets/im/select_lens/single_vision.jpeg',
-      price: 0 
+      price: 0
     },
-    { 
-      id: 'bifocal', 
-      title: 'Bifocal / Progressive', 
-      desc: 'For both Distance and Near Vision', 
+    {
+      id: 'bifocal',
+      title: 'Bifocal / Progressive',
+      desc: 'For both Distance and Near Vision',
       image: '/assets/im/select_lens/bifocal.jpeg',
-      price: 1500 
+      price: 1500
     },
-    { 
-      id: 'zero', 
-      title: 'Zero Power / Fashion', 
-      desc: 'No Prescription needed', 
+    {
+      id: 'zero',
+      title: 'Zero Power / Fashion',
+      desc: 'No Prescription needed',
       image: '/assets/im/select_lens/zero_power.jpeg',
-      price: 500 
+      price: 500
     },
-    { 
-      id: 'frame', 
-      title: 'Frame Only', 
-      desc: 'Buy frame without lenses', 
+    {
+      id: 'frame',
+      title: 'Frame Only',
+      desc: 'Buy frame without lenses',
       image: '/assets/im/select_lens/frame_only.jpeg',
-      price: 0 
+      price: 0
     }
   ].filter(type => {
     if (!product?.available_lenses || product.available_lenses.length === 0) return true;
-    
+
     // Map of product field names to internal IDs
     const mapping = {
       'Single Vision': ['single'],
@@ -293,10 +294,10 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                    {/* Frame Preview */}
                    <div style={{background: '#f8fafc', borderRadius: '12px', padding: '0.75rem', border: '1px solid #e2e8f0', textAlign: 'center'}}>
                        <p style={{fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px', letterSpacing: '1px'}}>Selected Frame</p>
-                       <img 
-                         src={product?.gallery?.[0] || product?.image || product?.frame_image || product?.images?.[0] || product?.images?.front} 
-                         alt="Frame" 
-                         style={{width: '100%', height: '60px', objectFit: 'contain'}} 
+                       <img
+                         src={product?.gallery?.[0] || product?.image || product?.frame_image || product?.images?.[0] || product?.images?.front}
+                         alt="Frame"
+                         style={{width: '100%', height: '60px', objectFit: 'contain'}}
                          onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&q=80&w=200';
@@ -319,6 +320,12 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                   <span>Frame Price</span>
                   <span>₹{product?.consumersPrice || product?.price}</span>
                 </div>
+                {(selectedColor || selectedSize) && (
+                  <div className="summary-row">
+                    <span>Frame Variant</span>
+                    <span>{selectedColor?.name || selectedColor || 'Standard'}{selectedSize ? ` / ${selectedSize}` : ''}</span>
+                  </div>
+                )}
                 {selections.visionType && (
                    <div className="summary-row">
                     <span>{selections.visionType.title}</span>
@@ -349,20 +356,16 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                                 <span style={{textAlign: 'center'}}>{manualDetails.rightSph}</span>
                                 <span style={{textAlign: 'center'}}>{manualDetails.leftSph}</span>
                             </div>
-                            {manualDetails.cylindrical && (
-                                <>
-                                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '4px'}}>
-                                        <span style={{fontWeight: 'bold', color: '#64748b'}}>CYL</span>
-                                        <span style={{textAlign: 'center'}}>{manualDetails.rightCyl || '-'}</span>
-                                        <span style={{textAlign: 'center'}}>{manualDetails.leftCyl || '-'}</span>
+                                    <div className="grid grid-cols-3 gap-2 mb-1">
+                                        <span className="font-bold text-slate-500">CYL</span>
+                                        <span className="text-center">{manualDetails.rightCyl || '-'}</span>
+                                        <span className="text-center">{manualDetails.leftCyl || '-'}</span>
                                     </div>
-                                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '4px'}}>
-                                        <span style={{fontWeight: 'bold', color: '#64748b'}}>Axis</span>
-                                        <span style={{textAlign: 'center'}}>{manualDetails.rightAxis || '-'}</span>
-                                        <span style={{textAlign: 'center'}}>{manualDetails.leftAxis || '-'}</span>
+                                    <div className="grid grid-cols-3 gap-2 mb-1">
+                                        <span className="font-bold text-slate-500">Axis</span>
+                                        <span className="text-center">{manualDetails.rightAxis || '-'}</span>
+                                        <span className="text-center">{manualDetails.leftAxis || '-'}</span>
                                     </div>
-                                </>
-                            )}
                             {selections.visionType?.id === 'bifocal' && (
                                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '4px', paddingTop: '4px', borderTop: '1px solid #f1f5f9'}}>
                                     <span style={{fontWeight: 'bold', color: '#64748b'}}>Addl.</span>
@@ -374,10 +377,10 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                     )}
                     {selections.powerOption === 'upload' && selections.prescriptionFile && (
                         <div style={{width: '100%', height: '100px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0'}}>
-                            <img 
-                                src={URL.createObjectURL(selections.prescriptionFile)} 
-                                alt="Prescription Preview" 
-                                style={{width: '100%', height: '100%', objectFit: 'contain', background: '#f8fafc'}} 
+                            <img
+                                src={URL.createObjectURL(selections.prescriptionFile)}
+                                alt="Prescription Preview"
+                                style={{width: '100%', height: '100%', objectFit: 'contain', background: '#f8fafc'}}
                             />
                         </div>
                     )}
@@ -388,8 +391,8 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                   <span>₹{calculateTotal()}</span>
                 </div>
               </div>
-              <button 
-                className="btn-cta w-full" 
+              <button
+                className="btn-cta w-full"
                 onClick={async () => {
                   let prescriptionUrl = null;
                   if (selections.powerOption === 'upload' && selections.prescriptionFile) {
@@ -402,9 +405,9 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                       toast.success("Prescription uploaded!", { id: toastId });
                       prescriptionUrl = res.url;
                   }
-                  addToCart(product, { ...selections, manualDetails, prescriptionUrl });
+                  addToCart(product, { ...selections, selectedColor, selectedSize, manualDetails, prescriptionUrl });
                   onClose();
-                }} 
+                }}
                 style={{marginTop: '2rem'}}
               >
                 BUY NOW
@@ -422,19 +425,19 @@ const LensSelector = ({ isOpen, onClose, product }) => {
               <h3 className="text-sm font-bold uppercase tracking-widest text-gray-800">
                 {selections.powerOption === 'upload' ? 'Upload Prescription' : 'Manual Entry'}
               </h3>
-              <button 
-                onClick={() => setIsPowerModalOpen(false)} 
+              <button
+                onClick={() => setIsPowerModalOpen(false)}
                 className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500"
               >
                 <X size={18} />
               </button>
             </div>
-            
+
             <div className="p-6 max-h-[80vh] overflow-y-auto">
               {selections.powerOption === 'upload' && (
                  <div className="upload-power-form">
                     <p className="text-xs text-gray-500 mb-6 text-center">Please upload a clear image of your latest eye prescription. We will verify the details.</p>
-                    
+
                     <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors group relative overflow-hidden">
                       {selections.prescriptionFile ? (
                         <div className="absolute inset-0 p-2">
@@ -453,12 +456,12 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                       <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*,.pdf" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
                     </label>
 
-                    <button 
-                      className="w-full py-4 bg-black text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed" 
+                    <button
+                      className="w-full py-5 bg-blue-600 text-white rounded-2xl text-[15px] md:text-[16px] font-black uppercase tracking-widest hover:bg-blue-700 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-600/20"
                       onClick={() => {
                         setIsPowerModalOpen(false);
                         setStep(4);
-                      }} 
+                      }}
                       disabled={!selections.prescriptionFile}
                     >
                       Save & Proceed
@@ -476,14 +479,6 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                             <Check size={14} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
                           </div>
                           <span className="text-[13px] font-bold text-gray-700 group-hover:text-black transition-colors">I have same power for both eyes</span>
-                       </label>
-                       <label className="flex items-center gap-3 cursor-pointer group">
-                          <div className="relative flex items-center justify-center">
-                            <input type="checkbox" className="sr-only peer" checked={manualDetails.cylindrical} onChange={(e) => setManualDetails({...manualDetails, cylindrical: e.target.checked})} />
-                            <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-black peer-checked:border-black transition-all"></div>
-                            <Check size={14} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
-                          </div>
-                          <span className="text-[13px] font-bold text-gray-700 group-hover:text-black transition-colors">I have cylindrical power</span>
                        </label>
                     </div>
 
@@ -503,10 +498,10 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                       {/* SPH Row */}
                       <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center`}>
                         <div className="text-[13px] font-black text-gray-700 uppercase">SPH</div>
-                        
+
                         {/* Right Eye SPH (or Combined) */}
                         <div className="relative">
-                          <select 
+                          <select
                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
                             value={manualDetails.rightSph}
                             onChange={(e) => {
@@ -529,7 +524,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                         {/* Left Eye SPH (Only if not samePower) */}
                         {!manualDetails.samePower && (
                            <div className="relative">
-                             <select 
+                             <select
                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
                                value={manualDetails.leftSph}
                                onChange={(e) => setManualDetails({...manualDetails, leftSph: e.target.value})}
@@ -544,15 +539,13 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                         )}
                       </div>
 
-                      {/* CYL Row - Only if cylindrical checked */}
-                      {manualDetails.cylindrical && (
-                        <>
-                          <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center animate-fade-in`}>
+                      {/* CYL Row */}
+                      <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center animate-fade-in`}>
                             <div className="text-[13px] font-black text-gray-700 uppercase">CYL</div>
-                            
+
                             {/* Right Eye CYL (or Combined) */}
                             <div className="relative">
-                              <select 
+                              <select
                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
                                 value={manualDetails.rightCyl}
                                 onChange={(e) => {
@@ -575,7 +568,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                             {/* Left Eye CYL (Only if not samePower) */}
                             {!manualDetails.samePower && (
                                <div className="relative">
-                                 <select 
+                                 <select
                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
                                    value={manualDetails.leftCyl}
                                    onChange={(e) => setManualDetails({...manualDetails, leftCyl: e.target.value})}
@@ -593,9 +586,9 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                           {/* Axis Row */}
                           <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center animate-fade-in`}>
                             <div className="text-[13px] font-black text-gray-700 uppercase">Axis</div>
-                            <input 
-                              type="text" 
-                              placeholder="0-180" 
+                            <input
+                              type="text"
+                              placeholder="0-180"
                               className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black transition-all"
                               value={manualDetails.rightAxis}
                               onChange={(e) => {
@@ -608,26 +601,23 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                               }}
                             />
                             {!manualDetails.samePower && (
-                               <input 
-                                 type="text" 
-                                 placeholder="0-180" 
+                               <input
+                                 type="text"
+                                 placeholder="0-180"
                                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black transition-all"
                                  value={manualDetails.leftAxis}
                                  onChange={(e) => setManualDetails({...manualDetails, leftAxis: e.target.value})}
                                />
                             )}
                           </div>
-                        </>
-                      )}
-
                       {/* Addl. Power Row - Only if Bifocal */}
                       {selections.visionType?.id === 'bifocal' && (
                         <div className={`grid ${manualDetails.samePower ? 'grid-cols-[100px_1fr]' : 'grid-cols-[100px_1fr_1fr]'} gap-4 mb-4 items-center animate-fade-in`}>
                           <div className="text-[13px] font-black text-gray-700 uppercase">Addl. Power</div>
-                          
+
                           {/* Right Eye Addl. Power (or Combined) */}
                           <div className="relative">
-                            <select 
+                            <select
                               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
                               value={manualDetails.rightAddlPower}
                               onChange={(e) => {
@@ -650,7 +640,7 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                           {/* Left Eye Addl. Power (Only if not samePower) */}
                           {!manualDetails.samePower && (
                              <div className="relative">
-                               <select 
+                               <select
                                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold appearance-none focus:outline-none focus:border-black focus:bg-white transition-all cursor-pointer"
                                  value={manualDetails.leftAddlPower}
                                  onChange={(e) => setManualDetails({...manualDetails, leftAddlPower: e.target.value})}
@@ -670,29 +660,38 @@ const LensSelector = ({ isOpen, onClose, product }) => {
                     <div className="border-t border-gray-100 pt-8 mt-4">
                       <h5 className="text-[11px] font-black uppercase text-gray-400 tracking-widest mb-4">Patient Details</h5>
                       <div className="space-y-4">
-                        <input 
-                          type="text" 
-                          placeholder="Full Name *" 
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all" 
+                        <input
+                          type="text"
+                          placeholder="Full Name *"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all"
                           value={manualDetails.name}
-                          onChange={(e) => setManualDetails({...manualDetails, name: e.target.value})} 
+                          onChange={(e) => setManualDetails({...manualDetails, name: e.target.value})}
                         />
-                        <input 
-                          type="tel" 
-                          placeholder="Phone Number *" 
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all" 
-                          value={manualDetails.phone}
-                          onChange={(e) => setManualDetails({...manualDetails, phone: e.target.value})} 
-                        />
+                        <div className="grid grid-cols-2 gap-4">
+                          <input
+                            type="tel"
+                            placeholder="Phone Number *"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all"
+                            value={manualDetails.phone}
+                            onChange={(e) => setManualDetails({...manualDetails, phone: e.target.value})}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Age"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all"
+                            value={manualDetails.age}
+                            onChange={(e) => setManualDetails({...manualDetails, age: e.target.value})}
+                          />
+                        </div>
                       </div>
                     </div>
-                    
-                    <button 
-                      className="w-full py-4.5 bg-black text-white rounded-2xl text-[13px] font-black uppercase tracking-widest hover:bg-gray-800 transition-all mt-8 shadow-lg shadow-black/10 disabled:opacity-50" 
+
+                    <button
+                      className="w-full py-5 bg-blue-600 text-white rounded-2xl text-[15px] md:text-[16px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all mt-8 shadow-xl shadow-blue-600/20 disabled:opacity-50"
                       onClick={() => {
                         setIsPowerModalOpen(false);
                         setStep(4);
-                      }} 
+                      }}
                       disabled={!manualDetails.name || !manualDetails.phone || !manualDetails.leftSph || !manualDetails.rightSph}
                     >
                       Save Details & Proceed

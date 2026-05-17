@@ -18,6 +18,14 @@ import '../Admin.css';
 
 const STATUS_OPTIONS = ['pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled', 'returned'];
 
+const getSelectedColorName = (item) => {
+  const selectedColor = item?.selected_color || item?.lens_selection?.selectedColor;
+  if (!selectedColor) return null;
+  return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+};
+
+const getSelectedSize = (item) => item?.selected_size || item?.lens_selection?.selectedSize;
+
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -282,8 +290,18 @@ const AdminOrders = () => {
                                  <div>
                                     <p className="text-sm font-black text-gray-900">{item.product_name}</p>
                                     <p className="text-[10px] font-bold text-gray-400 mt-0.5">Quantity: {item.quantity}</p>
+                                    {(getSelectedColorName(item) || getSelectedSize(item)) && (
+                                       <p className="text-[10px] font-bold text-gray-500 mt-0.5">
+                                          {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : 'Color: Standard'}{getSelectedSize(item) ? ` / Size: ${getSelectedSize(item)}` : ''}
+                                       </p>
+                                    )}
                                     {item.lens_selection && (
                                        <div className="mt-2 flex flex-wrap gap-2">
+                                          {(getSelectedColorName(item) || getSelectedSize(item)) && (
+                                             <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-black uppercase tracking-widest border border-slate-200">
+                                                {getSelectedColorName(item) || 'Standard'}{getSelectedSize(item) ? ` / ${getSelectedSize(item)}` : ''}
+                                             </span>
+                                          )}
                                           {item.lens_selection.visionType && (
                                              <span className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded text-[9px] font-black uppercase tracking-widest border border-purple-100">
                                                 {item.lens_selection.visionType.title}

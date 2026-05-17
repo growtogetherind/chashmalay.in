@@ -47,7 +47,11 @@ const HeroSlider = () => {
         setSlides(FALLBACK_SLIDES);
       }
       setLoading(false);
-    }, () => setLoading(false));
+    }, (err) => {
+      console.warn("Carousel subscription failed, falling back to local slides:", err);
+      setSlides(FALLBACK_SLIDES);
+      setLoading(false);
+    });
     return () => {
       unsubscribe();
       unsubSettings();
