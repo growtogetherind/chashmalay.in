@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import {
@@ -9,11 +9,12 @@ import {
 import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ui/ProductCard';
-import LensSelector from '../components/ui/LensSelector';
-import ContactLensSelector from '../components/ui/ContactLensSelector';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
 import toast from 'react-hot-toast';
 import './ProductDetail.css';
+
+const LensSelector = lazy(() => import('../components/ui/LensSelector'));
+const ContactLensSelector = lazy(() => import('../components/ui/ContactLensSelector'));
 
 const Accordion = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,9 +65,18 @@ const ProductDetail = () => {
   const sliderRef = useRef(null);
 
   useEffect(() => {
+    let isActive = true;
     const fetchProduct = async () => {
       setLoading(true);
-      const { data, error } = await getProductById(id);
+      setProduct(null);
+      setRelatedProducts([]);
+      setRealTimeReviews([]);
+      setActiveImage(0);
+      setImageLoading(true);
+
+      const { data, error } = await getProductById(id, { includeReviews: false });
+      if (!isActive) return;
+
       if (!error && data) {
         data.colors = data.colors || [];
         const newGallery = data.images?.gallery || [];
@@ -81,22 +91,55 @@ const ProductDetail = () => {
         const colorImages = (data.colors || []).map(c => c.image).filter(Boolean);
         data.gallery = Array.from(new Set([...singleImages, ...newGallery, ...colorImages])).filter(Boolean);
         setProduct(data);
-        const { data: allProds } = await getProducts({ category: data.category });
-        if (allProds) setRelatedProducts(allProds.filter(p => p.id !== data.id).slice(0, 10));
       }
       setLoading(false);
     };
     fetchProduct();
-    
+
     const unsubscribeReviews = subscribeProductReviews(id, (data) => {
-      setRealTimeReviews(data || []);
+      if (isActive) setRealTimeReviews(data || []);
     }, (err) => console.error("Review sync error:", err));
 
     window.scrollTo(0, 0);
     return () => {
+      isActive = false;
       unsubscribeReviews();
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!product?.category) return;
+    let cancelled = false;
+
+    const loadRelated = async () => {
+      const { data: allProds } = await getProducts({ category: product.category });
+      if (!cancelled && allProds) {
+        setRelatedProducts(allProds.filter(p => p.id !== product.id).slice(0, 10));
+      }
+    };
+
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(loadRelated, { timeout: 1200 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback(idleId);
+      };
+    }
+
+    const timeoutId = window.setTimeout(loadRelated, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [product]);
+
+  useEffect(() => {
+    if (!product?.gallery?.length) return;
+    product.gallery.slice(1, 4).forEach((src) => {
+      const image = new Image();
+      image.src = src;
+    });
+  }, [product]);
 
   useEffect(() => {
     setImageLoading(true);
@@ -142,8 +185,8 @@ const ProductDetail = () => {
     }, 1000);
   };
 
-  const nextImage = () => setActiveImage((prev) => (prev + 1) % product.gallery.length);
-  const prevImage = () => setActiveImage((prev) => (prev - 1 + product.gallery.length) % product.gallery.length);
+  const nextImage = () => setActiveImage((prev) => (prev + 1) % (product.gallery?.length || 1));
+  const prevImage = () => setActiveImage((prev) => (prev - 1 + (product.gallery?.length || 1)) % (product.gallery?.length || 1));
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -178,6 +221,7 @@ const ProductDetail = () => {
     : 0; // Remove demo 4.8 fallback
   const isContactLens = product.category?.toLowerCase().includes('contact') || product.category?.toLowerCase() === 'contacts';
   const selectedFrameColor = (product.colors && product.colors.length > 0) ? product.colors[activeColor] : null;
+  const gallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
 
   return (
     <div className="product-detail-page pt-28">
@@ -187,13 +231,13 @@ const ProductDetail = () => {
           <div className="space-y-12">
             <div className="gallery-container">
               <div className="vertical-thumbnails">
-                {product.gallery.map((img, idx) => (
+                {gallery.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveImage(idx)}
                     className={`thumb-btn ${activeImage === idx ? 'active' : ''}`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-contain" />
+                    <img src={img} alt="" className="w-full h-full object-contain" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>
@@ -211,12 +255,15 @@ const ProductDetail = () => {
                     )}
                     <motion.img
                       key={activeImage}
-                      src={product.gallery[activeImage]}
+                      src={gallery[activeImage]}
+                      alt={product.name}
                       onLoad={() => setImageLoading(false)}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: imageLoading ? 0 : 1, scale: imageLoading ? 0.9 : 1 }}
                       transition={{ duration: 0.5, ease: TRANSITIONS.ease }}
                       className="w-full max-w-[90%] h-auto object-contain"
+                      fetchPriority={activeImage === 0 ? 'high' : 'auto'}
+                      decoding="async"
                     />
                   </div>
                 </AnimatePresence>
@@ -439,14 +486,16 @@ const ProductDetail = () => {
           </aside>
         </div>
 
-        <section className="mt-32 pt-16 border-t border-divider">
-           <div className="flex justify-between items-end mb-12">
-              <h2 className="text-2xl font-bold text-primary">Similar Products</h2>
-           </div>
-           <div className="similar-grid-container" ref={sliderRef}>
-              {relatedProducts.map(p => <div key={p.id} className="w-full"><ProductCard product={p} /></div>)}
-           </div>
-        </section>
+        {relatedProducts.length > 0 && (
+          <section className="mt-32 pt-16 border-t border-divider">
+             <div className="flex justify-between items-end mb-12">
+                <h2 className="text-2xl font-bold text-primary">Similar Products</h2>
+             </div>
+             <div className="similar-grid-container" ref={sliderRef}>
+                {relatedProducts.map(p => <div key={p.id} className="w-full"><ProductCard product={p} /></div>)}
+             </div>
+          </section>
+        )}
       </div>
 
       <div className="pdp-sticky-cta">
@@ -455,8 +504,16 @@ const ProductDetail = () => {
          </button>
       </div>
 
-      <LensSelector isOpen={isLensModalOpen} onClose={() => setIsLensModalOpen(false)} product={product} selectedColor={selectedFrameColor} selectedSize={activeSize} />
-      <ContactLensSelector isOpen={isCLModalOpen} onClose={() => setIsCLModalOpen(false)} product={product} selectedColor={selectedFrameColor} selectedSize={activeSize} />
+      {(isLensModalOpen || isCLModalOpen) && (
+        <Suspense fallback={null}>
+          {isLensModalOpen && (
+            <LensSelector isOpen={isLensModalOpen} onClose={() => setIsLensModalOpen(false)} product={product} selectedColor={selectedFrameColor} selectedSize={activeSize} />
+          )}
+          {isCLModalOpen && (
+            <ContactLensSelector isOpen={isCLModalOpen} onClose={() => setIsCLModalOpen(false)} product={product} selectedColor={selectedFrameColor} selectedSize={activeSize} />
+          )}
+        </Suspense>
+      )}
 
       <AnimatePresence>
         {isReviewModalOpen && (

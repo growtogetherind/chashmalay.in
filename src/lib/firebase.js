@@ -168,15 +168,18 @@ export const subscribeProducts = ({ category, shape, priceMin, priceMax, isFeatu
   }, onError);
 };
 
-export const getProductById = async (id) => {
+export const getProductById = async (id, { includeReviews = true } = {}) => {
   try {
     const docSnap = await getDoc(doc(db, "products", id));
     if (docSnap.exists()) {
-      const reviewsQ = query(collection(db, "reviews"), where("product_id", "==", id));
-      const reviewsSnap = await getDocs(reviewsQ);
-      const reviews = reviewsSnap.docs
-        .map(d => ({ id: d.id, ...d.data() }))
-        .filter((review) => review.status === 'approved');
+      let reviews = [];
+      if (includeReviews) {
+        const reviewsQ = query(collection(db, "reviews"), where("product_id", "==", id));
+        const reviewsSnap = await getDocs(reviewsQ);
+        reviews = reviewsSnap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter((review) => review.status === 'approved');
+      }
       return { data: normalizeProduct({ ...docSnap.data(), id: docSnap.id, reviews }), error: null };
     }
     return { data: null, error: "Product not found" };
