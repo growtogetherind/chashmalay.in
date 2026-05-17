@@ -38,6 +38,12 @@ const getTimestamp = (val) => {
 
 const byCreatedDesc = (a, b) => getTimestamp(b.created_at) - getTimestamp(a.created_at);
 const byNameAsc = (a, b) => (a.full_name || a.name || '').localeCompare(b.full_name || b.name || '');
+const bySortOrderThenName = (a, b) => {
+  const sortA = Number(a.sort_order ?? 999);
+  const sortB = Number(b.sort_order ?? 999);
+  if (sortA !== sortB) return sortA - sortB;
+  return byNameAsc(a, b);
+};
 
 const DEFAULT_SETTINGS = {
   store_name: 'Chashmalay',
@@ -539,7 +545,7 @@ export const getCategories = async () => {
     const snap = await getDocs(q);
     const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     // Sort manually to avoid index requirement
-    data.sort(byNameAsc);
+    data.sort(bySortOrderThenName);
     return { data, error: null };
   } catch (error) {
     console.error("getCategories Error:", error);
@@ -549,14 +555,39 @@ export const getCategories = async () => {
 
 export const subscribeCategories = (onData, onError) => subscribeToQuery(
   collection(db, "categories"),
-  (items) => onData(items.sort(byNameAsc)),
+  (items) => onData(items.sort(bySortOrderThenName)),
   onError
 );
 
+const slugify = (value = '') => value
+  .toString()
+  .trim()
+  .toLowerCase()
+  .replace(/&/g, 'and')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '');
+
+const categoryPayload = (category = {}) => {
+  const image = category.image_url || category.image || '';
+  return {
+    ...category,
+    name: category.name?.trim() || '',
+    slug: category.slug || slugify(category.name),
+    image,
+    image_url: image,
+    description: category.description || '',
+    color: category.color || '#f8fafc',
+    accent: category.accent || '#1d4ed8',
+    sort_order: Number(category.sort_order || 999),
+    is_active: category.is_active !== false,
+  };
+};
+
 export const saveCategory = async (category, id = null) => {
   try {
-    if (id) await updateDoc(doc(db, "categories", id), { ...category, updated_at: serverTimestamp() });
-    else await addDoc(collection(db, "categories"), { ...category, created_at: serverTimestamp() });
+    const payload = categoryPayload(category);
+    if (id) await updateDoc(doc(db, "categories", id), { ...payload, updated_at: serverTimestamp() });
+    else await addDoc(collection(db, "categories"), { ...payload, created_at: serverTimestamp(), updated_at: serverTimestamp() });
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -723,6 +754,45 @@ export const addOrderNote = async (orderId, note) => {
 };
 
 // ─── Reviews & Ratings ────────────────────────────────────────────────────────
+const buildReviewSummary = (reviews = []) => {
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  reviews.forEach((review) => {
+    const rating = Math.max(1, Math.min(5, Math.round(Number(review.rating || 0))));
+    counts[rating] += 1;
+  });
+
+  const count = reviews.length;
+  const total = reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0);
+  const average = count ? Number((total / count).toFixed(1)) : 0;
+
+  return { average, count, counts };
+};
+
+export const recomputeProductReviewSummary = async (productId) => {
+  if (!productId) return { error: null };
+
+  try {
+    const reviewsQ = query(collection(db, "reviews"), where("product_id", "==", productId));
+    const reviewsSnap = await getDocs(reviewsQ);
+    const approvedReviews = reviewsSnap.docs
+      .map((reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }))
+      .filter((review) => review.status === 'approved');
+    const summary = buildReviewSummary(approvedReviews);
+
+    await updateDoc(doc(db, "products", productId), {
+      review_summary: summary,
+      rating: summary.average,
+      review_count: summary.count,
+      updated_at: serverTimestamp()
+    });
+
+    return { data: summary, error: null };
+  } catch (error) {
+    console.error("Firebase recomputeProductReviewSummary error:", error);
+    return { data: null, error };
+  }
+};
+
 export const addReview = async (productId, userId, rating, comment, userInfo) => {
   if (!checkRateLimit(`addReview_${userId}_${productId}`, 15000)) {
     return { error: "You are submitting reviews too quickly. Please wait." };
@@ -732,12 +802,14 @@ export const addReview = async (productId, userId, rating, comment, userInfo) =>
       product_id: productId,
       user_id: userId,
       rating: Number(rating),
-      comment,
+      comment: comment.trim(),
       // FIX: Only store display name — never email in a publicly readable collection
       reviewer_name: userInfo?.full_name || 'Anonymous Customer',
       product_name: userInfo?.product_name || '',
       status: 'pending',
-      created_at: serverTimestamp()
+      helpful_count: 0,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp()
     };
     await addDoc(collection(db, "reviews"), reviewData);
 
@@ -765,18 +837,22 @@ export const subscribeReviews = (onData, onError) => subscribeToQuery(
 
 export const subscribeProductReviews = (productId, onData, onError) => subscribeToQuery(
   query(
-    collection(db, "reviews"), 
-    where("product_id", "==", productId), 
-    where("status", "==", "approved"),
-    orderBy("created_at", "desc")
+    collection(db, "reviews"),
+    where("product_id", "==", productId),
+    where("status", "==", "approved")
   ),
-  onData,
+  (reviews) => onData(reviews.sort(byCreatedDesc)),
   onError
 );
 
 export const updateReviewStatus = async (id, status) => {
   try {
-    await updateDoc(doc(db, "reviews", id), { status, updated_at: serverTimestamp() });
+    const reviewRef = doc(db, "reviews", id);
+    const reviewSnap = await getDoc(reviewRef);
+    const productId = reviewSnap.exists() ? reviewSnap.data().product_id : null;
+
+    await updateDoc(reviewRef, { status, updated_at: serverTimestamp() });
+    await recomputeProductReviewSummary(productId);
     return { error: null };
   } catch (error) {
     return { error };
@@ -785,7 +861,12 @@ export const updateReviewStatus = async (id, status) => {
 
 export const deleteReview = async (id) => {
   try {
-    await deleteDoc(doc(db, "reviews", id));
+    const reviewRef = doc(db, "reviews", id);
+    const reviewSnap = await getDoc(reviewRef);
+    const productId = reviewSnap.exists() ? reviewSnap.data().product_id : null;
+
+    await deleteDoc(reviewRef);
+    await recomputeProductReviewSummary(productId);
     return { error: null };
   } catch (error) {
     return { error };

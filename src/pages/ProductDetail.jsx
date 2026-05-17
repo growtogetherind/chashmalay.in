@@ -2,9 +2,9 @@ import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import {
-  Star, Heart, Share2, MapPin, Box, RotateCcw,
-  ShieldCheck, ChevronDown, ChevronUp, Map, Eye, Search, Layers,
-  ChevronRight, ChevronLeft, User, X, CheckCircle
+  Star, Heart, RotateCcw,
+  ShieldCheck, ChevronDown, ChevronUp, Layers,
+  ChevronRight, ChevronLeft, X, CheckCircle
 } from 'lucide-react';
 import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
@@ -60,8 +60,6 @@ const ProductDetail = () => {
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  const [pincode, setPincode] = useState('');
-  const [pincodeStatus, setPincodeStatus] = useState(null);
   const sliderRef = useRef(null);
 
   useEffect(() => {
@@ -174,17 +172,6 @@ const ProductDetail = () => {
     }
   };
 
-  const checkPincode = () => {
-    if (!pincode || pincode.length !== 6) {
-      setPincodeStatus('error');
-      return;
-    }
-    setPincodeStatus('checking');
-    setTimeout(() => {
-      setPincodeStatus('success');
-    }, 1000);
-  };
-
   const nextImage = () => setActiveImage((prev) => (prev + 1) % (product.gallery?.length || 1));
   const prevImage = () => setActiveImage((prev) => (prev - 1 + (product.gallery?.length || 1)) % (product.gallery?.length || 1));
 
@@ -214,11 +201,22 @@ const ProductDetail = () => {
   const originalPrice = product.original_price || product.originalPrice ? parseInt((product.original_price || product.originalPrice).toString().replace(/,/g, '')) : Math.round(price * 1.3);
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
   
-  // Use real-time reviews for counts and ratings
+  // Use real-time reviews for counts and ratings, with product aggregates as the backend fallback.
   const reviews = realTimeReviews.length > 0 ? realTimeReviews : (product.reviews || []);
-  const avgRating = reviews.length > 0 
-    ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) 
-    : 0; // Remove demo 4.8 fallback
+  const reviewSummary = product.review_summary || {};
+  const reviewTotal = reviews.length || Number(reviewSummary.count || product.review_count || 0);
+  const avgRating = reviews.length > 0
+    ? Number((reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1))
+    : Number(reviewSummary.average || (reviewTotal ? product.rating : 0) || 0);
+  const ratingBreakdown = [5, 4, 3, 2, 1].map((rating) => {
+    const liveCount = reviews.filter((review) => Math.round(Number(review.rating || 0)) === rating).length;
+    const count = reviews.length ? liveCount : Number(reviewSummary.counts?.[rating] || 0);
+    return {
+      rating,
+      count,
+      percentage: reviewTotal ? Math.round((count / reviewTotal) * 100) : 0
+    };
+  });
   const isContactLens = product.category?.toLowerCase().includes('contact') || product.category?.toLowerCase() === 'contacts';
   const selectedFrameColor = (product.colors && product.colors.length > 0) ? product.colors[activeColor] : null;
   const gallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
@@ -402,18 +400,34 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <div className="logistics-box p-8 bg-slate-50 rounded-3xl border border-slate-100">
-                <div className="flex items-center gap-3 mb-6">
-                   <MapPin size={20} className="text-slate-900" />
-                   <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Check Delivery</h4>
+              <div className="rating-review-card">
+                <div className="rating-review-header">
+                  <h3>Rating & Reviews</h3>
+                  <button onClick={() => setIsReviewModalOpen(true)}>Write Review</button>
                 </div>
-                <div className="relative group">
-                  <input type="text" placeholder="Enter Pincode" className="w-full px-6 py-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-slate-900 transition-all text-slate-900 placeholder:text-slate-300" value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))} />
-                  <button onClick={checkPincode} disabled={pincodeStatus === 'checking'} className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-slate-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all">
-                    {pincodeStatus === 'checking' ? '...' : 'Check'}
-                  </button>
+
+                <div className="rating-review-body">
+                  <div className="rating-score-block">
+                    <div className="rating-score">
+                      <span>{Number(avgRating || 0).toFixed(1)}</span>
+                      <Star size={28} fill="#00a884" strokeWidth={0} />
+                    </div>
+                    <p>{reviewTotal.toLocaleString()} Reviews</p>
+                  </div>
+
+                  <div className="rating-bars">
+                    {ratingBreakdown.map(({ rating, percentage }) => (
+                      <div key={rating} className="rating-bar-row">
+                        <span className="rating-label">{rating}</span>
+                        <Star size={12} fill="#d9d4ef" strokeWidth={0} />
+                        <div className="rating-track">
+                          <div className="rating-fill" style={{ width: `${percentage}%` }} />
+                        </div>
+                        <span className="rating-percent">{percentage}%</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                {pincodeStatus === 'success' && <FadeIn><div className="flex items-center gap-2 mt-6 text-emerald-600"><CheckCircle size={14} /><span className="text-[10px] font-black uppercase tracking-widest">Express Delivery within 3-4 Days</span></div></FadeIn>}
               </div>
 
               <div className="specs-accordion space-y-4">

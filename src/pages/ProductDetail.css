@@ -194,6 +194,144 @@
   padding: 0 0 24px 0;
 }
 
+.rating-review-card {
+  background: #ffffff;
+  border: 1px solid #ede9f7;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 10px 28px rgba(20, 16, 56, 0.04);
+}
+
+.rating-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.rating-review-header h3 {
+  margin: 0;
+  color: #090039;
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.rating-review-header button {
+  flex-shrink: 0;
+  border: 1px solid #090039;
+  background: #090039;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.rating-review-header button:hover {
+  background: #ffffff;
+  color: #090039;
+}
+
+.rating-review-body {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: center;
+  gap: 26px;
+}
+
+.rating-score-block {
+  text-align: center;
+}
+
+.rating-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #3e1d72;
+}
+
+.rating-score span {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.rating-score-block p {
+  margin: 8px 0 0;
+  color: #5d438d;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.rating-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rating-bar-row {
+  display: grid;
+  grid-template-columns: 14px 14px minmax(90px, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-label {
+  color: #101010;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.rating-track {
+  height: 3px;
+  background: #d9d4ef;
+  overflow: hidden;
+}
+
+.rating-fill {
+  height: 100%;
+  background: #00a884;
+}
+
+.rating-percent {
+  color: #665097;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .rating-review-card {
+    padding: 20px;
+  }
+
+  .rating-review-header {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 22px;
+  }
+
+  .rating-review-header h3 {
+    font-size: 22px;
+  }
+
+  .rating-review-header button {
+    width: 100%;
+  }
+
+  .rating-review-body {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+}
+
 /* Similar Products Slider */
 .similar-grid-container {
   display: grid;
