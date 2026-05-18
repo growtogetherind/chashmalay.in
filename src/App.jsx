@@ -29,6 +29,11 @@ const Offers       = lazy(() => import('./pages/Offers.jsx'));
 const ContactLens       = lazy(() => import('./pages/ContactLens.jsx'));
 const ContactLensDetail = lazy(() => import('./pages/ContactLensDetail.jsx'));
 const FindStore         = lazy(() => import('./pages/FindStore.jsx'));
+const About             = lazy(() => import('./pages/About.jsx'));
+const Terms             = lazy(() => import('./pages/Terms.jsx'));
+const Privacy           = lazy(() => import('./pages/Privacy.jsx'));
+const Contact           = lazy(() => import('./pages/Contact.jsx'));
+const Faq               = lazy(() => import('./pages/Faq.jsx'));
 const NotFound     = lazy(() => import('./pages/NotFound.jsx'));
 
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard.jsx'));
@@ -138,6 +143,13 @@ function App() {
                               <Route path="/account"                  element={<ProtectedRoute><Account /></ProtectedRoute>} />
                               <Route path="/account/orders"           element={<ProtectedRoute><Account /></ProtectedRoute>} />
                               <Route path="/account/orders/:orderId"  element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+                              <Route path="/about"                    element={<About />} />
+                              <Route path="/terms"                    element={<Terms />} />
+                              <Route path="/privacy"                  element={<Privacy />} />
+                              <Route path="/shipping"                 element={<Terms />} />
+                              <Route path="/returns"                  element={<Terms />} />
+                              <Route path="/contact"                  element={<Contact />} />
+                              <Route path="/faq"                      element={<Faq />} />
                               <Route path="*"                         element={<NotFound />} />
                             </Routes>}
                           </Suspense>

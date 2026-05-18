@@ -677,7 +677,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                           />
                           <input
                             type="number"
-                            placeholder="Age"
+                            placeholder="Age *"
                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-[13px] font-bold focus:outline-none focus:border-black focus:bg-white transition-all"
                             value={manualDetails.age}
                             onChange={(e) => setManualDetails({...manualDetails, age: e.target.value})}
@@ -692,7 +692,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                         setIsPowerModalOpen(false);
                         setStep(4);
                       }}
-                      disabled={!manualDetails.name || !manualDetails.phone || !manualDetails.leftSph || !manualDetails.rightSph}
+                      disabled={!manualDetails.name || !manualDetails.phone || !manualDetails.age || !manualDetails.leftSph || !manualDetails.rightSph}
                     >
                       Save Details & Proceed
                     </button>

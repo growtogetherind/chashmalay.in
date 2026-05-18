@@ -155,19 +155,21 @@ const Home = () => {
       </FadeIn>
 
       {/* Features Bar */}
-      <section className="py-10 bg-white border-t border-gray-100">
+      <section className="py-16 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: <Truck size={28} className="text-primary" />, title: 'Speedy delivery', desc: 'Fast shipping nationwide' },
-              { icon: <RotateCcw size={28} className="text-primary" />, title: 'Return policy', desc: 'Easy 30-day returns' },
-              { icon: <HeadphonesIcon size={28} className="text-primary" />, title: 'Custom support', desc: '24/7 customer service' },
-              { icon: <CreditCard size={28} className="text-primary" />, title: 'Secure payment', desc: 'Encrypted transactions' },
+              { icon: <Truck size={40} className="text-primary transition-transform group-hover:scale-110 duration-300" />, title: 'Speedy delivery', desc: 'Fast shipping nationwide' },
+              { icon: <RotateCcw size={40} className="text-primary transition-transform group-hover:scale-110 duration-300" />, title: 'Return policy', desc: 'Easy 7-day returns' },
+              { icon: <HeadphonesIcon size={40} className="text-primary transition-transform group-hover:scale-110 duration-300" />, title: 'Custom support', desc: '24/7 customer service' },
+              { icon: <CreditCard size={40} className="text-primary transition-transform group-hover:scale-110 duration-300" />, title: 'Secure payment', desc: 'Encrypted transactions' },
             ].map((f, i) => (
-              <div key={i} className="flex flex-col items-center text-center gap-2 p-4">
-                {f.icon}
-                <h4 className="text-sm font-bold text-gray-900">{f.title}</h4>
-                <p className="text-xs text-gray-500">{f.desc}</p>
+              <div key={i} className="group flex flex-col items-center text-center gap-3 p-6 rounded-2xl hover:bg-gray-50/80 transition-all duration-300">
+                <div className="p-3 bg-blue-50 rounded-2xl text-primary transition-colors group-hover:bg-primary group-hover:text-white duration-300">
+                  {React.cloneElement(f.icon, { className: 'transition-transform duration-300' })}
+                </div>
+                <h4 className="text-base font-extrabold text-gray-900 mt-2">{f.title}</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
