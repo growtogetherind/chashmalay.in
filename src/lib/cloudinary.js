@@ -29,7 +29,7 @@ const validateImageFile = (file, maxBytes) => {
   return null;
 };
 
-const uploadWithXhr = ({ endpoint, formData, onProgress }) => new Promise((resolve, reject) => {
+const uploadWithXhr = ({ endpoint, formData, onProgress, timeout = 6000 }) => new Promise((resolve, reject) => {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', endpoint);
 
@@ -58,7 +58,7 @@ const uploadWithXhr = ({ endpoint, formData, onProgress }) => new Promise((resol
 
   xhr.onerror = () => reject(new Error('Network error while uploading to Cloudinary.'));
   xhr.ontimeout = () => reject(new Error('Cloudinary upload timed out.'));
-  xhr.timeout = 60000;
+  xhr.timeout = timeout;
   xhr.send(formData);
 });
 
@@ -117,7 +117,7 @@ const compressAndConvertToBase64 = (file, maxWidth = 800, maxHeight = 800, quali
  * it automatically falls back to a high-quality locally compressed Base64 data URL.
  */
 export const uploadImage = async (file, folder = 'products', options = {}) => {
-  const { onProgress, retries = 1, maxBytes = MAX_IMAGE_UPLOAD_BYTES } = options;
+  const { onProgress, retries = 0, maxBytes = MAX_IMAGE_UPLOAD_BYTES, timeout = 6000 } = options;
   const validationError = validateImageFile(file, maxBytes);
   if (validationError) return { url: null, error: validationError };
 
@@ -142,6 +142,7 @@ export const uploadImage = async (file, folder = 'products', options = {}) => {
           endpoint: uploadEndpoint(cloudName),
           formData,
           onProgress,
+          timeout,
         });
         lastError = null;
         break;
