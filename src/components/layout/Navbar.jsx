@@ -129,7 +129,7 @@ const Navbar = () => {
                 <button
                   onClick={() => setIsProfileOpen((v) => !v)}
                   aria-label="Account"
-                  className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 ml-1 ${
+                  className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ml-1 ${
                     user
                       ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-100 hover:shadow-indigo-200'
                       : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
@@ -157,7 +157,7 @@ const Navbar = () => {
                           {/* User Info Header */}
                           <div className="px-4 py-4 bg-gradient-to-br from-indigo-50 to-purple-50 border-b border-gray-100">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-black shadow-md shadow-indigo-100 flex-shrink-0">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-black shadow-md shadow-indigo-100 flex-shrink-0">
                                 {getInitials()}
                               </div>
                               <div className="min-w-0">
@@ -305,7 +305,7 @@ const Navbar = () => {
               {/* User info (mobile) */}
               {user && (
                 <div className="mx-4 mt-4 p-3 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl flex items-center gap-3 border border-indigo-100/60">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-black shadow flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-black shadow flex-shrink-0">
                     {getInitials()}
                   </div>
                   <div className="min-w-0">
