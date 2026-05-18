@@ -13,8 +13,7 @@ const getVariantDescription = (item) => {
   const color = getSelectedColorName(item);
   const size = getSelectedSize(item);
   if (!color && !size) return '';
-  return `
-Frame: ${color || 'Standard'}${size ? ` / Size: ${size}` : ''}`;
+  return `\nFrame: ${color || 'Standard'}${size ? ` / Size: ${size}` : ''}`;
 };
 
 export const generateInvoice = (order) => {
@@ -23,52 +22,85 @@ export const generateInvoice = (order) => {
     ? order.created_at.toDate()
     : new Date(order.created_at?.seconds * 1000 || order.created_at || Date.now());
 
-  // Business Header
+  // Page Width
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // 1. Brand Logo (Placed at top left)
   try {
-    doc.addImage("/logo.png", "PNG", 14, 5, 25, 25);
-  } catch (e) {}
+    doc.addImage("/logo.png", "PNG", 14, 10, 25, 25);
+  } catch (e) {
+    console.error("Logo failed to load in PDF:", e);
+  }
 
+  // 2. Brand Identity Header
   doc.setFontSize(22);
-  doc.setTextColor(30, 63, 138); // primary-blue
-  doc.text('CHASHMALAY.IN', 14, 40);
-
-  doc.setFontSize(10);
-  doc.setTextColor(100);
-  doc.text('Luxury Eyewear Store', 14, 46);
-  doc.text('GSTIN: 27AABCM1234F1Z5 (Mock)', 14, 51);
-  doc.text('Mumbai, India', 14, 56);
-
-  // Invoice Title
-  doc.setFontSize(20);
-  doc.setTextColor(0);
-  doc.text('INVOICE', 140, 40);
-
-  doc.setFontSize(10);
-  doc.text(`Invoice #: INV-${order.id?.slice(0, 8).toUpperCase()}`, 140, 48);
-  doc.text(`Date: ${date.toLocaleDateString('en-IN')}`, 140, 53);
-  doc.text(`Status: ${order.status?.toUpperCase()}`, 140, 58);
-
-  // Bill To
-  doc.setDrawColor(230);
-  doc.line(14, 45, 196, 45);
-
-  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('BILL TO:', 14, 55);
+  doc.setTextColor(30, 63, 138); // Brand Primary Blue
+  doc.text('CHASHMALAY.IN', 14, 46);
 
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(order.shipping_address?.name || 'Customer', 14, 62);
-  doc.text(order.shipping_address?.line1 || '', 14, 67);
-  if (order.shipping_address?.line2) doc.text(order.shipping_address.line2, 14, 72);
-  doc.text(`${order.shipping_address?.city || ''}, ${order.shipping_address?.state || ''} - ${order.shipping_address?.pincode || ''}`, 14, 77);
-  doc.text(`Phone: ${order.shipping_address?.phone || ''}`, 14, 82);
+  doc.setTextColor(100);
+  doc.text('Premium Eyewear Store', 14, 52);
+  doc.text('GSTIN: 27AABCM1234F1Z5 (Mock)', 14, 57);
+  doc.text('Somatane, Maharashtra, India', 14, 62);
 
-  // Table
+  // 3. Invoice Metadata
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(31, 41, 55); // Charcoal text
+  doc.text('INVOICE', 140, 46);
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100);
+  doc.text(`Invoice #: INV-${order.id?.slice(0, 8).toUpperCase()}`, 140, 52);
+  doc.text(`Date: ${date.toLocaleDateString('en-IN')}`, 140, 57);
+  
+  const status = order.status?.toUpperCase() || 'CONFIRMED';
+  doc.text(`Status: ${status}`, 140, 62);
+
+  // 4. Horizontal Elegant Divider Line
+  doc.setDrawColor(229, 231, 235); // border-gray-200
+  doc.setLineWidth(0.5);
+  doc.line(14, 67, 196, 67);
+
+  // 5. Bill To Section
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 63, 138); // Primary blue
+  doc.text('BILL TO:', 14, 76);
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(55, 65, 81); // Slate-700
+  
+  const name = order.shipping_address?.name || 'Customer';
+  const line1 = order.shipping_address?.line1 || '';
+  const line2 = order.shipping_address?.line2 || '';
+  const city = order.shipping_address?.city || '';
+  const state = order.shipping_address?.state || '';
+  const pincode = order.shipping_address?.pincode || '';
+  const phone = order.shipping_address?.phone || '';
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(name, 14, 82);
+  doc.setFont('helvetica', 'normal');
+  doc.text(line1, 14, 87);
+  
+  let currentY = 92;
+  if (line2) {
+    doc.text(line2, 14, currentY);
+    currentY += 5;
+  }
+  doc.text(`${city}, ${state} - ${pincode}`, 14, currentY);
+  doc.text(`Phone: ${phone}`, 14, currentY + 5);
+
+  // 6. Products Table
   const tableData = order.order_items?.map(item => [
     {
       content: `${item.products?.name || item.product_name}${getVariantDescription(item)}\nLenses: ${item.lens_selection?.visionType?.title || 'Frame Only'} (${item.lens_selection?.lensPackage?.name || 'Standard'})`,
-      styles: { cellPadding: 3 }
+      styles: { cellPadding: 4 }
     },
     `INR ${Number(item.price).toLocaleString()}`,
     item.quantity,
@@ -76,42 +108,121 @@ export const generateInvoice = (order) => {
   ]) || [];
 
   autoTable(doc, {
-    startY: 110,
+    startY: 112,
     head: [['Product Details', 'Price', 'Qty', 'Total']],
     body: tableData,
-    headStyles: { fillStyle: 'f3f4f6', textColor: [31, 41, 55], fontStyle: 'bold' },
-    styles: { fontSize: 9, cellPadding: 4 },
+    headStyles: { 
+      fillColor: [30, 63, 138], // Brand Primary Blue
+      textColor: [255, 255, 255], 
+      fontStyle: 'bold', 
+      fontSize: 9.5
+    },
+    alternateRowStyles: {
+      fillColor: [249, 250, 251] // Slate-50 alternate row background
+    },
+    styles: { 
+      fontSize: 9, 
+      cellPadding: 4, 
+      lineColor: [243, 244, 246] 
+    },
     columnStyles: {
-      0: { cellWidth: 100 },
+      0: { cellWidth: 105 },
       1: { halign: 'right' },
       2: { halign: 'center' },
       3: { halign: 'right' }
-    }
+    },
+    margin: { left: 14, right: 14 }
   });
-// ...
-  const finalY = (doc).lastAutoTable?.finalY || 200;
-  doc.setFontSize(10);
+
+  let finalY = doc.lastAutoTable?.finalY || 180;
+
+  // 7. Prescription Section (If available in any order items)
+  const prescriptionItems = order.order_items?.filter(item => item.lens_selection?.manualDetails) || [];
+  if (prescriptionItems.length > 0) {
+    finalY += 12;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 63, 138);
+    doc.text("PRESCRIPTION DETAILS", 14, finalY);
+    
+    let rxCurrentY = finalY + 4;
+    
+    prescriptionItems.forEach((item) => {
+      const details = item.lens_selection.manualDetails;
+      const rxData = [
+        ['RIGHT (OD)', details.rightSph || '-', details.rightCyl || '-', details.rightAxis || '-', details.rightAddlPower || '-'],
+        ['LEFT (OS)', details.leftSph || '-', details.leftCyl || '-', details.leftAxis || '-', details.leftAddlPower || '-']
+      ];
+      
+      autoTable(doc, {
+        startY: rxCurrentY,
+        head: [['Eye', 'SPH', 'CYL', 'Axis', 'Addl. Power']],
+        body: rxData,
+        headStyles: { fillColor: [75, 85, 99], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8.5 },
+        theme: 'grid',
+        margin: { left: 14, right: 14 },
+        styles: { fontSize: 8.5, halign: 'center', cellPadding: 3.5 },
+        columnStyles: { 0: { halign: 'left', fontStyle: 'bold', cellWidth: 35 } }
+      });
+
+      rxCurrentY = doc.lastAutoTable.finalY + 5;
+
+      // Patient Info if available
+      if (details.name || details.phone) {
+         doc.setFontSize(8);
+         doc.setTextColor(156, 163, 175);
+         doc.text(`Patient Name: ${details.name || '-'}  |  Phone: ${details.phone || '-'}`, 14, rxCurrentY + 1);
+         rxCurrentY += 8;
+      }
+    });
+
+    finalY = rxCurrentY;
+  }
+
+  // 8. Calculations Summary Card
+  if (finalY > 230) {
+    doc.addPage();
+    finalY = 20;
+  } else {
+    finalY += 8;
+  }
 
   const subtotal = Number(order.total_amount) / 1.18;
   const gst = Number(order.total_amount) - subtotal;
 
-  doc.text('Subtotal:', 140, finalY);
-  doc.text(`INR ${subtotal.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 196, finalY, { align: 'right' });
+  doc.setFontSize(9.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(75, 85, 99);
 
-  doc.text('GST (18%):', 140, finalY + 7);
-  doc.text(`INR ${gst.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 196, finalY + 7, { align: 'right' });
+  doc.text('Subtotal:', 135, finalY);
+  doc.text(`INR ${subtotal.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 196, finalY, { align: 'right' });
 
-  doc.setFontSize(12);
+  doc.text('GST (18%):', 135, finalY + 6);
+  doc.text(`INR ${gst.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 196, finalY + 6, { align: 'right' });
+
+  doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
-  doc.text('TOTAL AMOUNT:', 140, finalY + 15);
-  doc.text(`INR ${Number(order.total_amount).toLocaleString()}`, 196, finalY + 15, { align: 'right' });
+  doc.setTextColor(30, 63, 138); // brand color
+  doc.text('TOTAL AMOUNT:', 135, finalY + 13);
+  doc.text(`INR ${Number(order.total_amount).toLocaleString()}`, 196, finalY + 13, { align: 'right' });
 
-  // Footer
+  // 9. Standardized Professional Footer (Sticky at page bottom)
+  const pageHeight = doc.internal.pageSize.getHeight();
+  
+  doc.setDrawColor(229, 231, 235);
+  doc.line(14, pageHeight - 32, 196, pageHeight - 32);
+
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(150);
-  doc.text('This is a computer generated invoice and does not require a physical signature.', 105, 280, { align: 'center' });
-  doc.text('Thank you for shopping with Chashmalay.in!', 105, 285, { align: 'center' });
+  doc.setTextColor(156, 163, 175);
+  doc.text('TERMS & CONDITIONS:', 14, pageHeight - 26);
+  doc.text('1. Warranty valid for 3 months from delivery date for manufacturing defects.', 14, pageHeight - 22);
+  doc.text('2. Easy returns accepted within 7 days of delivery. Product must be unused and in original packaging.', 14, pageHeight - 18);
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 63, 138);
+  doc.text('Thank you for shopping with Chashmalay.in!', pageWidth / 2, pageHeight - 8, { align: 'center' });
 
   doc.save(`Invoice_Chashmalay_${order.id?.slice(0, 8).toUpperCase()}.pdf`);
 };
