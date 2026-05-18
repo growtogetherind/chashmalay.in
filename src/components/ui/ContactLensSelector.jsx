@@ -156,7 +156,7 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
                         <p className="text-xs text-slate-400 mt-1">Image files accepted</p>
                       </div>
                     )}
-                    <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                    <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" onChange={async (e) => {
                       const file = e.target.files[0];
                       if (file) {
                         try {
