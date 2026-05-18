@@ -76,6 +76,33 @@ const Checkout = () => {
       return;
     }
     
+    setProcessing(true);
+
+    // Process any pending base64 prescription uploads when saving the address
+    for (let i = 0; i < cart.length; i++) {
+      const item = cart[i];
+      if (item.lensSelection?.prescriptionUrl && item.lensSelection.prescriptionUrl.startsWith('data:')) {
+        const toastId = toast.loading(`Uploading prescription for ${item.name}...`);
+        try {
+          const blob = base64ToBlob(item.lensSelection.prescriptionUrl);
+          const file = new File([blob], `prescription-${item.id}.webp`, { type: 'image/webp' });
+          const res = await uploadImage(file, 'prescriptions');
+          
+          if (res.error) throw new Error(res.error);
+          
+          toast.success("Prescription uploaded!", { id: toastId });
+          // Update the cart context so the final url is persisted
+          if (updateLensSelection) {
+            await updateLensSelection(item.cartVariantKey || item.firebaseId || item.id, { prescriptionUrl: res.url });
+          }
+        } catch (error) {
+          toast.error(`Failed to upload prescription for ${item.name}`, { id: toastId });
+          setProcessing(false);
+          return; // Stop transition to Review if upload fails
+        }
+      }
+    }
+
     if (user) {
       const { updateProfile } = await import('../lib/firebase');
       updateProfile(user.uid, { 
@@ -92,6 +119,7 @@ const Checkout = () => {
       });
     }
 
+    setProcessing(false);
     setStep(1);
     window.scrollTo(0, 0);
   };
@@ -119,40 +147,6 @@ const Checkout = () => {
 
     setProcessing(true);
 
-    // Process any pending base64 prescription uploads before proceeding to payment
-    const finalCartItems = [...cart];
-    for (let i = 0; i < finalCartItems.length; i++) {
-      const item = finalCartItems[i];
-      if (item.lensSelection?.prescriptionUrl && item.lensSelection.prescriptionUrl.startsWith('data:')) {
-        const toastId = toast.loading(`Uploading prescription for ${item.name}...`);
-        try {
-          const blob = base64ToBlob(item.lensSelection.prescriptionUrl);
-          const file = new File([blob], `prescription-${item.id}.webp`, { type: 'image/webp' });
-          const res = await uploadImage(file, 'prescriptions');
-          
-          if (res.error) throw new Error(res.error);
-          
-          finalCartItems[i] = {
-            ...item,
-            lensSelection: {
-              ...item.lensSelection,
-              prescriptionUrl: res.url
-            }
-          };
-          
-          toast.success("Prescription uploaded!", { id: toastId });
-          // Update the cart context so the final url is persisted in case of payment failure
-          if (updateLensSelection) {
-            updateLensSelection(item.cartVariantKey || item.firebaseId || item.id, { prescriptionUrl: res.url });
-          }
-        } catch (error) {
-          toast.error(`Failed to upload prescription for ${item.name}`, { id: toastId });
-          setProcessing(false);
-          return; // Stop payment if upload fails
-        }
-      }
-    }
-
     const loaded = await loadRazorpay();
     if (!loaded) { toast.error('Payment service unavailable. Try again.'); setProcessing(false); return; }
 
@@ -170,7 +164,7 @@ const Checkout = () => {
         try {
           const order = await createOrder({
             userId: user.uid,
-            items: finalCartItems,
+            items: cart,
             total: finalTotal,
             address,
             paymentId: response.razorpay_payment_id
@@ -255,7 +249,9 @@ const Checkout = () => {
                        <InputField label="Postal Code" name="pincode" value={address.pincode} onChange={handleAddressChange} placeholder="Postal Code" maxLength={6} required />
                     </div>
                     <div className="pt-8 text-right">
-                       <button type="submit" className="btn-primary w-full md:w-auto">Continue to Review</button>
+                       <button type="submit" disabled={processing} className="btn-primary w-full md:w-auto">
+                         {processing ? 'Optimizing & Uploading...' : 'Continue to Review'}
+                       </button>
                     </div>
                  </form>
               </FadeIn>
