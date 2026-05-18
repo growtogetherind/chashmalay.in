@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { FadeIn } from './Motion';
 
@@ -66,7 +66,7 @@ const TestimonialStack = () => {
                   ))}
                 </div>
                 {/* Comment */}
-                <p className="text-gray-600 text-sm leading-relaxed mb-5">"{t.comment}"</p>
+                <p className="text-gray-600 text-sm leading-relaxed mb-5">“{t.comment}”</p>
                 {/* Author */}
                 <div className="flex items-center gap-3 border-t border-gray-200 pt-4">
                   <img

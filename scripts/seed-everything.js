@@ -1,9 +1,7 @@
 import { db } from "./admin.js";
 import fs from 'fs';
-import path from 'path';
 
 const IMG_DIR = 'public/assets/im/all_img';
-const FRAMES_DIR = 'public/assets/frames';
 
 async function seedEverything() {
     console.log("🚀 Starting Targeted Seeding...");

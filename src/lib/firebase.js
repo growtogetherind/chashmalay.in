@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, limit, serverTimestamp, increment, runTransaction, onSnapshot } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -106,7 +106,12 @@ export const normalizeProduct = (product = {}) => {
 
 const productPayload = (product = {}) => {
   const normalized = normalizeProduct(product);
-  const { id, gallery, frameImage, originalPrice, consumersPrice, ...payload } = normalized;
+  const payload = { ...normalized };
+  delete payload.id;
+  delete payload.gallery;
+  delete payload.frameImage;
+  delete payload.originalPrice;
+  delete payload.consumersPrice;
   return payload;
 };
 
@@ -216,8 +221,6 @@ export const deleteProduct = async (id) => {
   } catch (error) { return { error }; }
 };
 
-
-
 // --- Cart ---
 export const getCartItems = async (userId) => {
   try {
@@ -284,72 +287,70 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
   if (!checkRateLimit(`createOrder_${userId}`, 10000)) {
     throw new Error("Please wait before placing another order.");
   }
-  try {
-    const orderData = {
-      user_id: userId,
-      total_amount: total,
-      shipping_address: address,
-      razorpay_payment_id: paymentId,
-      status: 'confirmed',
-      created_at: serverTimestamp()
-    };
-    const orderRef = await addDoc(collection(db, "orders"), orderData);
+  const orderData = {
+    user_id: userId,
+    total_amount: total,
+    shipping_address: address,
+    razorpay_payment_id: paymentId,
+    status: 'confirmed',
+    created_at: serverTimestamp()
+  };
+  const orderRef = await addDoc(collection(db, "orders"), orderData);
 
-    // Send Telegram Notification (Optional but recommended)
-    sendTelegramNotification(`🚀 *New Order Received!*\n\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Amount:* ₹${Number(total).toLocaleString()}\n*Customer:* ${address.name}\n*City:* ${address.city}`);
+  // Send Telegram Notification (Optional but recommended)
+  sendTelegramNotification(`🚀 *New Order Received!*\n\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Amount:* ₹${Number(total).toLocaleString()}\n*Customer:* ${address.name}\n*City:* ${address.city}`);
 
-    const batchPromises = items.map(async (item) => {
-      const pid = item.product_id || item.id;
-      const qty = item.quantity || 1;
+  const batchPromises = items.map(async (item) => {
+    const pid = item.product_id || item.id;
+    const qty = item.quantity || 1;
 
-      if (pid && !pid.startsWith('custom-')) {
-        try {
-          // Use a transaction to check stock BEFORE decrementing (prevents overselling)
-          await runTransaction(db, async (transaction) => {
-            const productRef = doc(db, "products", pid);
-            const productSnap = await transaction.get(productRef);
-            if (!productSnap.exists()) return; // Product deleted — skip silently
-            const currentStock = productSnap.data().stock_quantity ?? 0;
-            if (currentStock < qty) {
-              // Stock ran out before their purchase; we log but do not throw
-              // (payment is already captured — must not break the order).
-              // Admin will see the negative stock and can resolve manually.
-              console.warn(`Low stock for ${pid}: requested ${qty}, available ${currentStock}`);
-            }
-            transaction.update(productRef, {
-              stock_quantity: increment(-qty),
-              updated_at: serverTimestamp()
-            });
+    if (pid && !pid.startsWith('custom-')) {
+      try {
+        // Use a transaction to check stock BEFORE decrementing (prevents overselling)
+        await runTransaction(db, async (transaction) => {
+          const productRef = doc(db, "products", pid);
+          const productSnap = await transaction.get(productRef);
+          if (!productSnap.exists()) return; // Product deleted — skip silently
+          const currentStock = productSnap.data().stock_quantity ?? 0;
+          if (currentStock < qty) {
+            // Stock ran out before their purchase; we log but do not throw
+            // (payment is already captured — must not break the order).
+            // Admin will see the negative stock and can resolve manually.
+            console.warn(`Low stock for ${pid}: requested ${qty}, available ${currentStock}`);
+          }
+          transaction.update(productRef, {
+            stock_quantity: increment(-qty),
+            updated_at: serverTimestamp()
           });
-        } catch (stockError) {
-          console.error(`FAILED to decrement stock for ${pid}:`, stockError);
-        }
+        });
+      } catch (stockError) {
+        console.error(`FAILED to decrement stock for ${pid}:`, stockError);
       }
+    }
 
-      const basePrice = parseInt((item.price || item.consumersPrice || "0").toString().replace(/,/g, ''));
-      let lensTotal = 0;
-      if (item.lensSelection?.visionType) lensTotal += item.lensSelection.visionType.price;
-      if (item.lensSelection?.lensPackage) lensTotal += item.lensSelection.lensPackage.price;
-      const finalItemPrice = basePrice + lensTotal;
+    const basePrice = parseInt((item.price || item.consumersPrice || "0").toString().replace(/,/g, ''));
+    let lensTotal = 0;
+    if (item.lensSelection?.visionType) lensTotal += item.lensSelection.visionType.price;
+    if (item.lensSelection?.lensPackage) lensTotal += item.lensSelection.lensPackage.price;
+    const finalItemPrice = basePrice + lensTotal;
 
-      return addDoc(collection(db, "order_items"), {
-        order_id: orderRef.id,
-        product_id: pid || `custom-${Date.now()}`,
-        quantity: qty,
-        price: finalItemPrice,
-        product_name: item.name || 'Premium Eyewear',
-        frame_image: getProductImage(item),
-        category: item.category || '',
-        brand: item.brand || '',
-        lens_selection: item.lensSelection || null,
-        selected_color: item.lensSelection?.selectedColor || null,
-        selected_size: item.lensSelection?.selectedSize || null,
-        cart_variant_key: item.cartVariantKey || item.firebaseId || null
-      });
+    return addDoc(collection(db, "order_items"), {
+      order_id: orderRef.id,
+      product_id: pid || `custom-${Date.now()}`,
+      quantity: qty,
+      price: finalItemPrice,
+      product_name: item.name || 'Premium Eyewear',
+      frame_image: getProductImage(item),
+      category: item.category || '',
+      brand: item.brand || '',
+      lens_selection: item.lensSelection || null,
+      selected_color: item.lensSelection?.selectedColor || null,
+      selected_size: item.lensSelection?.selectedSize || null,
+      cart_variant_key: item.cartVariantKey || item.firebaseId || null
     });
-    await Promise.all(batchPromises);
-    return { id: orderRef.id, ...orderData };
-  } catch (error) { throw error; }
+  });
+  await Promise.all(batchPromises);
+  return { id: orderRef.id, ...orderData };
 };
 
 export const getUserOrders = async (userId) => {
@@ -1000,8 +1001,6 @@ export const deleteCarouselItem = async (id) => {
     return { error: null };
   } catch (error) { return { error }; }
 };
-
-
 
 export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
   try {

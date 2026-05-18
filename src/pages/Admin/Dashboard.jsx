@@ -1,17 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Package,
-  ShoppingBag,
-  DollarSign,
-  Users,
-  TrendingUp,
-  ArrowRight,
-  Search,
-  Bell,
-  MoreVertical,
-  Filter
-} from 'lucide-react';
+import { Package, ShoppingBag, DollarSign, Users, TrendingUp, ArrowRight, Search, Bell, MoreVertical, Filter } from 'lucide-react';
 import { subscribeDashboardStats } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import '../Admin.css';
@@ -55,8 +44,6 @@ const AdminDashboard = () => {
           }
         }
         lastOrderId = latestOrder.id;
-      } else if (currentOrders.length > 0 && !lastOrderId) {
-        lastOrderId = currentOrders[0].id;
       }
 
       setLoading(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import './ScrollFrameHero.css';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -23,27 +23,6 @@ export default function ScrollFrameHero() {
   const lastDrawnIndexRef = useRef(-1);
   const rafRef = useRef(null);
   const loadedCountRef = useRef(0);
-
-  // ── Pre-load all frames ──────────────────────────────────────────────────
-  useEffect(() => {
-    imagesRef.current = [];
-    loadedCountRef.current = 0;
-
-    FRAMES.forEach((src, i) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        loadedCountRef.current += 1;
-        // Initial draw if first frame is ready
-        if (i === 0) drawFrame(0);
-      };
-      imagesRef.current[i] = img;
-    });
-
-    return () => {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
 
   // ── Draw logic (COVER scaling for FULL SCREEN feel) ──────────────────────
   const drawFrame = useCallback((index) => {
@@ -77,6 +56,27 @@ export default function ScrollFrameHero() {
     ctx.drawImage(img, dx, dy, drawW, drawH);
     lastDrawnIndexRef.current = index;
   }, []);
+
+  // ── Pre-load all frames ──────────────────────────────────────────────────
+  useEffect(() => {
+    imagesRef.current = [];
+    loadedCountRef.current = 0;
+
+    FRAMES.forEach((src, i) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        loadedCountRef.current += 1;
+        // Initial draw if first frame is ready
+        if (i === 0) drawFrame(0);
+      };
+      imagesRef.current[i] = img;
+    });
+
+    return () => {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [drawFrame]);
 
   // ── Continuous Lerp Animation Loop ─────────────────────────────────────
   const animate = useCallback(() => {

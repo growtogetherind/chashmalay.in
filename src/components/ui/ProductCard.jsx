@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import { getCloudinarySrcSet, transformCloudinaryUrl } from '../../lib/cloudinary';
 
 const COLOR_SWATCH_MAP = {
   Black: '#000000',
@@ -45,6 +46,7 @@ const ProductCard = ({ product }) => {
 
   const frontImage = product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image';
   const hoverImage = product.images?.model || product.model_image || product.images?.gallery?.[1] || frontImage;
+  const activeImage = isHovered ? hoverImage : frontImage;
   const colorCandidates = Array.isArray(product.colors) && product.colors.length
     ? product.colors
     : [product.color || product.frame_color || product.frameColor].filter(Boolean);
@@ -89,10 +91,15 @@ const ProductCard = ({ product }) => {
 
         {/* Product Image */}
         <img
-          src={isHovered ? hoverImage : frontImage}
+          src={transformCloudinaryUrl(activeImage, { width: 640 })}
+          srcSet={activeImage.includes('res.cloudinary.com') ? getCloudinarySrcSet(activeImage, [320, 480, 640, 800]) : undefined}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px"
           alt={product.name}
+          width="640"
+          height="480"
           className="w-full h-full object-contain mix-blend-multiply p-4 md:p-5 transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
+          decoding="async"
           onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image'; }}
         />
 

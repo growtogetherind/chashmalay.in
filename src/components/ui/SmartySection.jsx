@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
-import { Bluetooth, Mic, Phone, Navigation, Disc, ArrowRight } from 'lucide-react';
+import { Mic, Phone, Navigation, Disc, ArrowRight } from 'lucide-react';
 import './SmartySection.css';
 
 const features = [

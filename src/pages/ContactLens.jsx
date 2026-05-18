@@ -119,7 +119,7 @@ const ContactLens = () => {
     if (isMobileFilterOpen) {
       setPendingFilters(selectedFilters);
     }
-  }, [isMobileFilterOpen]);
+  }, [isMobileFilterOpen, selectedFilters]);
 
   const handleFilterChange = (key, value) => {
     setPendingFilters(prev => {
@@ -403,7 +403,7 @@ const ContactLens = () => {
                          <X size={32} />
                        </div>
                        <h3 className="text-xl font-bold text-primary mb-2">No Matching Lenses</h3>
-                       <p className="text-slate-400 text-sm max-w-xs">We couldn't find any lenses matching your current filters.</p>
+                       <p className="text-slate-400 text-sm max-w-xs">We couldn’t find any lenses matching your current filters.</p>
                        <button
                          onClick={handleClearAll}
                          className="mt-8 text-[10px] font-black uppercase tracking-[0.2em] text-accent border-b border-accent/30 pb-1 hover:border-accent transition-all"

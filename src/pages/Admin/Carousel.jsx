@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, X, Edit3, Trash2, ExternalLink, Image as ImageIcon, Eye, EyeOff, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, X, Edit3, Trash2, ExternalLink, Image as ImageIcon, Eye, EyeOff } from 'lucide-react';
 import { getCarouselItems, saveCarouselItem, deleteCarouselItem, subscribeCarouselItems } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import AdminSidebar from '../../components/layout/AdminSidebar';

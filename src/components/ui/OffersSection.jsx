@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tag, Zap, Gift, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { subscribeOffers } from '../../lib/firebase';
 
 const OffersSection = () => {
@@ -93,7 +93,6 @@ const OffersSection = () => {
             </button>
           </div>
       </div>
-
 
       <style>{`
         .vertical-text {

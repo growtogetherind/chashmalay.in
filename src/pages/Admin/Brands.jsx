@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Edit3, Trash2, X, Image as ImageIcon } from 'lucide-react';
 import { getBrands, saveBrand, deleteBrand, subscribeBrands } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';

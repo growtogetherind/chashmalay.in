@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Environment, ContactShadows, MeshTransmissionMaterial } from '@react-three/drei';
 import { useInView } from 'framer-motion';

@@ -1,19 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Package,
-  Search,
-  TrendingDown,
-  CheckCircle,
-  XCircle,
-  Plus,
-  Minus,
-  RefreshCw,
-  AlertTriangle,
-  Settings,
-  Bell,
-  Filter
-} from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+
+import { Package, Search, XCircle, Plus, Minus, RefreshCw, AlertTriangle, Bell } from 'lucide-react';
 import { getProducts, updateProductStock, getCategories, subscribeProducts, subscribeCategories } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import toast from 'react-hot-toast';
@@ -206,9 +193,9 @@ const AdminInventory = () => {
                           </td>
                           <td className="text-right">
                              <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => adjustStock(p.id, -1)} className="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"><Minus size={16} /></button>
-                                <button onClick={() => adjustStock(p.id, 1)} className="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors flex items-center justify-center"><Plus size={16} /></button>
-                                <button onClick={() => adjustStock(p.id, 10)} className="ml-2 px-3 py-1.5 bg-gray-900 text-white text-[10px] font-extrabold rounded-lg hover:bg-purple-600 transition-all">+10</button>
+                                <button disabled={saving[p.id]} onClick={() => adjustStock(p.id, -1)} className="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center disabled:opacity-50"><Minus size={16} /></button>
+                                <button disabled={saving[p.id]} onClick={() => adjustStock(p.id, 1)} className="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors flex items-center justify-center disabled:opacity-50"><Plus size={16} /></button>
+                                <button disabled={saving[p.id]} onClick={() => adjustStock(p.id, 10)} className="ml-2 px-3 py-1.5 bg-gray-900 text-white text-[10px] font-extrabold rounded-lg hover:bg-purple-600 transition-all disabled:opacity-50">+10</button>
                              </div>
                           </td>
                        </tr>

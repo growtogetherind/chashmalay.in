@@ -1,14 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  X,
-  Download,
-  Search,
-  Filter,
-  MoreVertical,
-  DownloadCloud,
-  Settings,
-  Bell
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Download, Search, Filter, MoreVertical, DownloadCloud, Settings, Bell } from 'lucide-react';
 import { subscribeAllOrders, updateOrderStatus as firebaseUpdateOrderStatus } from '../../lib/firebase';
 import { generateInvoice } from '../../lib/invoice';
 import AdminSidebar from '../../components/layout/AdminSidebar';
@@ -128,41 +119,41 @@ const AdminOrders = () => {
 
         {/* Status Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-           <div className="admin-card !p-6 border-l-4 border-l-purple-500 relative overflow-hidden group">
+           <button type="button" onClick={() => setFilter('pending')} className="admin-card !p-6 border-l-4 border-l-purple-500 relative overflow-hidden group text-left">
               <div className="flex justify-between items-start mb-4">
                  <span className="text-[10px] font-bold uppercase tracking-[2px] text-purple-600 bg-purple-50 px-2 py-1 rounded-md">New orders</span>
                  <div className="text-red-500 text-[10px] font-bold flex items-center gap-1">↓ 2.67% <span className="text-gray-400">Than last week</span></div>
               </div>
               <div className="text-4xl font-extrabold text-gray-900">{stats.new}</div>
               <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all"></div>
-           </div>
+           </button>
 
-           <div className="admin-card !p-6 border-l-4 border-l-orange-500 relative overflow-hidden group">
+           <button type="button" onClick={() => setFilter('confirmed')} className="admin-card !p-6 border-l-4 border-l-orange-500 relative overflow-hidden group text-left">
               <div className="flex justify-between items-start mb-4">
                  <span className="text-[10px] font-bold uppercase tracking-[2px] text-orange-600 bg-orange-50 px-2 py-1 rounded-md">Await accepting</span>
                  <div className="text-green-500 text-[10px] font-bold flex items-center gap-1">↑ 2.67% <span className="text-gray-400">Than last week</span></div>
               </div>
               <div className="text-4xl font-extrabold text-gray-900">{stats.await}</div>
               <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-all"></div>
-           </div>
+           </button>
 
-           <div className="admin-card !p-6 border-l-4 border-l-yellow-500 relative overflow-hidden group">
+           <button type="button" onClick={() => setFilter('shipped')} className="admin-card !p-6 border-l-4 border-l-yellow-500 relative overflow-hidden group text-left">
               <div className="flex justify-between items-start mb-4">
                  <span className="text-[10px] font-bold uppercase tracking-[2px] text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md">On way orders</span>
                  <div className="text-red-500 text-[10px] font-bold flex items-center gap-1">↓ 0.51% <span className="text-gray-400">Than last week</span></div>
               </div>
               <div className="text-4xl font-extrabold text-gray-900">{stats.onWay}</div>
               <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-yellow-500/5 rounded-full blur-2xl group-hover:bg-yellow-500/10 transition-all"></div>
-           </div>
+           </button>
 
-           <div className="admin-card !p-6 border-l-4 border-l-emerald-500 relative overflow-hidden group">
+           <button type="button" onClick={() => setFilter('delivered')} className="admin-card !p-6 border-l-4 border-l-emerald-500 relative overflow-hidden group text-left">
               <div className="flex justify-between items-start mb-4">
                  <span className="text-[10px] font-bold uppercase tracking-[2px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">Delivered orders</span>
                  <div className="text-green-500 text-[10px] font-bold flex items-center gap-1">↑ 2.67% <span className="text-gray-400">Than last week</span></div>
               </div>
               <div className="text-4xl font-extrabold text-gray-900">{stats.delivered}</div>
               <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
-           </div>
+           </button>
         </div>
 
         {/* Toolbar */}
@@ -351,12 +342,13 @@ const AdminOrders = () => {
                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Update Order Status</p>
                      <div className="flex flex-wrap gap-2">
                         {STATUS_OPTIONS.map(s => (
-                           <button
-                              key={s}
-                              onClick={() => updateStatus(selectedOrder.id, s)}
-                              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border-2 ${
-                                 selectedOrder.status === s ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-100' : 'bg-white text-gray-400 border-gray-100 hover:border-gray-200 hover:text-gray-600'
-                              }`}
+	                           <button
+	                              key={s}
+	                              onClick={() => updateStatus(selectedOrder.id, s)}
+                                disabled={updating}
+	                              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border-2 ${
+	                                 selectedOrder.status === s ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-100' : 'bg-white text-gray-400 border-gray-100 hover:border-gray-200 hover:text-gray-600'
+	                              }`}
                            >
                               {s}
                            </button>

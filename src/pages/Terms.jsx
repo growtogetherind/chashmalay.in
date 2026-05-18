@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const Terms = () => {
   return (
@@ -37,7 +37,7 @@ const Terms = () => {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-4">Customer Obligations and Conduct</h2>
             <p className="mb-4">
-              We assume that the personal information provided by you while filling our order form is accurate and complete. You must update your personal information to the company. If the personal information is inadequate, not complete, or insufficient the company in such case will not be held liable/responsible for any damage and/or delays caused due to inadequate and insufficient information received from your end. Any information received by the company will be preserved with absolute secrecy and will not be disclosed or distributed to any other third party save and except when required by the law. The company reserves its rights to terminate the account if it is found dealing with fraudulent activities prompting the company to terminate and/or discontinue any usage of the company's website by blocking its access.
+              We assume that the personal information provided by you while filling our order form is accurate and complete. You must update your personal information to the company. If the personal information is inadequate, not complete, or insufficient the company in such case will not be held liable/responsible for any damage and/or delays caused due to inadequate and insufficient information received from your end. Any information received by the company will be preserved with absolute secrecy and will not be disclosed or distributed to any other third party save and except when required by the law. The company reserves its rights to terminate the account if it is found dealing with fraudulent activities prompting the company to terminate and/or discontinue any usage of the company’s website by blocking its access.
             </p>
             <p className="mb-4">
               The Company reserves the right to take legal action against such persons for fraudulent use of the Website and any other unlawful acts or omissions in breach of these terms and conditions.
@@ -45,7 +45,7 @@ const Terms = () => {
             <ul className="list-disc pl-6 space-y-2">
               <li>To engage into activity that will lead to restrictions of other users from visiting our site.</li>
               <li>Posting on or transmitting through unlawful, abusive or objectionable material of any kind on this site is prohibited which would constitute an offence or otherwise which violates any applicable local, national or international law.</li>
-              <li>Any unnecessary or unwanted intervention causing disturbance and hampering the privacy or business of the company is strictly prohibited without prior consent of the company's website administrator.</li>
+              <li>Any unnecessary or unwanted intervention causing disturbance and hampering the privacy or business of the company is strictly prohibited without prior consent of the company’s website administrator.</li>
               <li>Any kind of copying and/or fixing and/or pasting and/or parsing any content from or within the website without obtaining permission is completely forbidden.</li>
             </ul>
           </section>
@@ -116,7 +116,7 @@ const Terms = () => {
               The company hereby gives three months warranty on any product purchased online. The company further provides the warranties on those products as given by the manufacturer to the customer. All warranties are limited to manufacturing defects only.
             </p>
             <p>
-              <strong>For Frames and Sunglasses:</strong> This includes immunity extended in furtherance to the manufacturer's warranty against deficiencies in hinges and welding points only lasting for a period of 3 months from the purchase date specified.
+              <strong>For Frames and Sunglasses:</strong> This includes immunity extended in furtherance to the manufacturer’s warranty against deficiencies in hinges and welding points only lasting for a period of 3 months from the purchase date specified.
             </p>
           </section>
 

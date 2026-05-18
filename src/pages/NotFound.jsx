@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
 
 const NotFound = () => {
@@ -16,7 +16,7 @@ const NotFound = () => {
       <p style={{ fontSize: '6rem', fontWeight: 900, color: '#e2e8f0', lineHeight: 1 }}>404</p>
       <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0f172a' }}>Page Not Found</h1>
       <p style={{ color: '#64748b', maxWidth: '380px', lineHeight: 1.7 }}>
-        The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+        The page you’re looking for doesn’t exist or has been moved. Let’s get you back on track.
       </p>
       <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         <Link

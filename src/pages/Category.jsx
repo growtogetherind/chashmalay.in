@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { SlidersHorizontal, ChevronDown, X, Filter, ArrowUpDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ui/ProductCard';
-import { FadeIn, RevealText, StaggerContainer, StaggerItem, TRANSITIONS } from '../components/ui/Motion';
+import { FadeIn, RevealText, TRANSITIONS } from '../components/ui/Motion';
 
 import { subscribeProducts } from '../lib/firebase';
 
@@ -328,7 +328,7 @@ const Category = () => {
       setPendingColors(selectedColors);
       setPendingThemes(selectedThemes);
     }
-  }, [isMobileFilterOpen]);
+  }, [isMobileFilterOpen, selectedColors, selectedShapes, selectedThemes, selectedTypes]);
 
   const filteredProducts = React.useMemo(() => {
     const selected = {
@@ -438,7 +438,6 @@ const Category = () => {
            </div>
         </div>
       </header>
-
 
       <div className="w-full max-w-[1920px] mx-auto py-6 md:py-12 px-4 lg:px-8 lg:pl-0">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">

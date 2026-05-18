@@ -29,13 +29,20 @@ const validateImageFile = (file, maxBytes) => {
   return null;
 };
 
-const uploadWithXhr = ({ endpoint, formData, onProgress, timeout = 6000 }) => new Promise((resolve, reject) => {
+const uploadWithXhr = ({ endpoint, formData, onProgress, timeout = 60000 }) => new Promise((resolve, reject) => {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', endpoint);
 
+  let lastUpdate = 0;
   xhr.upload.onprogress = (event) => {
     if (event.lengthComputable && onProgress) {
-      onProgress(Math.round((event.loaded / event.total) * 100));
+      const percent = Math.round((event.loaded / event.total) * 100);
+      const now = Date.now();
+      // Throttle updates: call onProgress only if 250ms elapsed, or if percent changed, or at 100%
+      if (percent === 100 || now - lastUpdate > 250) {
+        onProgress(percent);
+        lastUpdate = now;
+      }
     }
   };
 
@@ -63,10 +70,9 @@ const uploadWithXhr = ({ endpoint, formData, onProgress, timeout = 6000 }) => ne
 });
 
 /**
- * Compresses an image in the browser using HTML5 Canvas and converts it to a Base64 data URL
- * to avoid exceeding Firestore's 1MB document size limit when storing offline uploads.
+ * Compresses an image in the browser using HTML5 Canvas and converts it to a highly optimized WebP Base64 data URL.
  */
-const compressAndConvertToBase64 = (file, maxWidth = 800, maxHeight = 800, quality = 0.7) => {
+export const compressToWebP = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.75) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -101,8 +107,7 @@ const compressAndConvertToBase64 = (file, maxWidth = 800, maxHeight = 800, quali
 
         ctx.drawImage(img, 0, 0, width, height);
 
-        const mimeType = file.type === 'image/png' || file.type === 'image/webp' ? file.type : 'image/jpeg';
-        const dataUrl = canvas.toDataURL(mimeType, quality);
+        const dataUrl = canvas.toDataURL('image/webp', quality);
         resolve(dataUrl);
       };
       img.onerror = (error) => reject(error);
@@ -112,12 +117,49 @@ const compressAndConvertToBase64 = (file, maxWidth = 800, maxHeight = 800, quali
 };
 
 /**
+ * Converts a base64 data string back to a Blob object for uploading.
+ */
+export const base64ToBlob = (base64Data, contentType = 'image/webp') => {
+  const base64 = base64Data.split(',')[1] || base64Data;
+  const byteCharacters = atob(base64);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  return new Blob(byteArrays, { type: contentType });
+};
+
+
+
+/**
+ * Sanitizes a filename for SEO-friendly Cloudinary public_ids.
+ * Converts to lowercase, replaces spaces/special chars with dashes.
+ */
+export const sanitizeFileName = (fileName) => {
+  if (!fileName) return `upload-${Date.now()}`;
+  const nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+  return nameWithoutExtension
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-') // Replace non-alphanumeric with dashes
+    .replace(/-+/g, '-')        // Collapse multiple dashes
+    .replace(/^-|-$/g, '');     // Trim dashes from start/end
+};
+
+/**
  * Uploads an image to Cloudinary and returns an optimized URL ready to store.
- * If Cloudinary is offline or DNS is unresolved (e.g. net::ERR_NAME_NOT_RESOLVED), 
- * it automatically falls back to a high-quality locally compressed Base64 data URL.
  */
 export const uploadImage = async (file, folder = 'products', options = {}) => {
-  const { onProgress, retries = 0, maxBytes = MAX_IMAGE_UPLOAD_BYTES, timeout = 6000 } = options;
+  const { onProgress, retries = 0, maxBytes = MAX_IMAGE_UPLOAD_BYTES, timeout = 60000, tags = [] } = options;
   const validationError = validateImageFile(file, maxBytes);
   if (validationError) return { url: null, error: validationError };
 
@@ -128,15 +170,33 @@ export const uploadImage = async (file, folder = 'products', options = {}) => {
     if (!cloudName) throw new Error("Cloudinary Cloud Name is missing from environment variables.");
     if (!uploadPreset) throw new Error("Cloudinary upload preset is missing from environment variables.");
 
+    // Compress the image before uploading to make the upload ultra-fast and smooth!
+    let uploadFile = file;
+    try {
+      if (file.type && file.type.startsWith('image/')) {
+        const compressedBase64 = await compressToWebP(file, 1200, 1200, 0.75);
+        const mimeType = 'image/webp';
+        const blob = base64ToBlob(compressedBase64, mimeType);
+        uploadFile = new File([blob], file.name ? file.name.replace(/\.[^/.]+$/, "") + ".webp" : 'image.webp', { type: mimeType });
+      }
+    } catch (compressionErr) {
+      console.warn("Client-side image compression failed. Uploading original file:", compressionErr);
+    }
+
     let data = null;
     let lastError = null;
+
+    // Auto-generate tags from folder if none provided (e.g. 'products/colors' -> ['products', 'colors'])
+    const uploadTags = tags.length ? tags : (folder ? folder.split('/') : []);
 
     for (let attempt = 0; attempt <= retries; attempt += 1) {
       try {
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', uploadFile);
         formData.append('upload_preset', uploadPreset);
         if (folder) formData.append('folder', folder);
+        if (uploadTags.length > 0) formData.append('tags', uploadTags.join(','));
+        if (uploadFile.name) formData.append('public_id', sanitizeFileName(uploadFile.name));
 
         data = await uploadWithXhr({
           endpoint: uploadEndpoint(cloudName),
@@ -163,19 +223,7 @@ export const uploadImage = async (file, folder = 'products', options = {}) => {
       error: null
     };
   } catch (error) {
-    console.warn("Cloudinary upload failed (possibly offline or DNS block). Falling back to local compressed Base64 data URL:", error);
-    try {
-      const base64Url = await compressAndConvertToBase64(file);
-      return {
-        url: base64Url,
-        secureUrl: base64Url,
-        publicId: `fallback-${Date.now()}`,
-        resourceType: 'image',
-        format: file.type.split('/')[1] || 'jpeg',
-        error: null
-      };
-    } catch (fallbackError) {
-      return { url: null, error: `Upload failed: ${error.message || error}. Fallback also failed: ${fallbackError.message || fallbackError}` };
-    }
+    console.error("Cloudinary upload failed:", error);
+    return { url: null, error: error.message || String(error) };
   }
 };

@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Grid, User, ShoppingBag, Search } from 'lucide-react';
+import { Home, Grid, User, ShoppingBag } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import './BottomNav.css';
 

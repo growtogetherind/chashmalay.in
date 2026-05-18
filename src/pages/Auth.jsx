@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -65,7 +65,7 @@ const Auth = () => {
     try {
       await resetPassword(form.email.trim());
       setMode('login'); // Go back to login after sending
-    } catch (err) {
+    } catch {
       // Error is handled in AuthContext toast
     } finally {
       setResetLoading(false);
@@ -76,7 +76,11 @@ const Auth = () => {
     <div className="auth-page">
       {/* Background */}
       <div className="auth-bg">
-        <img src="https://images.unsplash.com/photo-1572635196237-14b3f281501f?auto=format&fit=crop&q=80&w=2000" alt="bg" className="auth-bg-img" />
+        <img
+          src="https://res.cloudinary.com/dpv40ou2c/image/upload/f_auto,q_auto,c_fill,w_1600/banners/sunglasses_banner.png"
+          alt=""
+          className="auth-bg-img"
+        />
         <div className="auth-bg-overlay" />
       </div>
 
@@ -107,7 +111,7 @@ const Auth = () => {
             {mode === 'forgot' ? (
               <div className="animate-fade-in">
                 <h3 className="text-xl font-black text-gray-900 mb-2">Reset Password</h3>
-                <p className="text-sm text-gray-500 mb-6">Enter your email address and we'll send you a link to reset your password.</p>
+                <p className="text-sm text-gray-500 mb-6">Enter your email address and we’ll send you a link to reset your password.</p>
                 
                 <form onSubmit={handleForgotPassword} className="auth-form">
                   <div className="form-group">

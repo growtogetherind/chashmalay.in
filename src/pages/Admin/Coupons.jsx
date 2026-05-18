@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Trash2, Calendar, IndianRupee, Tag, Edit3, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getCoupons, saveCoupon, deleteCoupon, subscribeCoupons } from '../../lib/firebase';

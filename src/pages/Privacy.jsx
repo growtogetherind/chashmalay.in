@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const Privacy = () => {
   return (
@@ -26,7 +26,7 @@ const Privacy = () => {
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Data Automatically Collected</h3>
                 <p>
-                  We log visitor's domain and IP address automatically; this information does not identify you as an individual, but only the computer that is being used to view the site. This data is used to see where the site is being used in the world to ensure coverage, and for click stream analysis to help better understand site usage, so that we can improve our service to you. We do not link information automatically logged by such means with personal data about specific individuals.
+                  We log visitor’s domain and IP address automatically; this information does not identify you as an individual, but only the computer that is being used to view the site. This data is used to see where the site is being used in the world to ensure coverage, and for click stream analysis to help better understand site usage, so that we can improve our service to you. We do not link information automatically logged by such means with personal data about specific individuals.
                 </p>
               </div>
 
@@ -36,7 +36,7 @@ const Privacy = () => {
                   When you request information through this site, we may need to know some personal information about you. When emailing us, or subscribing for free news or information we need your e-mail address, name and other limited personal identifiers, typically name and contact number. If you choose to purchase information, goods, products or services, we will usually require some additional limited financial details.
                 </p>
                 <p className="mb-2">
-                  If we require sensitive personal data then we will ensure that the collection and use is in strict accordance with the "Information Technology Act" principles of data protection and data privacy.
+                  If we require sensitive personal data then we will ensure that the collection and use is in strict accordance with the “Information Technology Act” principles of data protection and data privacy.
                 </p>
                 <p>
                   We will not pass your details to anyone else outside Chashmalay.in without your permission.
@@ -81,10 +81,10 @@ const Privacy = () => {
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>The use or inability to use the services</li>
-                <li>Unauthorized access to or alteration to the user's transmission or data or any other matter relating to services; including without limitation damages for loss of use, data or profits, arising out of use of the website or services.</li>
+                <li>Unauthorized access to or alteration to the user’s transmission or data or any other matter relating to services; including without limitation damages for loss of use, data or profits, arising out of use of the website or services.</li>
               </ul>
               <p>
-                Chashmalay.in shall not be responsible for delay or inability to use the Website or related services, failure to provide services, or any other information or services obtained through the website. We are not held responsible for non-availability of the website or any of its services or products during periodic maintenance operations or any unplanned suspension of access to the Website that may occur due to any technical error which is beyond Chashmalay.in's control.
+                Chashmalay.in shall not be responsible for delay or inability to use the Website or related services, failure to provide services, or any other information or services obtained through the website. We are not held responsible for non-availability of the website or any of its services or products during periodic maintenance operations or any unplanned suspension of access to the Website that may occur due to any technical error which is beyond Chashmalay.in’s control.
               </p>
               <p>
                 The user understands and agrees that any materials downloaded or obtained through the website is entirely at their own risk. The company will not be held responsible for any damage caused to their computer system while downloading or after downloading our materials in any manner whatsoever and as such the user is solely held responsible for any such damages.

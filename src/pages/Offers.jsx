@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, Sparkles, Copy, ChevronRight } from 'lucide-react';
 import { subscribeOffers } from '../lib/firebase';

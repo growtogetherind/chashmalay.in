@@ -1,23 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  LayoutGrid,
-  Box,
-  Layers,
-  Tag,
-  Package,
-  Receipt,
-  Users,
-  FileText,
-  Ticket,
-  Star,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  MessageSquare,
-  HelpCircle
-} from 'lucide-react';
+import { LayoutGrid, Box, Layers, Tag, Package, Receipt, Users, FileText, Ticket, Star, Settings, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../ui/Logo';
 

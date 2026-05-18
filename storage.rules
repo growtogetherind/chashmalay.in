@@ -3,37 +3,34 @@ service firebase.storage {
   match /b/{bucket}/o {
 
     // ─── Product Images ───────────────────────────────────────────────────────
-    // Public read. Writes are restricted to authenticated users only (admins
-    // upload product images). In a mature setup, this should be admin-only via
-    // Custom Claims: request.auth.token.admin == true
+    // Product media uploads are handled by Cloudinary. Keep legacy Firebase
+    // Storage assets readable, but block direct client writes here.
     match /products/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if false;
     }
 
     // ─── Prescription Uploads ─────────────────────────────────────────────────
-    // Users can only upload to their own prescription folder.
-    // Admins can read all prescriptions.
-    // Files must be images or PDFs, max 10MB.
+    // Prescription uploads are handled by Cloudinary. If this legacy path is
+    // used, only image files under 8MB are accepted for the owner.
     match /prescriptions/{userId}/{allPaths=**} {
       allow read: if request.auth != null &&
         (request.auth.uid == userId || request.auth.token.admin == true);
       allow write: if request.auth != null &&
         request.auth.uid == userId &&
-        request.resource.size < 10 * 1024 * 1024 &&
-        (request.resource.contentType.matches('image/.*') ||
-         request.resource.contentType == 'application/pdf');
+        request.resource.size < 8 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*');
     }
 
     // ─── Carousel & Marketing Images ──────────────────────────────────────────
     match /carousel/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if false;
     }
 
     match /offers/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if false;
     }
 
     // ─── Block all other paths ────────────────────────────────────────────────

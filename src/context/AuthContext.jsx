@@ -1,16 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db, getProfile as fetchFirebaseProfile, updateProfile as updateFirebaseProfile } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut as firebaseSignOut,
-  GoogleAuthProvider,
-  signInWithPopup,
-  updateProfile as updateAuthProfile,
-  sendPasswordResetEmail
-} from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, updateProfile as updateAuthProfile, sendPasswordResetEmail } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext({});

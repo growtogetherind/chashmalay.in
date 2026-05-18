@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -48,7 +48,7 @@ const Contact = () => {
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Contact Us</h1>
           <p className="text-gray-600">
-            Have questions about our products, orders, or prescription fittings? Get in touch with us. We'd love to hear from you.
+            Have questions about our products, orders, or prescription fittings? Get in touch with us. We’d love to hear from you.
           </p>
         </div>
 

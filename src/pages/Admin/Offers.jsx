@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Edit3, Trash2, X } from 'lucide-react';
 import { getOffers, saveOffer, deleteOffer, subscribeOffers } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';

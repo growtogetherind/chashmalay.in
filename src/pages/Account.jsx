@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Package, MapPin, Edit3, LogOut, ChevronRight, Cake } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getUserOrders } from '../lib/firebase';
+import toast from 'react-hot-toast';
 import './Account.css';
 
 const ORDER_STATUS_COLORS = {

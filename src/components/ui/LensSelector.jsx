@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, Check, ChevronRight, Camera } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
-import { uploadImage } from '../../lib/cloudinary';
+import { uploadImage, compressToWebP } from '../../lib/cloudinary';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './LensSelector.css';
 
@@ -13,7 +14,8 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
     visionType: null,
     lensPackage: null,
     powerOption: null,
-    prescriptionFile: null
+    prescriptionFile: null,
+    prescriptionUrl: null
   });
   const [manualDetails, setManualDetails] = useState({
     samePower: false,
@@ -36,7 +38,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
     if (isOpen) {
       setStep(1);
       setIsPowerModalOpen(false);
-      setSelections({ visionType: null, lensPackage: null, powerOption: null, prescriptionFile: null, selectedColor, selectedSize });
+      setSelections({ visionType: null, lensPackage: null, powerOption: null, prescriptionFile: null, prescriptionUrl: null, selectedColor, selectedSize });
       setManualDetails({ samePower: false, cylindrical: false, leftSph: '', rightSph: '', leftCyl: '', rightCyl: '', leftAxis: '', rightAxis: '', leftAddlPower: '', rightAddlPower: '', name: '', phone: '', age: '' });
     }
   }, [isOpen, selectedColor, selectedSize]);
@@ -376,7 +378,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     {selections.powerOption === 'upload' && selections.prescriptionFile && (
                         <div style={{width: '100%', height: '100px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0'}}>
                             <img
-                                src={URL.createObjectURL(selections.prescriptionFile)}
+                                src={selections.prescriptionUrl || URL.createObjectURL(selections.prescriptionFile)}
                                 alt="Prescription Preview"
                                 style={{width: '100%', height: '100%', objectFit: 'contain', background: '#f8fafc'}}
                             />
@@ -392,23 +394,9 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
               <button
                 className="btn-cta w-full"
                 onClick={async () => {
-                  let prescriptionUrl = null;
-                  if (selections.powerOption === 'upload' && selections.prescriptionFile) {
-                      const toastId = toast.loading("Uploading prescription: 0%...");
-                      const res = await uploadImage(selections.prescriptionFile, 'prescriptions', {
-                          onProgress: (percent) => {
-                              toast.loading(`Uploading prescription: ${percent}%...`, { id: toastId });
-                          }
-                      });
-                      if (res.error) {
-                          toast.error("Failed to upload prescription", { id: toastId });
-                          return;
-                      }
-                      toast.success("Prescription uploaded!", { id: toastId });
-                      prescriptionUrl = res.url;
-                  }
-                  addToCart(product, { ...selections, selectedColor, selectedSize, manualDetails, prescriptionUrl });
+                  addToCart(product, { ...selections, selectedColor, selectedSize, manualDetails, prescriptionUrl: selections.prescriptionUrl || null });
                   onClose();
+                  navigate('/cart');
                 }}
                 style={{marginTop: '2rem'}}
               >
@@ -443,7 +431,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors group relative overflow-hidden">
                       {selections.prescriptionFile ? (
                         <div className="absolute inset-0 p-2">
-                           <img src={URL.createObjectURL(selections.prescriptionFile)} alt="Preview" className="w-full h-full object-contain rounded-lg" />
+                           <img src={selections.prescriptionUrl || URL.createObjectURL(selections.prescriptionFile)} alt="Preview" className="w-full h-full object-contain rounded-lg" />
                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                              <span className="text-white font-bold text-xs uppercase tracking-widest bg-black/50 px-4 py-2 rounded-full">Change Image</span>
                            </div>
@@ -455,7 +443,20 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                             <p className="text-xs text-gray-400">PNG, JPG or WEBP</p>
                         </div>
                       )}
-                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
+                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          try {
+                            const toastId = toast.loading('Optimizing image...');
+                            const compressedBase64 = await compressToWebP(file);
+                            setSelections({...selections, prescriptionFile: file, prescriptionUrl: compressedBase64});
+                            toast.success('Image optimized!', { id: toastId });
+                          } catch (err) {
+                            toast.error('Failed to optimize image.');
+                            setSelections({...selections, prescriptionFile: file});
+                          }
+                        }
+                      }} />
                     </label>
 
                     <button

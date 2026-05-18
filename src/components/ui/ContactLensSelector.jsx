@@ -2,17 +2,20 @@ import { useState, useEffect } from 'react';
 import { X, Check, Eye, UploadCloud, Sparkles, ChevronRight } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
-import { uploadImage } from '../../lib/cloudinary';
+import { compressToWebP } from '../../lib/cloudinary';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './LensSelector.css'; // Reuse the same CSS for consistency
 
 const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, selectedSize = null }) => {
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selections, setSelections] = useState({
     powerOption: null,
     prescriptionFile: null,
+    prescriptionUrl: null,
     leftPower: '',
     rightPower: '',
     bc: '', // Base Curve
@@ -28,6 +31,7 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
       setSelections({
         powerOption: null,
         prescriptionFile: null,
+        prescriptionUrl: null,
         leftPower: '',
         rightPower: '',
         bc: product?.base_curve || '8.6',
@@ -45,25 +49,7 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
 
   const handleAddToCart = async () => {
     setIsSubmitting(true);
-    let prescriptionUrl = null;
-
-     if (selections.powerOption === 'upload' && selections.prescriptionFile) {
-      const toastId = toast.loading("Uploading prescription: 0%...");
-      try {
-        const res = await uploadImage(selections.prescriptionFile, 'prescriptions', {
-          onProgress: (percent) => {
-            toast.loading(`Uploading prescription: ${percent}%...`, { id: toastId });
-          }
-        });
-        if (res.error) throw new Error(res.error);
-        toast.success("Prescription uploaded!", { id: toastId });
-        prescriptionUrl = res.url;
-      } catch {
-        toast.error("Failed to upload prescription", { id: toastId });
-        setIsSubmitting(false);
-        return;
-      }
-    }
+    let prescriptionUrl = selections.prescriptionUrl || null;
 
     const manualDetails = selections.powerOption === 'manual' ? {
       leftSph: selections.leftPower,
@@ -85,6 +71,7 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
     toast.success("Added to cart!");
     onClose();
     setIsSubmitting(false);
+    navigate('/cart');
   };
 
   return (
@@ -157,7 +144,7 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
                   <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all relative overflow-hidden group">
                     {selections.prescriptionFile ? (
                       <div className="absolute inset-0 p-4">
-                        <img src={URL.createObjectURL(selections.prescriptionFile)} alt="Prescription" className="w-full h-full object-contain rounded-2xl" />
+                        <img src={selections.prescriptionUrl || URL.createObjectURL(selections.prescriptionFile)} alt="Prescription" className="w-full h-full object-contain rounded-2xl" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                           <span className="bg-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">Change Image</span>
                         </div>
@@ -169,7 +156,20 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
                         <p className="text-xs text-slate-400 mt-1">Image files accepted</p>
                       </div>
                     )}
-                    <input type="file" className="hidden" accept="image/*" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
+                    <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        try {
+                          const toastId = toast.loading('Optimizing image...');
+                          const compressedBase64 = await compressToWebP(file);
+                          setSelections({...selections, prescriptionFile: file, prescriptionUrl: compressedBase64});
+                          toast.success('Image optimized!', { id: toastId });
+                        } catch (err) {
+                          toast.error('Failed to optimize image.');
+                          setSelections({...selections, prescriptionFile: file});
+                        }
+                      }
+                    }} />
                   </label>
                   <button className="btn-cta w-full" disabled={!selections.prescriptionFile} onClick={() => setStep(3)}>Continue to Summary</button>
                 </div>

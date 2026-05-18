@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Camera } from 'lucide-react';
 import { FadeIn } from './Motion';
 
@@ -34,7 +34,6 @@ const InstagramShowcase = () => {
                    <iframe
                       src={`${reel.url}embed`}
                       className="w-full h-full border-none"
-                      allowtransparency="true"
                       allow="encrypted-media"
                       frameBorder="0"
                       scrolling="no"

@@ -290,11 +290,11 @@ a {
 }
 
 .category-eye {
-  background-image: url('https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&q=80&w=1000');
+  background-image: url('/assets/im/eyeglasses.png');
 }
 
 .category-sun {
-  background-image: url('https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&q=80&w=1000');
+  background-image: url('/assets/im/sunglasses.png');
 }
 
 .category-content {

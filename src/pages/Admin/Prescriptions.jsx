@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FileText, Download, Eye, Calendar, X, ExternalLink } from 'lucide-react';
 import { savePrescription, subscribePrescriptions } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';

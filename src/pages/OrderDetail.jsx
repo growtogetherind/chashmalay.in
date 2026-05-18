@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Check, Package, Truck, Home, MapPin, Receipt, ShieldCheck, Download } from 'lucide-react';
 import { getOrderById, updateOrderStatus } from '../lib/firebase';
@@ -29,17 +29,17 @@ const OrderDetail = () => {
   const [loading, setLoading] = useState(true);
   const { confirm } = useConfirm();
 
-  const fetchOrder = () => {
+  const fetchOrder = useCallback(() => {
     setLoading(true);
     getOrderById(orderId).then(({ data }) => {
       setOrder(data);
       setLoading(false);
     });
-  };
+  }, [orderId]);
 
   useEffect(() => {
     fetchOrder();
-  }, [orderId]);
+  }, [fetchOrder]);
 
   const handleCancelOrder = async () => {
     if (!(await confirm({ title: 'Cancel Order', message: 'Are you sure you want to cancel this order? This action cannot be undone.' }))) return;

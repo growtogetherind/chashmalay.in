@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Phone, Clock, Search, Navigation } from 'lucide-react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { MapPin, Phone, Clock, Navigation } from 'lucide-react';
 import { FadeIn, RevealText, StaggerContainer, StaggerItem } from '../components/ui/Motion';
 
 const STORES = [
@@ -74,7 +74,6 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
 
 const FindStore = () => {
     const [selectedCity, setSelectedCity] = useState('All');
-    const [userLocation, setUserLocation] = useState(null);
     const [nearestStoreId, setNearestStoreId] = useState(null);
 
     const findNearest = () => {
@@ -82,7 +81,6 @@ const FindStore = () => {
         
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
-            setUserLocation({ lat: latitude, lng: longitude });
 
             let minDistance = Infinity;
             let nearestId = null;

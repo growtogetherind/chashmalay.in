@@ -1,6 +1,5 @@
-import React from 'react';
-import { ShieldCheck, Eye, Users, Target } from 'lucide-react';
 
+import { ShieldCheck, Eye, Users, Target } from 'lucide-react';
 
 const About = () => {
   return (
@@ -78,9 +77,9 @@ const About = () => {
       {/* Director's Desk */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">From The Director's Desk</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">From The Director’s Desk</h2>
           <blockquote className="text-xl italic text-gray-600 mb-8">
-            "Almost nothing needs to be said when you have eyes!"
+            “Almost nothing needs to be said when you have eyes!”
           </blockquote>
           <div className="text-gray-600 space-y-4 leading-relaxed text-left max-w-3xl mx-auto">
             <p>

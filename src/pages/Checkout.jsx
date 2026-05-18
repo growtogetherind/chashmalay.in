@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, MapPin, CreditCard, ShoppingBag, Shield, CheckCircle } from 'lucide-react';
+import { ChevronRight, ShoppingBag, Shield, CheckCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createOrder } from '../lib/firebase';
+import { uploadImage, base64ToBlob } from '../lib/cloudinary';
 import toast from 'react-hot-toast';
 import { FadeIn } from '../components/ui/Motion';
 
@@ -26,7 +27,7 @@ const InputField = ({ label, ...props }) => (
 );
 
 const Checkout = () => {
-  const { cart, cartTotal, tax, finalTotal, discount, emptyCart } = useCart();
+  const { cart, cartTotal, tax, finalTotal, discount, emptyCart, updateLensSelection } = useCart();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -117,6 +118,41 @@ const Checkout = () => {
     }
 
     setProcessing(true);
+
+    // Process any pending base64 prescription uploads before proceeding to payment
+    const finalCartItems = [...cart];
+    for (let i = 0; i < finalCartItems.length; i++) {
+      const item = finalCartItems[i];
+      if (item.lensSelection?.prescriptionUrl && item.lensSelection.prescriptionUrl.startsWith('data:')) {
+        const toastId = toast.loading(`Uploading prescription for ${item.name}...`);
+        try {
+          const blob = base64ToBlob(item.lensSelection.prescriptionUrl);
+          const file = new File([blob], `prescription-${item.id}.webp`, { type: 'image/webp' });
+          const res = await uploadImage(file, 'prescriptions');
+          
+          if (res.error) throw new Error(res.error);
+          
+          finalCartItems[i] = {
+            ...item,
+            lensSelection: {
+              ...item.lensSelection,
+              prescriptionUrl: res.url
+            }
+          };
+          
+          toast.success("Prescription uploaded!", { id: toastId });
+          // Update the cart context so the final url is persisted in case of payment failure
+          if (updateLensSelection) {
+            updateLensSelection(item.cartVariantKey || item.firebaseId || item.id, { prescriptionUrl: res.url });
+          }
+        } catch (error) {
+          toast.error(`Failed to upload prescription for ${item.name}`, { id: toastId });
+          setProcessing(false);
+          return; // Stop payment if upload fails
+        }
+      }
+    }
+
     const loaded = await loadRazorpay();
     if (!loaded) { toast.error('Payment service unavailable. Try again.'); setProcessing(false); return; }
 
@@ -134,7 +170,7 @@ const Checkout = () => {
         try {
           const order = await createOrder({
             userId: user.uid,
-            items: cart,
+            items: finalCartItems,
             total: finalTotal,
             address,
             paymentId: response.razorpay_payment_id
@@ -176,8 +212,6 @@ const Checkout = () => {
       </div>
     );
   }
-
-
 
   return (
     <div className="bg-background min-h-screen pt-32 pb-24 text-primary selection:bg-accent/20">

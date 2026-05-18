@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, ShoppingBag, Truck, RotateCcw, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { HelpCircle, ChevronDown, ChevronUp, Truck, RotateCcw, Shield } from 'lucide-react';
 
 const Faq = () => {
   const faqCategories = [

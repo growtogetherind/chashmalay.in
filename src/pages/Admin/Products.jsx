@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Tags, Layers, ChevronRight, Upload, Palette, Package, MoreVertical, Eye } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye } from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -96,7 +96,6 @@ const AdminProducts = () => {
   const [activeTab, setActiveTab] = useState('basic');
   const [pendingImages, setPendingImages] = useState({});
   const [pendingGallery, setPendingGallery] = useState([]);
-  const [pendingColorImages, setPendingColorImages] = useState({}); // New: Color variant uploads
   const { confirm } = useConfirm();
 
   // ── Lock body scroll when modal is open ──────────────────────────────────
@@ -303,7 +302,7 @@ const AdminProducts = () => {
         if (error) throw new Error(`Failed to upload ${path}: ${error}`);
 
         if (path.includes('.')) {
-          const [_, child] = path.split('.');
+          const [, child] = path.split('.');
           finalImages[child] = url;
         }
       }
@@ -843,8 +842,24 @@ const AdminProducts = () => {
                             className="absolute inset-0 opacity-0 cursor-pointer z-10"
                           />
                           {form.images?.[img.id] && (
-                            <div className="absolute inset-0 bg-emerald-900/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all backdrop-blur-[2px]">
+                            <div className="absolute inset-0 bg-emerald-900/10 opacity-0 group-hover:opacity-100 flex flex-col gap-3 items-center justify-center transition-all backdrop-blur-[2px] z-20 pointer-events-none">
                               <div className="bg-white/90 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-600 shadow-xl">Recalibrate Media</div>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setForm(prev => ({ ...prev, images: { ...prev.images, [img.id]: '' } }));
+                                  setPendingImages(prev => {
+                                    const next = { ...prev };
+                                    delete next[`images.${img.id}`];
+                                    return next;
+                                  });
+                                }}
+                                className="pointer-events-auto bg-white text-red-500 hover:bg-red-50 hover:text-red-600 hover:scale-110 p-2.5 rounded-full shadow-xl transition-all border border-red-100"
+                                title="Remove Image"
+                              >
+                                <Trash2 size={16} />
+                              </button>
                             </div>
                           )}
                         </div>

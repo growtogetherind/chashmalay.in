@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ShieldCheck, Zap, Droplets, Heart, Share2, Star,
-  ChevronRight, ChevronLeft, Plus, Minus, Info,
-  ArrowRight, CheckCircle2, AlertCircle, HelpCircle,
-  FileText, PenLine, ShieldAlert, UploadCloud
-} from 'lucide-react';
+import { ShieldCheck, Zap, Droplets, Heart, Share2, Star, Plus, Minus, Info, ArrowRight, CheckCircle2, HelpCircle, PenLine, ShieldAlert, UploadCloud } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getProductById, subscribeProducts } from '../lib/firebase';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ui/ProductCard';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
 import toast from 'react-hot-toast';
@@ -19,7 +13,6 @@ const ContactLensDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
@@ -287,7 +280,7 @@ const ContactLensDetail = () => {
                        <input type="file" className="hidden" />
                     </label>
                     <p className="mt-4 text-[9px] font-bold text-center text-slate-400 uppercase tracking-widest leading-relaxed">
-                      Don't have a prescription? <span className="text-emerald-600 cursor-pointer hover:underline">Need Eye Power Check?</span>
+                      Don’t have a prescription? <span className="text-emerald-600 cursor-pointer hover:underline">Need Eye Power Check?</span>
                     </p>
                   </div>
                 )}

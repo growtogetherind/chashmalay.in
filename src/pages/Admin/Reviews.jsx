@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Star, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { updateReviewStatus, deleteReview, subscribeReviews } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
@@ -101,7 +101,7 @@ const AdminReviews = () => {
                <div className="relative z-10 mb-8">
                  <p className="text-sm font-black text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{review.product_name || 'Eyewear Product'}</p>
                  <div className="relative">
-                    <span className="absolute -left-3 -top-2 text-3xl text-emerald-100 font-serif leading-none opacity-0 group-hover:opacity-100 transition-all">"</span>
+                    <span className="absolute -left-3 -top-2 text-3xl text-emerald-100 font-serif leading-none opacity-0 group-hover:opacity-100 transition-all">“</span>
                     <p className="text-xs text-slate-500 font-bold leading-relaxed italic line-clamp-4 pl-2 border-l-2 border-slate-50 group-hover:border-emerald-100 transition-colors">
                       {review.comment}
                     </p>

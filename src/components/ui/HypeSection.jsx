@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
-import { Camera, ArrowRight } from 'lucide-react';
+
 import './HypeSection.css';
 
 const reels = [
@@ -53,7 +53,6 @@ const HypeSection = () => {
                  <iframe 
                    src={reel.videoUrl} 
                    className="w-full h-full border-none grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
-                   allowtransparency="true" 
                    allow="encrypted-media"
                    scrolling="no"
                  />

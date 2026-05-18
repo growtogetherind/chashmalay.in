@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShoppingCart, Star, Truck, RotateCcw, HeadphonesIcon, CreditCard, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Truck, RotateCcw, HeadphonesIcon, CreditCard, ChevronLeft, ChevronRight } from 'lucide-react';
 import { subscribeProducts } from '../lib/firebase';
 
 // Components
@@ -105,7 +105,7 @@ const Home = () => {
             <FadeIn delay={0.2} className="flex flex-col justify-center md:pl-4">
               <p className="text-xs font-bold text-gray-900 mb-2 tracking-wide">Trending products to buy 1 get 1</p>
               <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight tracking-tight">
-                For the sunglasses <br /> you don't yet know
+                For the sunglasses <br /> you don’t yet know
               </h2>
               <p className="text-gray-500 text-xs leading-relaxed mb-4 max-w-md font-medium">
                 If you are the sunglasses person who wants to find the best deal, we carry the top performing sunglasses from top brands and manufacturers.

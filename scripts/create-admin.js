@@ -1,16 +1,21 @@
-import { admin, db, auth } from "./admin.js";
+import { db, auth } from "./admin.js";
 
-const adminEmail = "admin@gmail.com";
-const adminPassword = "password123"; // Firebase requires min 6 characters
+const adminEmail = process.env.ADMIN_EMAIL;
+const adminPassword = process.env.ADMIN_PASSWORD;
 
 async function createAdmin() {
+  if (!adminEmail || !adminPassword) {
+    console.error("Set ADMIN_EMAIL and ADMIN_PASSWORD before running this script.");
+    process.exit(1);
+  }
+
   console.log("Creating admin user...");
   try {
     let user;
     try {
       user = await auth.getUserByEmail(adminEmail);
       console.log("User already exists, updating profile...");
-    } catch (e) {
+    } catch {
       user = await auth.createUser({
         email: adminEmail,
         password: adminPassword,
@@ -27,9 +32,7 @@ async function createAdmin() {
     }, { merge: true });
 
     console.log("Admin privileges granted successfully!");
-    console.log(`Login details:`);
     console.log(`Email: ${adminEmail}`);
-    console.log(`Password: ${adminPassword}`);
     process.exit(0);
   } catch (error) {
     console.error("Error creating admin:", error.message);

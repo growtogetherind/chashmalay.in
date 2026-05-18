@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, X, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getProducts } from '../../lib/firebase';
@@ -63,7 +63,7 @@ const SearchModal = ({ isOpen, onClose }) => {
         <div className="search-results-area">
           {query.length > 0 ? (
             <div className="search-results">
-              <p className="results-label">Searching for "{query}"...</p>
+              <p className="results-label">Searching for “{query}”…</p>
               {searchResults.length > 0 ? (
                 searchResults.map(product => (
                   <div key={product.id} className="mock-result-item cursor-pointer" onClick={() => { onClose(); navigate(`/product/${product.id}`); }}>

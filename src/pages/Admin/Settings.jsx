@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Save, Mail, Wrench, Globe, Truck } from 'lucide-react';
 import { saveSettings, subscribeSettings } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';

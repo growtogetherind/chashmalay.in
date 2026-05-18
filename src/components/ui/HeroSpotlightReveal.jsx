@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import pic1 from '../../assets/hero/pic1.png';
 import pic2 from '../../assets/hero/pic2.png';
