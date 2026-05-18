@@ -3,7 +3,30 @@ import { Link } from 'react-router-dom';
 import { Package, ShoppingBag, DollarSign, Users, TrendingUp, ArrowRight, Search, Bell, MoreVertical, Filter } from 'lucide-react';
 import { subscribeDashboardStats } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
+import toast from 'react-hot-toast';
 import '../Admin.css';
+
+const playNotificationSound = () => {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const playTone = (freq, duration, delay) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + delay);
+      osc.stop(audioCtx.currentTime + delay + duration);
+    };
+    playTone(659.25, 0.4, 0);
+    playTone(880.00, 0.6, 0.12);
+  } catch (err) {
+    console.warn("Could not play synthesized audio notification:", err);
+  }
+};
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({ orders: 0, products: 0, revenue: 0, users: 0, pendingOrders: 0, lowStockProducts: 0 });
@@ -35,12 +58,47 @@ const AdminDashboard = () => {
       if (currentOrders.length > 0) {
         const latestOrder = currentOrders[0];
         if (lastOrderId && latestOrder.id !== lastOrderId) {
+          // Play notification chime
+          playNotificationSound();
+
+          // Show elegant in-app custom toast
+          toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-3xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 border border-purple-100 overflow-hidden`}>
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 pt-0.5">
+                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black">
+                      🚀
+                    </div>
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <p className="text-xs font-black text-gray-900 uppercase tracking-wider">New Order Received!</p>
+                    <p className="mt-1 text-xs text-gray-500 font-bold">
+                      Order #{latestOrder.id.slice(0, 8).toUpperCase()} for ₹{Number(latestOrder.total_amount).toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                      Customer: {latestOrder.profiles?.full_name || latestOrder.shipping_address?.name || 'Guest'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex border-l border-gray-100">
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="w-full border border-transparent rounded-none rounded-r-3xl p-4 flex items-center justify-center text-xs font-black uppercase tracking-widest text-purple-600 hover:text-purple-700 hover:bg-purple-50 focus:outline-none"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          ), { duration: 10000 });
+
+          // Browser native notification
           if (Notification.permission === "granted") {
             new Notification("🚀 New Order Received!", {
               body: `Order #${latestOrder.id.slice(0, 8).toUpperCase()} for ₹${Number(latestOrder.total_amount).toLocaleString()}`,
               icon: "/favicon.ico"
             });
-            // Play a subtle sound if you have one, or just the alert
           }
         }
         lastOrderId = latestOrder.id;
@@ -90,6 +148,22 @@ const AdminDashboard = () => {
                 <span className="text-purple-600 font-extrabold text-xs uppercase tracking-wider">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
                 <span className="text-gray-400 text-[10px] font-bold">Live store data</span>
              </div>
+             {"Notification" in window && Notification.permission === "default" && (
+                <button
+                   onClick={async () => {
+                      const permission = await Notification.permission === "default" 
+                         ? await Notification.requestPermission()
+                         : Notification.permission;
+                      if (permission === "granted") {
+                         toast.success("Desktop alerts enabled!");
+                         playNotificationSound();
+                      }
+                   }}
+                   className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors border border-purple-100 mr-2"
+                >
+                   <Bell size={12} className="animate-bounce" /> Enable Alerts
+                </button>
+             )}
              <div className="relative">
                 <button 
                   onClick={() => setIsNotificationOpen(!isNotificationOpen)}
