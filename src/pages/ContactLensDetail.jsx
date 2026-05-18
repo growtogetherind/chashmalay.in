@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Zap, Droplets, Heart, Share2, Star, Plus, Minus, Info, ArrowRight, CheckCircle2, HelpCircle, PenLine, ShieldAlert, UploadCloud } from 'lucide-react';
+import { ShieldCheck, Zap, Droplets, Heart, Share2, Star, Plus, Minus, Info, ArrowRight, CheckCircle2, HelpCircle, PenLine, ShieldAlert, UploadCloud, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getProductById, subscribeProducts } from '../lib/firebase';
+import { getProductById, subscribeProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { compressToWebP } from '../lib/cloudinary';
 import ProductCard from '../components/ui/ProductCard';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
 import toast from 'react-hot-toast';
@@ -20,7 +22,16 @@ const ContactLensDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [prescriptionType, setPrescriptionType] = useState('manual');
+  const [prescriptionFile, setPrescriptionFile] = useState(null);
+  const [prescriptionUrl, setPrescriptionUrl] = useState(null);
   const [selectedColor, setSelectedColor] = useState('');
+  
+  // Review States
+  const [realTimeReviews, setRealTimeReviews] = useState([]);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const { user } = useAuth();
   
   const [powers, setPowers] = useState({
     leftSph: '',
@@ -36,9 +47,14 @@ const ContactLensDetail = () => {
   const axisValues = React.useMemo(() => Array.from({ length: 181 }, (_, i) => i.toString()), []);
 
   useEffect(() => {
+    let isActive = true;
+    let unsubRelated = null;
+
     const fetchProduct = async () => {
       setLoading(true);
       const { data, error } = await getProductById(id);
+      if (!isActive) return;
+
       if (error || !data) {
         toast.error("Product not found");
         navigate('/contact-lenses');
@@ -48,14 +64,26 @@ const ContactLensDetail = () => {
       setLoading(false);
 
       // Fetch related products
-      const unsub = subscribeProducts({ category: data.category }, (items) => {
-        setRelatedProducts(items.filter(p => p.id !== id).slice(0, 4));
+      unsubRelated = subscribeProducts({ category: data.category }, (items) => {
+        if (isActive) {
+          setRelatedProducts(items.filter(p => p.id !== id).slice(0, 4));
+        }
       });
-      return () => unsub();
     };
 
     fetchProduct();
+
+    const unsubscribeReviews = subscribeProductReviews(id, (data) => {
+      if (isActive) setRealTimeReviews(data || []);
+    }, (err) => console.error("Review sync error:", err));
+
     window.scrollTo(0, 0);
+
+    return () => {
+      isActive = false;
+      if (unsubRelated) unsubRelated();
+      unsubscribeReviews();
+    };
   }, [id, navigate]);
 
   if (loading || !product) {
@@ -76,12 +104,36 @@ const ContactLensDetail = () => {
   const price = Number(product.price || 0);
   const originalPrice = Number(product.original_price || price * 1.2);
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-  const reviews = product.reviews || [];
+  const reviews = realTimeReviews.length > 0 ? realTimeReviews : (product.reviews || []);
   const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : (product.rating || 4.8);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) { toast.error('Please sign in to write a review'); return; }
+    if (!reviewForm.comment.trim()) { toast.error('Please write a comment'); return; }
+
+    setSubmittingReview(true);
+    const userInfo = { full_name: user.displayName || 'Anonymous Customer', product_name: product.name };
+    const { error } = await addReview(product.id, user.uid, reviewForm.rating, reviewForm.comment, userInfo);
+
+    if (error) {
+      toast.error('Failed to submit review');
+    } else {
+      toast.success('Review submitted for approval.');
+      setIsReviewModalOpen(false);
+      setReviewForm({ rating: 5, comment: '' });
+    }
+    setSubmittingReview(false);
+  };
 
   const handleAddToCart = () => {
     if (prescriptionType === 'manual' && (!powers.leftSph || !powers.rightSph)) {
       toast.error("Please select your power details");
+      return;
+    }
+
+    if (prescriptionType === 'upload' && !prescriptionFile) {
+      toast.error("Please upload your prescription image");
       return;
     }
 
@@ -99,7 +151,7 @@ const ContactLensDetail = () => {
         leftAxis: powers.leftAxis,
         rightAxis: powers.rightAxis,
       } : null,
-      prescriptionUrl: null,
+      prescriptionUrl: prescriptionType === 'upload' ? prescriptionUrl : null,
       isContactLens: true,
     };
 
@@ -272,12 +324,35 @@ const ContactLensDetail = () => {
                   </div>
                 ) : (
                   <div className="upload-section animate-fade-in">
-                    <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all group">
-                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                         <UploadCloud size={32} className="text-slate-300 group-hover:text-emerald-500 mb-2 transition-colors" />
-                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Click to upload image</p>
-                       </div>
-                       <input type="file" className="hidden" />
+                    <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all group relative overflow-hidden">
+                       {prescriptionFile ? (
+                         <div className="absolute inset-0 p-2">
+                           <img src={prescriptionUrl || URL.createObjectURL(prescriptionFile)} alt="Prescription" className="w-full h-full object-contain rounded-2xl" />
+                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                             <span className="bg-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">Change Image</span>
+                           </div>
+                         </div>
+                       ) : (
+                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                           <UploadCloud size={32} className="text-slate-300 group-hover:text-emerald-500 mb-2 transition-colors" />
+                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Click to upload image</p>
+                         </div>
+                       )}
+                       <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" onChange={async (e) => {
+                         const file = e.target.files[0];
+                         if (file) {
+                           try {
+                             const toastId = toast.loading('Optimizing image...');
+                             const compressedBase64 = await compressToWebP(file);
+                             setPrescriptionFile(file);
+                             setPrescriptionUrl(compressedBase64);
+                             toast.success('Image optimized!', { id: toastId });
+                           } catch (err) {
+                             toast.error('Failed to optimize image.');
+                             setPrescriptionFile(file);
+                           }
+                         }
+                       }} />
                     </label>
                     <p className="mt-4 text-[9px] font-bold text-center text-slate-400 uppercase tracking-widest leading-relaxed">
                       Don’t have a prescription? <span className="text-emerald-600 cursor-pointer hover:underline">Need Eye Power Check?</span>
@@ -495,6 +570,67 @@ const ContactLensDetail = () => {
           </section>
         </div>
 
+        {/* Rating & Reviews Section */}
+        <section className="py-24 border-t border-slate-100">
+           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              <div>
+                 <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-2">Verified Feedback</h2>
+                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Real reviews from verified purchases</p>
+              </div>
+              <button onClick={() => setIsReviewModalOpen(true)} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-xl">
+                 Write Review
+              </button>
+           </div>
+
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start mb-12">
+              {/* Rating Stats Card */}
+              <div className="bg-slate-50 p-8 rounded-[35px] border border-slate-100">
+                 <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-5xl font-black text-slate-900">{avgRating}</span>
+                    <span className="text-slate-400 font-bold">/ 5.0</span>
+                 </div>
+                 <div className="flex text-amber-400 mb-6">
+                    {[...Array(5)].map((_, i) => <Star key={i} size={16} fill={i < Math.floor(avgRating) ? "currentColor" : "none"} />)}
+                 </div>
+                 <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{reviews.length} total customer reviews</p>
+              </div>
+
+              {/* Reviews List */}
+              <div className="lg:col-span-2 space-y-6 max-h-[500px] overflow-y-auto pr-4">
+                 {reviews.length > 0 ? (
+                    reviews.map((review, idx) => (
+                       <div key={review.id || idx} className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+                          <div className="flex justify-between items-start">
+                             <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-slate-950 text-white flex items-center justify-center font-bold text-sm">
+                                   {review.reviewer_name?.[0] || 'A'}
+                                </div>
+                                <div>
+                                   <p className="text-xs font-black text-slate-900">{review.reviewer_name || 'Anonymous Customer'}</p>
+                                   <p className="text-[10px] text-slate-400 font-bold">
+                                      {review.created_at?.toDate ? review.created_at.toDate().toLocaleDateString() : new Date().toLocaleDateString()}
+                                   </p>
+                                </div>
+                             </div>
+                             <div className="flex text-amber-400">
+                                {[...Array(5)].map((_, i) => (
+                                   <Star key={i} size={10} fill={i < review.rating ? "currentColor" : "none"} />
+                                ))}
+                             </div>
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed italic">“{review.comment}”</p>
+                       </div>
+                    ))
+                 ) : (
+                    <div className="text-center py-12 bg-slate-50 rounded-3xl border border-slate-100">
+                       <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">No reviews yet. Be the first to review!</p>
+                       <button onClick={() => setIsReviewModalOpen(true)} className="px-4 py-2 border border-slate-900 rounded-lg text-[9px] font-black uppercase tracking-widest text-slate-900 hover:bg-slate-900 hover:text-white transition-all">Write Review</button>
+                    </div>
+                 )}
+              </div>
+           </div>
+        </section>
+
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <section className="py-24 border-t border-slate-100">
@@ -505,6 +641,38 @@ const ContactLensDetail = () => {
           </section>
         )}
       </div>
+
+      <AnimatePresence>
+        {isReviewModalOpen && (
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-[35px] w-full max-w-md overflow-hidden shadow-2xl relative">
+              <div className="p-8 border-b border-gray-100 flex justify-between items-center">
+                <h3 className="text-lg font-black text-gray-900">Post Review</h3>
+                <button onClick={() => setIsReviewModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20} /></button>
+              </div>
+              <form onSubmit={handleReviewSubmit} className="p-8">
+                <div className="mb-8 text-center">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Your Rating</label>
+                  <div className="flex justify-center gap-3">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button key={star} type="button" onClick={() => setReviewForm({ ...reviewForm, rating: star })} className="hover:scale-110 transition-transform">
+                        <Star size={32} fill={star <= reviewForm.rating ? '#FBBF24' : 'none'} color={star <= reviewForm.rating ? '#FBBF24' : '#E5E7EB'} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-8">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Technical Feedback</label>
+                  <textarea value={reviewForm.comment} onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })} className="w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-black transition-all resize-none min-h-[120px]" placeholder="Tell us about the quality and fit..." required />
+                </div>
+                <button type="submit" disabled={submittingReview} className="w-full py-5 bg-black text-white rounded-[35px] text-[11px] font-black uppercase tracking-[3px] hover:bg-slate-800 transition-all disabled:opacity-50">
+                  {submittingReview ? 'Processing...' : 'Execute Submission'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
