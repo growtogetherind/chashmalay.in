@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  X, ChevronDown, Tag, Shield, ArrowRight, Zap, 
-  Plus, Minus, CheckCircle2, ShoppingBag, UploadCloud, Eye
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X, Tag, ArrowRight, Plus, Minus, ShoppingBag, UploadCloud, Eye } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,8 +13,8 @@ const CartDrawer = () => {
   const {
     cart, removeFromCart, updateQuantity,
     cartTotal, tax, discount, finalTotal,
-    getItemPrice, applyCoupon, removeCoupon,
-    isCartOpen, closeCart, addToCart, updateLensSelection
+    getItemPrice, applyCoupon,
+    isCartOpen, closeCart, updateLensSelection
   } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -55,10 +52,14 @@ const CartDrawer = () => {
   const handleFileUpload = async (itemId, file) => {
     if (!file) return;
     setUploadingId(itemId);
-    const toastId = toast.loading("Uploading prescription...");
+    const toastId = toast.loading("Uploading prescription: 0%... ");
     
     try {
-      const res = await uploadImage(file, 'prescriptions');
+      const res = await uploadImage(file, 'prescriptions', {
+        onProgress: (percent) => {
+          toast.loading(`Uploading prescription: ${percent}%...`, { id: toastId });
+        }
+      });
       if (res.error) throw new Error(res.error);
       
       // Update item in cart with the new prescription URL

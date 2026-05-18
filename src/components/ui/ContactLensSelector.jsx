@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Check, Eye, UploadCloud, Sparkles, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { uploadImage } from '../../lib/cloudinary';
@@ -10,7 +9,6 @@ import './LensSelector.css'; // Reuse the same CSS for consistency
 const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, selectedSize = null }) => {
   const { addToCart } = useCart();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selections, setSelections] = useState({
     powerOption: null,
@@ -49,14 +47,18 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
     setIsSubmitting(true);
     let prescriptionUrl = null;
 
-    if (selections.powerOption === 'upload' && selections.prescriptionFile) {
-      const toastId = toast.loading("Uploading prescription...");
+     if (selections.powerOption === 'upload' && selections.prescriptionFile) {
+      const toastId = toast.loading("Uploading prescription: 0%...");
       try {
-        const res = await uploadImage(selections.prescriptionFile, 'prescriptions');
+        const res = await uploadImage(selections.prescriptionFile, 'prescriptions', {
+          onProgress: (percent) => {
+            toast.loading(`Uploading prescription: ${percent}%...`, { id: toastId });
+          }
+        });
         if (res.error) throw new Error(res.error);
         toast.success("Prescription uploaded!", { id: toastId });
         prescriptionUrl = res.url;
-      } catch (err) {
+      } catch {
         toast.error("Failed to upload prescription", { id: toastId });
         setIsSubmitting(false);
         return;
@@ -164,10 +166,10 @@ const ContactLensSelector = ({ isOpen, onClose, product, selectedColor = null, s
                       <div className="text-center p-8">
                         <UploadCloud size={40} className="text-slate-300 mx-auto mb-4" />
                         <p className="text-sm font-bold text-slate-900">Click to upload prescription</p>
-                        <p className="text-xs text-slate-400 mt-1">Image or PDF accepted</p>
+                        <p className="text-xs text-slate-400 mt-1">Image files accepted</p>
                       </div>
                     )}
-                    <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
                   </label>
                   <button className="btn-cta w-full" disabled={!selections.prescriptionFile} onClick={() => setStep(3)}>Continue to Summary</button>
                 </div>

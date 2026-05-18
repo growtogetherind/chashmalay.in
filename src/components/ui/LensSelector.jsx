@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Check, ChevronRight, Eye, Zap, Shield, Sparkles, Camera } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { X, Check, ChevronRight, Camera } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { uploadImage } from '../../lib/cloudinary';
 import toast from 'react-hot-toast';
@@ -8,7 +7,6 @@ import './LensSelector.css';
 
 const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selectedSize = null }) => {
   const { addToCart } = useCart();
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isPowerModalOpen, setIsPowerModalOpen] = useState(false);
   const [selections, setSelections] = useState({
@@ -249,7 +247,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                      <button className={`power-option-card ${selections.powerOption === 'manual' ? 'active' : ''}`} onClick={() => handlePowerSelect('manual')}>
                         <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
                            <div className="power-icon-wrapper">
-                              <img src="/assets/im/select_lens/mobile_manual.png" alt="Enter Manually" onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&q=80&w=100'; }} />
+                              <img src="/assets/im/select_lens/mobile_manual.png" alt="Enter Manually" onError={(e) => { e.target.onerror = null; e.target.src = '/assets/im/eyeglasses.png'; }} />
                            </div>
                            <div style={{textAlign: 'left'}}>
                               <h5 style={{fontSize: '1rem', fontWeight: 'bold', color: '#0f172a'}}>Enter Power Manually</h5>
@@ -262,14 +260,14 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
               </div>
 
               <div>
-                 <h4 style={{fontSize: '1rem', marginBottom: '1rem', color: '#0f172a', fontWeight: 'bold'}}>I don't know my power</h4>
+                 <h4 style={{fontSize: '1rem', marginBottom: '1rem', color: '#0f172a', fontWeight: 'bold'}}>I don’t know my power</h4>
                  <button className={`power-option-card ${selections.powerOption === 'later' ? 'active' : ''}`} onClick={() => handlePowerSelect('later')}>
                     <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
                        <div className="power-icon-wrapper">
-                          <img src="/assets/im/select_lens/call_girl.png" alt="Submit Later" onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100'; }} />
+                          <img src="/assets/im/select_lens/call_girl.png" alt="Submit Later" onError={(e) => { e.target.onerror = null; e.target.src = '/assets/im/lens.png'; }} />
                        </div>
                        <div style={{textAlign: 'left'}}>
-                          <h5 style={{fontSize: '1rem', fontWeight: 'bold', color: '#0f172a'}}>I don't know my power</h5>
+                          <h5 style={{fontSize: '1rem', fontWeight: 'bold', color: '#0f172a'}}>I don’t know my power</h5>
                           <p style={{fontSize: '0.875rem', color: '#64748b'}}>Submit later after placing the order</p>
                        </div>
                     </div>
@@ -300,7 +298,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                          style={{width: '100%', height: '60px', objectFit: 'contain'}}
                          onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&q=80&w=200';
+                            e.target.src = '/assets/im/eyeglasses.png';
                          }}
                        />
                        <p style={{fontSize: '11px', fontWeight: 'bold', color: '#0f172a', marginTop: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{product?.name}</p>
@@ -396,8 +394,12 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                 onClick={async () => {
                   let prescriptionUrl = null;
                   if (selections.powerOption === 'upload' && selections.prescriptionFile) {
-                      const toastId = toast.loading("Uploading prescription...");
-                      const res = await uploadImage(selections.prescriptionFile, 'prescriptions');
+                      const toastId = toast.loading("Uploading prescription: 0%...");
+                      const res = await uploadImage(selections.prescriptionFile, 'prescriptions', {
+                          onProgress: (percent) => {
+                              toast.loading(`Uploading prescription: ${percent}%...`, { id: toastId });
+                          }
+                      });
                       if (res.error) {
                           toast.error("Failed to upload prescription", { id: toastId });
                           return;
@@ -450,10 +452,10 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <Camera className="w-10 h-10 mb-3 text-gray-400 group-hover:text-primary transition-colors" />
                             <p className="mb-2 text-sm text-gray-500"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
-                            <p className="text-xs text-gray-400">SVG, PNG, JPG or PDF</p>
+                            <p className="text-xs text-gray-400">PNG, JPG or WEBP</p>
                         </div>
                       )}
-                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*,.pdf" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
+                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" onChange={(e) => setSelections({...selections, prescriptionFile: e.target.files[0]})} />
                     </label>
 
                     <button
