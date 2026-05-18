@@ -1023,8 +1023,8 @@ export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
  * 2. Message @userinfobot to get your CHAT_ID.
  */
 const sendTelegramNotification = async (message) => {
-  const BOT_TOKEN = ""; // ADD YOUR BOT TOKEN HERE
-  const CHAT_ID = "";    // ADD YOUR CHAT ID HERE
+  const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || ""; // ADD TO YOUR .env FILE
+  const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";    // ADD TO YOUR .env FILE
   
   if (!BOT_TOKEN || !CHAT_ID) return;
 
