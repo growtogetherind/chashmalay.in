@@ -1,15 +1,12 @@
-import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
+import { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useParams, Link } from 'react-router-dom';
-import {
-  Star, Heart, RotateCcw,
-  ShieldCheck, ChevronDown, ChevronUp, Layers,
-  ChevronRight, ChevronLeft, X, CheckCircle
-} from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Star, Heart, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Layers, ChevronRight, ChevronLeft, X, CheckCircle } from 'lucide-react';
 import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ui/ProductCard';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
+import { getCloudinarySrcSet, transformCloudinaryUrl } from '../lib/cloudinary';
 import toast from 'react-hot-toast';
 import './ProductDetail.css';
 
@@ -158,20 +155,6 @@ const ProductDetail = () => {
     toast.success(exists ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
-  const handleShare = async () => {
-    const shareData = { title: product.name, text: `Check out ${product.name} on Chashmalay!`, url: window.location.href };
-    try {
-      if (navigator.share) await navigator.share(shareData);
-      else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success('Link copied to clipboard!');
-      }
-    } catch {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard!');
-    }
-  };
-
   const nextImage = () => setActiveImage((prev) => (prev + 1) % (product.gallery?.length || 1));
   const prevImage = () => setActiveImage((prev) => (prev - 1 + (product.gallery?.length || 1)) % (product.gallery?.length || 1));
 
@@ -220,6 +203,7 @@ const ProductDetail = () => {
   const isContactLens = product.category?.toLowerCase().includes('contact') || product.category?.toLowerCase() === 'contacts';
   const selectedFrameColor = (product.colors && product.colors.length > 0) ? product.colors[activeColor] : null;
   const gallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
+  const activeImageUrl = gallery[activeImage] || gallery[0] || '';
 
   return (
     <div className="product-detail-page pt-28">
@@ -235,7 +219,7 @@ const ProductDetail = () => {
                     onClick={() => setActiveImage(idx)}
                     className={`thumb-btn ${activeImage === idx ? 'active' : ''}`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-contain" loading="lazy" decoding="async" />
+	                    <img src={transformCloudinaryUrl(img, { width: 160 })} alt="" width="160" height="120" className="w-full h-full object-contain" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>
@@ -253,14 +237,16 @@ const ProductDetail = () => {
                     )}
                     <motion.img
                       key={activeImage}
-                      src={gallery[activeImage]}
-                      alt={product.name}
+	                      src={transformCloudinaryUrl(activeImageUrl, { width: 1200 })}
+                        srcSet={activeImageUrl.includes('res.cloudinary.com') ? getCloudinarySrcSet(activeImageUrl, [640, 960, 1200, 1600]) : undefined}
+                        sizes="(max-width: 1024px) 100vw, 58vw"
+	                      alt={product.name}
                       onLoad={() => setImageLoading(false)}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: imageLoading ? 0 : 1, scale: imageLoading ? 0.9 : 1 }}
                       transition={{ duration: 0.5, ease: TRANSITIONS.ease }}
                       className="w-full max-w-[90%] h-auto object-contain"
-                      fetchPriority={activeImage === 0 ? 'high' : 'auto'}
+                      fetchpriority={activeImage === 0 ? 'high' : 'auto'}
                       decoding="async"
                     />
                   </div>
@@ -484,7 +470,7 @@ const ProductDetail = () => {
                               ))}
                             </div>
                           </div>
-                          <p className="text-xs text-slate-600 leading-relaxed italic">"{review.comment}"</p>
+                          <p className="text-xs text-slate-600 leading-relaxed italic">“{review.comment}”</p>
                         </div>
                       ))
                     ) : (
