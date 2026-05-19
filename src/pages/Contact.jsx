@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { sendTelegramNotification } from '../lib/firebase';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,7 @@ const Contact = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
       toast.error('Please fill in all required fields.');
@@ -25,6 +26,14 @@ const Contact = () => {
     }
     
     setIsSubmitting(true);
+    
+    try {
+      const telegramMessage = `✉️ *New Contact Inquiry!*\n\n*Name:* ${formData.name}\n*Email:* ${formData.email}\n*Phone:* ${formData.phone || 'Not Provided'}\n*Subject:* ${formData.subject || 'General Inquiry'}\n\n*Message:*\n${formData.message}`;
+      await sendTelegramNotification(telegramMessage);
+    } catch (err) {
+      console.error("Failed to send Telegram notification:", err);
+    }
+
     // Simulate API request
     setTimeout(() => {
       setIsSubmitting(false);

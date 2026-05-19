@@ -56,7 +56,9 @@ const DEFAULT_SETTINGS = {
   free_shipping_min: 0,
   maintenance_mode: false,
   store_logo: '',
-  carousel_interval: 5
+  carousel_interval: 5,
+  telegram_bot_token: '',
+  telegram_chat_id: ''
 };
 
 export const getProductImage = (product = {}) => (
@@ -1015,15 +1017,21 @@ export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
   }
 };
 
-/**
- * Sends a notification to a Telegram bot.
- * To get started:
- * 1. Create a bot via @BotFather on Telegram to get your BOT_TOKEN.
- * 2. Message @userinfobot to get your CHAT_ID.
- */
-const sendTelegramNotification = async (message) => {
-  const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || ""; // ADD TO YOUR .env FILE
-  const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";    // ADD TO YOUR .env FILE
+export const sendTelegramNotification = async (message) => {
+  let BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || ""; // Fallback to env file
+  let CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";    // Fallback to env file
+  
+  try {
+    const { data: settings } = await getSettings();
+    if (settings?.telegram_bot_token) {
+      BOT_TOKEN = settings.telegram_bot_token;
+    }
+    if (settings?.telegram_chat_id) {
+      CHAT_ID = settings.telegram_chat_id;
+    }
+  } catch (err) {
+    console.error("Error loading Telegram settings dynamically:", err);
+  }
   
   if (!BOT_TOKEN || !CHAT_ID) return;
 
