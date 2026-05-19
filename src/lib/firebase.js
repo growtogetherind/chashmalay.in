@@ -1061,6 +1061,31 @@ export const sendTelegramNotification = async (message) => {
 };
 
 export const sendOrderConfirmationSMS = async (phoneNumber, customerName, orderId, amount) => {
+  // 1. Try sending via secure Vercel same-origin serverless backend proxy first (bypasses browser CORS & protects API key)
+  try {
+    const response = await fetch("/api/send-sms", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        phoneNumber,
+        customerName,
+        orderId,
+        amount
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("SMS sent successfully via backend proxy:", data);
+      return;
+    }
+  } catch (backendError) {
+    console.warn("Backend proxy failed, trying client-side fallback (direct fetch):", backendError);
+  }
+
+  // 2. Client-side Fallback (Runs if backend serverless API is offline or returns error)
   let API_KEY = import.meta.env.VITE_FAST2SMS_API_KEY || "";
   let SENDER_ID = import.meta.env.VITE_FAST2SMS_SENDER_ID || "FSTSMS";
 
