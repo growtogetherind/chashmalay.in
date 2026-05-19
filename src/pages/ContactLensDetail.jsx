@@ -231,7 +231,7 @@ const ContactLensDetail = () => {
                     {discountPercent}% OFF
                   </div>
                 </div>
-                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Inclusive of all taxes</p>
+                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Free Shipping Included</p>
               </div>
 
               {/* Prescription Selection */}

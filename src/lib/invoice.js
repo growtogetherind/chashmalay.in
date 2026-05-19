@@ -42,8 +42,7 @@ export const generateInvoice = (order) => {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100);
   doc.text('Premium Eyewear Store', 14, 52);
-  doc.text('GSTIN: 27AABCM1234F1Z5 (Mock)', 14, 57);
-  doc.text('Somatane, Maharashtra, India', 14, 62);
+  doc.text('Somatane, Maharashtra, India', 14, 57);
 
   // 3. Invoice Metadata
   doc.setFontSize(22);
@@ -187,8 +186,7 @@ export const generateInvoice = (order) => {
     finalY += 8;
   }
 
-  const subtotal = Number(order.total_amount) / 1.18;
-  const gst = Number(order.total_amount) - subtotal;
+  const subtotal = Number(order.total_amount);
 
   doc.setFontSize(9.5);
   doc.setFont('helvetica', 'normal');
@@ -197,14 +195,11 @@ export const generateInvoice = (order) => {
   doc.text('Subtotal:', 135, finalY);
   doc.text(`INR ${subtotal.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 196, finalY, { align: 'right' });
 
-  doc.text('GST (18%):', 135, finalY + 6);
-  doc.text(`INR ${gst.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 196, finalY + 6, { align: 'right' });
-
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 63, 138); // brand color
-  doc.text('TOTAL AMOUNT:', 135, finalY + 13);
-  doc.text(`INR ${Number(order.total_amount).toLocaleString()}`, 196, finalY + 13, { align: 'right' });
+  doc.text('TOTAL AMOUNT:', 135, finalY + 8);
+  doc.text(`INR ${Number(order.total_amount).toLocaleString()}`, 196, finalY + 8, { align: 'right' });
 
   // 9. Standardized Professional Footer (Sticky at page bottom)
   const pageHeight = doc.internal.pageSize.getHeight();

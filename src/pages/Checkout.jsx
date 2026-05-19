@@ -27,7 +27,7 @@ const InputField = ({ label, ...props }) => (
 );
 
 const Checkout = () => {
-  const { cart, cartTotal, tax, finalTotal, discount, emptyCart, updateLensSelection } = useCart();
+  const { cart, cartTotal, finalTotal, discount, emptyCart, updateLensSelection } = useCart();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -352,10 +352,6 @@ const Checkout = () => {
                       <span>₹{cartTotal.toFixed(0)}</span>
                    </div>
                    <div className="flex justify-between">
-                      <span className="text-secondary">GST (18%)</span>
-                      <span>₹{tax.toFixed(0)}</span>
-                   </div>
-                   <div className="flex justify-between">
                       <span className="text-secondary">Shipping</span>
                       <span className="text-accent uppercase text-xs font-black tracking-widest">Complimentary</span>
                    </div>
@@ -371,7 +367,7 @@ const Checkout = () => {
                    <span className="font-sans font-bold text-lg tracking-tight">Total</span>
                    <span className="font-sans font-black text-3xl text-primary tracking-tighter">₹{finalTotal.toFixed(0)}</span>
                 </div>
-                <p className="text-[10px] text-secondary text-right">Inclusive of all duties and taxes</p>
+                <p className="text-[10px] text-secondary text-right">Complimentary Shipping & Delivery</p>
              </div>
           </div>
 

@@ -320,7 +320,7 @@ const ProductDetail = () => {
                       Save {discountPercent}% Today
                     </span>
                   </div>
-                  <p className="text-[10px] font-bold text-slate-400">Tax Included • Free Lens Kit</p>
+                  <p className="text-[10px] font-bold text-slate-400">Free Lens Kit Included</p>
                 </div>
               </div>
 

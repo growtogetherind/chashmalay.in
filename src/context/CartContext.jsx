@@ -281,8 +281,8 @@ export const CartProvider = ({ children }) => {
     return total + itemPrice * (item.quantity || 1);
   }, 0);
 
-  const tax = Math.round(cartTotal * 0.18);
-  const finalTotal = cartTotal + tax - (discount.amount || 0);
+  const tax = 0;
+  const finalTotal = cartTotal - (discount.amount || 0);
 
   return (
     <CartContext.Provider value={{

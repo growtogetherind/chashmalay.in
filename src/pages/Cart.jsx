@@ -14,7 +14,7 @@ import './Cart.css';
 const Cart = () => {
   const {
     cart, removeFromCart, updateQuantity,
-    cartTotal, tax, discount, finalTotal,
+    cartTotal, discount, finalTotal,
     getItemPrice, applyCoupon, removeCoupon
   } = useCart();
   const { user } = useAuth();
@@ -216,10 +216,6 @@ const Cart = () => {
                   <span className="value">-₹{Math.round(discount.amount).toLocaleString()}</span>
                </div>
              )}
-             <div className="bill-item">
-                <span>Estimated GST (18%)</span>
-                <span className="value">₹{Math.round(tax).toLocaleString()}</span>
-             </div>
              <div className="bill-item">
                 <span>Fitting Fee</span>
                 <span className="value"><span className="old-price" style={{marginRight: '8px'}}>₹199</span> <span className="free-text">FREE</span></span>

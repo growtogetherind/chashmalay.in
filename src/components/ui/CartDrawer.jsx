@@ -12,7 +12,7 @@ import './CartDrawer.css';
 const CartDrawer = () => {
   const {
     cart, removeFromCart, updateQuantity,
-    cartTotal, tax, discount, finalTotal,
+    cartTotal, discount, finalTotal,
     getItemPrice, applyCoupon,
     isCartOpen, closeCart, updateLensSelection
   } = useCart();
@@ -256,10 +256,6 @@ const CartDrawer = () => {
                       <span>-₹{Math.round(discount.amount).toLocaleString()}</span>
                     </div>
                   )}
-                  <div className="summary-row">
-                    <span>GST (18%)</span>
-                    <span>₹{Math.round(tax).toLocaleString()}</span>
-                  </div>
                   <div className="summary-row total">
                     <span>Final Amount</span>
                     <span>₹{Math.round(finalTotal).toLocaleString()}</span>
