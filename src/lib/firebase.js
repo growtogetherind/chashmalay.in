@@ -58,7 +58,9 @@ const DEFAULT_SETTINGS = {
   store_logo: '',
   carousel_interval: 5,
   telegram_bot_token: '',
-  telegram_chat_id: ''
+  telegram_chat_id: '',
+  fast2sms_api_key: '',
+  fast2sms_sender_id: 'FSTSMS'
 };
 
 export const getProductImage = (product = {}) => (
@@ -301,6 +303,14 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
 
   // Send Telegram Notification (Optional but recommended)
   sendTelegramNotification(`🚀 *New Order Received!*\n\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Amount:* ₹${Number(total).toLocaleString()}\n*Customer:* ${address.name}\n*City:* ${address.city}`);
+
+  // Send Fast2SMS Order Confirmation
+  sendOrderConfirmationSMS(
+    address.phone,
+    address.name,
+    orderRef.id.slice(0, 8).toUpperCase(),
+    total
+  );
 
   const batchPromises = items.map(async (item) => {
     const pid = item.product_id || item.id;
@@ -1047,5 +1057,57 @@ export const sendTelegramNotification = async (message) => {
     });
   } catch (error) {
     console.error("Telegram Notification Error:", error);
+  }
+};
+
+export const sendOrderConfirmationSMS = async (phoneNumber, customerName, orderId, amount) => {
+  let API_KEY = import.meta.env.VITE_FAST2SMS_API_KEY || "";
+  let SENDER_ID = import.meta.env.VITE_FAST2SMS_SENDER_ID || "FSTSMS";
+
+  try {
+    const { data: settings } = await getSettings();
+    if (settings?.fast2sms_api_key) {
+      API_KEY = settings.fast2sms_api_key;
+    }
+    if (settings?.fast2sms_sender_id) {
+      SENDER_ID = settings.fast2sms_sender_id;
+    }
+  } catch (err) {
+    console.error("Error loading Fast2SMS settings dynamically:", err);
+  }
+
+  if (!API_KEY || !phoneNumber) return;
+
+  const cleanPhone = phoneNumber.replace(/\D/g, "").slice(-10);
+  const message = `Dear ${customerName}, your order #${orderId} of Rs. ${Math.round(amount)} has been successfully placed. Thank you for shopping with chashmaly.in!`;
+
+  try {
+    const params = new URLSearchParams();
+    params.append("route", "q"); // Using route 'q' for quick transactional
+    params.append("message", message);
+    params.append("numbers", cleanPhone);
+    params.append("language", "english");
+    params.append("flash", "0");
+
+    if (SENDER_ID) {
+      params.append("sender_id", SENDER_ID);
+    }
+
+    const response = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+      method: "POST",
+      headers: {
+        "authorization": API_KEY,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cache-Control": "no-cache"
+      },
+      body: params
+    });
+
+    const data = await response.json();
+    if (!data.return) {
+      console.warn("Fast2SMS API returned false:", data);
+    }
+  } catch (error) {
+    console.error("Fast2SMS Notification Error:", error);
   }
 };
