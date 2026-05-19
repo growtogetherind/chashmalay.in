@@ -8,6 +8,7 @@ import './LensSelector.css';
 
 const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selectedSize = null }) => {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isPowerModalOpen, setIsPowerModalOpen] = useState(false);
   const [selections, setSelections] = useState({
