@@ -27,6 +27,7 @@ const AdminSettings = () => {
   const [showToken, setShowToken] = useState(false);
   const [fetchingChatId, setFetchingChatId] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
+  const [botUsername, setBotUsername] = useState('Chashmalay_bot');
 
   useEffect(() => {
     const unsubscribe = subscribeSettings((data) => {
@@ -35,6 +36,23 @@ const AdminSettings = () => {
     }, () => setLoading(false));
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (form.telegram_bot_token) {
+      const fetchBotInfo = async () => {
+        try {
+          const res = await fetch(`https://api.telegram.org/bot${form.telegram_bot_token}/getMe`);
+          const data = await res.json();
+          if (data.ok && data.result?.username) {
+            setBotUsername(data.result.username);
+          }
+        } catch (err) {
+          console.error("Error fetching bot info:", err);
+        }
+      };
+      fetchBotInfo();
+    }
+  }, [form.telegram_bot_token]);
 
   const handleFetchChatId = async () => {
     if (!form.telegram_bot_token) {
@@ -56,7 +74,7 @@ const AdminSettings = () => {
       const updates = data.result || [];
       if (updates.length === 0) {
         toast.error(
-          'No recent messages. Please search for @HighDemo1_bot on Telegram, tap "Start", then try syncing again.',
+          `No recent messages. Please search for @${botUsername} on Telegram, tap "Start", then try syncing again.`,
           { id: toastId, duration: 6000 }
         );
         setFetchingChatId(false);
@@ -256,7 +274,7 @@ const AdminSettings = () => {
                 <div className="mb-8 p-6 bg-slate-50 border border-slate-100 rounded-[20px]">
                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">Setup Sequence</p>
                   <ol className="text-[11px] text-slate-500 font-bold list-decimal list-inside space-y-2.5 leading-relaxed">
-                    <li>Message the bot <a href="https://t.me/HighDemo1_bot" target="_blank" rel="noopener noreferrer" className="text-emerald-500 underline hover:text-emerald-600 font-black">@HighDemo1_bot</a> and tap <strong>Start</strong>.</li>
+                    <li>Message the bot <a href={`https://t.me/${botUsername}`} target="_blank" rel="noopener noreferrer" className="text-emerald-500 underline hover:text-emerald-600 font-black">@{botUsername}</a> and tap <strong>Start</strong>.</li>
                     <li>Input your Bot Token below (pre-filled with your active token).</li>
                     <li>Click <strong>Sync Chat ID</strong> to automatically locate and link your Chat ID.</li>
                     <li>Click <strong>Send Test Alert</strong> to verify connection, then click <strong>Save Settings</strong>.</li>

@@ -301,9 +301,6 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
   };
   const orderRef = await addDoc(collection(db, "orders"), orderData);
 
-  // Send Telegram Notification (Optional but recommended)
-  sendTelegramNotification(`🚀 *New Order Received!*\n\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Amount:* ₹${Number(total).toLocaleString()}\n*Customer:* ${address.name}\n*City:* ${address.city}`);
-
   // Send Fast2SMS Order Confirmation
   sendOrderConfirmationSMS(
     address.phone,
@@ -346,6 +343,41 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
     if (item.lensSelection?.lensPackage) lensTotal += item.lensSelection.lensPackage.price;
     const finalItemPrice = basePrice + lensTotal;
 
+    // Check for prescriptions and save them to 'prescriptions' collection
+    const lens = item.lensSelection;
+    if (lens && (lens.prescriptionUrl || lens.manualDetails || lens.powerOption === 'later')) {
+      try {
+        await savePrescription({
+          user_id: userId,
+          user_name: address.name || 'Customer',
+          user_phone: address.phone || '',
+          order_id: orderRef.id,
+          product_name: item.name || 'Premium Eyewear',
+          image_url: lens.prescriptionUrl || null,
+          right_eye: lens.manualDetails ? {
+            sph: lens.manualDetails.rightSph || '',
+            cyl: lens.manualDetails.rightCyl || '',
+            axis: lens.manualDetails.rightAxis || '',
+            add: lens.manualDetails.rightAddlPower || ''
+          } : null,
+          left_eye: lens.manualDetails ? {
+            sph: lens.manualDetails.leftSph || '',
+            cyl: lens.manualDetails.leftCyl || '',
+            axis: lens.manualDetails.leftAxis || '',
+            add: lens.manualDetails.leftAddlPower || ''
+          } : null,
+          status: 'pending'
+        });
+
+        // If a file was uploaded, trigger a dedicated Telegram notification
+        if (lens.prescriptionUrl) {
+          sendTelegramNotification(`📑 *New Prescription Uploaded!*\n\n*Customer:* ${address.name}\n*Phone:* ${address.phone}\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Item:* ${item.name || 'Eyewear'}\n\n🖼️ [View Uploaded Prescription](${lens.prescriptionUrl})`);
+        }
+      } catch (e) {
+        console.error("Error saving prescription to database:", e);
+      }
+    }
+
     return addDoc(collection(db, "order_items"), {
       order_id: orderRef.id,
       product_id: pid || `custom-${Date.now()}`,
@@ -362,6 +394,68 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
     });
   });
   await Promise.all(batchPromises);
+
+  // Generate detailed notification body for Telegram
+  let itemsDetail = '';
+  items.forEach((item, index) => {
+    const qty = item.quantity || 1;
+    const basePrice = parseInt((item.price || item.consumersPrice || "0").toString().replace(/,/g, ''));
+    let lensTotal = 0;
+    if (item.lensSelection?.visionType) lensTotal += item.lensSelection.visionType.price;
+    if (item.lensSelection?.lensPackage) lensTotal += item.lensSelection.lensPackage.price;
+    const finalItemPrice = basePrice + lensTotal;
+    
+    const color = item.lensSelection?.selectedColor 
+      ? (typeof item.lensSelection.selectedColor === 'string' ? item.lensSelection.selectedColor : item.lensSelection.selectedColor.name)
+      : 'Standard';
+    const size = item.lensSelection?.selectedSize || 'Standard';
+
+    itemsDetail += `\n*${index + 1}. ${item.name}*\n`;
+    itemsDetail += `   • *Brand:* ${item.brand || 'Premium Edition'}\n`;
+    itemsDetail += `   • *Specs:* Color: ${color} | Size: ${size}\n`;
+    itemsDetail += `   • *Qty:* ${qty} x ₹${finalItemPrice.toLocaleString()} = ₹${(finalItemPrice * qty).toLocaleString()}\n`;
+    
+    if (item.lensSelection && item.lensSelection.visionType?.id !== 'frame') {
+      const ls = item.lensSelection;
+      itemsDetail += `   • *Lens Vision Type:* ${ls.visionType?.name || 'N/A'} (₹${ls.visionType?.price || 0})\n`;
+      itemsDetail += `   • *Lens Package:* ${ls.lensPackage?.name || 'N/A'} (₹${ls.lensPackage?.price || 0})\n`;
+      
+      if (ls.prescriptionUrl) {
+        itemsDetail += `   • *Prescription:* [View Uploaded Image](${ls.prescriptionUrl})\n`;
+      } else if (ls.manualDetails) {
+        const md = ls.manualDetails;
+        itemsDetail += `   • *Prescription (Manual Power):*\n`;
+        itemsDetail += `     OD (Right): SPH: ${md.rightSph || '-'} | CYL: ${md.rightCyl || '-'} | AXIS: ${md.rightAxis || '-'} | ADD: ${md.rightAddlPower || '-'}\n`;
+        itemsDetail += `     OS (Left):  SPH: ${md.leftSph || '-'} | CYL: ${md.leftCyl || '-'} | AXIS: ${md.leftAxis || '-'} | ADD: ${md.leftAddlPower || '-'}\n`;
+      } else {
+        itemsDetail += `   • *Prescription:* Upload Later (Follow-up via WhatsApp)\n`;
+      }
+    }
+  });
+
+  const fullOrderDescription = `🛒 *New Customer Order Placed!*
+
+*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()} (Full: \`${orderRef.id}\`)
+*Razorpay Payment ID:* \`${paymentId || 'N/A'}\`
+*Amount:* ₹${Number(total).toLocaleString()}
+*Status:* Confirmed
+
+*Customer Details:*
+• *Name:* ${address.name}
+• *Phone:* ${address.phone}
+• *DOB:* ${address.dob || 'Not Provided'}
+
+*Delivery Address:*
+${address.line1}${address.line2 ? `, ${address.line2}` : ''}
+${address.city}, ${address.state} - ${address.pincode}
+
+*Order Items:*${itemsDetail}
+
+_Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}_`;
+
+  // Send Telegram Notification
+  sendTelegramNotification(fullOrderDescription);
+
   return { id: orderRef.id, ...orderData };
 };
 
@@ -1027,7 +1121,7 @@ export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
   }
 };
 
-export const sendTelegramNotification = async (message) => {
+export const sendTelegramNotification = async (message, options = {}) => {
   let BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || ""; // Fallback to env file
   let CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";    // Fallback to env file
   
@@ -1046,14 +1140,20 @@ export const sendTelegramNotification = async (message) => {
   if (!BOT_TOKEN || !CHAT_ID) return;
 
   try {
+    const payload = {
+      chat_id: CHAT_ID,
+      text: message,
+      parse_mode: 'Markdown'
+    };
+    
+    if (options.reply_markup) {
+      payload.reply_markup = options.reply_markup;
+    }
+
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown'
-      })
+      body: JSON.stringify(payload)
     });
   } catch (error) {
     console.error("Telegram Notification Error:", error);
