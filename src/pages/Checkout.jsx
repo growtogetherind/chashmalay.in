@@ -93,7 +93,8 @@ const Checkout = () => {
           toast.success("Prescription uploaded!", { id: toastId });
           // Update the cart context so the final url is persisted
           if (updateLensSelection) {
-            await updateLensSelection(item.cartVariantKey || item.firebaseId || item.id, { prescriptionUrl: res.url });
+            // Use secureUrl (raw Cloudinary URL) — not the display-transformed url — so Telegram links & admin downloads work correctly
+            await updateLensSelection(item.cartVariantKey || item.firebaseId || item.id, { prescriptionUrl: res.secureUrl || res.url });
           }
         } catch (error) {
           toast.error(`Failed to upload prescription for ${item.name}`, { id: toastId });

@@ -63,8 +63,9 @@ const CartDrawer = () => {
       if (res.error) throw new Error(res.error);
       
       // Update item in cart with the new prescription URL
+      // Use secureUrl (raw Cloudinary URL) — not the display-transformed url — so Telegram links & admin downloads work correctly
       await updateLensSelection(itemId, {
-        prescriptionUrl: res.url,
+        prescriptionUrl: res.secureUrl || res.url,
         powerOption: 'upload'
       });
       toast.success("Prescription updated!", { id: toastId });

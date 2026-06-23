@@ -347,13 +347,15 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
     const lens = item.lensSelection;
     if (lens && (lens.prescriptionUrl || lens.manualDetails || lens.powerOption === 'later')) {
       try {
+        // Strip any Cloudinary display-transform params so stored URL is always a clean direct link
+        const cleanRxUrl = cleanCloudinaryUrl(lens.prescriptionUrl);
         await savePrescription({
           user_id: userId,
           user_name: address.name || 'Customer',
           user_phone: address.phone || '',
           order_id: orderRef.id,
           product_name: item.name || 'Premium Eyewear',
-          image_url: lens.prescriptionUrl || null,
+          image_url: cleanRxUrl || null,
           right_eye: lens.manualDetails ? {
             sph: lens.manualDetails.rightSph || '',
             cyl: lens.manualDetails.rightCyl || '',
@@ -370,8 +372,8 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
         });
 
         // If a file was uploaded, trigger a dedicated Telegram notification
-        if (lens.prescriptionUrl) {
-          sendTelegramNotification(`📑 *New Prescription Uploaded!*\n\n*Customer:* ${address.name}\n*Phone:* ${address.phone}\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Item:* ${item.name || 'Eyewear'}\n\n🖼️ [View Uploaded Prescription](${lens.prescriptionUrl})`);
+        if (cleanRxUrl) {
+          sendTelegramNotification(`📑 *New Prescription Uploaded!*\n\n*Customer:* ${address.name}\n*Phone:* ${address.phone}\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Item:* ${item.name || 'Eyewear'}\n\n🖼️ [View Uploaded Prescription](${cleanRxUrl})`);
         }
       } catch (e) {
         console.error("Error saving prescription to database:", e);
@@ -421,7 +423,7 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
       itemsDetail += `   • *Lens Package:* ${ls.lensPackage?.name || 'N/A'} (₹${ls.lensPackage?.price || 0})\n`;
       
       if (ls.prescriptionUrl) {
-        itemsDetail += `   • *Prescription:* [View Uploaded Image](${ls.prescriptionUrl})\n`;
+        itemsDetail += `   • *Prescription:* [View Uploaded Image](${cleanCloudinaryUrl(ls.prescriptionUrl)})\n`;
       } else if (ls.manualDetails) {
         const md = ls.manualDetails;
         itemsDetail += `   • *Prescription (Manual Power):*\n`;
@@ -1119,6 +1121,18 @@ export const updateOrderItemPower = async (itemId, updatedLensSelection) => {
   } catch (error) {
     return { error };
   }
+};
+
+/**
+ * Strips Cloudinary display-transform parameters from a URL.
+ * e.g. converts  .../upload/f_auto,q_auto,c_scale,w_800/v1/.../image.webp
+ *      back to   .../upload/v1/.../image.webp
+ * This ensures URLs stored in Firestore and sent as Telegram links are clean and clickable.
+ */
+const cleanCloudinaryUrl = (url) => {
+  if (!url || !url.includes('/upload/')) return url || '';
+  // Remove any transformation segment between /upload/ and the version or file path
+  return url.replace(/\/upload\/[^/]+(?=\/v\d|\/[a-z0-9_-]+\/)/, '/upload');
 };
 
 export const sendTelegramNotification = async (message, options = {}) => {
