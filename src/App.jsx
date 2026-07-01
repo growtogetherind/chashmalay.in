@@ -1,5 +1,5 @@
 import { useEffect, useState, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ConfirmProvider } from './context/ConfirmContext';
@@ -56,6 +56,78 @@ const PageLoader = () => (
     <div style={{ width: '40px', height: '40px', border: '4px solid #1e3f8a', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
   </div>
 );
+
+const MaintenancePage = () => (
+  <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 py-16">
+    <div className="w-full max-w-xl rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70 sm:p-10">
+      <p className="mb-4 text-[11px] font-black uppercase tracking-[0.35em] text-red-500">Maintenance Mode</p>
+      <h1 className="mb-4 text-3xl font-black text-slate-900 sm:text-5xl">We’ll Be Back Soon</h1>
+      <p className="mx-auto max-w-lg text-sm leading-7 text-slate-500 sm:text-base">
+        The storefront is temporarily unavailable while we complete important updates. Admin access remains available.
+      </p>
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <a href="/auth" className="rounded-full bg-slate-900 px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-700">
+          Admin Login
+        </a>
+        <a href="/admin" className="rounded-full border border-slate-200 px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+          Open Admin
+        </a>
+      </div>
+    </div>
+  </div>
+);
+
+const PublicRoutes = ({ settings }) => {
+  const location = useLocation();
+  const isMaintenanceMode = Boolean(settings?.maintenance_mode);
+  const isAllowedMaintenancePath = location.pathname === '/auth' || location.pathname.startsWith('/admin');
+
+  if (isMaintenanceMode && !isAllowedMaintenancePath) {
+    return (
+      <div className="min-h-screen bg-slate-50 px-4 py-10 sm:py-16">
+        <MaintenancePage />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
+      <main className="main-content">
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/category/:name" element={<Category />} />
+              <Route path="/contact-lenses" element={<ContactLens />} />
+              <Route path="/contact-lens/:id" element={<ContactLensDetail />} />
+              <Route path="/offers" element={<Offers />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/find-store" element={<FindStore />} />
+              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+              <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+              <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+              <Route path="/account/orders" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+              <Route path="/account/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+              <Route path="/about" element={<About />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/shipping" element={<Terms />} />
+              <Route path="/returns" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/faq" element={<Faq />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+      </main>
+      <Footer />
+      <BottomNav />
+    </>
+  );
+};
 
 function App() {
   const [settings, setSettings] = useState({});
@@ -117,48 +189,7 @@ function App() {
                   <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminSettings /></Suspense></AdminRoute>} />
 
                   {/* ── Public / Customer routes ── */}
-                  <Route path="*" element={
-                    <>
-                      <Navbar />
-                      <main className="main-content">
-                        <ErrorBoundary>
-                          <Suspense fallback={<PageLoader />}>
-                            {settings.maintenance_mode && window.location.pathname !== '/auth' ? (
-                              <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-                                <h1 className="text-3xl md:text-5xl font-black text-gray-900 mb-4">We’ll Be Back Soon</h1>
-                                <p className="text-gray-500 max-w-xl">The store is temporarily under maintenance. Please check back shortly.</p>
-                              </div>
-                            ) : <Routes>
-                              <Route path="/"                         element={<Home />} />
-                              <Route path="/auth"                     element={<Auth />} />
-                              <Route path="/cart"                     element={<Cart />} />
-                              <Route path="/category/:name"           element={<Category />} />
-                              <Route path="/contact-lenses"           element={<ContactLens />} />
-                              <Route path="/contact-lens/:id"         element={<ContactLensDetail />} />
-                              <Route path="/offers"                   element={<Offers />} />
-                              <Route path="/product/:id"              element={<ProductDetail />} />
-                              <Route path="/find-store"               element={<FindStore />} />
-                              <Route path="/checkout"                 element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-                              <Route path="/order-success/:orderId"   element={<OrderSuccess />} />
-                              <Route path="/account"                  element={<ProtectedRoute><Account /></ProtectedRoute>} />
-                              <Route path="/account/orders"           element={<ProtectedRoute><Account /></ProtectedRoute>} />
-                              <Route path="/account/orders/:orderId"  element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-                              <Route path="/about"                    element={<About />} />
-                              <Route path="/terms"                    element={<Terms />} />
-                              <Route path="/privacy"                  element={<Privacy />} />
-                              <Route path="/shipping"                 element={<Terms />} />
-                              <Route path="/returns"                  element={<Terms />} />
-                              <Route path="/contact"                  element={<Contact />} />
-                              <Route path="/faq"                      element={<Faq />} />
-                              <Route path="*"                         element={<NotFound />} />
-                            </Routes>}
-                          </Suspense>
-                        </ErrorBoundary>
-                      </main>
-                      <Footer />
-                      <BottomNav />
-                    </>
-                  } />
+                  <Route path="*" element={<PublicRoutes settings={settings} />} />
                 </Routes>
                 </div>
               </ErrorBoundary>
