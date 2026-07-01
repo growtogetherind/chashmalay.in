@@ -63,7 +63,7 @@ const MaintenancePage = () => (
       <p className="mb-4 text-[11px] font-black uppercase tracking-[0.35em] text-red-500">Coming Soon</p>
       <h1 className="mb-4 text-3xl font-black text-slate-900 sm:text-5xl">We’re Getting Things Ready</h1>
       <p className="mx-auto max-w-xl text-sm leading-7 text-slate-500 sm:text-base">
-        Our storefront is temporarily under maintenance while we complete important updates. Please check back soon, and our admin team will continue to manage the store from the backend.
+        Our storefront is temporarily under maintenance while we complete important updates. Please check back soon.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <a href="/auth" className="rounded-full bg-slate-900 px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-700">
