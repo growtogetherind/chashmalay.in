@@ -59,11 +59,11 @@ const PageLoader = () => (
 
 const MaintenancePage = () => (
   <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 py-16">
-    <div className="w-full max-w-xl rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70 sm:p-10">
-      <p className="mb-4 text-[11px] font-black uppercase tracking-[0.35em] text-red-500">Maintenance Mode</p>
-      <h1 className="mb-4 text-3xl font-black text-slate-900 sm:text-5xl">We’ll Be Back Soon</h1>
-      <p className="mx-auto max-w-lg text-sm leading-7 text-slate-500 sm:text-base">
-        The storefront is temporarily unavailable while we complete important updates. Admin access remains available.
+    <div className="w-full max-w-2xl rounded-[36px] border border-slate-200 bg-white p-8 shadow-[0_25px_80px_-25px_rgba(15,23,42,0.25)] sm:p-12">
+      <p className="mb-4 text-[11px] font-black uppercase tracking-[0.35em] text-red-500">Coming Soon</p>
+      <h1 className="mb-4 text-3xl font-black text-slate-900 sm:text-5xl">We’re Getting Things Ready</h1>
+      <p className="mx-auto max-w-xl text-sm leading-7 text-slate-500 sm:text-base">
+        Our storefront is temporarily under maintenance while we complete important updates. Please check back soon, and our admin team will continue to manage the store from the backend.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <a href="/auth" className="rounded-full bg-slate-900 px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-700">
