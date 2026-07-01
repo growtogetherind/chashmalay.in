@@ -179,23 +179,26 @@ const AdminSettings = () => {
                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Store Name</label>
                      <input value={form.store_name} onChange={e => setForm({...form, store_name: e.target.value})} className="w-full bg-slate-50 border border-slate-100 p-5 rounded-[20px] text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-inner" />
                   </div>
-                  <div className="flex items-center justify-between p-8 bg-red-50 rounded-[32px] border border-red-100 group/toggle shadow-sm">
+                  <label className="flex items-center justify-between p-8 bg-red-50 rounded-[32px] border border-red-100 group/toggle shadow-sm cursor-pointer">
                      <div className="flex-1">
                         <p className="text-[11px] font-black text-red-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div> Maintenance Mode
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> Maintenance Mode
                         </p>
-                        <p className="text-[10px] text-slate-400 font-bold leading-relaxed max-w-[240px]">Temporarily hide the storefront while you make important updates.</p>
+                        <p className="text-[10px] text-slate-400 font-bold leading-relaxed max-w-[240px]">
+                          {form.maintenance_mode ? 'Storefront is currently hidden from visitors.' : 'Turn this on to temporarily hide the storefront while updates are in progress.'}
+                        </p>
                      </div>
-                     <div className="relative inline-flex items-center cursor-pointer">
+                     <div className="relative inline-flex items-center">
                         <input
+                          id="maintenance-mode-toggle"
                           type="checkbox"
                           checked={form.maintenance_mode}
                           onChange={e => setForm({...form, maintenance_mode: e.target.checked})}
                           className="sr-only peer"
                         />
-                        <div className="w-14 h-7 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500 shadow-inner"></div>
+                        <div className="w-14 h-7 bg-slate-200 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500 shadow-inner relative"></div>
                      </div>
-                  </div>
+                  </label>
                   <div className="form-group pt-4">
                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Carousel Slide Duration (Seconds)</label>
                      <div className="relative">
