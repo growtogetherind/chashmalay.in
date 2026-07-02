@@ -2,42 +2,52 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://chashmaly.in/</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://chashmaly.in/category/eyeglasses</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://chashmaly.in/category/sunglasses</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://chashmaly.in/contact-lenses</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://chashmaly.in/offers</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://chashmaly.in/find-store</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://chashmaly.in/about</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://chashmaly.in/contact</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://chashmaly.in/privacy</loc>
+    <lastmod>2026-07-01</lastmod>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://chashmaly.in/terms</loc>
+    <lastmod>2026-07-01</lastmod>
+    <priority>0.4</priority>
   </url>
 </urlset>

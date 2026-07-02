@@ -22,7 +22,7 @@ const InstagramShowcase = () => {
                  In Motion
               </h2>
            </div>
-           <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-ej-sm font-bold text-ej-border underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ej-border rounded-ej-xs p-1">
+           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-ej-sm font-bold text-ej-border underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ej-border rounded-ej-xs p-1">
               Follow @Chashmalay
            </a>
         </div>

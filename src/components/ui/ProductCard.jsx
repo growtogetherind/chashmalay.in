@@ -76,6 +76,7 @@ const ProductCard = ({ product }) => {
         {/* Wishlist */}
         <button
           className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:border-red-100 hover:bg-white transition-all duration-300 shadow-md hover:scale-110"
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

@@ -204,7 +204,7 @@ const FindStore = () => {
                                                 <a 
                                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(store.name + ' ' + store.address)}`}
                                                     target="_blank"
-                                                    rel="noreferrer"
+                                                    rel="noopener noreferrer"
                                                     className="text-[10px] font-bold tracking-widest uppercase text-primary hover:text-accent-dark transition-colors flex items-center gap-2"
                                                 >
                                                     Get Directions <Navigation size={12} />
@@ -225,9 +225,11 @@ const FindStore = () => {
                             width="100%" 
                             height="100%" 
                             frameBorder="0" 
+                            title="Store location map"
                             style={{ border: 0 }}
                             src={`https://maps.google.com/maps?q=${encodeURIComponent(STORES.find(s => s.id === nearestStoreId)?.name || 'chashmalay.in boutique ' + selectedCity)}&output=embed`}
                             allowFullScreen
+                            loading="lazy"
                             className="grayscale contrast-125 opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                         />
                     </div>

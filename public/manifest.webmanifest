@@ -1,0 +1,16 @@
+{
+  "name": "Chashmalay.in",
+  "short_name": "Chashmalay",
+  "description": "Premium eyewear, sunglasses, and contact lenses",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}

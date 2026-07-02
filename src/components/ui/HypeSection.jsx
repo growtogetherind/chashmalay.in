@@ -52,8 +52,10 @@ const HypeSection = () => {
               <div className="aspect-[9/16] rounded-[3rem] overflow-hidden bg-white border border-black/5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] group-hover:shadow-[0_45px_90px_-20px_rgba(0,0,0,0.15)] group-hover:-translate-y-4 transition-all duration-700">
                  <iframe 
                    src={reel.videoUrl} 
+                   title={`Instagram reel ${reel.id}`}
                    className="w-full h-full border-none grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
                    allow="encrypted-media"
+                   loading="lazy"
                    scrolling="no"
                  />
               </div>
@@ -62,7 +64,7 @@ const HypeSection = () => {
         </div>
 
         <div className="text-center mt-32 flex flex-col items-center gap-6">
-           <a href="https://instagram.com" target="_blank" rel="noreferrer" className="group text-[11px] font-black uppercase tracking-[0.4em] text-[#161616] hover:text-[#009688] transition-all flex flex-col items-center gap-4">
+           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="group text-[11px] font-black uppercase tracking-[0.4em] text-[#161616] hover:text-[#009688] transition-all flex flex-col items-center gap-4">
               <span>Follow Us @CHASHMALAY</span>
               <div className="w-12 h-px bg-black opacity-10 group-hover:w-24 group-hover:opacity-100 transition-all duration-700" />
            </a>

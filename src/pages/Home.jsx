@@ -97,6 +97,8 @@ const Home = () => {
                   src="https://res.cloudinary.com/dpv40ou2c/image/upload/q_auto/f_auto/c_fill,w_900,h_675/banners/sunglasses_banner.png"
                   alt="Featured Sunglasses"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </FadeIn>

@@ -461,7 +461,7 @@ const AdminOrders = () => {
                                  {item.lens_selection?.prescriptionUrl && (
                                     <div className="mb-4">
                                        <p className="text-[10px] font-bold text-purple-400 uppercase mb-2">Uploaded Prescription</p>
-                                       <a href={item.lens_selection.prescriptionUrl} target="_blank" rel="noreferrer" className="block relative group rounded-xl overflow-hidden border-2 border-purple-200 bg-white aspect-video">
+                                       <a href={item.lens_selection.prescriptionUrl} target="_blank" rel="noopener noreferrer" className="block relative group rounded-xl overflow-hidden border-2 border-purple-200 bg-white aspect-video">
                                           <img src={item.lens_selection.prescriptionUrl} alt="Prescription" className="w-full h-full object-contain" />
                                           <div className="absolute inset-0 bg-purple-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                              <span className="text-white text-[10px] font-black uppercase tracking-widest bg-purple-600 px-4 py-2 rounded-full shadow-lg">View Full Image</span>

@@ -29,11 +29,16 @@ export default defineConfig({
     hmr: { overlay: true },
   },
   build: {
-    // Use esbuild (default) – drop console.log in production
     minify: 'esbuild',
     target: 'esnext',
+    cssCodeSplit: true,
+    sourcemap: false,
+    reportCompressedSize: false,
+    assetsInlineLimit: 4096,
+    cssMinify: 'esbuild',
     esbuildOptions: {
       drop: ['console', 'debugger'],
+      legalComments: 'none',
     },
     rollupOptions: {
       output: {
@@ -53,6 +58,6 @@ export default defineConfig({
         }
       }
     },
-    chunkSizeWarningLimit: 600
+    chunkSizeWarningLimit: 700
   }
 })

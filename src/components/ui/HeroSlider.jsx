@@ -162,6 +162,8 @@ const HeroSlider = () => {
                 alt={slide.title || 'Hero'}
                 className="h-full w-full object-cover object-top"
                 loading="eager"
+                decoding="async"
+                fetchPriority="high"
                 style={{
                   maskImage: 'linear-gradient(to left, black 55%, transparent 95%)',
                   WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 95%)',
@@ -213,6 +215,8 @@ const HeroSlider = () => {
             src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.jpeg"
             alt="Fashion Style"
             className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700"
+            loading="lazy"
+            decoding="async"
           />
           {/* Bottom red gradient accent */}
           <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-orange-800/70 via-orange-700/20 to-transparent" />
@@ -237,6 +241,8 @@ const HeroSlider = () => {
               src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.jpeg"
               alt="Sunglasses Model"
               className="h-full w-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+              decoding="async"
               style={{
                 maskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
                 WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
@@ -252,6 +258,8 @@ const HeroSlider = () => {
               src="/assets/im/all_img/26march-website-banner.jpg.jpeg"
               alt="Collection Style"
               className="absolute inset-0 w-full h-full object-cover brightness-75 hover:brightness-95 hover:scale-105 transition-all duration-400"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-800 h-32 sm:h-40 md:h-44">
@@ -259,6 +267,8 @@ const HeroSlider = () => {
               src="/assets/im/poster1.png"
               alt="Eyewear Style"
               className="absolute inset-0 w-full h-full object-cover brightness-75 hover:brightness-95 hover:scale-105 transition-all duration-400"
+              loading="lazy"
+              decoding="async"
               onError={(e) => { e.target.src = '/assets/im/eyeglasses.png'; }}
             />
           </div>

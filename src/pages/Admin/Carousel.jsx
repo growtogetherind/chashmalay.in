@@ -118,7 +118,7 @@ const AdminCarousel = () => {
                        <div className="w-40 h-20 bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 relative group/preview shadow-inner">
                           <img src={item.image} className="w-full h-full object-cover transition-transform group-hover/preview:scale-110" alt="" />
                           <div className="absolute inset-0 bg-emerald-900/10 opacity-0 group-hover/preview:opacity-100 transition-all flex items-center justify-center backdrop-blur-[2px]">
-                             <a href={item.image} target="_blank" rel="noreferrer" className="p-3 bg-white text-emerald-600 rounded-xl shadow-2xl hover:scale-110 transition-transform"><ExternalLink size={16} strokeWidth={2.5} /></a>
+                             <a href={item.image} target="_blank" rel="noopener noreferrer" className="p-3 bg-white text-emerald-600 rounded-xl shadow-2xl hover:scale-110 transition-transform"><ExternalLink size={16} strokeWidth={2.5} /></a>
                           </div>
                        </div>
                     </td>
