@@ -140,8 +140,12 @@ const Checkout = () => {
   });
 
   const handlePayment = async () => {
-    // Use the new key first, fall back to the old one for backward compat
-    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || import.meta.env.VITE_RAZORPAY_KEY;
+    // Key ID is a public identifier (not a secret) — safe to embed as fallback.
+    // VITE_RAZORPAY_KEY_ID is preferred (set in Vercel env vars for production).
+    const razorpayKey =
+      import.meta.env.VITE_RAZORPAY_KEY_ID ||
+      import.meta.env.VITE_RAZORPAY_KEY ||
+      'rzp_test_T8Y4OVZReJCDxP';
     if (!razorpayKey) {
       toast.error('Payment gateway is not configured.');
       return;
