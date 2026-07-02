@@ -7,6 +7,7 @@ import { createOrder } from '../lib/firebase';
 import { uploadImage, base64ToBlob } from '../lib/cloudinary';
 import toast from 'react-hot-toast';
 import { FadeIn } from '../components/ui/Motion';
+import { sanitizeTextInput } from '../lib/utils';
 
 const STEPS = ['Shipping', 'Review', 'Secure Payment'];
 
@@ -44,7 +45,11 @@ const Checkout = () => {
     pincode: profile?.address?.pincode || ''
   });
 
-  const handleAddressChange = (e) => setAddress(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleAddressChange = (e) => {
+    const rawValue = e.target.value;
+    const sanitizedValue = typeof rawValue === 'string' ? sanitizeTextInput(rawValue) : rawValue;
+    setAddress(prev => ({ ...prev, [e.target.name]: sanitizedValue }));
+  };
 
   useEffect(() => {
     const fetchPincodeData = async () => {
@@ -61,8 +66,8 @@ const Checkout = () => {
             }));
             toast.success(`Auto-filled: ${District}, ${State}`);
           }
-        } catch (err) {
-          console.error("Pincode fetch error:", err);
+        } catch {
+          // Ignore pincode lookup failures and keep checkout flow intact.
         }
       }
     };
@@ -135,7 +140,8 @@ const Checkout = () => {
   });
 
   const handlePayment = async () => {
-    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY;
+    // Use the new key first, fall back to the old one for backward compat
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || import.meta.env.VITE_RAZORPAY_KEY;
     if (!razorpayKey) {
       toast.error('Payment gateway is not configured.');
       return;
@@ -151,40 +157,86 @@ const Checkout = () => {
     const loaded = await loadRazorpay();
     if (!loaded) { toast.error('Payment service unavailable. Try again.'); setProcessing(false); return; }
 
-    const amountInPaise = Math.round(finalTotal * 100);
+    // STEP 1: Create order on server (KEY_SECRET never touches frontend)
+    let razorpayOrderId, razorpayOrderAmount, razorpayOrderCurrency;
+    try {
+      const amountInPaise = Math.round(finalTotal * 100);
+      const orderRes = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt: `rcpt_${user.uid.slice(0, 8)}_${Date.now()}`,
+        }),
+      });
 
+      if (!orderRes.ok) {
+        const err = await orderRes.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to initiate payment.');
+      }
+
+      const orderData = await orderRes.json();
+      razorpayOrderId = orderData.order_id;
+      razorpayOrderAmount = orderData.amount;
+      razorpayOrderCurrency = orderData.currency;
+    } catch (error) {
+      toast.error(error.message || 'Could not connect to payment gateway.');
+      setProcessing(false);
+      return;
+    }
+
+    // STEP 2: Open Razorpay modal with server-created order_id
     const options = {
       key: razorpayKey,
-      amount: amountInPaise,
-      currency: 'INR',
+      amount: razorpayOrderAmount,
+      currency: razorpayOrderCurrency,
+      order_id: razorpayOrderId,
       name: 'Chashmalay.in',
       description: `Order for ${cart.length} item(s)`,
-      image: '/logo.png', // Ideally your logo
+      image: '/logo.png',
       handler: async function (response) {
+        // STEP 3: Verify signature server-side before recording order
         setProcessing(true);
         try {
+          const verifyRes = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+
+          if (!verifyRes.ok) {
+            const errBody = await verifyRes.json().catch(() => ({}));
+            throw new Error(errBody.error || 'Payment verification failed.');
+          }
+
+          // Signature verified — safe to record order in Firestore
           const order = await createOrder({
             userId: user.uid,
             items: cart,
             total: finalTotal,
             address,
-            paymentId: response.razorpay_payment_id
+            paymentId: response.razorpay_payment_id,
+            razorpayOrderId: response.razorpay_order_id,
           });
           await emptyCart();
           navigate(`/order-success/${order?.id}`);
         } catch (err) {
-          console.error(err);
           setProcessing(false);
-          toast.error('Order creation failed. Contact support with ID: ' + response.razorpay_payment_id);
+          toast.error(err.message || ('Order creation failed. Contact support with Payment ID: ' + response.razorpay_payment_id));
         }
       },
       prefill: {
         name: address.name,
         email: user?.email || '',
-        contact: address.phone
+        contact: address.phone,
       },
       theme: { color: '#1A1A1A' },
-      modal: { ondismiss: () => setProcessing(false) }
+      modal: { ondismiss: () => setProcessing(false) },
     };
 
     const rzp = new window.Razorpay(options);

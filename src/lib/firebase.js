@@ -287,7 +287,7 @@ export const updateProfile = async (userId, updates) => {
 };
 
 // --- Orders ---
-export const createOrder = async ({ userId, items, total, address, paymentId }) => {
+export const createOrder = async ({ userId, items, total, address, paymentId, razorpayOrderId }) => {
   if (!checkRateLimit(`createOrder_${userId}`, 10000)) {
     throw new Error("Please wait before placing another order.");
   }
@@ -296,6 +296,7 @@ export const createOrder = async ({ userId, items, total, address, paymentId }) 
     total_amount: total,
     shipping_address: address,
     razorpay_payment_id: paymentId,
+    razorpay_order_id: razorpayOrderId || null,
     status: 'confirmed',
     created_at: serverTimestamp()
   };
