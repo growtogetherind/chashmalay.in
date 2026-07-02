@@ -47,7 +47,7 @@ const CategoryBentoGrid = () => {
         id: cat.id,
         name: cat.name,
         count: cat.description || 'Shop styles',
-        image: cat.image_url || cat.image || FALLBACK_CATEGORIES[index % FALLBACK_CATEGORIES.length].image,
+        image: cat.image_url || cat.image || cat.base_photo || cat.basePhoto || cat.photo || FALLBACK_CATEGORIES[index % FALLBACK_CATEGORIES.length].image,
         link: `/category/${cat.slug || cat.name?.toLowerCase().replace(/\s+/g, '-')}`,
         color: cat.color || FALLBACK_CATEGORIES[index % FALLBACK_CATEGORIES.length].color,
         accent: cat.accent || FALLBACK_CATEGORIES[index % FALLBACK_CATEGORIES.length].accent,

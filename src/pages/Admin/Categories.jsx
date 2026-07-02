@@ -62,6 +62,10 @@ const slugify = (value = '') => value
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '');
 
+const resolveCategoryImage = (category = {}) => (
+  category.image_url || category.image || category.base_photo || category.basePhoto || category.photo || ''
+);
+
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,7 +97,7 @@ const AdminCategories = () => {
     if (!form.name) return toast.error('Name is required');
     
     setSaving(true);
-    const image = form.image_url || form.image || '';
+    const image = resolveCategoryImage(form);
     const { error } = await saveCategory({
       ...form,
       slug: form.slug || slugify(form.name),
@@ -197,8 +201,8 @@ const AdminCategories = () => {
                     <tr key={c.id} className="group">
                       <td>
                         <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shadow-inner">
-                          {(c.image_url || c.image) ? (
-                            <img src={c.image_url || c.image} alt={c.name} className="w-full h-full object-cover" />
+                          {resolveCategoryImage(c) ? (
+                            <img src={resolveCategoryImage(c)} alt={c.name} className="w-full h-full object-cover" />
                           ) : (
                             <ImageIcon size={20} className="text-slate-300" />
                           )}
@@ -213,7 +217,7 @@ const AdminCategories = () => {
                       </td>
                       <td className="text-right">
                         <div className="flex justify-end gap-3">
-                          <button onClick={() => { setForm({ ...EMPTY_FORM, ...c, image: c.image_url || c.image || '', image_url: c.image_url || c.image || '' }); setEditing(c.id); setShowForm(true); }} className="p-2.5 rounded-lg bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 border border-slate-100 hover:border-emerald-100 transition-all"><Edit3 size={16} /></button>
+                          <button onClick={() => { const image = resolveCategoryImage(c); setForm({ ...EMPTY_FORM, ...c, image, image_url: image }); setEditing(c.id); setShowForm(true); }} className="p-2.5 rounded-lg bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 border border-slate-100 hover:border-emerald-100 transition-all"><Edit3 size={16} /></button>
                           <button onClick={() => handleDelete(c.id, c.name)} className="p-2.5 rounded-lg bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-600 border border-slate-100 hover:border-red-100 transition-all"><Trash2 size={16} /></button>
                         </div>
                       </td>
@@ -243,20 +247,20 @@ const AdminCategories = () => {
               </div>
               <button onClick={() => setShowForm(false)} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-900 border border-slate-100"><X size={20} /></button>
             </div>
-            <form onSubmit={handleSave} className="space-y-10">
+            <form onSubmit={handleSave} className="admin-form space-y-10">
               <div className="form-group">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Category Image</label>
                 <div className="flex items-center gap-5 bg-slate-50 border border-slate-100 rounded-3xl p-4">
                   <div className="relative w-28 h-28 rounded-2xl bg-white border border-slate-100 overflow-hidden flex items-center justify-center shadow-inner group">
-                    {form.image_url || form.image ? (
-                      <img src={form.image_url || form.image} alt="Category preview" className="w-full h-full object-cover" />
+                    {resolveCategoryImage(form) ? (
+                      <img src={resolveCategoryImage(form)} alt="Category preview" className="w-full h-full object-cover" />
                     ) : (
                       <ImageIcon size={30} className="text-slate-300" />
                     )}
                     <input type="file" accept="image/*" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
                     <div className="absolute inset-0 bg-emerald-900/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all backdrop-blur-[2px]">
                       <div className="bg-white/90 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-600 shadow-xl">
-                        {form.image_url || form.image ? 'Replace' : 'Upload'}
+                        {resolveCategoryImage(form) ? 'Replace' : 'Upload'}
                       </div>
                     </div>
                   </div>

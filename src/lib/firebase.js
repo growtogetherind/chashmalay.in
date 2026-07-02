@@ -123,7 +123,7 @@ const subscribeToQuery = (q, onData, onError, mapper = mapDoc) => onSnapshot(
   q,
   (snapshot) => onData(snapshot.docs.map((d) => mapper(d))),
   (error) => {
-    console.error("Firestore subscription error:", error);
+    if (import.meta.env.DEV) console.error("Firestore subscription error:", error);
     if (onError) onError(error);
   }
 );
@@ -160,7 +160,7 @@ export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatu
 
     return { data: products, error: null };
   } catch (error) {
-    console.error("Firebase getProducts error:", error);
+    if (import.meta.env.DEV) console.error("Firebase getProducts error:", error);
     return { data: [], error };
   }
 };
@@ -677,7 +677,7 @@ const slugify = (value = '') => value
   .replace(/^-+|-+$/g, '');
 
 const categoryPayload = (category = {}) => {
-  const image = category.image_url || category.image || '';
+  const image = category.image_url || category.image || category.base_photo || category.basePhoto || category.photo || '';
   return {
     ...category,
     name: category.name?.trim() || '',
@@ -1192,7 +1192,7 @@ export const sendOrderConfirmationSMS = async (phoneNumber, customerName, orderI
 
     if (response.ok) {
       const data = await response.json();
-      console.log("SMS sent successfully via backend proxy:", data);
+      if (import.meta.env.DEV) console.log("SMS sent successfully via backend proxy:", data);
       return;
     }
   } catch (backendError) {
