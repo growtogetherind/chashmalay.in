@@ -686,57 +686,6 @@ const Category = () => {
                   </div>
 
                   <div className="space-y-2">
-                     {/* Category Accordion */}
-                     <div className="border-b border-gray-100 pb-2">
-                        <button
-                          onClick={() => toggleFilter('category')}
-                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
-                        >
-                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Category</span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.category ? 'transform rotate-180 text-accent' : ''}`}
-                          />
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {expandedFilters.category && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pt-1 pb-4 space-y-2.5">
-                                 {['Eyeglasses', 'Sunglasses', 'Contact Lenses'].map(cat => {
-                                     const isChecked = pendingCategories.includes(cat);
-                                     const handleToggle = () => {
-                                         setPendingCategories(prev =>
-                                             prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-                                         );
-                                     };
-                                     const availabilityCount = getAvailabilityCount('category', cat, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
-
-                                     return (
-                                         <label key={cat} className="flex items-center gap-3 cursor-pointer group py-1">
-                                             <input
-                                                 type="checkbox"
-                                                 checked={isChecked}
-                                                 onChange={handleToggle}
-                                                 className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
-                                             />
-                                             <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
-                                                 {cat} <span className="text-[10px] text-slate-400 font-normal">({availabilityCount})</span>
-                                             </span>
-                                         </label>
-                                     );
-                                 })}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                     </div>
-
                       {/* Frame Type Accordion */}
                       <div className="border-b border-gray-100 pb-2">
                          <button
@@ -867,7 +816,7 @@ const Category = () => {
                             >
                               <div className="pt-1 pb-4">
                                 <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-                                    {['Black', 'Tortoise', 'Clear', 'Gold', 'Blue', 'Red'].map(color => {
+                                    {colorOptions.map(color => {
                                         const isSelected = pendingColors.includes(color);
                                         const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
 
@@ -1156,35 +1105,6 @@ const Category = () => {
                       </div>
                    </div>
 
-                    {/* Category Filter */}
-                    <div>
-                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Category</h4>
-                       <div className="space-y-3">
-                          {['Eyeglasses', 'Sunglasses', 'Contact Lenses'].map(cat => {
-                             const isChecked = pendingCategories.includes(cat);
-                             const handleToggle = () => {
-                                 setPendingCategories(prev =>
-                                     prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-                                 );
-                             };
-                             const availabilityCount = getAvailabilityCount('category', cat, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
-                             return (
-                                 <label key={cat} className="flex items-center gap-3 cursor-pointer group py-1">
-                                     <input
-                                         type="checkbox"
-                                         checked={isChecked}
-                                         onChange={handleToggle}
-                                         className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
-                                     />
-                                     <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
-                                         {cat} <span className="text-[10px] text-slate-400 font-normal">({availabilityCount})</span>
-                                     </span>
-                                 </label>
-                             );
-                          })}
-                       </div>
-                    </div>
-
                     {/* Frame Shape Filter */}
                     <div>
                        <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Shape</h4>
@@ -1216,7 +1136,7 @@ const Category = () => {
                     <div>
                        <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Color</h4>
                        <div className="grid grid-cols-3 gap-3">
-                          {['Black', 'Tortoise', 'Clear', 'Gold', 'Blue', 'Red'].map(color => {
+                          {colorOptions.map(color => {
                              const isSelected = pendingColors.includes(color);
                              const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
                              return (
