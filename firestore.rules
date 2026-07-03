@@ -139,6 +139,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ─── Lens System (Categories, Lenses, Addons) ─────────────────────────────
+    match /lens_categories/{catId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /lenses/{lensId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /lens_addons/{addonId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ─── Settings ─────────────────────────────────────────────────────────────
     match /settings/{settingId} {
       allow read: if true;

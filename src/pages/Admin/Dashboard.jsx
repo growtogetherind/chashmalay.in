@@ -294,16 +294,21 @@ const AdminDashboard = () => {
                  </button>
               </div>
               <div className="bar-chart-container">
-                 {[stats.orders, stats.pendingOrders, stats.lowStockProducts, stats.products].map((value, i) => {
-                    const h = Math.max(12, Math.min(95, value * 8));
-                    return (
-                    <div key={i} className="bar-wrapper">
-                       <div className="bar group" style={{ height: `${h}%` }}>
-                          <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{value}</div>
-                       </div>
-                       <span className="bar-label">{['Orders', 'Open', 'Low', 'SKUs'][i]}</span>
-                    </div>
-                 )})}
+                  {(() => {
+                     const dataset = [stats.orders, stats.pendingOrders, stats.lowStockProducts, stats.products];
+                     const maxVal = Math.max(...dataset, 1);
+                     return dataset.map((value, i) => {
+                        const h = Math.max(12, Math.round((value / maxVal) * 90));
+                        return (
+                           <div key={i} className="bar-wrapper">
+                              <div className="bar group" style={{ height: `${h}%` }}>
+                                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{value}</div>
+                              </div>
+                              <span className="bar-label">{['Orders', 'Open', 'Low', 'SKUs'][i]}</span>
+                           </div>
+                        );
+                     });
+                  })()}
               </div>
            </div>
         </div>

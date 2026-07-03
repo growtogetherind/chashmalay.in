@@ -142,7 +142,20 @@ const CartDrawer = () => {
                   {cart.map((item) => {
                     const itemId = getItemId(item);
                     const basePrice = getItemPrice(item);
-                    const lensPrice = (item.lensSelection?.visionType?.price || 0) + (item.lensSelection?.lensPackage?.price || 0);
+                    let lensPrice = 0;
+                    if (item.lensSelection?.selectedLens?.price) {
+                      lensPrice += Number(item.lensSelection.selectedLens.price);
+                    } else if (item.lensSelection?.lensPackage?.price) {
+                      lensPrice += Number(item.lensSelection.lensPackage.price);
+                    }
+                    if (item.lensSelection?.addons && item.lensSelection.addons.length > 0) {
+                      item.lensSelection.addons.forEach(a => {
+                        lensPrice += Number(a.price || 0);
+                      });
+                    }
+                    if (item.lensSelection?.visionType?.price) {
+                      lensPrice += Number(item.lensSelection.visionType.price);
+                    }
                     const currentPrice = (basePrice + lensPrice) * (item.quantity || 1);
 
                     return (
@@ -158,9 +171,14 @@ const CartDrawer = () => {
                             </div>
                             <p className="item-meta">
                               {item.products?.brand || item.brand || 'Premium Edition'} • {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : (item.products?.frame_shape || item.frame_shape || 'Medium')}{item.lensSelection?.selectedSize ? ` / Size: ${item.lensSelection.selectedSize}` : ''}
-                              {item.lensSelection?.lensPackage && (
+                              {(item.lensSelection?.selectedLens || item.lensSelection?.lensPackage) && (
                                 <span className="block mt-1 text-indigo-600 font-bold">
-                                  Lens: {item.lensSelection.lensPackage.name}
+                                  Lens: {item.lensSelection.selectedLens?.name || item.lensSelection.lensPackage.name} ({item.lensSelection.visionType?.name || 'Clear'})
+                                </span>
+                              )}
+                              {item.lensSelection?.addons && item.lensSelection.addons.length > 0 && (
+                                <span className="block mt-0.5 text-[9px] text-slate-500 font-medium">
+                                  Upgrades: {item.lensSelection.addons.map(a => `${a.name} (+₹${a.price})`).join(', ')}
                                 </span>
                               )}
                             </p>

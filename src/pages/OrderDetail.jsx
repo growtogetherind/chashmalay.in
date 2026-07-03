@@ -180,20 +180,24 @@ const OrderDetail = () => {
                           </p>
                         )}
                         {item.lens_selection?.visionType && (
-                          <p className="text-sm text-gray-800 font-medium">{item.lens_selection.visionType.title}</p>
+                          <p className="text-sm text-gray-800 font-medium">{item.lens_selection.visionType.name || item.lens_selection.visionType.title}</p>
                         )}
+                        {(item.lens_selection?.selectedLens || item.lens_selection?.lensPackage) && (
+                          <p className="text-xs text-primary-blue font-bold mt-1">
+                            {item.lens_selection.selectedLens?.name || item.lens_selection.lensPackage?.name}
+                          </p>
+                        )}
+                        {item.lens_selection?.addons && item.lens_selection.addons.map((a, aIdx) => (
+                          <p key={aIdx} className="text-[10px] text-amber-600 font-bold mt-0.5">+ {a.name}</p>
+                        ))}
                         {item.lens_selection?.isContactLens && (
                           <p className="text-sm text-gray-800 font-medium">Contact Lenses</p>
                         )}
-                        {!item.lens_selection && (
-                          <p className="text-sm text-gray-400 font-medium italic">
-                            {item.category?.toLowerCase().includes('contact') ? 'Contact Lens' : 'Frame Only'}
-                          </p>
-                        )}
-                        <p className="text-xs text-primary-blue font-bold mt-1">{item.lens_selection.lensPackage?.name}</p>
                       </div>
                     ) : (
-                      <span className="text-sm text-gray-500">Not specified</span>
+                      <span className="text-sm text-gray-400 font-medium italic">
+                        {item.category?.toLowerCase().includes('contact') ? 'Contact Lens' : 'Frame Only'}
+                      </span>
                     )}
                   </td>
                   <td className="text-sm font-bold text-gray-700">{item.quantity}</td>

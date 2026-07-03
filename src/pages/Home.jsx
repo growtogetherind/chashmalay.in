@@ -8,6 +8,7 @@ import HeroSlider from '../components/ui/HeroSlider';
 import CategoryBentoGrid from '../components/ui/CategoryBentoGrid';
 import ProductCard from '../components/ui/ProductCard';
 import TestimonialStack from '../components/ui/TestimonialStack';
+import BrandTabs from '../components/ui/BrandTabs';
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/ui/Motion';
 
 const SectionHeader = ({ label, title }) => (
@@ -17,9 +18,140 @@ const SectionHeader = ({ label, title }) => (
   </div>
 );
 
+const ARRIVALS_ITEMS = [
+  {
+    id: 'arr-1',
+    name: 'Aria Cat-Eye',
+    price: '₹4,499',
+    image: '/assets/im/all_img/0rb4165_622_t3_030a_1.png',
+    showTag: true,
+  },
+  {
+    id: 'arr-2',
+    name: 'Aria Cat-Eye',
+    price: '₹4,499',
+    image: '/assets/im/all_img/0rb4165_622_t3_030a_1.png',
+    showTag: true,
+  },
+  {
+    id: 'arr-3',
+    name: '',
+    price: '',
+    image: '/assets/im/arrivals_male_model.png',
+    isModel: true,
+    showTag: false,
+  },
+  {
+    id: 'arr-4',
+    name: 'Leo Square Frame',
+    price: '₹5,999',
+    image: '/assets/im/all_img/0rb2140_901_030a.png',
+    showTag: true,
+  },
+  {
+    id: 'arr-5',
+    name: 'Aria Cat-Eye',
+    price: '₹4,499',
+    image: '/assets/im/all_img/0rb3025i_004_78_030a_new.png',
+    showTag: true,
+  },
+  {
+    id: 'arr-6',
+    name: 'Line Frames',
+    price: '₹8,999',
+    image: '/assets/im/arrivals_female_model.png',
+    isModel: true,
+    showTag: true,
+  },
+  {
+    id: 'arr-7',
+    name: 'Luna Round Optical',
+    price: '₹3,499',
+    image: '/assets/im/all_img/0rx65452943p21_1.png',
+    showTag: true,
+  },
+  {
+    id: 'arr-8',
+    name: 'Luna Round Optical',
+    price: '₹3,499',
+    image: '/assets/im/all_img/0rx65452943p21_1.png',
+    showTag: true,
+  },
+];
+
+const ArrivalCard = ({ item, product }) => {
+  if (product) {
+    const priceVal = parseInt((product.consumersPrice || product.price || "0").toString().replace(/,/g, ''));
+    const imageVal = product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image';
+    const isContactLens = product.category?.toLowerCase().includes('contact');
+    const linkTo = isContactLens ? `/contact-lens/${product.id}` : `/product/${product.id}`;
+
+    return (
+      <Link to={linkTo} className="flex flex-col h-full group">
+        <div className="relative bg-[#f5f5f5] rounded-sm overflow-hidden flex-shrink-0 aspect-square lg:aspect-auto lg:h-full lg:flex-grow flex items-center justify-center">
+          <div className="absolute top-3 right-3 bg-[#e75a24] text-white text-[8px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm z-10">
+            NEW
+          </div>
+          <img
+            src={imageVal}
+            alt={product.name}
+            className="w-full h-full object-contain p-6 md:p-8 group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image'; }}
+          />
+        </div>
+        <div className="mt-3 text-left">
+          <h3 className="text-[11px] font-extrabold text-gray-900 uppercase tracking-widest leading-none line-clamp-1">
+            {product.name}
+          </h3>
+          <p className="text-[10px] font-bold text-gray-400 mt-2">
+            ₹{priceVal.toLocaleString()}
+          </p>
+        </div>
+      </Link>
+    );
+  }
+
+  const { name, price, image, isModel, showTag } = item;
+  const linkTo = isModel
+    ? '/category/sunglasses'
+    : name.toLowerCase().includes('optical')
+    ? '/category/eyeglasses'
+    : '/category/sunglasses';
+
+  return (
+    <Link to={linkTo} className="flex flex-col h-full group">
+      <div className={`relative bg-[#f5f5f5] rounded-sm overflow-hidden flex-shrink-0 ${isModel ? 'aspect-[3/4] lg:aspect-auto lg:h-full lg:flex-grow' : 'aspect-square lg:aspect-auto lg:h-full lg:flex-grow'} flex items-center justify-center`}>
+        {showTag && (
+          <div className="absolute top-3 right-3 bg-[#e75a24] text-white text-[8px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm z-10">
+            NEW
+          </div>
+        )}
+        <img
+          src={image}
+          alt={name || "Lifestyle Model"}
+          className={`w-full h-full ${isModel ? 'object-cover' : 'object-contain p-6 md:p-8'} group-hover:scale-105 transition-transform duration-500`}
+          loading="lazy"
+        />
+      </div>
+      {name && (
+        <div className="mt-3 text-left">
+          <h3 className="text-[11px] font-extrabold text-gray-900 uppercase tracking-widest leading-none">
+            {name}
+          </h3>
+          <p className="text-[10px] font-bold text-gray-400 mt-2">
+            {price}
+          </p>
+        </div>
+      )}
+    </Link>
+  );
+};
+
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,14 +163,33 @@ const Home = () => {
 
     // Fetch New Arrivals
     const unsubNew = subscribeProducts({ isNew: true }, (data) => {
-      setNewArrivals(data.slice(0, 3));
+      setNewArrivals(data);
+    });
+
+    // Fetch All Products (for backup)
+    const unsubAll = subscribeProducts({}, (data) => {
+      setAllProducts(data);
     });
 
     return () => {
       unsubFeatured();
       unsubNew();
+      unsubAll();
     };
   }, []);
+
+  // Combine new arrivals with all products to make sure we always have 6 products
+  const productsToDisplay = [...newArrivals];
+  
+  // Fill with other products if we have fewer than 6
+  if (productsToDisplay.length < 6) {
+    const backups = allProducts.filter(
+      (ap) => !productsToDisplay.some((p) => p.id === ap.id)
+    );
+    productsToDisplay.push(...backups.slice(0, 6 - productsToDisplay.length));
+  }
+
+  const hasDbProducts = productsToDisplay.length >= 6;
 
   return (
     <div className="bg-white text-gray-900 font-sans">
@@ -46,110 +197,129 @@ const Home = () => {
       {/* Hero Slider with Bento Grid */}
       <HeroSlider />
 
+      {/* Gender/Shop All Promo Section */}
+      <section className="pt-10 pb-2 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            {/* Shop All Card */}
+            <Link 
+              to="/category/all" 
+              className="relative group bg-[#f5f5f5] rounded-2xl overflow-hidden aspect-square flex items-center justify-center hover:shadow-md transition-all duration-300"
+            >
+              <img 
+                src="https://i.ibb.co/1YPcbTPW/eyewear-landing-page-variant-1-1.webp" 
+                alt="Shop All" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </Link>
+
+            {/* Men Card */}
+            <Link 
+              to="/category/men" 
+              className="relative group bg-[#f5f5f5] rounded-2xl overflow-hidden aspect-square flex items-center justify-center hover:shadow-md transition-all duration-300"
+            >
+              <img 
+                src="https://i.ibb.co/Jws0NQVr/eyewear-landing-page-variant-1.webp" 
+                alt="Men" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </Link>
+
+            {/* Women Card */}
+            <Link 
+              to="/category/women" 
+              className="relative group bg-[#f5f5f5] rounded-2xl overflow-hidden aspect-square flex items-center justify-center hover:shadow-md transition-all duration-300"
+            >
+              <img 
+                src="https://i.ibb.co/tpbPKKCL/woman.webp" 
+                alt="Women" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </Link>
+
+            {/* Kids Card */}
+            <Link 
+              to="/category/kids" 
+              className="relative group bg-[#f5f5f5] rounded-2xl overflow-hidden aspect-square flex items-center justify-center hover:shadow-md transition-all duration-300"
+            >
+              <img 
+                src="https://i.ibb.co/TxgHzFQW/kids.webp" 
+                alt="Kids" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </Link>
+
+          </div>
+        </div>
+      </section>
+
       {/* Category Circles */}
-      <section className="py-8 bg-white border-b border-gray-100">
+      <section className="py-2 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <CategoryBentoGrid />
         </div>
       </section>
 
-      {/* Our Products (Featured) */}
-      <section className="py-10 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-6">
-            <SectionHeader label="Hottest collections" title="Our products" />
-            <div className="flex gap-2">
-              <button className="w-8 h-8 flex items-center justify-center bg-gray-900 text-white hover:bg-gray-800 transition-colors">
-                <ChevronLeft size={16} />
-              </button>
-              <button className="w-8 h-8 flex items-center justify-center bg-gray-900 text-white hover:bg-gray-800 transition-colors">
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
 
-          {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-gray-200 animate-pulse rounded-2xl aspect-[4/3]" />
-              ))}
-            </div>
-          ) : (
-            <StaggerContainer className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {featuredProducts.map((p) => (
-                <StaggerItem key={p.id}>
-                  <ProductCard product={p} />
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
-          )}
-        </div>
-      </section>
 
-      {/* Promo / Feature Banner */}
-      <section className="py-8 bg-white border-y border-gray-100">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            {/* Left - Cloudinary optimized banner */}
-            <FadeIn delay={0.1}>
-              <div className="rounded-lg overflow-hidden aspect-[4/3] w-full">
-                <img
-                  src="https://res.cloudinary.com/dpv40ou2c/image/upload/q_auto/f_auto/c_fill,w_900,h_675/banners/sunglasses_banner.png"
-                  alt="Featured Sunglasses"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            </FadeIn>
 
-            {/* Right - Text */}
-            <FadeIn delay={0.2} className="flex flex-col justify-center md:pl-4">
-              <p className="text-xs font-bold text-gray-900 mb-2 tracking-wide">Trending products to buy 1 get 1</p>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight tracking-tight">
-                For the sunglasses <br /> you don’t yet know
-              </h2>
-              <p className="text-gray-500 text-xs leading-relaxed mb-4 max-w-md font-medium">
-                If you are the sunglasses person who wants to find the best deal, we carry the top performing sunglasses from top brands and manufacturers.
-              </p>
-              <p className="text-sm font-bold text-primary mb-6">
-                Best selling price at ₹590
-              </p>
-              <Link
-                to="/category/sunglasses"
-                className="inline-flex items-center justify-center w-fit border border-primary text-primary bg-white text-xs font-bold px-8 py-2.5 rounded hover:bg-blue-50 transition-colors tracking-wide"
-              >
-                SHOP NOW
-              </Link>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
 
       {/* New Arrivals */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-8">
-            <SectionHeader label="Friendly frames" title="New arrivals" />
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-extrabold uppercase tracking-[0.2em] text-gray-900">
+              New Arrivals
+            </h2>
           </div>
 
-          {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-gray-200 animate-pulse rounded-2xl aspect-[4/3]" />
-              ))}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:h-[680px]">
+            {/* Column 1 */}
+            <div className="flex flex-col justify-between h-full gap-6">
+              <div className="lg:h-[calc(50%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[0]} product={hasDbProducts ? productsToDisplay[0] : null} />
+              </div>
+              <div className="lg:h-[calc(50%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[1]} product={hasDbProducts ? productsToDisplay[1] : null} />
+              </div>
             </div>
-          ) : (
-            <StaggerContainer className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {(newArrivals.length > 0 ? newArrivals : featuredProducts).map((p) => (
-                <StaggerItem key={p.id}>
-                  <ProductCard product={p} />
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
-          )}
+
+            {/* Column 2 */}
+            <div className="flex flex-col justify-between h-full gap-6">
+              <div className="lg:h-[calc(66%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[2]} />
+              </div>
+              <div className="lg:h-[calc(34%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[3]} product={hasDbProducts ? productsToDisplay[2] : null} />
+              </div>
+            </div>
+
+            {/* Column 3 */}
+            <div className="flex flex-col justify-between h-full gap-6">
+              <div className="lg:h-[calc(34%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[4]} product={hasDbProducts ? productsToDisplay[3] : null} />
+              </div>
+              <div className="lg:h-[calc(66%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[5]} />
+              </div>
+            </div>
+
+            {/* Column 4 */}
+            <div className="flex flex-col justify-between h-full gap-6">
+              <div className="lg:h-[calc(50%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[6]} product={hasDbProducts ? productsToDisplay[4] : null} />
+              </div>
+              <div className="lg:h-[calc(50%-12px)] flex flex-col">
+                <ArrivalCard item={ARRIVALS_ITEMS[7]} product={hasDbProducts ? productsToDisplay[5] : null} />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* Brand Partners Marquee */}
+      <BrandTabs />
 
       {/* Testimonials */}
       <FadeIn>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye } from 'lucide-react';
-import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands } from '../../lib/firebase';
+import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
 import toast from 'react-hot-toast';
@@ -19,28 +19,15 @@ const CONTACT_LENS_TYPES = ['Spherical', 'Toric', 'Multifocal', 'Colored'];
 const PACK_SIZES = ['1 Lens', '2 Lenses', '6 Lenses', '10 Lenses', '30 Lenses', '90 Lenses'];
 const CONTACT_LENS_COLORS = ['Clear', 'Blue', 'Brown', 'Green', 'Hazel', 'Gray', 'Honey', 'Turquoise'];
 
-const DEFAULT_CATEGORIES = [
-  { id: 'def-c1', name: 'Eyeglasses' },
-  { id: 'def-c2', name: 'Sunglasses' },
-  { id: 'def-c3', name: 'Computer Glasses' },
-  { id: 'def-c4', name: 'Contact Lenses' },
-  { id: 'def-c5', name: 'Reading Glasses' }
-];
 
-const DEFAULT_BRANDS = [
-  { id: 'def-b1', name: 'Chashmalay' },
-  { id: 'def-b2', name: 'Ray-Ban' },
-  { id: 'def-b3', name: 'Oakley' },
-  { id: 'def-b4', name: 'Vincent Chase' },
-  { id: 'def-b5', name: 'Carrera' },
-  { id: 'def-b6', name: 'Vogue' },
-  { id: 'def-b7', name: 'Fossil' }
-];
+
+const ACCESSORY_TYPES = ['Lens Cleaner', 'Microfiber Cloth', 'Contact Lens Solution', 'Spectacle Case'];
 
 const EMPTY_PRODUCT = {
   name: '',
   brand: '',
   category: '',
+  default_color: '',
   sku: '',
   price: '',
   original_price: '',
@@ -67,6 +54,8 @@ const EMPTY_PRODUCT = {
     gallery: []
   },
   colors: [],
+  // Accessory specific field
+  accessory_type: '',
   // Contact Lens specific fields
   disposable_type: 'Monthly',
   contact_lens_type: 'Spherical',
@@ -76,7 +65,10 @@ const EMPTY_PRODUCT = {
   water_content: '38%',
   uv_protection: 'Yes',
   base_curve: '8.6',
-  diameter: '14.2'
+  diameter: '14.2',
+  show_lens_selection: true,
+  show_color_selection: true,
+  show_size_selection: true
 };
 const SIZES = ['S', 'M', 'L'];
 
@@ -84,6 +76,7 @@ const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [lensCategories, setLensCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
@@ -97,18 +90,6 @@ const AdminProducts = () => {
   const [pendingImages, setPendingImages] = useState({});
   const [pendingGallery, setPendingGallery] = useState([]);
   const { confirm } = useConfirm();
-
-  // ── Lock body scroll when modal is open ──────────────────────────────────
-  useEffect(() => {
-    if (showForm || showColorModal) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [showForm, showColorModal]);
 
   // Auto-save draft to localStorage
   useEffect(() => {
@@ -151,15 +132,19 @@ const AdminProducts = () => {
       setLoading(false);
     }, () => setLoading(false));
     const unCategories = subscribeCategories((data) => {
-      setCategories(data && data.length > 0 ? data : DEFAULT_CATEGORIES);
+      setCategories(data || []);
     });
     const unBrands = subscribeBrands((data) => {
-      setBrands(data && data.length > 0 ? data : DEFAULT_BRANDS);
+      setBrands(data || []);
+    });
+    const unLensCategories = subscribeLensCategories((data) => {
+      setLensCategories(data || []);
     });
     return () => {
       unProducts?.();
       unCategories?.();
       unBrands?.();
+      unLensCategories?.();
     };
   }, []);
 
@@ -178,22 +163,16 @@ const AdminProducts = () => {
       // Smart Fallback: If categories/brands collections are empty,
       // extract unique values from existing products
       let fetchedCats = cRes.data || [];
-      if (fetchedCats.length === 0) {
-        if (fetchedProducts.length > 0) {
-          const uniqueCats = [...new Set(fetchedProducts.map(p => p.category).filter(Boolean))];
-          fetchedCats = uniqueCats.map((name, i) => ({ id: `ext-${i}`, name }));
-        }
-        if (fetchedCats.length === 0) fetchedCats = DEFAULT_CATEGORIES;
+      if (fetchedCats.length === 0 && fetchedProducts.length > 0) {
+        const uniqueCats = [...new Set(fetchedProducts.map(p => p.category).filter(Boolean))];
+        fetchedCats = uniqueCats.map((name, i) => ({ id: `ext-${i}`, name }));
       }
       setCategories(fetchedCats);
 
       let fetchedBrands = bRes.data || [];
-      if (fetchedBrands.length === 0) {
-        if (fetchedProducts.length > 0) {
-          const uniqueBrands = [...new Set(fetchedProducts.map(p => p.brand).filter(Boolean))];
-          fetchedBrands = uniqueBrands.map((name, i) => ({ id: `ext-b-${i}`, name }));
-        }
-        if (fetchedBrands.length === 0) fetchedBrands = DEFAULT_BRANDS;
+      if (fetchedBrands.length === 0 && fetchedProducts.length > 0) {
+        const uniqueBrands = [...new Set(fetchedProducts.map(p => p.brand).filter(Boolean))];
+        fetchedBrands = uniqueBrands.map((name, i) => ({ id: `ext-b-${i}`, name }));
       }
       setBrands(fetchedBrands);
     } catch (err) {
@@ -256,7 +235,7 @@ const AdminProducts = () => {
       setColorForm(form.colors[index]);
     } else {
       setColorEditing(null);
-      setColorForm({ name: '', hex: '#000000', hex2: '', is_dual_tone: false, image: '' });
+      setColorForm({ name: '', hex: '#000000', hex2: '', is_dual_tone: false, image: '', image_side: '', image_model: '' });
     }
     setShowColorModal(true);
   };
@@ -549,7 +528,7 @@ const AdminProducts = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Category *</label>
                       <select name="category" value={form.category} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
@@ -562,6 +541,18 @@ const AdminProducts = () => {
                       <select name="brand" value={form.brand} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         <option value="">Select Brand</option>
                         {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Default Color</label>
+                      <select name="default_color" value={form.default_color || ''} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
+                        <option value="">Select Default Color</option>
+                        {Array.from(new Set([
+                          ...(form.colors || []).map(c => c.name),
+                          'Black', 'Gold', 'Silver', 'Gunmetal', 'Transparent', 'Brown', 'Blue', 'Rose Gold', 'Green', 'Gray', 'Clear', 'Honey', 'Hazel', 'Red', 'Tortoise'
+                        ].filter(Boolean))).map(col => (
+                          <option key={col} value={col}>{col}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -632,6 +623,57 @@ const AdminProducts = () => {
                       <input name="tags" value={form.tags} onChange={handleChange} placeholder="e.g. premium, red, round" className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm" />
                     </div>
                   </div>
+
+                  <div className="form-group">
+                    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-4 block">Compatible Lens Categories</label>
+                    <div className="flex flex-wrap gap-6 p-5 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
+                      {(lensCategories.length > 0 ? lensCategories : [
+                        { id: 'l1', name: 'Single Vision' },
+                        { id: 'l2', name: 'Bifocal' },
+                        { id: 'l3', name: 'Progressive' }
+                      ]).map(cat => (
+                        <label key={cat.id || cat.name} className="flex items-center gap-3 cursor-pointer group">
+                          <div className="relative flex items-center">
+                            <input
+                              type="checkbox"
+                              className="peer opacity-0 absolute h-6 w-6 cursor-pointer z-10"
+                              checked={form.available_lenses?.some(al => al.toLowerCase() === cat.name.toLowerCase()) || false}
+                              onChange={(e) => {
+                                const list = form.available_lenses || [];
+                                const newList = e.target.checked
+                                  ? [...list, cat.name]
+                                  : list.filter(item => item.toLowerCase() !== cat.name.toLowerCase());
+                                setForm(prev => ({ ...prev, available_lenses: newList }));
+                              }}
+                            />
+                            <div className="h-6 w-6 border-2 border-slate-200 rounded-lg bg-white peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all flex items-center justify-center shadow-inner">
+                              <Plus size={14} className="text-white scale-0 peer-checked:scale-100 transition-transform" />
+                            </div>
+                          </div>
+                          <span className="text-xs font-black text-slate-500 group-hover:text-slate-900 transition-colors uppercase">{cat.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-[9px] text-slate-400 mt-2 font-medium italic">Select which lens categories are compatible with this frame. If none are selected, all categories will be shown.</p>
+                  </div>
+
+                  {/* ── Accessories Specialized Fields ── */}
+                  {form.category?.toLowerCase().includes('accessor') && (
+                    <div className="p-8 bg-amber-50/30 rounded-[24px] border border-amber-100/50 space-y-8">
+                       <div className="flex items-center gap-3 mb-2">
+                          <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                          <h4 className="text-[11px] font-black uppercase tracking-[2px] text-amber-800">Accessory Specifications</h4>
+                       </div>
+                       <div className="form-group">
+                         <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Accessory Type *</label>
+                         <select name="accessory_type" value={form.accessory_type || ''} onChange={handleChange} className="w-full bg-white border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-amber-500 outline-none transition-all shadow-sm cursor-pointer">
+                           <option value="">Select Accessory Type</option>
+                           {ACCESSORY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                         </select>
+                         <p className="text-[9px] text-slate-400 mt-2 font-medium italic">This field powers the Accessory Type filter on the storefront.</p>
+                       </div>
+                    </div>
+                  )}
 
                   {/* ── Contact Lens Specialized Fields ── */}
                   {(form.category?.toLowerCase().includes('contact') || form.category?.toLowerCase() === 'contacts') && (
@@ -747,6 +789,27 @@ const AdminProducts = () => {
                           <span className="text-[10px] font-bold uppercase text-slate-400 group-hover:text-slate-900 transition-colors">Featured Product</span>
                         </label>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-4 block">Interactive Features Config</label>
+                    <div className="flex flex-wrap gap-8 p-5 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
+                      <label className="flex items-center gap-4 cursor-pointer group">
+                        <input type="checkbox" name="show_lens_selection" checked={form.show_lens_selection !== false} onChange={handleChange} className="peer hidden" />
+                        <div className="w-5 h-5 rounded-lg border-2 border-slate-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all shadow-inner" />
+                        <span className="text-[10px] font-bold uppercase text-slate-400 group-hover:text-slate-900 transition-colors">Enable Lenses Selector</span>
+                      </label>
+                      <label className="flex items-center gap-4 cursor-pointer group">
+                        <input type="checkbox" name="show_color_selection" checked={form.show_color_selection !== false} onChange={handleChange} className="peer hidden" />
+                        <div className="w-5 h-5 rounded-lg border-2 border-slate-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all shadow-inner" />
+                        <span className="text-[10px] font-bold uppercase text-slate-400 group-hover:text-slate-900 transition-colors">Show Color Options</span>
+                      </label>
+                      <label className="flex items-center gap-4 cursor-pointer group">
+                        <input type="checkbox" name="show_size_selection" checked={form.show_size_selection !== false} onChange={handleChange} className="peer hidden" />
+                        <div className="w-5 h-5 rounded-lg border-2 border-slate-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all shadow-inner" />
+                        <span className="text-[10px] font-bold uppercase text-slate-400 group-hover:text-slate-900 transition-colors">Show Size Options</span>
+                      </label>
                     </div>
                   </div>
 
@@ -914,13 +977,13 @@ const AdminProducts = () => {
 
       {showColorModal && (
         <div className="admin-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[2100] flex items-center justify-center p-4" onClick={() => setShowColorModal(false)}>
-          <div className="admin-modal max-w-lg w-full bg-white rounded-3xl p-8 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+          <div className="admin-modal max-w-lg w-full bg-white rounded-3xl p-6 md:p-8 shadow-2xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100">
               <h3 className="text-xl font-bold text-slate-900">{colorEditing !== null ? 'Edit Color' : 'Add Color'}</h3>
               <button onClick={() => setShowColorModal(false)} className="p-2 text-slate-400 hover:text-slate-900 transition-colors"><X size={20} /></button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="form-group">
                 <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Color Name</label>
                 <input
@@ -960,35 +1023,107 @@ const AdminProducts = () => {
                 )}
               </div>
 
-              <div className="form-group">
-                 <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Photo for this color</label>
-                 <div className="relative aspect-video bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer">
-                    {colorForm.image ? (
-                       <img src={colorForm.image} alt="" className="w-full h-full object-contain p-2" />
-                    ) : (
-                       <div className="flex flex-col items-center text-slate-300">
-                          <Upload size={24} />
-                          <span className="text-[10px] font-bold mt-2">Upload Photo</span>
-                       </div>
-                    )}
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={async (e) => {
-                         const file = e.target.files[0];
-                         if (file) {
-                            const toastId = toast.loading('Uploading...');
-                            const { url, error } = await uploadImage(file, 'products/colors');
-                            if (error) toast.error('Upload failed');
-                            else {
-                               setColorForm(prev => ({ ...prev, image: url }));
-                               toast.success('Uploaded!');
-                            }
-                            toast.dismiss(toastId);
-                         }
-                      }}
-                      className="absolute inset-0 opacity-0 cursor-pointer" 
-                    />
+              <div className="form-group border-t border-slate-100 pt-4">
+                 <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Color Variation Photos (Multiple Sides)</label>
+                 <div className="grid grid-cols-3 gap-3">
+                   {/* Front View */}
+                   <div className="flex flex-col items-center gap-1.5">
+                     <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Front</span>
+                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner">
+                        {colorForm.image ? (
+                           <img src={colorForm.image} alt="" className="w-full h-full object-contain p-1" />
+                        ) : (
+                           <div className="flex flex-col items-center text-slate-300">
+                              <Upload size={16} />
+                              <span className="text-[8px] font-bold mt-1">Upload</span>
+                           </div>
+                        )}
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={async (e) => {
+                             const file = e.target.files[0];
+                             if (file) {
+                                const toastId = toast.loading('Uploading front...');
+                                const { url, error } = await uploadImage(file, 'products/colors');
+                                if (error) toast.error('Upload failed');
+                                else {
+                                   setColorForm(prev => ({ ...prev, image: url }));
+                                   toast.success('Uploaded Front!');
+                                }
+                                toast.dismiss(toastId);
+                             }
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer" 
+                        />
+                     </div>
+                   </div>
+
+                   {/* Side View */}
+                   <div className="flex flex-col items-center gap-1.5">
+                     <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Side</span>
+                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner">
+                        {colorForm.image_side ? (
+                           <img src={colorForm.image_side} alt="" className="w-full h-full object-contain p-1" />
+                        ) : (
+                           <div className="flex flex-col items-center text-slate-300">
+                              <Upload size={16} />
+                              <span className="text-[8px] font-bold mt-1">Upload</span>
+                           </div>
+                        )}
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={async (e) => {
+                             const file = e.target.files[0];
+                             if (file) {
+                                const toastId = toast.loading('Uploading side...');
+                                const { url, error } = await uploadImage(file, 'products/colors');
+                                if (error) toast.error('Upload failed');
+                                else {
+                                   setColorForm(prev => ({ ...prev, image_side: url }));
+                                   toast.success('Uploaded Side!');
+                                }
+                                toast.dismiss(toastId);
+                             }
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer" 
+                        />
+                     </div>
+                   </div>
+
+                   {/* Model View */}
+                   <div className="flex flex-col items-center gap-1.5">
+                     <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Model</span>
+                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner">
+                        {colorForm.image_model ? (
+                           <img src={colorForm.image_model} alt="" className="w-full h-full object-contain p-1" />
+                        ) : (
+                           <div className="flex flex-col items-center text-slate-300">
+                              <Upload size={16} />
+                              <span className="text-[8px] font-bold mt-1">Upload</span>
+                           </div>
+                        )}
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={async (e) => {
+                             const file = e.target.files[0];
+                             if (file) {
+                                const toastId = toast.loading('Uploading model...');
+                                const { url, error } = await uploadImage(file, 'products/colors');
+                                if (error) toast.error('Upload failed');
+                                else {
+                                   setColorForm(prev => ({ ...prev, image_model: url }));
+                                   toast.success('Uploaded Model!');
+                                }
+                                toast.dismiss(toastId);
+                             }
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer" 
+                        />
+                     </div>
+                   </div>
                  </div>
               </div>
             </div>

@@ -52,6 +52,7 @@ export const CartProvider = ({ children }) => {
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
   const [discount, setDiscount] = useState({ amount: 0, code: null });
+  const [activeCouponData, setActiveCouponData] = useState(null);
 
   // ─── Unified price reader ─────────────────────────────────────────────────────
   // Handles both Firebase cart items (item.products.price) and guest items (item.price)
@@ -60,6 +61,24 @@ export const CartProvider = ({ children }) => {
     const priceStr = priceRaw.toString().replace(/,/g, '');
     const parsed = parseFloat(priceStr);
     return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const getFullItemPrice = (item) => {
+    let itemPrice = getItemPrice(item);
+    if (item.lensSelection?.selectedLens?.price) {
+      itemPrice += Number(item.lensSelection.selectedLens.price);
+    } else if (item.lensSelection?.lensPackage?.price) {
+      itemPrice += Number(item.lensSelection.lensPackage.price);
+    }
+    if (item.lensSelection?.addons && item.lensSelection.addons.length > 0) {
+      item.lensSelection.addons.forEach(a => {
+        itemPrice += Number(a.price || 0);
+      });
+    }
+    if (item.lensSelection?.visionType?.price) {
+      itemPrice += Number(item.lensSelection.visionType.price);
+    }
+    return itemPrice;
   };
 
   // ─── Load Cart ────────────────────────────────────────────────────────────────
@@ -116,11 +135,18 @@ export const CartProvider = ({ children }) => {
     // Sanitize to avoid circular refs from React elements which break Firebase
     const sanitizedLenses = lensSelection ? {
       visionType: lensSelection.visionType
-        ? { id: lensSelection.visionType.id, title: lensSelection.visionType.title, price: lensSelection.visionType.price }
+        ? { id: lensSelection.visionType.id, name: lensSelection.visionType.name || lensSelection.visionType.title, slug: lensSelection.visionType.slug || '', price: lensSelection.visionType.price }
         : null,
-      lensPackage: lensSelection.lensPackage
-        ? { id: lensSelection.lensPackage.id, name: lensSelection.lensPackage.name, price: lensSelection.lensPackage.price }
+      selectedLens: lensSelection.selectedLens
+        ? { id: lensSelection.selectedLens.id, name: lensSelection.selectedLens.name, price: lensSelection.selectedLens.price }
         : null,
+      addons: Array.isArray(lensSelection.addons)
+        ? lensSelection.addons.map(a => ({ id: a.id, name: a.name, price: a.price, group: a.group || '' }))
+        : [],
+      // Backward compatibility mapping for old code referencing lensPackage
+      lensPackage: lensSelection.selectedLens
+        ? { id: lensSelection.selectedLens.id, name: lensSelection.selectedLens.name, price: lensSelection.selectedLens.price }
+        : (lensSelection.lensPackage ? { id: lensSelection.lensPackage.id, name: lensSelection.lensPackage.name, price: lensSelection.lensPackage.price } : null),
       powerOption: lensSelection.powerOption || null,
       selectedColor: normalizeSelectedColor(lensSelection.selectedColor),
       selectedSize: lensSelection.selectedSize || null,
@@ -243,6 +269,7 @@ export const CartProvider = ({ children }) => {
     setCart([]);
     localStorage.removeItem(CART_STORAGE_KEY);
     setDiscount({ amount: 0, code: null });
+    setActiveCouponData(null);
   };
 
   // ─── Coupon Logic ─────────────────────────────────────────────────────────────
@@ -255,31 +282,110 @@ export const CartProvider = ({ children }) => {
         return { success: false, message: `Add ₹${(minPurchase - cartTotal).toFixed(0)} more to use this coupon.` };
       }
 
-      const rawPct = Number(coupon.discount_percentage || 0);
-      const pct = rawPct > 1 ? rawPct / 100 : rawPct;
-      let amount = cartTotal * pct;
-      const maxDiscount = Number(coupon.max_discount || 0);
-      if (maxDiscount > 0) amount = Math.min(amount, maxDiscount);
+      const isBogoCode = coupon.is_bogo || code.toUpperCase().includes('BOGO') || code.toUpperCase().includes('BUY1GET1');
+      if (isBogoCode) {
+        const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        if (totalQty < 2) {
+          return { success: false, message: "Add at least 2 products to the cart to apply BOGO offer." };
+        }
+      }
 
-      setDiscount({ amount, code: code.toUpperCase() });
-      return { success: true, message: `Coupon applied! You save ₹${amount.toFixed(0)}` };
+      setActiveCouponData(coupon);
+
+      let initialDiscount = 0;
+      if (isBogoCode) {
+        const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        const allPrices = [];
+        cart.forEach(item => {
+          const itemPrice = getFullItemPrice(item);
+          for (let i = 0; i < (item.quantity || 1); i++) {
+            allPrices.push(itemPrice);
+          }
+        });
+        allPrices.sort((a, b) => a - b);
+        const freeCount = Math.floor(totalQty / 2);
+        for (let i = 0; i < freeCount; i++) {
+          initialDiscount += allPrices[i] || 0;
+        }
+      } else {
+        const rawPct = Number(coupon.discount_percentage || 0);
+        const pct = rawPct > 1 ? rawPct / 100 : rawPct;
+        initialDiscount = cartTotal * pct;
+        const maxDiscount = Number(coupon.max_discount || 0);
+        if (maxDiscount > 0) initialDiscount = Math.min(initialDiscount, maxDiscount);
+      }
+
+      setDiscount({ amount: initialDiscount, code: code.toUpperCase() });
+      return { success: true, message: `Coupon applied! You save ₹${initialDiscount.toFixed(0)}` };
     }
     
     return { success: false, message: error || 'Invalid or expired coupon code.' };
   };
 
-  const removeCoupon = () => setDiscount({ amount: 0, code: null });
+  const removeCoupon = () => {
+    setDiscount({ amount: 0, code: null });
+    setActiveCouponData(null);
+  };
 
   // ─── Computed Values ──────────────────────────────────────────────────────────
   const cartCount = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   const cartTotal = cart.reduce((total, item) => {
-    let itemPrice = getItemPrice(item);
-    // Add lens selection costs for guest cart
-    if (item.lensSelection?.visionType?.price) itemPrice += item.lensSelection.visionType.price;
-    if (item.lensSelection?.lensPackage?.price) itemPrice += item.lensSelection.lensPackage.price;
-    return total + itemPrice * (item.quantity || 1);
+    return total + getFullItemPrice(item) * (item.quantity || 1);
   }, 0);
+
+  // Auto recalculate discount when cart/total changes
+  useEffect(() => {
+    if (activeCouponData) {
+      const code = activeCouponData.code;
+      const minPurchase = Number(activeCouponData.min_purchase || 0);
+      
+      if (cartTotal < minPurchase) {
+        setDiscount({ amount: 0, code: null });
+        setActiveCouponData(null);
+        toast.error(`Coupon removed: Add ₹${(minPurchase - cartTotal).toFixed(0)} more to use.`);
+        return;
+      }
+
+      const isBogoCode = activeCouponData.is_bogo || code.toUpperCase().includes('BOGO') || code.toUpperCase().includes('BUY1GET1');
+      if (isBogoCode) {
+        const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        if (totalQty < 2) {
+          setDiscount({ amount: 0, code: null });
+          setActiveCouponData(null);
+          toast.error("Coupon removed: Add at least 2 items to use the BOGO offer.");
+          return;
+        }
+
+        const allPrices = [];
+        cart.forEach(item => {
+          const itemPrice = getFullItemPrice(item);
+          for (let i = 0; i < (item.quantity || 1); i++) {
+            allPrices.push(itemPrice);
+          }
+        });
+
+        allPrices.sort((a, b) => a - b);
+        const freeCount = Math.floor(totalQty / 2);
+        let bogoDiscount = 0;
+        for (let i = 0; i < freeCount; i++) {
+          bogoDiscount += allPrices[i] || 0;
+        }
+
+        setDiscount({ amount: bogoDiscount, code: code.toUpperCase() });
+      } else {
+        const rawPct = Number(activeCouponData.discount_percentage || 0);
+        const pct = rawPct > 1 ? rawPct / 100 : rawPct;
+        let amount = cartTotal * pct;
+        const maxDiscount = Number(activeCouponData.max_discount || 0);
+        if (maxDiscount > 0) amount = Math.min(amount, maxDiscount);
+
+        setDiscount({ amount, code: code.toUpperCase() });
+      }
+    } else {
+      setDiscount({ amount: 0, code: null });
+    }
+  }, [cart, cartTotal, activeCouponData]);
 
   const tax = 0;
   const finalTotal = cartTotal - (discount.amount || 0);

@@ -49,6 +49,9 @@ const AdminBrands     = lazy(() => import('./pages/Admin/Brands.jsx'));
 const AdminPrescriptions = lazy(() => import('./pages/Admin/Prescriptions.jsx'));
 const AdminReviews       = lazy(() => import('./pages/Admin/Reviews.jsx'));
 const AdminSettings      = lazy(() => import('./pages/Admin/Settings.jsx'));
+const AdminLensCategories = lazy(() => import('./pages/Admin/LensCategories.jsx'));
+const AdminLenses         = lazy(() => import('./pages/Admin/Lenses.jsx'));
+const AdminLensAddons     = lazy(() => import('./pages/Admin/LensAddons.jsx'));
 
 // ─── Page-level Suspense fallback ─────────────────────────────────────────────
 const PageLoader = () => (
@@ -91,7 +94,14 @@ const PublicRoutes = ({ settings }) => {
   }
 
   return (
-    <>
+    <ReactLenis root options={{ 
+      duration: 1.5, 
+      lerp: 0.08, 
+      smoothWheel: true, 
+      wheelMultiplier: 1, 
+      touchMultiplier: 2,
+      infinite: false 
+    }}>
       <Navbar />
       <main className="main-content">
         <ErrorBoundary>
@@ -125,7 +135,7 @@ const PublicRoutes = ({ settings }) => {
       </main>
       <Footer />
       <BottomNav />
-    </>
+    </ReactLenis>
   );
 };
 
@@ -139,64 +149,58 @@ function App() {
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <ReactLenis root options={{ 
-        duration: 1.5, 
-        lerp: 0.08, 
-        smoothWheel: true, 
-        wheelMultiplier: 1, 
-        touchMultiplier: 2,
-        infinite: false 
-      }}>
-        <ConfirmProvider>
-          <AuthProvider>
-            <CartProvider>
-              <CartDrawer />
-              <ScrollToTop />
-              <ErrorBoundary>
-                <div className="app-container">
+      <ConfirmProvider>
+        <AuthProvider>
+          <CartProvider>
+            <CartDrawer />
+            <ScrollToTop />
+            <ErrorBoundary>
+              <div className="app-container">
 
-                <Toaster
-                  position="top-right"
-                  toastOptions={{
-                    duration: 3000,
-                    style: {
-                      background: '#ffffff',
-                      color: '#0f172a',
-                      fontWeight: 700,
-                      fontSize: '0.8125rem',
-                      borderRadius: '16px',
-                      padding: '12px 20px',
-                      border: '1px solid #f1f5f9',
-                      boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
-                    }
-                  }}
-                />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    fontWeight: 700,
+                    fontSize: '0.8125rem',
+                    borderRadius: '16px',
+                    padding: '12px 20px',
+                    border: '1px solid #f1f5f9',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+                  }
+                }}
+              />
 
-                <Routes>
-                  {/* ── Admin routes — no Navbar/Footer ── */}
-                  <Route path="/admin" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense></AdminRoute>} />
-                  <Route path="/admin/products" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminProducts /></Suspense></AdminRoute>} />
-                  <Route path="/admin/inventory" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminInventory /></Suspense></AdminRoute>} />
-                  <Route path="/admin/orders" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminOrders /></Suspense></AdminRoute>} />
-                  <Route path="/admin/customers" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCustomers /></Suspense></AdminRoute>} />
-                  <Route path="/admin/coupons" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCoupons /></Suspense></AdminRoute>} />
-                  <Route path="/admin/offers" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminOffers /></Suspense></AdminRoute>} />
-                  <Route path="/admin/carousel" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCarousel /></Suspense></AdminRoute>} />
-                  <Route path="/admin/categories" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCategories /></Suspense></AdminRoute>} />
-                  <Route path="/admin/brands" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminBrands /></Suspense></AdminRoute>} />
-                  <Route path="/admin/prescriptions" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminPrescriptions /></Suspense></AdminRoute>} />
-                  <Route path="/admin/reviews" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminReviews /></Suspense></AdminRoute>} />
-                  <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminSettings /></Suspense></AdminRoute>} />
+              <Routes>
+                {/* ── Admin routes — no Navbar/Footer ── */}
+                <Route path="/admin" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense></AdminRoute>} />
+                <Route path="/admin/products" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminProducts /></Suspense></AdminRoute>} />
+                <Route path="/admin/inventory" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminInventory /></Suspense></AdminRoute>} />
+                <Route path="/admin/orders" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminOrders /></Suspense></AdminRoute>} />
+                <Route path="/admin/customers" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCustomers /></Suspense></AdminRoute>} />
+                <Route path="/admin/coupons" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCoupons /></Suspense></AdminRoute>} />
+                <Route path="/admin/offers" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminOffers /></Suspense></AdminRoute>} />
+                <Route path="/admin/carousel" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCarousel /></Suspense></AdminRoute>} />
+                <Route path="/admin/categories" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCategories /></Suspense></AdminRoute>} />
+                <Route path="/admin/brands" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminBrands /></Suspense></AdminRoute>} />
+                <Route path="/admin/prescriptions" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminPrescriptions /></Suspense></AdminRoute>} />
+                <Route path="/admin/reviews" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminReviews /></Suspense></AdminRoute>} />
+                <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminSettings /></Suspense></AdminRoute>} />
+                <Route path="/admin/lens-categories" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminLensCategories /></Suspense></AdminRoute>} />
+                <Route path="/admin/lenses" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminLenses /></Suspense></AdminRoute>} />
+                <Route path="/admin/lens-addons" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminLensAddons /></Suspense></AdminRoute>} />
 
-                  {/* ── Public / Customer routes ── */}
-                  <Route path="*" element={<PublicRoutes settings={settings} />} />
-                </Routes>
-                </div>
-              </ErrorBoundary>
-            </CartProvider>
-          </AuthProvider>
-        </ConfirmProvider>
-      </ReactLenis>
+                {/* ── Public / Customer routes ── */}
+                <Route path="*" element={<PublicRoutes settings={settings} />} />
+              </Routes>
+              </div>
+            </ErrorBoundary>
+          </CartProvider>
+        </AuthProvider>
+      </ConfirmProvider>
     </Router>
   );
 }

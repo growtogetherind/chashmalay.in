@@ -76,8 +76,8 @@ const Checkout = () => {
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
-    if (!address.name || !address.phone || !address.dob || !address.line1 || !address.city || !address.pincode) {
-      toast.error('All fields including Date of Birth are compulsory.');
+    if (!address.name || !address.phone || !address.line1 || !address.city || !address.pincode) {
+      toast.error('All shipping address fields are compulsory.');
       return;
     }
     
@@ -295,7 +295,7 @@ const Checkout = () => {
                        <InputField label="Contact Number" name="phone" value={address.phone} onChange={handleAddressChange} placeholder="Mobile Number" required />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       <InputField label="Date of Birth" name="dob" type="date" value={address.dob} onChange={handleAddressChange} required />
+                       <InputField label="Date of Birth (Optional)" name="dob" type="date" value={address.dob} onChange={handleAddressChange} />
                        <div className="hidden md:block" /> 
                     </div>
                     <InputField label="Address Line 1" name="line1" value={address.line1} onChange={handleAddressChange} placeholder="House / Flat No., Street Name" required />
@@ -332,8 +332,20 @@ const Checkout = () => {
                 <div className="space-y-8 mb-12">
                    {cart.map((item) => {
                      const basePrice = parseInt((item.consumersPrice || item.price || "0").toString().replace(/,/g, ''));
-                     let lensTotal = item.lensSelection?.visionType?.price || 0;
-                     lensTotal += item.lensSelection?.lensPackage?.price || 0;
+                     let lensTotal = 0;
+                     if (item.lensSelection?.selectedLens?.price) {
+                       lensTotal += Number(item.lensSelection.selectedLens.price);
+                     } else if (item.lensSelection?.lensPackage?.price) {
+                       lensTotal += Number(item.lensSelection.lensPackage.price);
+                     }
+                     if (item.lensSelection?.addons && item.lensSelection.addons.length > 0) {
+                       item.lensSelection.addons.forEach(a => {
+                         lensTotal += Number(a.price || 0);
+                       });
+                     }
+                     if (item.lensSelection?.visionType?.price) {
+                       lensTotal += Number(item.lensSelection.visionType.price);
+                     }
 
                      return (
                        <div key={item.cartId} className="flex gap-6 items-center">
@@ -348,8 +360,15 @@ const Checkout = () => {
                                  {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : 'Color: Standard'}{item.lensSelection?.selectedSize ? ` / Size: ${item.lensSelection.selectedSize}` : ''}
                                </p>
                              )}
-                             {(item.lensSelection?.visionType || item.lensSelection?.lensPackage) && (
-                               <p className="text-xs font-sans text-accent">Includes Lens Package</p>
+                             {(item.lensSelection?.selectedLens || item.lensSelection?.lensPackage) && (
+                               <p className="text-xs font-sans text-accent">
+                                 Lens: {item.lensSelection.selectedLens?.name || item.lensSelection.lensPackage.name} ({item.lensSelection.visionType?.name || 'Clear'})
+                               </p>
+                             )}
+                             {item.lensSelection?.addons && item.lensSelection.addons.length > 0 && (
+                               <p className="text-[10px] font-sans text-secondary">
+                                 Upgrades: {item.lensSelection.addons.map(a => a.name).join(', ')}
+                               </p>
                              )}
                           </div>
                            <div className="text-lg font-sans font-black">

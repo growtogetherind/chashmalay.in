@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutGrid, Box, Layers, Tag, Package, Receipt, Users, FileText, Ticket, Star, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutGrid, Box, Layers, Tag, Package, Receipt, Users, FileText, Ticket, Star, Settings, LogOut, Menu, X, Glasses, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../ui/Logo';
 
@@ -21,6 +21,9 @@ const AdminSidebar = () => {
     { path: '/admin/coupons', label: 'Coupons', icon: <Ticket size={20} /> },
     { path: '/admin/carousel', label: 'Home Banners', icon: <LayoutGrid size={20} /> },
     { path: '/admin/reviews', label: 'Reviews', icon: <Star size={20} /> },
+    { path: '/admin/lens-categories', label: 'Lens Categories', icon: <Layers size={20} /> },
+    { path: '/admin/lenses', label: 'Lenses', icon: <Glasses size={20} /> },
+    { path: '/admin/lens-addons', label: 'Lens Add-ons', icon: <Sparkles size={20} /> },
   ];
 
   const bottomItems = [

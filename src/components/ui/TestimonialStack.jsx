@@ -34,20 +34,10 @@ const TestimonialStack = () => {
     <section className="py-10 bg-white border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Our customers</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Our Testimonials</h2>
-          </div>
-          {/* Navigation dots styled like screenshot */}
-          <div className="flex gap-2">
-            <button className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-red-600 hover:text-red-600 transition-colors">
-              <ChevronLeft size={14} />
-            </button>
-            <button className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-red-600 hover:text-red-600 transition-colors">
-              <ChevronRight size={14} />
-            </button>
-          </div>
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-extrabold uppercase tracking-[0.2em] text-gray-900">
+            Our Testimonials
+          </h2>
         </div>
 
         {/* Cards Grid */}

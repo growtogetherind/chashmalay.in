@@ -340,8 +340,10 @@ export const createOrder = async ({ userId, items, total, address, paymentId, ra
 
     const basePrice = parseInt((item.price || item.consumersPrice || "0").toString().replace(/,/g, ''));
     let lensTotal = 0;
-    if (item.lensSelection?.visionType) lensTotal += item.lensSelection.visionType.price;
-    if (item.lensSelection?.lensPackage) lensTotal += item.lensSelection.lensPackage.price;
+    if (item.lensSelection?.selectedLens?.price) lensTotal += Number(item.lensSelection.selectedLens.price);
+    if (item.lensSelection?.addons?.length) {
+      item.lensSelection.addons.forEach(a => { lensTotal += Number(a.price || 0); });
+    }
     const finalItemPrice = basePrice + lensTotal;
 
     // Check for prescriptions and save them to 'prescriptions' collection
@@ -404,8 +406,10 @@ export const createOrder = async ({ userId, items, total, address, paymentId, ra
     const qty = item.quantity || 1;
     const basePrice = parseInt((item.price || item.consumersPrice || "0").toString().replace(/,/g, ''));
     let lensTotal = 0;
-    if (item.lensSelection?.visionType) lensTotal += item.lensSelection.visionType.price;
-    if (item.lensSelection?.lensPackage) lensTotal += item.lensSelection.lensPackage.price;
+    if (item.lensSelection?.selectedLens?.price) lensTotal += Number(item.lensSelection.selectedLens.price);
+    if (item.lensSelection?.addons?.length) {
+      item.lensSelection.addons.forEach(a => { lensTotal += Number(a.price || 0); });
+    }
     const finalItemPrice = basePrice + lensTotal;
     
     const color = item.lensSelection?.selectedColor 
@@ -420,9 +424,12 @@ export const createOrder = async ({ userId, items, total, address, paymentId, ra
     
     if (item.lensSelection && item.lensSelection.visionType?.id !== 'frame') {
       const ls = item.lensSelection;
-      itemsDetail += `   • *Lens Vision Type:* ${ls.visionType?.name || 'N/A'} (₹${ls.visionType?.price || 0})\n`;
-      itemsDetail += `   • *Lens Package:* ${ls.lensPackage?.name || 'N/A'} (₹${ls.lensPackage?.price || 0})\n`;
-      
+      if (ls.selectedLens) {
+        itemsDetail += `   • *Lens:* ${ls.selectedLens.name} — ${ls.visionType?.name || ls.category || 'N/A'} (₹${ls.selectedLens.price || 0})\n`;
+      }
+      if (ls.addons?.length) {
+        itemsDetail += `   • *Add-ons:* ${ls.addons.map(a => `${a.name} (₹${a.price})`).join(', ')}\n`;
+      }
       if (ls.prescriptionUrl) {
         itemsDetail += `   • *Prescription:* [View Uploaded Image](${cleanCloudinaryUrl(ls.prescriptionUrl)})\n`;
       } else if (ls.manualDetails) {
@@ -1250,4 +1257,410 @@ export const sendOrderConfirmationSMS = async (phoneNumber, customerName, orderI
   } catch (error) {
     console.error("Fast2SMS Notification Error:", error);
   }
+};
+
+// ─── Lens System (Categories, Lenses, Add-ons) ───────────────────────────────
+
+// --- Lens Categories ---
+export const getLensCategories = async () => {
+  try {
+    const q = query(collection(db, "lens_categories"), orderBy("sort_order", "asc"));
+    const snap = await getDocs(q);
+    return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
+  } catch (error) { return { data: [], error }; }
+};
+
+export const subscribeLensCategories = (onData, onError) => subscribeToQuery(
+  query(collection(db, "lens_categories"), orderBy("sort_order", "asc")),
+  onData,
+  onError
+);
+
+export const saveLensCategory = async (data, id = null) => {
+  try {
+    const payload = { ...data, sort_order: Number(data.sort_order || 999), updated_at: serverTimestamp() };
+    if (id) await updateDoc(doc(db, "lens_categories", id), payload);
+    else await addDoc(collection(db, "lens_categories"), { ...payload, created_at: serverTimestamp() });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+export const deleteLensCategory = async (id) => {
+  try {
+    await deleteDoc(doc(db, "lens_categories", id));
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+// --- Lenses ---
+export const getLenses = async (categoryId = null) => {
+  try {
+    let q = query(collection(db, "lenses"), orderBy("sort_order", "asc"));
+    if (categoryId) q = query(collection(db, "lenses"), where("category_id", "==", categoryId), orderBy("sort_order", "asc"));
+    const snap = await getDocs(q);
+    return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
+  } catch (error) { return { data: [], error }; }
+};
+
+export const subscribeLenses = (onData, onError) => subscribeToQuery(
+  query(collection(db, "lenses"), orderBy("sort_order", "asc")),
+  onData,
+  onError
+);
+
+export const saveLens = async (data, id = null) => {
+  try {
+    const payload = { ...data, price: Number(data.price || 0), sort_order: Number(data.sort_order || 999), updated_at: serverTimestamp() };
+    if (id) await updateDoc(doc(db, "lenses", id), payload);
+    else await addDoc(collection(db, "lenses"), { ...payload, created_at: serverTimestamp() });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+export const deleteLens = async (id) => {
+  try {
+    await deleteDoc(doc(db, "lenses", id));
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+// --- Lens Add-ons ---
+export const getLensAddons = async () => {
+  try {
+    const q = query(collection(db, "lens_addons"), orderBy("sort_order", "asc"));
+    const snap = await getDocs(q);
+    return { data: snap.docs.map(d => ({ id: d.id, ...d.data() })), error: null };
+  } catch (error) { return { data: [], error }; }
+};
+
+export const subscribeLensAddons = (onData, onError) => subscribeToQuery(
+  query(collection(db, "lens_addons"), orderBy("sort_order", "asc")),
+  onData,
+  onError
+);
+
+export const saveLensAddon = async (data, id = null) => {
+  try {
+    const payload = { ...data, price: Number(data.price || 0), sort_order: Number(data.sort_order || 999), updated_at: serverTimestamp() };
+    if (id) await updateDoc(doc(db, "lens_addons", id), payload);
+    else await addDoc(collection(db, "lens_addons"), { ...payload, created_at: serverTimestamp() });
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+export const deleteLensAddon = async (id) => {
+  try {
+    await deleteDoc(doc(db, "lens_addons", id));
+    return { error: null };
+  } catch (error) { return { error }; }
+};
+
+// --- Lens System Seeder ---
+// Seeds default data into empty collections so the admin dashboard starts functional.
+export const seedLensSystemIfEmpty = async () => {
+  try {
+    const [catSnap, lensSnap, addonSnap] = await Promise.all([
+      getDocs(collection(db, "lens_categories")),
+      getDocs(collection(db, "lenses")),
+      getDocs(collection(db, "lens_addons")),
+    ]);
+    const now = serverTimestamp();
+
+    // --- Seed Lens Categories ---
+    let categoryIds = {};
+    if (catSnap.empty) {
+      const defaultCats = [
+        { name: 'Single Vision', slug: 'single-vision', description: 'Corrects one field of vision (Distance or Reading).', sort_order: 1, is_active: true },
+        { name: 'Bifocal', slug: 'bifocal', description: 'Two optical powers in one lens for Distance and Reading.', sort_order: 2, is_active: true },
+        { name: 'Progressive', slug: 'progressive', description: 'Seamless transition between Distance, Intermediate and Reading vision.', sort_order: 3, is_active: true },
+      ];
+      for (const cat of defaultCats) {
+        const ref = await addDoc(collection(db, "lens_categories"), { ...cat, created_at: now, updated_at: now });
+        categoryIds[cat.slug] = ref.id;
+      }
+    } else {
+      catSnap.docs.forEach(d => { categoryIds[d.data().slug] = d.id; });
+    }
+
+    // --- Seed Lenses ---
+    if (lensSnap.empty) {
+      const defaultLenses = [
+        // --- Single Vision Lenses ---
+        {
+          name: 'Anti Glare Premium (Echo HMC)',
+          category_id: categoryIds['single-vision'] || '',
+          category_name: 'Single Vision',
+          price: 490,
+          description: 'Affordable anti-glare lens for everyday use.',
+          features: ['Anti Glare Coating', 'Scratch Resistant', 'Better Clarity', 'Daily Use', 'Lightweight'],
+          badge: 'Budget',
+          sort_order: 1,
+          is_active: true
+        },
+        {
+          name: 'Blue Protection (Nature UV)',
+          category_id: categoryIds['single-vision'] || '',
+          category_name: 'Single Vision',
+          price: 749,
+          description: 'Protects eyes from blue light emitted by digital screens.',
+          features: ['Blue Light Protection', 'UV Protection', 'Scratch Resistant', 'Clear Vision', 'Suitable for Office Use'],
+          badge: 'Popular',
+          sort_order: 2,
+          is_active: true
+        },
+        {
+          name: 'Low Reflection Blue Screen',
+          category_id: categoryIds['single-vision'] || '',
+          category_name: 'Single Vision',
+          price: 1349,
+          description: 'Premium blue-cut lens with low reflection coating.',
+          features: ['Premium Blue Filter', 'Low Reflection', 'UV Protection', 'Anti Glare', 'Scratch Resistant', 'High Clarity'],
+          badge: 'Top Selling',
+          sort_order: 3,
+          is_active: true
+        },
+        {
+          name: 'Night Driving + Blue Protection',
+          category_id: categoryIds['single-vision'] || '',
+          category_name: 'Single Vision',
+          price: 1499,
+          description: 'Special coating for reduced glare while driving at night.',
+          features: ['Night Driving Technology', 'Blue Protection', 'Anti Glare', 'Better Contrast', 'Scratch Resistant'],
+          badge: 'Recommended',
+          sort_order: 4,
+          is_active: true
+        },
+
+        // --- Bifocal Lenses ---
+        {
+          name: 'Round Top Bifocal',
+          category_id: categoryIds['bifocal'] || '',
+          category_name: 'Bifocal',
+          price: 699,
+          description: 'Traditional bifocal lens.',
+          features: ['UV Protection', 'Free Anti Reflection', 'Reading Segment', 'Scratch Resistant'],
+          badge: 'Budget',
+          sort_order: 1,
+          is_active: true
+        },
+        {
+          name: 'Anti Glare Round Top (Echo HMC)',
+          category_id: categoryIds['bifocal'] || '',
+          category_name: 'Bifocal',
+          price: 1249,
+          description: 'Round-top bifocal with anti-glare coating.',
+          features: ['Anti Glare', 'Scratch Resistant', 'Better Clarity', 'UV Protection'],
+          badge: 'Popular',
+          sort_order: 2,
+          is_active: true
+        },
+        {
+          name: 'Blue Protection (Nature UV)',
+          category_id: categoryIds['bifocal'] || '',
+          category_name: 'Bifocal',
+          price: 1799,
+          description: 'Blue light protection bifocal lens.',
+          features: ['Blue Light Protection', 'UV Protection', 'Anti Glare', 'Scratch Resistant', 'Premium Finish'],
+          badge: 'Top Selling',
+          sort_order: 3,
+          is_active: true
+        },
+        {
+          name: 'Blue Screen Protect Lens',
+          category_id: categoryIds['bifocal'] || '',
+          category_name: 'Bifocal',
+          price: 2490,
+          description: 'Premium bifocal lens for heavy screen users.',
+          features: ['Advanced Blue Filter', 'UV Protection', 'Premium Anti Reflection', 'Better Eye Comfort', 'Scratch Resistant'],
+          badge: 'Recommended',
+          sort_order: 4,
+          is_active: true
+        },
+
+        // --- Progressive Lenses ---
+        {
+          name: 'Anti Glare Premium (Echo HMC)',
+          category_id: categoryIds['progressive'] || '',
+          category_name: 'Progressive',
+          price: 1190,
+          description: 'Entry-level progressive lens.',
+          features: ['Anti Glare', 'Scratch Resistant', 'Smooth Transition', 'Daily Use'],
+          badge: 'Budget',
+          sort_order: 1,
+          is_active: true
+        },
+        {
+          name: 'Blue Protection (Nature UV)',
+          category_id: categoryIds['progressive'] || '',
+          category_name: 'Progressive',
+          price: 1549,
+          description: 'Progressive lens with blue light protection.',
+          features: ['Blue Protection', 'UV Protection', 'Anti Glare', 'Scratch Resistant'],
+          badge: 'Popular',
+          sort_order: 2,
+          is_active: true
+        },
+        {
+          name: 'Low Reflection Blue Screen',
+          category_id: categoryIds['progressive'] || '',
+          category_name: 'Progressive',
+          price: 2490,
+          description: 'Premium progressive lens with low reflection coating.',
+          features: ['Premium Blue Filter', 'Low Reflection', 'Anti Glare', 'UV Protection', 'Scratch Resistant'],
+          badge: 'Top Selling',
+          sort_order: 3,
+          is_active: true
+        },
+        {
+          name: 'Wide Corridor Blue Protection',
+          category_id: categoryIds['progressive'] || '',
+          category_name: 'Progressive',
+          price: 2490,
+          description: 'Wide viewing area with blue light protection.',
+          features: ['Wide Corridor Design', 'Blue Protection', 'Smooth Transition', 'Comfortable Vision'],
+          badge: 'Recommended',
+          sort_order: 4,
+          is_active: true
+        },
+        {
+          name: 'Wide Corridor + Low Reflection Blue Screen',
+          category_id: categoryIds['progressive'] || '',
+          category_name: 'Progressive',
+          price: 3490,
+          description: 'Wide corridor premium lens with blue filter.',
+          features: ['Wide Corridor', 'Premium Blue Filter', 'Low Reflection', 'Anti Glare', 'UV Protection'],
+          badge: 'Best Value',
+          sort_order: 5,
+          is_active: true
+        },
+        {
+          name: 'Wide Corridor Night Driving + Blue Protection',
+          category_id: categoryIds['progressive'] || '',
+          category_name: 'Progressive',
+          price: 3890,
+          description: 'Ultimate progressive lens for professionals and frequent drivers.',
+          features: ['Night Driving Technology', 'Wide Corridor', 'Blue Protection', 'Premium Anti Reflection', 'UV Protection', 'Scratch Resistant'],
+          badge: 'Premium',
+          sort_order: 6,
+          is_active: true
+        }
+      ];
+      for (const lens of defaultLenses) {
+        await addDoc(collection(db, "lenses"), { ...lens, created_at: now, updated_at: now });
+      }
+    }
+
+    // --- Seed Add-ons ---
+    if (addonSnap.empty) {
+      const defaultAddons = [
+        // --- Group: Lens Treatment ---
+        {
+          name: 'Base Lens',
+          group: 'Lens Treatment',
+          price: 0,
+          description: 'Standard clear lens included.',
+          applicable_categories: ['single-vision', 'bifocal', 'progressive'],
+          sort_order: 1,
+          is_active: true,
+          is_default: true
+        },
+        {
+          name: 'Photochromic Grey',
+          group: 'Lens Treatment',
+          price: 500,
+          description: 'Automatically darkens outdoors and becomes clear indoors.',
+          applicable_categories: ['single-vision', 'bifocal', 'progressive'],
+          sort_order: 2,
+          is_active: true,
+          is_default: false
+        },
+        {
+          name: 'Photochromic Brown',
+          group: 'Lens Treatment',
+          price: 500,
+          description: 'Brown transition tint for better outdoor contrast.',
+          applicable_categories: ['single-vision', 'bifocal', 'progressive'],
+          sort_order: 3,
+          is_active: true,
+          is_default: false
+        },
+
+        // --- Group: Premium Coating ---
+        {
+          name: 'Super Hydrophobic Coating',
+          group: 'Premium Coating',
+          price: 350,
+          description: 'Repels water, oil, fingerprints and dust.',
+          applicable_categories: ['single-vision', 'bifocal', 'progressive'],
+          sort_order: 4,
+          is_active: true,
+          is_default: false
+        },
+
+        // --- Group: Scratch Protection ---
+        {
+          name: 'Premium Scratch Resistant',
+          group: 'Scratch Protection',
+          price: 250,
+          description: 'Extra scratch-resistant coating for longer lens life.',
+          applicable_categories: ['single-vision', 'bifocal', 'progressive'],
+          sort_order: 5,
+          is_active: true,
+          is_default: false
+        },
+
+        // --- Group: UV Protection ---
+        {
+          name: 'UV400 Protection',
+          group: 'UV Protection',
+          price: 300,
+          description: 'Blocks 100% UVA & UVB rays.',
+          applicable_categories: ['single-vision', 'bifocal', 'progressive'],
+          sort_order: 6,
+          is_active: true,
+          is_default: false
+        },
+
+        // --- Group: Driving ---
+        {
+          name: 'Night Driving Upgrade',
+          group: 'Driving',
+          price: 450,
+          description: 'Reduces glare from headlights and improves night vision.',
+          applicable_categories: ['single-vision', 'progressive'],
+          sort_order: 7,
+          is_active: true,
+          is_default: false
+        },
+
+        // --- Group: Polarized ---
+        {
+          name: 'Polarized Upgrade',
+          group: 'Polarized',
+          price: 700,
+          description: 'Reduces reflections from roads, water, and glass surfaces.',
+          applicable_categories: ['single-vision', 'progressive'],
+          sort_order: 8,
+          is_active: true,
+          is_default: false
+        },
+
+        // --- Group: Premium Package ---
+        {
+          name: 'Diamond Coating',
+          group: 'Premium Package',
+          price: 900,
+          description: 'Premium coating combining: Anti Glare, Hydrophobic Layer, Oleophobic Layer, UV Protection, Enhanced Scratch Resistance',
+          applicable_categories: ['single-vision', 'bifocal', 'progressive'],
+          sort_order: 9,
+          is_active: true,
+          is_default: false
+        }
+      ];
+      for (const addon of defaultAddons) {
+        await addDoc(collection(db, "lens_addons"), { ...addon, created_at: now, updated_at: now });
+      }
+    }
+    return { error: null };
+  } catch (error) { return { error }; }
 };

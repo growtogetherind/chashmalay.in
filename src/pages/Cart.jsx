@@ -95,7 +95,20 @@ const Cart = () => {
             {cart.map((item) => {
               const itemId = getItemId(item);
               const basePrice = getItemPrice(item);
-              const lensPrice = (item.lensSelection?.visionType?.price || 0) + (item.lensSelection?.lensPackage?.price || 0);
+              let lensPrice = 0;
+              if (item.lensSelection?.selectedLens?.price) {
+                lensPrice += Number(item.lensSelection.selectedLens.price);
+              } else if (item.lensSelection?.lensPackage?.price) {
+                lensPrice += Number(item.lensSelection.lensPackage.price);
+              }
+              if (item.lensSelection?.addons && item.lensSelection.addons.length > 0) {
+                item.lensSelection.addons.forEach(a => {
+                  lensPrice += Number(a.price || 0);
+                });
+              }
+              if (item.lensSelection?.visionType?.price) {
+                lensPrice += Number(item.lensSelection.visionType.price);
+              }
               const currentPrice = (basePrice + lensPrice) * (item.quantity || 1);
               const originalPrice = Math.round(currentPrice * 1.4);
 
@@ -126,9 +139,19 @@ const Cart = () => {
                       </p>
 
                       <div className="selection-row" onClick={() => toast.success('You have selected premium lenses!')}>
-                        <span>{item.lensSelection?.lensPackage?.name || 'Standard Lenses'}</span>
+                        <span>{item.lensSelection?.selectedLens?.name || item.lensSelection?.lensPackage?.name || 'Standard Lenses'} ({item.lensSelection?.visionType?.name || 'Clear'})</span>
                         <ChevronDown size={16} />
                       </div>
+
+                      {item.lensSelection?.addons && item.lensSelection.addons.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                          {item.lensSelection.addons.map((a, idx) => (
+                            <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-black uppercase tracking-wide border border-slate-200">
+                              + {a.name} (₹{a.price})
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       
                       <div className="selection-row power" onClick={() => toast('Your power details are saved and will be reviewed after order.')}>
                         <div className="flex flex-col gap-1">

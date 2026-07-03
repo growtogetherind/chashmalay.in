@@ -24,12 +24,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // ── Lock body scroll when mobile menu is open ────────────────────────────────
-  useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset';
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [isMobileMenuOpen]);
-
   // ── Close profile popup when clicking outside ────────────────────────────────
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -42,11 +36,14 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'EYEGLASSES',     path: '/category/eyeglasses' },
-    { name: 'SUNGLASSES',     path: '/category/sunglasses' },
-    { name: 'CONTACT LENSES', path: '/contact-lenses' },
-    { name: 'TRACK ORDER',     path: '/account' },
-    { name: 'STORE LOCATOR',  path: '/find-store' },
+    { name: 'EYEGLASSES',        path: '/category/eyeglasses' },
+    { name: 'SUNGLASSES',        path: '/category/sunglasses' },
+    { name: 'CLIP-ON GLASSES',   path: '/category/clip-on-glasses' },
+    { name: 'CONTACT LENSES',    path: '/contact-lenses' },
+    { name: 'READING GLASSES',   path: '/category/reading-glasses' },
+    { name: 'ACCESSORIES',       path: '/category/accessories' },
+    { name: 'TRACK ORDER',       path: '/account' },
+    { name: 'STORE LOCATOR',     path: '/find-store' },
   ];
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -95,7 +92,7 @@ const Navbar = () => {
               to="/"
               className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center group"
             >
-              <Logo className="h-[86px] w-auto transition-all duration-300 group-hover:scale-105" />
+              <Logo className="h-11 md:h-13 w-auto transition-all duration-300 group-hover:scale-105" />
             </Link>
 
             {/* Right – Icons */}
@@ -176,7 +173,6 @@ const Navbar = () => {
                             {[
                               { label: 'My Account', path: '/account', icon: <User size={15} /> },
                               { label: 'My Orders', path: '/account/orders', icon: <Package size={15} /> },
-                              { label: 'Track Order', path: '/account', icon: <Package size={15} /> },
                             ].map((item) => (
                               <Link
                                 key={item.path}
@@ -244,13 +240,13 @@ const Navbar = () => {
         {/* ── Row 2: Category Nav (desktop only) ── */}
         <div className="hidden md:block border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 md:px-8">
-            <nav className="flex items-center justify-center gap-8 h-10">
+            <nav className="flex items-center justify-center gap-4 lg:gap-6 xl:gap-8 h-10">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.name}
                   to={link.path}
                   className={({ isActive }) =>
-                    `text-[11px] font-semibold tracking-[0.12em] whitespace-nowrap transition-colors duration-200 ${
+                    `text-xs lg:text-[13px] font-bold tracking-[0.08em] whitespace-nowrap transition-colors duration-200 ${
                       isActive
                         ? 'text-gray-900 border-b-2 border-gray-900 pb-px'
                         : 'text-gray-500 hover:text-gray-900'
@@ -278,7 +274,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[2000]"
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[2000] mobile-menu-backdrop"
             />
 
             {/* Drawer */}
@@ -288,6 +284,7 @@ const Navbar = () => {
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="fixed top-0 right-0 h-screen w-[80vw] max-w-xs bg-white z-[2001] shadow-2xl flex flex-col"
+              data-lenis-prevent
             >
               {/* Drawer Header */}
               <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100">

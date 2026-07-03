@@ -98,7 +98,7 @@ export const generateInvoice = (order) => {
   // 6. Products Table
   const tableData = order.order_items?.map(item => [
     {
-      content: `${item.products?.name || item.product_name}${getVariantDescription(item)}\nLenses: ${item.lens_selection?.visionType?.title || 'Frame Only'} (${item.lens_selection?.lensPackage?.name || 'Standard'})`,
+      content: `${item.products?.name || item.product_name}${getVariantDescription(item)}\nLenses: ${item.lens_selection?.visionType?.name || item.lens_selection?.visionType?.title || 'Frame Only'}${item.lens_selection?.selectedLens || item.lens_selection?.lensPackage ? ` (${item.lens_selection.selectedLens?.name || item.lens_selection.lensPackage?.name})` : ''}${item.lens_selection?.addons?.length ? `\nUpgrades: ${item.lens_selection.addons.map(a => a.name).join(', ')}` : ''}${item.lens_selection?.prescriptionUrl ? '\nPrescription: Image Attached' : ''}`,
       styles: { cellPadding: 4 }
     },
     `INR ${Number(item.price).toLocaleString()}`,

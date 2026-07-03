@@ -1,11 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Plus, Edit3, Trash2, X, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Image as ImageIcon, RefreshCw } from 'lucide-react';
 import { getBrands, saveBrand, deleteBrand, subscribeBrands } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import { useConfirm } from '../../context/ConfirmContext';
 import toast from 'react-hot-toast';
 import '../Admin.css';
+
+const DEFAULT_BRANDS = [
+  { name: 'Ray-Ban', description: 'Iconic sunglasses and eyeglasses since 1937', logo: '' },
+  { name: 'Scott', description: 'Sporty and modern premium eyewear', logo: '' },
+  { name: 'IDEE', description: 'Trendy, youth-centric, and chic eyewear', logo: '' },
+  { name: 'IRUS', description: 'Stylish and affordable fashion eyewear', logo: '' },
+  { name: 'David Parker', description: 'Classic designs with high craftsmanship', logo: '' },
+  { name: 'Vogue', description: 'Fashion-forward eyewear designs for men and women', logo: '' },
+  { name: '13 Century', description: 'Heritage and vintage inspired optical frames', logo: '' },
+  { name: 'Essilor', description: 'World leader in prescription spectacle lenses', logo: '' },
+  { name: 'Zeiss', description: 'Precision optical lenses and high-end eyewear', logo: '' },
+  { name: 'Nova', description: 'Advanced technology lenses and stylish frames', logo: '' },
+  { name: 'Yash', description: 'Quality everyday affordable frames', logo: '' },
+  { name: 'Nikon', description: 'Legendary optical performance and premium lenses', logo: '' },
+  { name: 'Bonzer', description: 'Contemporary durable everyday eyewear', logo: '' }
+];
 
 const AdminBrands = () => {
   const [brands, setBrands] = useState([]);
@@ -14,22 +30,44 @@ const AdminBrands = () => {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: '', description: '', logo: '' });
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const { confirm } = useConfirm();
 
-  useEffect(() => {
-    setLoading(true);
-    const unsubscribe = subscribeBrands((data) => {
-      setBrands(data || []);
-      setLoading(false);
-    }, () => setLoading(false));
-    return unsubscribe;
-  }, []);
+   useEffect(() => {
+     setLoading(true);
+     const unsubscribe = subscribeBrands((data) => {
+       setBrands(data || []);
+       setLoading(false);
+     }, () => setLoading(false));
+     return unsubscribe;
+   }, []);
 
   const loadData = async () => {
     setLoading(true);
     const { data } = await getBrands();
     setBrands(data || []);
     setLoading(false);
+  };
+
+  const syncStorefrontBrands = async () => {
+    setSyncing(true);
+    const existingNames = new Set(brands.map(b => b.name.toLowerCase().trim()));
+    const missing = DEFAULT_BRANDS.filter(b => !existingNames.has(b.name.toLowerCase().trim()));
+
+    if (missing.length === 0) {
+      toast.success('Storefront brands are already synced');
+      setSyncing(false);
+      return;
+    }
+
+    const results = await Promise.all(missing.map(b => saveBrand(b)));
+    const failed = results.some(r => r.error);
+
+    if (failed) toast.error('Some brands could not be synced');
+    else toast.success(`${missing.length} storefront brand${missing.length === 1 ? '' : 's'} synced`);
+
+    await loadData();
+    setSyncing(false);
   };
 
   const handleFileUpload = async (e) => {
@@ -81,9 +119,14 @@ const AdminBrands = () => {
              <h1 className="admin-title">Brand Partners</h1>
              <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">{brands.length} Active Collaborations</p>
            </div>
-           <button onClick={() => { setForm({ name: '', description: '', logo: '' }); setEditing(null); setShowForm(true); }} className="admin-primary-btn px-6 shadow-lg shadow-emerald-500/20">
-             <Plus size={18} /> <span className="ml-1">Add Brand</span>
-           </button>
+           <div className="flex flex-wrap gap-3">
+             <button onClick={syncStorefrontBrands} disabled={syncing} className="px-5 py-3 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-[2px] text-slate-500 hover:text-emerald-600 hover:border-emerald-100 transition-all disabled:opacity-50 flex items-center gap-2">
+               <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} /> Sync Storefront
+             </button>
+             <button onClick={() => { setForm({ name: '', description: '', logo: '' }); setEditing(null); setShowForm(true); }} className="admin-primary-btn px-6 shadow-lg shadow-emerald-500/20">
+               <Plus size={18} /> <span className="ml-1">Add Brand</span>
+             </button>
+           </div>
         </div>
 
         <div className="admin-card">

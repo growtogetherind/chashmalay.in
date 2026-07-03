@@ -21,12 +21,12 @@ const EMPTY_FORM = {
 
 const STOREFRONT_CATEGORIES = [
   {
-    name: 'Eyeglasses',
+    name: 'Eyewear',
     slug: 'eyeglasses',
-    description: '2000+ Styles',
-    image: '/assets/im/eyeglasses1.png',
-    image_url: '/assets/im/eyeglasses1.png',
-    color: '#f8f4f0',
+    description: 'Premium Eyewear',
+    image: 'https://i.ibb.co/dsJrhRr1/eyewear-optimized.webp',
+    image_url: 'https://i.ibb.co/dsJrhRr1/eyewear-optimized.webp',
+    color: '#F6F4EE',
     accent: '#b45309',
     sort_order: 1,
     is_active: true,
@@ -34,23 +34,56 @@ const STOREFRONT_CATEGORIES = [
   {
     name: 'Sunglasses',
     slug: 'sunglasses',
-    description: '1500+ Styles',
-    image: '/assets/im/sunglasses.png',
-    image_url: '/assets/im/sunglasses.png',
-    color: '#f0f4f8',
+    description: 'Premium Sunglasses',
+    image: 'https://i.ibb.co/dsJrhRr1/eyewear-optimized.webp',
+    image_url: 'https://i.ibb.co/dsJrhRr1/eyewear-optimized.webp',
+    color: '#FFE5D0',
     accent: '#1d4ed8',
     sort_order: 2,
     is_active: true,
   },
   {
+    name: 'Clip-On Glasses',
+    slug: 'clip-on-glasses',
+    description: 'Clip-On Glasses',
+    image: 'https://i.ibb.co/vvsT2Csx/clip-on-optimized.webp',
+    image_url: 'https://i.ibb.co/vvsT2Csx/clip-on-optimized.webp',
+    color: '#EED9F7',
+    accent: '#7c3aed',
+    sort_order: 3,
+    is_active: true,
+  },
+  {
     name: 'Contact Lenses',
     slug: 'contacts',
-    description: 'All Powers',
-    image: '/assets/im/lens.png',
-    image_url: '/assets/im/lens.png',
-    color: '#f0faf4',
+    description: 'Contact Lenses',
+    image: 'https://i.ibb.co/Y4xPqzYN/lenses-optimized.webp',
+    image_url: 'https://i.ibb.co/Y4xPqzYN/lenses-optimized.webp',
+    color: '#D2F3E1',
     accent: '#15803d',
-    sort_order: 3,
+    sort_order: 4,
+    is_active: true,
+  },
+  {
+    name: 'Reading Glasses',
+    slug: 'reading-glasses',
+    description: 'Reading Glasses',
+    image: 'https://i.ibb.co/GfVs075q/reder-glasses-optimized.webp',
+    image_url: 'https://i.ibb.co/GfVs075q/reder-glasses-optimized.webp',
+    color: '#D7ECFB',
+    accent: '#0284c7',
+    sort_order: 5,
+    is_active: true,
+  },
+  {
+    name: 'Accessories',
+    slug: 'accessories',
+    description: 'Accessories',
+    image: 'https://i.ibb.co/rKBPK5bY/acces-optimized.webp',
+    image_url: 'https://i.ibb.co/rKBPK5bY/acces-optimized.webp',
+    color: '#EFE8D3',
+    accent: '#64748b',
+    sort_order: 6,
     is_active: true,
   },
 ];
@@ -76,14 +109,14 @@ const AdminCategories = () => {
   const [syncing, setSyncing] = useState(false);
   const { confirm } = useConfirm();
 
-  useEffect(() => {
-    setLoading(true);
-    const unsubscribe = subscribeCategories((data) => {
-      setCategories(data || []);
-      setLoading(false);
-    }, () => setLoading(false));
-    return unsubscribe;
-  }, []);
+   useEffect(() => {
+     setLoading(true);
+     const unsubscribe = subscribeCategories((data) => {
+       setCategories(data || []);
+       setLoading(false);
+     }, () => setLoading(false));
+     return unsubscribe;
+   }, []);
 
   const loadData = async () => {
     setLoading(true);
@@ -131,23 +164,36 @@ const AdminCategories = () => {
 
   const syncStorefrontCategories = async () => {
     setSyncing(true);
-    const existingKeys = new Set(categories.map((category) => (category.slug || slugify(category.name)).toLowerCase()));
-    const missing = STOREFRONT_CATEGORIES.filter((category) => !existingKeys.has(category.slug));
-
-    if (missing.length === 0) {
-      toast.success('Storefront categories are already synced');
+    try {
+      // 1. Identify and delete categories not in the new STOREFRONT_CATEGORIES list
+      const targetSlugs = new Set(STOREFRONT_CATEGORIES.map(c => c.slug));
+      const toDelete = categories.filter(c => !targetSlugs.has(c.slug));
+      
+      if (toDelete.length > 0) {
+        await Promise.all(toDelete.map(c => deleteCategory(c.id)));
+      }
+      
+      // 2. Add new categories or update existing ones with their correct images and metadata
+      await Promise.all(STOREFRONT_CATEGORIES.map(async (seedCat) => {
+        const existing = categories.find(c => c.slug === seedCat.slug);
+        if (existing) {
+          await saveCategory({
+            ...existing,
+            ...seedCat,
+          }, existing.id);
+        } else {
+          await saveCategory(seedCat);
+        }
+      }));
+      
+      toast.success('Storefront categories synced and old ones removed');
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to sync categories');
+    } finally {
+      await loadData();
       setSyncing(false);
-      return;
     }
-
-    const results = await Promise.all(missing.map((category) => saveCategory(category)));
-    const failed = results.some((result) => result.error);
-
-    if (failed) toast.error('Some categories could not be synced');
-    else toast.success(`${missing.length} storefront categor${missing.length === 1 ? 'y' : 'ies'} synced`);
-
-    await loadData();
-    setSyncing(false);
   };
 
   const handleDelete = async (id, name) => {

@@ -74,7 +74,7 @@ const ContactLens = () => {
 
   const [expandedFilters, setExpandedFilters] = useState({
     brand: false,
-    disposable_type: true, // Usage Duration is unfolded by default
+    disposable_type: false,
     pack_size: false,
   });
 
@@ -203,7 +203,7 @@ const ContactLens = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
              {/* Minimal Sidebar - Matches Category.jsx Sidebar feel */}
              <aside className="hidden lg:block lg:col-span-3">
-                <FadeIn delay={0.4} className="sticky top-28 bg-white border-r border-gray-100 p-6 h-[calc(100vh-112px)] max-h-[calc(100vh-112px)] overflow-y-auto custom-scrollbar pr-6">
+                <FadeIn delay={0.4} className="sticky top-28 bg-white border-r border-gray-100 p-6 h-[calc(100vh-112px)] max-h-[calc(100vh-112px)] overflow-y-auto custom-scrollbar pr-6" data-lenis-prevent>
                    {/* Sort By Section */}
                    <div className="flex justify-between items-center pb-4 mb-4 border-b border-gray-100">
                       <div className="flex items-center gap-2 text-slate-900 hover:text-primary transition-colors cursor-pointer">
@@ -251,7 +251,7 @@ const ContactLens = () => {
                                className="overflow-hidden"
                              >
                                <div className="pt-2 pb-4">
-                                 <div className="space-y-1 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                                 <div className="space-y-1 max-h-60 overflow-y-auto pr-2 custom-scrollbar" data-lenis-prevent>
                                      {filterOptions.brand.map(brand => {
                                          const isSelected = pendingFilters.brand.includes(brand);
                                          const count = getFacetedCount('brand', brand);
@@ -440,7 +440,7 @@ const ContactLens = () => {
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
                onClick={() => setIsMobileFilterOpen(false)}
-               className="fixed inset-0 bg-black/40 backdrop-blur-md z-[2000]"
+               className="fixed inset-0 bg-black/40 backdrop-blur-md z-[2000] contact-lens-filter-backdrop"
             />
             <motion.div
                initial={{ y: '100%' }}
@@ -448,6 +448,7 @@ const ContactLens = () => {
                exit={{ y: '100%' }}
                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                className="fixed bottom-0 left-0 right-0 h-[85vh] bg-white rounded-t-[40px] z-[2001] p-8 overflow-y-auto shadow-2xl"
+               data-lenis-prevent
             >
                <div className="flex justify-between items-center mb-10 pb-6 border-b border-gray-100">
                   <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[#0F172A]">Filter Options</h3>

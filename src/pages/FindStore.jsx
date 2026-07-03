@@ -161,7 +161,7 @@ const FindStore = () => {
                 {/* Stores Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
                     {/* List */}
-                    <div className="lg:col-span-5 space-y-10 max-h-[75vh] overflow-y-auto pr-6 custom-scrollbar">
+                    <div className="lg:col-span-5 space-y-10 max-h-[75vh] overflow-y-auto pr-6 custom-scrollbar" data-lenis-prevent>
                         <StaggerContainer>
                             {filteredStores.length > 0 ? (
                                 filteredStores.map((store) => (

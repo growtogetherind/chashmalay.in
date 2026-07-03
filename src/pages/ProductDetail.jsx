@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Star, Heart, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Layers, ChevronRight, ChevronLeft, X, CheckCircle } from 'lucide-react';
 import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ui/ProductCard';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
 import { getCloudinarySrcSet, transformCloudinaryUrl } from '../lib/cloudinary';
@@ -40,6 +41,7 @@ const Accordion = ({ title, children }) => {
 const ProductDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imageLoading, setImageLoading] = useState(true);
@@ -67,6 +69,7 @@ const ProductDetail = () => {
       setRelatedProducts([]);
       setRealTimeReviews([]);
       setActiveImage(0);
+      setActiveColor(0);
       setImageLoading(true);
 
       const { data, error } = await getProductById(id, { includeReviews: false });
@@ -86,6 +89,12 @@ const ProductDetail = () => {
         const colorImages = (data.colors || []).map(c => c.image).filter(Boolean);
         data.gallery = Array.from(new Set([...singleImages, ...newGallery, ...colorImages])).filter(Boolean);
         setProduct(data);
+        if (data.default_color && data.colors.length > 0) {
+          const idx = data.colors.findIndex(c => c.name?.toLowerCase() === data.default_color.toLowerCase());
+          if (idx !== -1) {
+            setActiveColor(idx);
+          }
+        }
       }
       setLoading(false);
     };
@@ -155,8 +164,7 @@ const ProductDetail = () => {
     toast.success(exists ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
-  const nextImage = () => setActiveImage((prev) => (prev + 1) % (product.gallery?.length || 1));
-  const prevImage = () => setActiveImage((prev) => (prev - 1 + (product.gallery?.length || 1)) % (product.gallery?.length || 1));
+
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -184,16 +192,14 @@ const ProductDetail = () => {
   const originalPrice = product.original_price || product.originalPrice ? parseInt((product.original_price || product.originalPrice).toString().replace(/,/g, '')) : Math.round(price * 1.3);
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
   
-  // Use real-time reviews for counts and ratings, with product aggregates as the backend fallback.
-  const reviews = realTimeReviews.length > 0 ? realTimeReviews : (product.reviews || []);
-  const reviewSummary = product.review_summary || {};
-  const reviewTotal = reviews.length || Number(reviewSummary.count || product.review_count || 0);
+  // Use only real-time reviews from Firebase.
+  const reviews = realTimeReviews || [];
+  const reviewTotal = reviews.length;
   const avgRating = reviews.length > 0
     ? Number((reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1))
-    : Number(reviewSummary.average || (reviewTotal ? product.rating : 0) || 0);
+    : 0;
   const ratingBreakdown = [5, 4, 3, 2, 1].map((rating) => {
-    const liveCount = reviews.filter((review) => Math.round(Number(review.rating || 0)) === rating).length;
-    const count = reviews.length ? liveCount : Number(reviewSummary.counts?.[rating] || 0);
+    const count = reviews.filter((review) => Math.round(Number(review.rating || 0)) === rating).length;
     return {
       rating,
       count,
@@ -201,9 +207,55 @@ const ProductDetail = () => {
     };
   });
   const isContactLens = product.category?.toLowerCase().includes('contact') || product.category?.toLowerCase() === 'contacts';
-  const selectedFrameColor = (product.colors && product.colors.length > 0) ? product.colors[activeColor] : null;
-  const gallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
+  const showLensSelection = product.show_lens_selection !== false;
+  const showColorSelection = product.show_color_selection !== false;
+  const showSizeSelection = product.show_size_selection !== false;
+
+  const handleDirectAddToCart = async () => {
+    try {
+      const selectedColor = (product.colors && product.colors.length > 0) ? product.colors[activeColor] : null;
+      const lensSelection = {
+        visionType: null,
+        selectedLens: null,
+        addons: [],
+        powerOption: null,
+        selectedColor: selectedColor,
+        selectedSize: showSizeSelection ? activeSize : null,
+        manualDetails: null,
+        prescriptionUrl: null,
+        isContactLens: isContactLens
+      };
+      await addToCart(product, lensSelection);
+      toast.success('Added to Cart!');
+    } catch (err) {
+      toast.error('Failed to add to cart.');
+    }
+  };
+
+  const colors = Array.isArray(product.colors) && product.colors.length > 0
+    ? product.colors
+    : [
+        {
+          name: product.color || product.frame_color || product.frameColor || 'Standard Edition',
+          hex: product.color_hex || product.colorHex || '#94a3b8',
+          is_dual_tone: false
+        }
+      ].filter(Boolean);
+
+  const selectedFrameColor = colors[activeColor] || null;
+  const colorGallery = selectedFrameColor
+    ? [selectedFrameColor.image, selectedFrameColor.image_side, selectedFrameColor.image_model].filter(Boolean)
+    : [];
+  
+  const mainGallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
+  const gallery = colorGallery.length > 0
+    ? colorGallery
+    : mainGallery;
+
   const activeImageUrl = gallery[activeImage] || gallery[0] || '';
+
+  const nextImage = () => setActiveImage((prev) => (prev + 1) % (gallery.length || 1));
+  const prevImage = () => setActiveImage((prev) => (prev - 1 + (gallery.length || 1)) % (gallery.length || 1));
 
   return (
     <div className="product-detail-page pt-28">
@@ -256,22 +308,22 @@ const ProductDetail = () => {
           </div>
 
           <aside className="sticky-sidebar">
-            <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-5">
               <div className="brand-header">
                 <FadeIn delay={0.1}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
                       {product.brand || 'Chashmalay Luxury'}
                     </span>
                     <div className="w-1 h-1 rounded-full bg-slate-300" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                    <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">
                       ID: {product.sku || product.id?.slice(0, 8)}
                     </span>
                   </div>
                 </FadeIn>
 
                 <div className="flex justify-between items-start gap-4">
-                  <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-slate-900 leading-[1.1] mb-4">
+                  <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-tight mb-2">
                     {product.name}
                   </h1>
                   <div className="flex gap-2 shrink-0">
@@ -284,7 +336,7 @@ const ProductDetail = () => {
                   </div>
                 </div>
 
-                   <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-4 mt-1">
                      {avgRating > 0 ? (
                        <>
                          <div className="flex items-center gap-1.5">
@@ -293,30 +345,30 @@ const ProductDetail = () => {
                                 <Star key={i} size={12} fill={i < Math.floor(avgRating) ? "#EAB308" : "none"} className={i < Math.floor(avgRating) ? "text-yellow-500" : "text-slate-200"} />
                               ))}
                             </div>
-                            <span className="text-[11px] font-black text-slate-900">{avgRating}</span>
+                            <span className="text-[11px] font-bold text-slate-900">{avgRating}</span>
                          </div>
                          <div className="w-px h-3 bg-slate-200" />
                        </>
                      ) : (
-                       <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">New Collection</span>
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">New Collection</span>
                      )}
-                     <button onClick={() => setIsReviewModalOpen(true)} className="text-[11px] text-slate-500 font-black uppercase tracking-widest hover:text-accent transition-colors">
+                     <button onClick={() => setIsReviewModalOpen(true)} className="text-[11px] text-slate-500 font-bold uppercase tracking-widest hover:text-accent transition-colors">
                        {reviews.length} Verified Reviews
                      </button>
                   </div>
               </div>
 
-              <div className="pricing-section border-y border-slate-100 py-8">
-                <div className="flex items-baseline gap-4 mb-3">
-                  <span className="text-4xl font-black text-slate-900 tracking-tighter">₹{price.toLocaleString()}</span>
+               <div className="pricing-section border-t border-slate-100 pt-5 pb-4">
+                <div className="flex items-baseline gap-4 mb-2">
+                  <span className="text-3xl font-bold text-slate-900 tracking-tight">₹{price.toLocaleString()}</span>
                   {originalPrice > price && (
-                    <span className="text-lg font-bold text-slate-300 line-through decoration-slate-300">₹{originalPrice.toLocaleString()}</span>
+                    <span className="text-base font-bold text-slate-300 line-through decoration-slate-300">₹{originalPrice.toLocaleString()}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">
                       Save {discountPercent}% Today
                     </span>
                   </div>
@@ -324,54 +376,73 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <div className="option-section">
-                <div className="flex justify-between items-end mb-5">
-                   <label className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">
-                     Select Color
-                   </label>
-                   <span className="text-[11px] font-black text-slate-900">{(product.colors && product.colors.length > 0) ? product.colors[activeColor]?.name : 'Standard Edition'}</span>
+              {product.description && (
+                <div className="description-section border-b border-slate-100 pb-4">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2">Design Notes</h4>
+                  <p className="text-[13px] md:text-sm text-slate-600 leading-relaxed font-normal antialiased">
+                    {product.description}
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-4">
-                  {(product.colors && product.colors.length > 0) ? product.colors.map((c, i) => (
-                    <button 
-                      key={i} 
+              )}
+
+              {showColorSelection && (
+                <div className="option-section">
+                  <div className="flex justify-between items-end mb-3">
+                     <label className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                       Select Color
+                     </label>
+                     <span className="text-[11px] font-medium text-slate-900">{colors[activeColor]?.name || 'Standard Edition'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    {colors.map((c, i) => (
+                      <button 
+                        key={i} 
                       onClick={() => {
                         setActiveColor(i);
-                        if (c.image) {
-                          const galleryIdx = product.gallery.indexOf(c.image);
-                          if (galleryIdx !== -1) setActiveImage(galleryIdx);
-                        }
-                      }} 
-                      className={`relative w-14 h-14 rounded-full border-2 transition-all p-1.5 ${activeColor === i ? 'border-slate-900 scale-110 shadow-xl' : 'border-slate-100 hover:border-slate-300'}`}
-                    >
-                      <div className="w-full h-full rounded-full border border-black/5" style={{ background: c.hex }} title={c.name} />
-                      {activeColor === i && <div className="absolute -top-1 -right-1 w-5 h-5 bg-slate-900 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg"><CheckCircle size={10} /></div>}
-                    </button>
-                  )) : <div className="w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-900 p-1.5 scale-110 shadow-lg"><div className="w-full h-full rounded-full" /></div>}
+                        setActiveImage(0);
+                      }}  
+                        className={`relative w-14 h-14 rounded-full border-2 transition-all p-1.5 ${activeColor === i ? 'border-slate-900 scale-110 shadow-xl' : 'border-slate-100 hover:border-slate-300'}`}
+                      >
+                        <div className="w-full h-full rounded-full border border-black/5" style={{ background: c.is_dual_tone && c.hex2 ? `linear-gradient(135deg, ${c.hex} 50%, ${c.hex2} 50%)` : c.hex }} title={c.name} />
+                        {activeColor === i && <div className="absolute -top-1 -right-1 w-5 h-5 bg-slate-900 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg"><CheckCircle size={10} /></div>}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="option-section">
-                <div className="flex justify-between items-center mb-5">
-                  <label className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Select Size</label>
-                  <button className="text-[10px] font-black uppercase tracking-widest text-slate-900 border-b-2 border-slate-900 pb-0.5">Size Guide</button>
+              {showSizeSelection && (
+                <div className="option-section">
+                  <div className="flex justify-between items-center mb-3">
+                    <label className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Select Size</label>
+                    <button className="text-[10px] font-bold uppercase tracking-widest text-slate-900 border-b border-slate-900 pb-0.5">Size Guide</button>
+                  </div>
+                  <div className="flex gap-4">
+                    {(product.available_sizes || ['S', 'M', 'L']).map(size => (
+                      <button key={size} onClick={() => setActiveSize(size)} className={`flex-1 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-[0.15em] border transition-all ${activeSize === size ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}>
+                        {size}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex gap-4">
-                  {(product.available_sizes || ['S', 'M', 'L']).map(size => (
-                    <button key={size} onClick={() => setActiveSize(size)} className={`flex-1 py-4 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] border-2 transition-all ${activeSize === size ? 'bg-slate-900 text-white border-slate-900 shadow-2xl shadow-slate-900/20' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'}`}>
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              )}
 
-              <div className="action-stack space-y-4 pt-4">
-                <button 
-                  onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} 
-                  className="w-full py-6 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-blue-900 transition-all shadow-2xl shadow-slate-900/30 inline-cta-desktop"
-                >
-                  {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
-                </button>
+              <div className="action-stack space-y-3 pt-2">
+                {showLensSelection ? (
+                  <button 
+                    onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} 
+                    className="w-full py-3.5 bg-primary text-white rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-blue-900 transition-all shadow-md inline-cta-desktop"
+                  >
+                    {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
+                  </button>
+                ) : (
+                  <button 
+                    onClick={handleDirectAddToCart} 
+                    className="w-full py-3.5 bg-primary text-white rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-blue-900 transition-all shadow-md inline-cta-desktop"
+                  >
+                    Add to Cart
+                  </button>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:border-slate-200 transition-all">
                     <ShieldCheck size={20} className="text-slate-900" />
@@ -431,6 +502,7 @@ const ProductDetail = () => {
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Material</span><p className="text-[12px] font-black text-slate-900">{product.frame_material || 'TR90 Ultra'}</p></div>
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Style</span><p className="text-[12px] font-black text-slate-900">{product.frame_type || 'Full Rim'}</p></div>
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Shape</span><p className="text-[12px] font-black text-slate-900">{product.frame_shape || 'Rectangle'}</p></div>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Frame Color</span><p className="text-[12px] font-black text-slate-900 capitalize">{colors[activeColor]?.name || product.frame_color || product.color || 'Standard Edition'}</p></div>
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Weight</span><p className="text-[12px] font-black text-slate-900">22g (Featherlight)</p></div>
                       </>
                     )}
@@ -499,9 +571,15 @@ const ProductDetail = () => {
       </div>
 
       <div className="pdp-sticky-cta">
-         <button onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} className="cta-main-btn">
-           {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
-         </button>
+         {showLensSelection ? (
+            <button onClick={() => isContactLens ? setIsCLModalOpen(true) : setIsLensModalOpen(true)} className="cta-main-btn">
+              {isContactLens ? 'Configure Lenses' : 'Select Lenses'}
+            </button>
+         ) : (
+            <button onClick={handleDirectAddToCart} className="cta-main-btn">
+              Add to Cart
+            </button>
+         )}
       </div>
 
       {(isLensModalOpen || isCLModalOpen) && (

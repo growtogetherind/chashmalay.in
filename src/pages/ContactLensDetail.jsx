@@ -104,8 +104,9 @@ const ContactLensDetail = () => {
   const price = Number(product.price || 0);
   const originalPrice = Number(product.original_price || price * 1.2);
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-  const reviews = realTimeReviews.length > 0 ? realTimeReviews : (product.reviews || []);
-  const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : (product.rating || 4.8);
+  // Use only real-time reviews from Firebase.
+  const reviews = realTimeReviews || [];
+  const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : 0;
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -205,29 +206,29 @@ const ContactLensDetail = () => {
           {/* Right: Info */}
           <div className="product-info-section sticky-sidebar">
             <FadeIn>
-              <div className="brand-badge text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600 mb-4 bg-emerald-50 w-fit px-4 py-1.5 rounded-full border border-emerald-100">
+              <div className="brand-badge text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-600 mb-2.5 bg-emerald-50 w-fit px-4 py-1.5 rounded-full border border-emerald-100">
                 {product.brand}
               </div>
-              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight mb-4 uppercase">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 uppercase">
                 {product.name}
               </h1>
               
-              <div className="flex items-center gap-6 mb-8">
+              <div className="flex items-center gap-6 mb-4">
                 <div className="flex items-center gap-1.5">
                   <div className="flex text-amber-400">
                     {[...Array(5)].map((_, i) => <Star key={i} size={14} fill={i < Math.floor(avgRating) ? "currentColor" : "none"} />)}
                   </div>
-                  <span className="text-sm font-black text-slate-900">{avgRating}</span>
+                  <span className="text-sm font-bold text-slate-900">{avgRating}</span>
                 </div>
                 <div className="h-4 w-px bg-slate-200"></div>
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{reviews.length} Reviews</span>
               </div>
 
-              <div className="price-stack mb-10">
+              <div className="price-stack mb-5">
                 <div className="flex items-baseline gap-4 mb-2">
-                  <span className="text-4xl font-black text-slate-900 tracking-tight">₹{price.toLocaleString()}</span>
-                  <span className="text-lg text-slate-400 line-through font-bold">₹{originalPrice.toLocaleString()}</span>
-                  <div className="bg-red-50 text-red-600 text-[11px] font-black px-3 py-1 rounded-full border border-red-100">
+                  <span className="text-3xl font-bold text-slate-900 tracking-tight">₹{price.toLocaleString()}</span>
+                  <span className="text-base text-slate-400 line-through font-bold">₹{originalPrice.toLocaleString()}</span>
+                  <div className="bg-red-50 text-red-600 text-[11px] font-bold px-3 py-1 rounded-full border border-red-100">
                     {discountPercent}% OFF
                   </div>
                 </div>
@@ -235,20 +236,20 @@ const ContactLensDetail = () => {
               </div>
 
               {/* Prescription Selection */}
-              <div className="prescription-selector mb-10">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">Vision Protocol</h3>
+              <div className="prescription-selector mb-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-900">Vision Protocol</h3>
                   <button className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-2 hover:underline">
                     <HelpCircle size={14} /> Power Guide
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-8">
+                <div className="grid grid-cols-2 gap-3 mb-4">
                   <button
                     onClick={() => setPrescriptionType('manual')}
-                    className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 font-black text-[10px] uppercase tracking-widest ${
+                    className={`p-3 rounded-xl border transition-all flex flex-col items-center gap-2 font-bold text-[10px] uppercase tracking-widest ${
                       prescriptionType === 'manual'
-                        ? 'border-primary bg-primary text-white shadow-lg shadow-primary/20'
+                        ? 'border-primary bg-primary text-white shadow-md shadow-primary/10'
                         : 'border-slate-200 bg-white text-slate-500 hover:border-primary/30 hover:text-primary hover:bg-slate-50'
                     }`}
                   >
@@ -257,9 +258,9 @@ const ContactLensDetail = () => {
                   </button>
                   <button
                     onClick={() => setPrescriptionType('upload')}
-                    className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 font-black text-[10px] uppercase tracking-widest ${
+                    className={`p-3 rounded-xl border transition-all flex flex-col items-center gap-2 font-bold text-[10px] uppercase tracking-widest ${
                       prescriptionType === 'upload'
-                        ? 'border-primary bg-primary text-white shadow-lg shadow-primary/20'
+                        ? 'border-primary bg-primary text-white shadow-md shadow-primary/10'
                         : 'border-slate-200 bg-white text-slate-500 hover:border-primary/30 hover:text-primary hover:bg-slate-50'
                     }`}
                   >
@@ -272,23 +273,23 @@ const ContactLensDetail = () => {
                   <div className="space-y-6 animate-fade-in">
                     {/* Left Eye */}
                     <div className="eye-grid">
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Left Eye (OS)</h4>
+                      <h4 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 mb-2">Left Eye (OS)</h4>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="select-wrapper">
-                          <label className="text-[8px] font-black uppercase text-slate-400 mb-1 block">SPH</label>
+                          <label className="text-[8px] font-semibold uppercase text-slate-400 mb-1 block">SPH</label>
                           <select className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none w-full" value={powers.leftSph} onChange={e => setPowers({...powers, leftSph: e.target.value})}>
                             <option value="">Select</option>
                             {sphPowers.map(p => <option key={p} value={p}>{p}</option>)}
                           </select>
                         </div>
                         <div className="select-wrapper">
-                          <label className="text-[8px] font-black uppercase text-slate-400 mb-1 block">CYL</label>
+                          <label className="text-[8px] font-semibold uppercase text-slate-400 mb-1 block">CYL</label>
                           <select className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none w-full" value={powers.leftCyl} onChange={e => setPowers({...powers, leftCyl: e.target.value})}>
                             {cylPowers.map(p => <option key={p} value={p}>{p}</option>)}
                           </select>
                         </div>
                         <div className="select-wrapper">
-                          <label className="text-[8px] font-black uppercase text-slate-400 mb-1 block">AXIS</label>
+                          <label className="text-[8px] font-semibold uppercase text-slate-400 mb-1 block">AXIS</label>
                           <select className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none w-full" value={powers.leftAxis} onChange={e => setPowers({...powers, leftAxis: e.target.value})}>
                             {axisValues.map(v => <option key={v} value={v}>{v}</option>)}
                           </select>
@@ -298,23 +299,23 @@ const ContactLensDetail = () => {
 
                     {/* Right Eye */}
                     <div className="eye-grid">
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Right Eye (OD)</h4>
+                      <h4 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 mb-2">Right Eye (OD)</h4>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="select-wrapper">
-                          <label className="text-[8px] font-black uppercase text-slate-400 mb-1 block">SPH</label>
+                          <label className="text-[8px] font-semibold uppercase text-slate-400 mb-1 block">SPH</label>
                           <select className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none w-full" value={powers.rightSph} onChange={e => setPowers({...powers, rightSph: e.target.value})}>
                             <option value="">Select</option>
                             {sphPowers.map(p => <option key={p} value={p}>{p}</option>)}
                           </select>
                         </div>
                         <div className="select-wrapper">
-                          <label className="text-[8px] font-black uppercase text-slate-400 mb-1 block">CYL</label>
+                          <label className="text-[8px] font-semibold uppercase text-slate-400 mb-1 block">CYL</label>
                           <select className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none w-full" value={powers.rightCyl} onChange={e => setPowers({...powers, rightCyl: e.target.value})}>
                             {cylPowers.map(p => <option key={p} value={p}>{p}</option>)}
                           </select>
                         </div>
                         <div className="select-wrapper">
-                          <label className="text-[8px] font-black uppercase text-slate-400 mb-1 block">AXIS</label>
+                          <label className="text-[8px] font-semibold uppercase text-slate-400 mb-1 block">AXIS</label>
                           <select className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none w-full" value={powers.rightAxis} onChange={e => setPowers({...powers, rightAxis: e.target.value})}>
                             {axisValues.map(v => <option key={v} value={v}>{v}</option>)}
                           </select>
@@ -329,13 +330,13 @@ const ContactLensDetail = () => {
                          <div className="absolute inset-0 p-2">
                            <img src={prescriptionUrl || URL.createObjectURL(prescriptionFile)} alt="Prescription" className="w-full h-full object-contain rounded-2xl" />
                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                             <span className="bg-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">Change Image</span>
+                             <span className="bg-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Change Image</span>
                            </div>
                          </div>
                        ) : (
                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
                            <UploadCloud size={32} className="text-slate-300 group-hover:text-emerald-500 mb-2 transition-colors" />
-                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Click to upload image</p>
+                           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Click to upload image</p>
                          </div>
                        )}
                        <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" onChange={async (e) => {
@@ -362,21 +363,21 @@ const ContactLensDetail = () => {
               </div>
 
               {/* Quantity Selector */}
-              <div className="quantity-section mb-10">
-                 <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 mb-4">Pack Quantity</h3>
+              <div className="quantity-section mb-5">
+                 <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-900 mb-2">Pack Quantity</h3>
                  <div className="flex items-center gap-4">
                     <div className="flex items-center bg-slate-50 border border-slate-100 rounded-2xl p-1 shadow-inner">
                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-400 hover:bg-white hover:text-slate-900 transition-all">
                           <Minus size={16} />
                        </button>
-                       <span className="w-12 text-center font-black text-slate-900">{quantity}</span>
+                       <span className="w-12 text-center font-bold text-slate-900">{quantity}</span>
                        <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-400 hover:bg-white hover:text-slate-900 transition-all">
                           <Plus size={16} />
                        </button>
                     </div>
                     <div className="flex-grow bg-slate-50 rounded-2xl px-6 py-4 border border-slate-100">
-                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-0.5">Total Quantity</span>
-                       <span className="text-sm font-black text-slate-900">{quantity * Number(product.pack_size?.split(' ')[0] || 6)} Lenses</span>
+                       <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400 block mb-0.5">Total Quantity</span>
+                       <span className="text-sm font-bold text-slate-900">{quantity * Number(product.pack_size?.split(' ')[0] || 6)} Lenses</span>
                     </div>
                  </div>
               </div>
@@ -392,14 +393,14 @@ const ContactLensDetail = () => {
                 const uniqueColors = [...new Set(colorList)];
                 if (uniqueColors.length === 0) return null;
                 return (
-                  <div className="color-section mb-10">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 mb-4">Lens Color</h3>
+                  <div className="color-section mb-5">
+                    <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-900 mb-2">Lens Color</h3>
                     <div className="flex flex-wrap gap-3">
                       {uniqueColors.map(color => (
                         <button
                           key={color}
                           onClick={() => setSelectedColor(selectedColor === color ? '' : color)}
-                          className={`px-5 py-2.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+                          className={`px-4 py-2 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all ${
                             selectedColor === color
                               ? 'border-primary bg-primary text-white shadow-lg shadow-primary/20'
                               : 'border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary hover:bg-slate-50'
@@ -414,40 +415,40 @@ const ContactLensDetail = () => {
               })()}
 
               {/* Actions */}
-              <div className="action-stack space-y-4 mb-12">
+              <div className="action-stack space-y-3 mb-6">
                 <button 
                   onClick={() => handleAddToCart()} 
-                  className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.35em] hover:bg-black transition-all shadow-2xl shadow-slate-900/30"
+                  className="w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-black transition-all shadow-md"
                 >
                   Add to Cart
                 </button>
               </div>
 
               {/* Trust elements */}
-              <div className="grid grid-cols-3 gap-y-8 gap-x-4 py-8 border-t border-slate-100">
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600"><ShieldCheck size={24} /></div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight">100% Original</span>
+              <div className="grid grid-cols-3 gap-y-6 gap-x-4 py-6 border-t border-slate-100">
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><ShieldCheck size={20} /></div>
+                  <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500 leading-tight">100% Original</span>
                 </div>
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600"><CheckCircle2 size={24} /></div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight">ISO Certified</span>
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600"><CheckCircle2 size={20} /></div>
+                  <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500 leading-tight">ISO Certified</span>
                 </div>
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600"><Zap size={24} /></div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight">Secure Payment</span>
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600"><Zap size={20} /></div>
+                  <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500 leading-tight">Secure Payment</span>
                 </div>
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600"><Share2 size={24} /></div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight">Easy Replace</span>
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600"><Share2 size={20} /></div>
+                  <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500 leading-tight">Easy Replace</span>
                 </div>
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600"><ArrowRight size={24} /></div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight">Fast Delivery</span>
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600"><ArrowRight size={20} /></div>
+                  <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500 leading-tight">Fast Delivery</span>
                 </div>
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-600"><Plus size={24} /></div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight">Doctor Rec.</span>
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600"><Plus size={20} /></div>
+                  <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500 leading-tight">Doctor Rec.</span>
                 </div>
               </div>
             </FadeIn>
@@ -596,7 +597,7 @@ const ContactLensDetail = () => {
               </div>
 
               {/* Reviews List */}
-              <div className="lg:col-span-2 space-y-6 max-h-[500px] overflow-y-auto pr-4">
+              <div className="lg:col-span-2 space-y-6 max-h-[500px] overflow-y-auto pr-4" data-lenis-prevent>
                  {reviews.length > 0 ? (
                     reviews.map((review, idx) => (
                        <div key={review.id || idx} className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">

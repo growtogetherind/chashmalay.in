@@ -29,6 +29,7 @@ const FRAME_TYPE_OPTIONS = ['Full Rim', 'Rimless', 'Half Rim', 'Low Bridge Fit']
 const FRAME_SHAPE_OPTIONS = ['Round', 'Square', 'Rectangle', 'Cat Eye', 'Geometric', 'Aviator', 'Oval', 'Wayfarer'];
 const COLOR_OPTIONS = ['Black', 'Gold', 'Silver', 'Gunmetal', 'Transparent', 'Brown', 'Blue', 'Rose Gold'];
 const THEME_OPTIONS = ['Classic', 'Modern', 'Luxury', 'Minimalist', 'Sport', 'Vintage'];
+const ACCESSORY_TYPE_OPTIONS = ['Lens Cleaner', 'Microfiber Cloth', 'Contact Lens Solution', 'Spectacle Case'];
 
 const COLOR_MAP = {
     'Black': '#000000',
@@ -44,7 +45,9 @@ const COLOR_MAP = {
     'Grey': '#9CA3AF',
     'Clear': '#FFFFFF',
     'Honey': '#D97706',
-    'Hazel': '#8B5E34'
+    'Hazel': '#8B5E34',
+    'Red': '#EF4444',
+    'Tortoise': '#8B5E34'
 };
 
 const HEX_COLOR_MAP = {
@@ -147,6 +150,28 @@ const categoryMatches = (productCategory, routeName) => {
     category.replace(/\s+/g, '') === target.replace(/\s+/g, '');
 };
 
+const productMatchesRoute = (product, routeName) => {
+  if (!routeName || routeName === 'all') return true;
+
+  const target = normalizeText(routeName);
+  const category = normalizeText(product.category);
+  const gender = normalizeText(product.gender);
+
+  // Check if route matches a gender
+  if (['men', 'man', 'gents'].includes(target)) {
+    return gender === 'men' || gender === 'unisex';
+  }
+  if (['women', 'woman', 'ladies'].includes(target)) {
+    return gender === 'women' || gender === 'unisex';
+  }
+  if (['kids', 'child', 'children'].includes(target)) {
+    return gender === 'kids';
+  }
+
+  // Otherwise fallback to category matching
+  return categoryMatches(product.category, routeName);
+};
+
 const normalizeCategoryProduct = (product = {}) => {
   const text = getProductText(product);
   const shape = findOption(product.frame_shape || product.frameShape || product.shape, FRAME_SHAPE_OPTIONS)
@@ -175,6 +200,13 @@ const getFilterValues = (product, attr) => {
   if (attr === 'shape') return [product.frame_shape || product.shape].filter(Boolean);
   if (attr === 'type') return [product.frame_type].filter(Boolean);
   if (attr === 'color') return product.filter_colors || [product.color].filter(Boolean);
+  if (attr === 'category') {
+    if (categoryMatches(product.category, 'eyeglasses')) return ['Eyeglasses'];
+    if (categoryMatches(product.category, 'sunglasses')) return ['Sunglasses'];
+    if (categoryMatches(product.category, 'contact-lenses')) return ['Contact Lenses'];
+    return [product.category].filter(Boolean);
+  }
+  if (attr === 'material') return [product.frame_material].filter(Boolean);
   return [product.theme].filter(Boolean);
 };
 
@@ -182,12 +214,38 @@ const matchesSelection = (values, selected) => (
   selected.length === 0 || values.some((value) => selected.includes(value))
 );
 
-const matchesFilters = (product, filters) => (
-  matchesSelection(getFilterValues(product, 'shape'), filters.shapes)
-  && matchesSelection(getFilterValues(product, 'type'), filters.types)
-  && matchesSelection(getFilterValues(product, 'color'), filters.colors)
-  && matchesSelection(getFilterValues(product, 'theme'), filters.themes)
-);
+const matchesFilters = (product, filters) => {
+  const price = getPrice(product);
+
+  // Category filter
+  const matchesCategory = !filters.categories || filters.categories.length === 0 || 
+    filters.categories.some(cat => categoryMatches(product.category, cat));
+
+  // Material filter
+  const matchesMaterial = !filters.materials || filters.materials.length === 0 ||
+    filters.materials.some(mat => 
+      String(product.frame_material || '').toLowerCase().includes(mat.toLowerCase())
+    );
+
+  // Accessory type filter
+  const matchesAccessoryType = !filters.accessoryTypes || filters.accessoryTypes.length === 0 ||
+    filters.accessoryTypes.some(at =>
+      String(product.accessory_type || '').toLowerCase() === at.toLowerCase()
+    );
+
+  // Price filter
+  const matchesPrice = !filters.priceRange || 
+    (price >= filters.priceRange[0] && price <= filters.priceRange[1]);
+
+  return matchesCategory
+    && matchesMaterial
+    && matchesPrice
+    && matchesAccessoryType
+    && matchesSelection(getFilterValues(product, 'shape'), filters.shapes)
+    && matchesSelection(getFilterValues(product, 'type'), filters.types)
+    && matchesSelection(getFilterValues(product, 'color'), filters.colors)
+    && matchesSelection(getFilterValues(product, 'theme'), filters.themes);
+};
 
 const sortProducts = (products, sort) => {
   const result = [...products];
@@ -262,21 +320,36 @@ const Category = () => {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedThemes, setSelectedThemes] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedMaterials, setSelectedMaterials] = useState([]);
+  const [selectedAccessoryTypes, setSelectedAccessoryTypes] = useState([]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(20000);
 
   // Pending filter states for deferred 'Apply' button flow
   const [pendingShapes, setPendingShapes] = useState([]);
   const [pendingTypes, setPendingTypes] = useState([]);
   const [pendingColors, setPendingColors] = useState([]);
   const [pendingThemes, setPendingThemes] = useState([]);
+  const [pendingCategories, setPendingCategories] = useState([]);
+  const [pendingMaterials, setPendingMaterials] = useState([]);
+  const [pendingAccessoryTypes, setPendingAccessoryTypes] = useState([]);
+  const [pendingMinPrice, setPendingMinPrice] = useState(0);
+  const [pendingMaxPrice, setPendingMaxPrice] = useState(20000);
 
   const [sortBy, setSortBy] = useState('recommended');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
+  const isAccessoriesRoute = (name || '').toLowerCase().includes('accessor');
+
   const [expandedFilters, setExpandedFilters] = useState({
-    type: true, // Frame Type is unfolded by default
+    category: false,
+    type: false,
     shape: false,
     color: false,
-    theme: false,
+    material: false,
+    price: false,
+    accessoryType: false,
   });
 
   const toggleFilter = (key) => {
@@ -286,13 +359,22 @@ const Category = () => {
     }));
   };
 
+  const handleMinChange = (e) => {
+    const value = Math.min(Number(e.target.value), pendingMaxPrice - 500);
+    setPendingMinPrice(value);
+  };
+  const handleMaxChange = (e) => {
+    const value = Math.max(Number(e.target.value), pendingMinPrice + 500);
+    setPendingMaxPrice(value);
+  };
+
   const categoryTitle = name ? name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'Eyeglasses';
 
   useEffect(() => {
     setLoading(true);
     const unsubscribe = subscribeProducts({ category: null }, (data) => {
       const processedProducts = (data || [])
-        .filter((product) => categoryMatches(product.category, name))
+        .filter((product) => productMatchesRoute(product, name))
         .map(normalizeCategoryProduct);
 
       setProducts(processedProducts);
@@ -307,17 +389,39 @@ const Category = () => {
     setSelectedTypes([]);
     setSelectedColors([]);
     setSelectedThemes([]);
+    setSelectedMaterials([]);
+    setSelectedAccessoryTypes([]);
+    setMinPrice(0);
+    setMaxPrice(20000);
+
     setPendingShapes([]);
     setPendingTypes([]);
     setPendingColors([]);
     setPendingThemes([]);
+    setPendingMaterials([]);
+    setPendingAccessoryTypes([]);
+    setPendingMinPrice(0);
+    setPendingMaxPrice(20000);
+
+    const initialCat = [];
+    if (name && name !== 'all') {
+      if (name.includes('glass')) initialCat.push('Eyeglasses');
+      else if (name.includes('sun')) initialCat.push('Sunglasses');
+      else if (name.includes('contact') || name.includes('lens')) initialCat.push('Contact Lenses');
+    }
+    setSelectedCategories(initialCat);
+    setPendingCategories(initialCat);
+
     setSortBy('recommended');
     setIsMobileFilterOpen(false);
     setExpandedFilters({
-      type: true,
+      category: false,
+      type: false,
       shape: false,
       color: false,
-      theme: false,
+      material: false,
+      price: false,
+      accessoryType: false,
     });
   }, [name]);
 
@@ -327,8 +431,13 @@ const Category = () => {
       setPendingTypes(selectedTypes);
       setPendingColors(selectedColors);
       setPendingThemes(selectedThemes);
+      setPendingCategories(selectedCategories);
+      setPendingMaterials(selectedMaterials);
+      setPendingAccessoryTypes(selectedAccessoryTypes);
+      setPendingMinPrice(minPrice);
+      setPendingMaxPrice(maxPrice);
     }
-  }, [isMobileFilterOpen, selectedColors, selectedShapes, selectedThemes, selectedTypes]);
+  }, [isMobileFilterOpen, selectedColors, selectedShapes, selectedThemes, selectedTypes, selectedCategories, selectedMaterials, selectedAccessoryTypes, minPrice, maxPrice]);
 
   const filteredProducts = React.useMemo(() => {
     const selected = {
@@ -336,10 +445,14 @@ const Category = () => {
       types: selectedTypes,
       colors: selectedColors,
       themes: selectedThemes,
+      categories: selectedCategories,
+      materials: selectedMaterials,
+      accessoryTypes: selectedAccessoryTypes,
+      priceRange: [minPrice, maxPrice],
     };
 
     return sortProducts(products.filter((product) => matchesFilters(product, selected)), sortBy);
-  }, [products, selectedShapes, selectedTypes, selectedColors, selectedThemes, sortBy]);
+  }, [products, selectedShapes, selectedTypes, selectedColors, selectedThemes, selectedCategories, selectedMaterials, selectedAccessoryTypes, minPrice, maxPrice, sortBy]);
 
   const typeOptions = React.useMemo(
     () => mergeOptions(FRAME_TYPE_OPTIONS, products.map((product) => product.frame_type)),
@@ -382,6 +495,11 @@ const Category = () => {
     setSelectedTypes(pendingTypes);
     setSelectedColors(pendingColors);
     setSelectedThemes(pendingThemes);
+    setSelectedCategories(pendingCategories);
+    setSelectedMaterials(pendingMaterials);
+    setSelectedAccessoryTypes(pendingAccessoryTypes);
+    setMinPrice(pendingMinPrice);
+    setMaxPrice(pendingMaxPrice);
     setIsMobileFilterOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -391,65 +509,153 @@ const Category = () => {
     setPendingTypes([]);
     setPendingColors([]);
     setPendingThemes([]);
+    setPendingCategories([]);
+    setPendingMaterials([]);
+    setPendingAccessoryTypes([]);
+    setPendingMinPrice(0);
+    setPendingMaxPrice(20000);
+
     setSelectedShapes([]);
     setSelectedTypes([]);
     setSelectedColors([]);
     setSelectedThemes([]);
+    setSelectedCategories([]);
+    setSelectedMaterials([]);
+    setSelectedAccessoryTypes([]);
+    setMinPrice(0);
+    setMaxPrice(20000);
   };
 
   const handleSortChange = (newSort) => {
     setSortBy(newSort);
   };
 
-  // Returns how many products match ALL OTHER filter groups AND have this attr value.
-  // This is the correct number to display beside each filter chip.
   const getAvailabilityCount = React.useCallback((attr, value, currentFilters) => {
-    const { shapes, types, colors, themes } = currentFilters;
+    const { shapes, types, colors, themes, categories, materials, priceRange } = currentFilters;
     return products.filter(p => {
       const filterSet = {
         shapes: attr === 'shape' ? [] : shapes,
         types: attr === 'type' ? [] : types,
         colors: attr === 'color' ? [] : colors,
         themes: attr === 'theme' ? [] : themes,
+        categories: attr === 'category' ? [] : (categories || []),
+        materials: attr === 'material' ? [] : (materials || []),
+        priceRange: priceRange || [0, 20000],
       };
       return matchesFilters(p, filterSet) && getFilterValues(p, attr).includes(value);
     }).length;
   }, [products]);
 
+  const getCategoryMeta = (slug = '') => {
+    const s = slug.toLowerCase();
+    if (s.includes('sun') || s.includes('shade')) {
+      return {
+        title: 'Sun Collection',
+        subtitle: 'High-performance sun protection meets iconic styling. Handcrafted frames designed to shield your vision in absolute style.',
+        breadcrumbs: ['Home', 'Shop', 'Sunglasses']
+      };
+    }
+    if (s.includes('contact') || s.includes('lens')) {
+      return {
+        title: 'Contact Lenses',
+        subtitle: 'Precision optical solutions designed for optimal oxygen transmission, hydration, and long-lasting daily comfort.',
+        breadcrumbs: ['Home', 'Shop', 'Contact Lenses']
+      };
+    }
+    if (s.includes('read') || s.includes('comp')) {
+      return {
+        title: 'Reading Glasses',
+        subtitle: 'Magnified precision optical wear tailored for reading and digital screen work. Ergonomic comfort for long tasks.',
+        breadcrumbs: ['Home', 'Shop', 'Reading Glasses']
+      };
+    }
+    if (s.includes('kids') || s.includes('child')) {
+      return {
+        title: 'Kids Eyewear',
+        subtitle: 'Durable, lightweight, and vibrant frames designed to match children\'s active lifestyles without compromising comfort.',
+        breadcrumbs: ['Home', 'Shop', 'Kids']
+      };
+    }
+    if (s === 'men' || s === 'man' || s === 'gents') {
+      return {
+        title: "Men's Eyewear",
+        subtitle: 'Explore our curated collections of premium eyewear for men, handcrafted from lightweight titanium and fine Italian acetate.',
+        breadcrumbs: ['Home', 'Shop', 'Men']
+      };
+    }
+    if (s === 'women' || s === 'woman' || s === 'ladies') {
+      return {
+        title: "Women's Eyewear",
+        subtitle: 'Explore our curated collections of premium eyewear for women, handcrafted from lightweight titanium and fine Italian acetate.',
+        breadcrumbs: ['Home', 'Shop', 'Women']
+      };
+    }
+    return {
+      title: categoryTitle,
+      subtitle: 'Explore our curated collections of premium eyewear, handcrafted from lightweight titanium and fine Italian acetate.',
+      breadcrumbs: ['Home', 'Shop', categoryTitle]
+    };
+  };
+
+  const catMeta = getCategoryMeta(name || '');
+
   return (
-    <div className="bg-[#fbfaff] text-primary min-h-screen relative">
+    <div className="bg-[#faf9f6] text-primary min-h-screen relative">
       {/* Editorial Header */}
-      <header className="pt-3 md:pt-6 pb-4 border-b border-divider bg-white">
-        <div className="container">
-           <div className="flex flex-col md:flex-row justify-between items-baseline gap-8">
-              <div>
-                <FadeIn delay={0}>
-                  <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-accent mb-2 block">
-                    Collection / Archive
-                  </span>
-                </FadeIn>
-                <h1 className="text-3xl md:text-5xl leading-tight tracking-tighter text-heading break-words font-medium uppercase flex items-baseline gap-3 flex-wrap">
-                  <RevealText text={categoryTitle} delay={0.1} />
-                  <span className="text-sm md:text-base font-normal text-slate-400 normal-case">
-                    {filteredProducts.length} items
-                  </span>
-                </h1>
+      <header className="pt-8 pb-10 bg-white border-b border-gray-100">
+        <div className="max-w-[1920px] mx-auto px-4 lg:px-8">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-2 mb-4 text-[10px] md:text-xs font-semibold text-slate-400 tracking-wider uppercase">
+            {catMeta.breadcrumbs.map((crumb, idx) => (
+              <React.Fragment key={idx}>
+                {idx > 0 && <span className="text-[8px] text-slate-300">/</span>}
+                <span className={idx === catMeta.breadcrumbs.length - 1 ? 'text-slate-800 font-bold' : ''}>
+                  {crumb}
+                </span>
+              </React.Fragment>
+            ))}
+          </nav>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-end">
+            <div className="md:col-span-8 lg:col-span-7">
+              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent mb-2.5 block">
+                Collection Archive
+              </span>
+              <h1 className="text-3xl md:text-5xl font-normal text-slate-900 leading-tight tracking-tight mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {catMeta.title}
+              </h1>
+              <p className="text-sm md:text-base text-slate-500 font-normal leading-relaxed max-w-xl">
+                {catMeta.subtitle}
+              </p>
+            </div>
+            
+            <div className="md:col-span-4 lg:col-span-5 flex flex-wrap md:justify-end items-center gap-6">
+              <div className="text-left md:text-right border-l md:border-l-0 md:border-r border-slate-200 pl-4 md:pl-0 pr-0 md:pr-6 py-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Catalog Size</span>
+                <span className="text-2xl font-black text-slate-900 leading-none">{filteredProducts.length} <span className="text-xs font-normal text-slate-500">items</span></span>
               </div>
-           </div>
+              <div className="text-left border-l border-slate-200 pl-4 py-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Active filters</span>
+                <span className="text-sm font-bold text-slate-800 leading-none">
+                  {selectedShapes.length + selectedTypes.length + selectedColors.length + selectedThemes.length || 'None'}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      <div className="w-full max-w-[1920px] mx-auto py-6 md:py-12 px-4 lg:px-8 lg:pl-0">
+      <div className="w-full max-w-[1920px] mx-auto py-6 md:py-12 px-4 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
            {/* Minimal Sidebar */}
             {/* Advanced Filters Sidebar */}
             <aside className="hidden lg:block lg:col-span-3">
-               <FadeIn delay={0.4} className="sticky top-28 bg-white border-r border-gray-100 p-6 h-[calc(100vh-112px)] max-h-[calc(100vh-112px)] overflow-y-auto custom-scrollbar pr-6">
+               <FadeIn delay={0.4} className="sticky top-28 bg-white border border-slate-100 rounded-2xl p-6 h-[calc(100vh-140px)] max-h-[calc(100vh-140px)] overflow-y-auto custom-scrollbar shadow-sm" data-lenis-prevent>
                   {/* Sort By Section */}
                   <div className="flex justify-between items-center pb-4 mb-4 border-b border-gray-100">
                      <div className="flex items-center gap-2 text-slate-900 hover:text-primary transition-colors cursor-pointer">
-                        <ArrowUpDown size={16} className="text-slate-700" />
-                        <span className="text-sm md:text-base font-extrabold text-slate-900 uppercase tracking-wide">Sort By</span>
+                        <ArrowUpDown size={14} className="text-slate-700" />
+                        <span className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Sort By</span>
                      </div>
                      <select
                        value={sortBy}
@@ -463,66 +669,126 @@ const Category = () => {
                      </select>
                   </div>
 
-                  {/* Filters Header (funnel icon + bold title) */}
-                  <div className="flex items-center gap-2.5 pb-4 mb-4 border-b border-gray-100">
-                     <Filter className="text-slate-900" size={20} strokeWidth={2.5} />
-                     <span className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Filters</span>
+                  {/* Filters Header */}
+                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
+                     <div className="flex items-center gap-2">
+                        <Filter className="text-slate-900" size={16} strokeWidth={2.5} />
+                        <span className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Filters</span>
+                     </div>
+                     {(selectedShapes.length > 0 || selectedTypes.length > 0 || selectedColors.length > 0 || selectedThemes.length > 0) && (
+                       <button
+                         onClick={handleClearAll}
+                         className="text-[10px] font-black text-accent uppercase tracking-wider hover:underline"
+                       >
+                         Clear All
+                       </button>
+                     )}
                   </div>
 
                   <div className="space-y-2">
-                     {/* Frame Type Accordion */}
+                     {/* Category Accordion */}
                      <div className="border-b border-gray-100 pb-2">
                         <button
-                          onClick={() => toggleFilter('type')}
+                          onClick={() => toggleFilter('category')}
                           className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
                         >
-                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Frame Type</span>
+                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Category</span>
                           <ChevronDown
-                            size={18}
-                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.type ? 'transform rotate-180 text-primary' : ''}`}
+                            size={16}
+                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.category ? 'transform rotate-180 text-accent' : ''}`}
                           />
                         </button>
                         <AnimatePresence initial={false}>
-                          {expandedFilters.type && (
+                          {expandedFilters.category && (
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="pt-2 pb-4">
-                                <div className="grid grid-cols-2 gap-3">
-                                    {typeOptions.map(type => {
-                                        const Icon = FrameIcons[type] || FrameIcons['Full Rim'];
-                                        const isSelected = pendingTypes.includes(type);
-                                        const availabilityCount = getAvailabilityCount('type', type, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
+                              <div className="pt-1 pb-4 space-y-2.5">
+                                 {['Eyeglasses', 'Sunglasses', 'Contact Lenses'].map(cat => {
+                                     const isChecked = pendingCategories.includes(cat);
+                                     const handleToggle = () => {
+                                         setPendingCategories(prev =>
+                                             prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                                         );
+                                     };
+                                     const availabilityCount = getAvailabilityCount('category', cat, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
 
-                                        return (
-                                            <button
-                                                key={type}
-                                                onClick={() => handleTypeChange(type)}
-                                                disabled={availabilityCount === 0 && !isSelected}
-                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
-                                                    isSelected ? 'border-primary bg-primary text-white scale-[1.03] shadow-lg shadow-primary/10' : 'border-slate-200 hover:border-primary/20 text-slate-500 hover:text-primary hover:bg-slate-50'
-                                                } ${availabilityCount === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
-                                            >
-                                                <div className={`mb-2.5 transition-transform duration-500 group-hover:scale-105 ${isSelected ? 'text-white' : 'text-primary'}`}>
-                                                    <Icon />
-                                                </div>
-                                                <div className="flex flex-col items-center">
-                                                   <span className="text-[10px] font-black uppercase tracking-wider leading-none text-center">{type}</span>
-                                                   <span className={`text-[8px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({availabilityCount})</span>
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                                     return (
+                                         <label key={cat} className="flex items-center gap-3 cursor-pointer group py-1">
+                                             <input
+                                                 type="checkbox"
+                                                 checked={isChecked}
+                                                 onChange={handleToggle}
+                                                 className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                                             />
+                                             <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                                 {cat} <span className="text-[10px] text-slate-400 font-normal">({availabilityCount})</span>
+                                             </span>
+                                         </label>
+                                     );
+                                 })}
                               </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
                      </div>
+
+                      {/* Frame Type Accordion */}
+                      <div className="border-b border-gray-100 pb-2">
+                         <button
+                           onClick={() => toggleFilter('type')}
+                           className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
+                         >
+                           <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Frame Type</span>
+                           <ChevronDown
+                             size={16}
+                             className={`text-slate-400 transition-transform duration-300 ${expandedFilters.type ? 'transform rotate-180 text-accent' : ''}`}
+                           />
+                         </button>
+                         <AnimatePresence initial={false}>
+                           {expandedFilters.type && (
+                             <motion.div
+                               initial={{ height: 0, opacity: 0 }}
+                               animate={{ height: 'auto', opacity: 1 }}
+                               exit={{ height: 0, opacity: 0 }}
+                               transition={{ duration: 0.2, ease: 'easeInOut' }}
+                               className="overflow-hidden"
+                             >
+                               <div className="pt-1 pb-4">
+                                 <div className="grid grid-cols-2 gap-3">
+                                     {['Full Rim', 'Rimless', 'Half Rim', 'Low Bridge Fit'].map(type => {
+                                         const Icon = FrameIcons[type] || FrameIcons.Rectangle;
+                                         const isSelected = pendingTypes.includes(type);
+                                         const availabilityCount = getAvailabilityCount('type', type, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
+
+                                         return (
+                                             <div key={type} className="flex flex-col items-center">
+                                                 <button
+                                                     onClick={() => handleTypeChange(type)}
+                                                     disabled={availabilityCount === 0 && !isSelected}
+                                                     className={`w-full p-3 flex items-center justify-center border rounded-xl transition-all ${
+                                                         isSelected ? 'border-slate-950 bg-slate-950 text-white scale-[1.02] shadow-sm' : 'border-slate-200 bg-white hover:border-slate-350'
+                                                     } ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
+                                                 >
+                                                     <div className={`transition-colors ${isSelected ? 'text-white' : 'text-slate-800'}`}>
+                                                         <Icon />
+                                                     </div>
+                                                 </button>
+                                                 <span className="text-[10px] font-semibold text-slate-700 mt-1.5 text-center truncate w-full">{type}</span>
+                                                 <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
+                                             </div>
+                                         );
+                                     })}
+                                 </div>
+                               </div>
+                             </motion.div>
+                           )}
+                         </AnimatePresence>
+                      </div>
 
                      {/* Frame Shape Accordion */}
                      <div className="border-b border-gray-100 pb-2">
@@ -530,10 +796,10 @@ const Category = () => {
                           onClick={() => toggleFilter('shape')}
                           className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
                         >
-                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Shape & Style</span>
+                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Frame Shape</span>
                           <ChevronDown
-                            size={18}
-                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.shape ? 'transform rotate-180 text-primary' : ''}`}
+                            size={16}
+                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.shape ? 'transform rotate-180 text-accent' : ''}`}
                           />
                         </button>
                         <AnimatePresence initial={false}>
@@ -542,33 +808,33 @@ const Category = () => {
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="pt-2 pb-4">
-                                <div className="grid grid-cols-2 gap-3">
-                                    {shapeOptions.map(shape => {
+                              <div className="pt-1 pb-4">
+                                <div className="grid grid-cols-3 gap-y-4 gap-x-2">
+                                    {['Round', 'Square', 'Cat Eye', 'Aviator', 'Rectangle'].map(shape => {
                                         const Icon = FrameIcons[shape] || FrameIcons.Rectangle;
                                         const isSelected = pendingShapes.includes(shape);
-                                        const availabilityCount = getAvailabilityCount('shape', shape, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
+                                        const availabilityCount = getAvailabilityCount('shape', shape, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
+                                        const label = shape === 'Cat Eye' ? 'Cat-Eye' : shape;
 
                                         return (
-                                            <button
-                                                key={shape}
-                                                onClick={() => handleShapeChange(shape)}
-                                                disabled={availabilityCount === 0 && !isSelected}
-                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-2xl transition-all duration-300 group shadow-sm ${
-                                                    isSelected ? 'border-primary bg-primary text-white scale-[1.03] shadow-lg shadow-primary/10' : 'border-slate-200 hover:border-primary/20 text-slate-500 hover:text-primary hover:bg-slate-50'
-                                                } ${availabilityCount === 0 && !isSelected ? 'opacity-10 grayscale cursor-not-allowed' : ''}`}
-                                            >
-                                                <div className={`mb-2.5 transition-transform duration-500 group-hover:scale-105 ${isSelected ? 'text-white' : 'text-primary'}`}>
-                                                    <Icon />
-                                                </div>
-                                                <div className="flex flex-col items-center">
-                                                   <span className="text-[10px] font-black uppercase tracking-wider leading-none text-center">{shape}</span>
-                                                   <span className={`text-[8px] mt-1 font-mono font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>({availabilityCount})</span>
-                                                </div>
-                                            </button>
+                                            <div key={shape} className="flex flex-col items-center">
+                                                <button
+                                                    onClick={() => handleShapeChange(shape)}
+                                                    disabled={availabilityCount === 0 && !isSelected}
+                                                    className={`w-full aspect-[4/3] flex items-center justify-center border rounded-xl transition-all ${
+                                                        isSelected ? 'border-slate-950 bg-slate-950 text-white scale-[1.02] shadow-sm' : 'border-slate-200 bg-white hover:border-slate-350'
+                                                    } ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
+                                                >
+                                                    <div className={`transition-colors ${isSelected ? 'text-white' : 'text-slate-800'}`}>
+                                                        <Icon />
+                                                    </div>
+                                                </button>
+                                                <span className="text-[10px] font-semibold text-slate-700 mt-1.5 text-center truncate w-full">{label}</span>
+                                                <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
+                                            </div>
                                         );
                                     })}
                                 </div>
@@ -584,10 +850,10 @@ const Category = () => {
                           onClick={() => toggleFilter('color')}
                           className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
                         >
-                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Frame Color</span>
+                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Color</span>
                           <ChevronDown
-                            size={18}
-                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.color ? 'transform rotate-180 text-primary' : ''}`}
+                            size={16}
+                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.color ? 'transform rotate-180 text-accent' : ''}`}
                           />
                         </button>
                         <AnimatePresence initial={false}>
@@ -596,30 +862,29 @@ const Category = () => {
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="pt-2 pb-4">
-                                <div className="space-y-1.5 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                                    {colorOptions.map(color => {
+                              <div className="pt-1 pb-4">
+                                <div className="grid grid-cols-3 gap-y-4 gap-x-2">
+                                    {['Black', 'Tortoise', 'Clear', 'Gold', 'Blue', 'Red'].map(color => {
                                         const isSelected = pendingColors.includes(color);
-                                        const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
+                                        const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
 
                                         return (
-                                            <button
-                                                key={color}
-                                                onClick={() => handleColorChange(color)}
-                                                disabled={availabilityCount === 0 && !isSelected}
-                                                className={`flex items-center justify-between w-full group transition-all p-2.5 rounded-xl hover:bg-slate-50 ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <ColorSwatch color={color} isSelected={isSelected} />
-                                                    <span className={`text-xs font-bold tracking-wide transition-colors ${isSelected ? 'text-primary' : 'text-slate-600 group-hover:text-primary'}`}>
-                                                        {color}
-                                                    </span>
-                                                </div>
-                                                <span className={`text-[10px] font-mono font-bold ${isSelected ? 'text-primary' : 'text-slate-400'}`}>({availabilityCount})</span>
-                                            </button>
+                                            <div key={color} className="flex flex-col items-center">
+                                                <button
+                                                    onClick={() => handleColorChange(color)}
+                                                    disabled={availabilityCount === 0 && !isSelected}
+                                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                                                        isSelected ? 'ring-2 ring-slate-950 ring-offset-2 scale-105' : 'hover:scale-105'
+                                                    } ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
+                                                >
+                                                    <ColorSwatch color={color} isSelected={false} size="w-full h-full" />
+                                                </button>
+                                                <span className="text-[10px] font-semibold text-slate-700 mt-1.5 text-center truncate w-full">{color}</span>
+                                                <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
+                                            </div>
                                         );
                                     })}
                                 </div>
@@ -629,47 +894,167 @@ const Category = () => {
                         </AnimatePresence>
                      </div>
 
-                     {/* Style Theme Accordion */}
+                     {/* Material Accordion */}
                      <div className="border-b border-gray-100 pb-2">
                         <button
-                          onClick={() => toggleFilter('theme')}
+                          onClick={() => toggleFilter('material')}
                           className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
                         >
-                          <span className="text-base md:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">Style Theme</span>
+                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Material</span>
                           <ChevronDown
-                            size={18}
-                            className={`text-slate-500 transition-transform duration-300 ${expandedFilters.theme ? 'transform rotate-180 text-primary' : ''}`}
+                            size={16}
+                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.material ? 'transform rotate-180 text-accent' : ''}`}
                           />
                         </button>
                         <AnimatePresence initial={false}>
-                          {expandedFilters.theme && (
+                          {expandedFilters.material && (
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="pt-2 pb-4">
-                                <div className="grid grid-cols-2 gap-2">
-                                    {themeOptions.map(theme => {
-                                        const isSelected = pendingThemes.includes(theme);
-                                        const availabilityCount = getAvailabilityCount('theme', theme, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
+                              <div className="pt-1 pb-4 space-y-2.5">
+                                 {['Acetate', 'Metal', 'Titanium', 'Plastic', 'TR90'].map(mat => {
+                                     const isChecked = pendingMaterials.includes(mat);
+                                     const handleToggle = () => {
+                                         setPendingMaterials(prev =>
+                                             prev.includes(mat) ? prev.filter(m => m !== mat) : [...prev, mat]
+                                         );
+                                     };
+                                     const availabilityCount = getAvailabilityCount('material', mat, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
 
-                                        return (
-                                            <button
-                                                key={theme}
-                                                onClick={() => handleThemeChange(theme)}
-                                                disabled={availabilityCount === 0 && !isSelected}
-                                                className={`px-3 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all text-center ${
-                                                    isSelected ? 'bg-primary text-white border-primary shadow-md shadow-primary/10' : 'border-slate-200 text-slate-500 hover:border-primary/30 hover:text-primary hover:bg-slate-50'
-                                                } ${availabilityCount === 0 && !isSelected ? 'opacity-10 cursor-not-allowed' : ''}`}
-                                            >
-                                                {theme} ({availabilityCount})
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                                     return (
+                                         <label key={mat} className="flex items-center gap-3 cursor-pointer group py-1">
+                                             <input
+                                                 type="checkbox"
+                                                 checked={isChecked}
+                                                 onChange={handleToggle}
+                                                 className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                                             />
+                                             <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                                 {mat} <span className="text-[10px] text-slate-400 font-normal">({availabilityCount})</span>
+                                             </span>
+                                         </label>
+                                     );
+                                 })}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                     </div>
+
+                  {/* Accessory Type Accordion - shown only on accessories route */}
+                  {isAccessoriesRoute && (
+                     <div className="border-b border-gray-100 pb-2">
+                        <button
+                          onClick={() => toggleFilter('accessoryType')}
+                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
+                        >
+                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Accessory Type</span>
+                          <ChevronDown
+                            size={16}
+                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.accessoryType ? 'transform rotate-180 text-accent' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {expandedFilters.accessoryType && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-1 pb-4 space-y-2.5">
+                                 {ACCESSORY_TYPE_OPTIONS.map(at => {
+                                     const isChecked = pendingAccessoryTypes.includes(at);
+                                     const handleToggle = () => {
+                                         setPendingAccessoryTypes(prev =>
+                                             prev.includes(at) ? prev.filter(a => a !== at) : [...prev, at]
+                                         );
+                                     };
+                                     const count = products.filter(p => (p.accessory_type || '').toLowerCase() === at.toLowerCase()).length;
+                                     return (
+                                         <label key={at} className="flex items-center gap-3 cursor-pointer group py-1">
+                                             <input
+                                                 type="checkbox"
+                                                 checked={isChecked}
+                                                 onChange={handleToggle}
+                                                 className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                                             />
+                                             <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                                 {at} <span className="text-[10px] text-slate-400 font-normal">({count})</span>
+                                             </span>
+                                         </label>
+                                     );
+                                 })}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                     </div>
+                  )}
+
+                  {/* Price Range Accordion */}
+                     <div className="border-b border-gray-100 pb-2">
+                        <button
+                          onClick={() => toggleFilter('price')}
+                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
+                        >
+                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Price Range</span>
+                          <ChevronDown
+                            size={16}
+                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.price ? 'transform rotate-180 text-accent' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {expandedFilters.price && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-2 pb-4 space-y-4">
+                                 <div className="relative h-1 w-[90%] mx-auto bg-slate-100 rounded-full my-4">
+                                     <div
+                                         className="absolute h-full bg-[#B78A5B] rounded-full"
+                                         style={{
+                                             left: `${(pendingMinPrice / 20000) * 100}%`,
+                                             right: `${100 - (pendingMaxPrice / 20000) * 100}%`
+                                         }}
+                                     />
+                                     <input
+                                         type="range"
+                                         min="0"
+                                         max="20000"
+                                         step="500"
+                                         value={pendingMinPrice}
+                                         onChange={handleMinChange}
+                                         className="absolute w-full h-1 pointer-events-none appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#B78A5B] [&::-webkit-slider-thumb]:appearance-none"
+                                     />
+                                     <input
+                                         type="range"
+                                         min="0"
+                                         max="20000"
+                                         step="500"
+                                         value={pendingMaxPrice}
+                                         onChange={handleMaxChange}
+                                         className="absolute w-full h-1 pointer-events-none appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#B78A5B] [&::-webkit-slider-thumb]:appearance-none"
+                                     />
+                                 </div>
+                                 <div className="flex items-center gap-3">
+                                     <div className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 text-center">
+                                         ₹{pendingMinPrice.toLocaleString()}
+                                     </div>
+                                     <span className="text-slate-400 font-bold">-</span>
+                                     <div className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 text-center">
+                                         ₹{pendingMaxPrice.toLocaleString()}
+                                     </div>
+                                 </div>
                               </div>
                             </motion.div>
                           )}
@@ -677,12 +1062,12 @@ const Category = () => {
                      </div>
                   </div>
 
-                  {/* Mockup Lavender Apply Button */}
+                  {/* Sleek Slate-900 Apply Button */}
                   <button
                     onClick={handleApplyFilters}
-                    className="w-full mt-6 py-4 bg-[#8e90af] hover:bg-[#7e809e] text-white font-bold rounded-2xl transition-all shadow-lg shadow-[#8e90af]/20 hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wider"
+                    className="w-full mt-6 py-3.5 bg-slate-900 hover:bg-black text-white font-extrabold rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] text-xs uppercase tracking-widest"
                   >
-                    Apply
+                    Apply Filters
                   </button>
                </FadeIn>
             </aside>
@@ -733,7 +1118,7 @@ const Category = () => {
                exit={{ opacity: 0 }}
                transition={TRANSITIONS.cinema}
                onClick={() => setIsMobileFilterOpen(false)}
-               className="fixed inset-0 bg-primary/20 backdrop-blur-md z-[2000]"
+               className="fixed inset-0 bg-primary/20 backdrop-blur-md z-[2000] category-filter-backdrop"
             />
             <motion.div
                initial={{ x: '-100%' }}
@@ -741,6 +1126,7 @@ const Category = () => {
                exit={{ x: '-100%' }}
                transition={TRANSITIONS.cinemaIn}
                className="fixed top-0 left-0 h-full w-[85vw] max-w-sm glass-panel z-[2001] p-8 overflow-y-auto"
+               data-lenis-prevent
             >
                <div className="flex justify-between items-center mb-12">
                   <span className="text-xs font-sans font-semibold tracking-widest text-primary uppercase">FILTERS</span>
@@ -770,69 +1156,184 @@ const Category = () => {
                       </div>
                    </div>
 
-                   <div>
-                      <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Shape</h4>
-                      <div className="grid grid-cols-2 gap-3">
-                         {shapeOptions.map(shape => {
-                            const Icon = FrameIcons[shape] || FrameIcons.Rectangle;
-                            const isSelected = pendingShapes.includes(shape);
-                            const availabilityCount = getAvailabilityCount('shape', shape, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
-                            return (
-                                <button
-                                   key={shape}
-                                   onClick={() => handleShapeChange(shape)}
-                                   disabled={availabilityCount === 0 && !isSelected}
-                                   className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'} ${availabilityCount === 0 && !isSelected ? 'opacity-30' : ''}`}
-                                >
-                                   <div className={`mb-2 ${isSelected ? 'text-white' : 'text-primary'}`}><Icon /></div>
-                                   <span className="text-[9px] font-bold uppercase tracking-widest">{shape} ({availabilityCount})</span>
-                                </button>
-                            );
-                         })}
-                      </div>
-                   </div>
-
-                   <div>
-                       <h4 className="text-[12px] font-sans font-black uppercase tracking-[0.25em] text-primary mb-6 border-b-2 border-primary/10 pb-3">Frame Color</h4>
-                       <div className="grid grid-cols-2 gap-3">
-                          {colorOptions.map(color => {
-                             const isSelected = pendingColors.includes(color);
-                             const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
+                    {/* Category Filter */}
+                    <div>
+                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Category</h4>
+                       <div className="space-y-3">
+                          {['Eyeglasses', 'Sunglasses', 'Contact Lenses'].map(cat => {
+                             const isChecked = pendingCategories.includes(cat);
+                             const handleToggle = () => {
+                                 setPendingCategories(prev =>
+                                     prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                                 );
+                             };
+                             const availabilityCount = getAvailabilityCount('category', cat, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
                              return (
-                                 <button
-                                    key={color}
-                                    onClick={() => handleColorChange(color)}
-                                    disabled={availabilityCount === 0 && !isSelected}
-                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary/10 text-primary scale-[1.05]' : 'border-slate-200 text-slate-600'} ${availabilityCount === 0 && !isSelected ? 'opacity-10' : ''}`}
-                                 >
-                                    <ColorSwatch color={color} isSelected={isSelected} size="w-6 h-6" />
-                                    <span className="text-[11px] font-black uppercase tracking-widest leading-none mt-2">{color}</span>
-                                    <span className={`text-[9px] mt-1 font-mono font-bold ${isSelected ? 'text-primary/60' : 'text-slate-400'}`}>({availabilityCount})</span>
-                                 </button>
+                                 <label key={cat} className="flex items-center gap-3 cursor-pointer group py-1">
+                                     <input
+                                         type="checkbox"
+                                         checked={isChecked}
+                                         onChange={handleToggle}
+                                         className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                                     />
+                                     <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                         {cat} <span className="text-[10px] text-slate-400 font-normal">({availabilityCount})</span>
+                                     </span>
+                                 </label>
                              );
                           })}
                        </div>
                     </div>
 
-                   <div>
-                      <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Style Theme</h4>
-                      <div className="grid grid-cols-2 gap-3">
-                         {themeOptions.map(theme => {
-                            const isSelected = pendingThemes.includes(theme);
-                            const availabilityCount = getAvailabilityCount('theme', theme, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes });
-                            return (
-                                <button
-                                   key={theme}
-                                   onClick={() => handleThemeChange(theme)}
-                                   disabled={availabilityCount === 0 && !isSelected}
-                                   className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white' : 'border-divider text-secondary'} ${availabilityCount === 0 && !isSelected ? 'opacity-30' : ''}`}
-                                >
-                                   <span className="text-[10px] font-bold uppercase tracking-widest">{theme} ({availabilityCount})</span>
-                                </button>
-                            );
-                         })}
-                      </div>
-                   </div>
+                    {/* Frame Shape Filter */}
+                    <div>
+                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Frame Shape</h4>
+                       <div className="grid grid-cols-3 gap-3">
+                          {['Round', 'Square', 'Cat Eye', 'Aviator', 'Rectangle'].map(shape => {
+                             const Icon = FrameIcons[shape] || FrameIcons.Rectangle;
+                             const isSelected = pendingShapes.includes(shape);
+                             const availabilityCount = getAvailabilityCount('shape', shape, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
+                             const label = shape === 'Cat Eye' ? 'Cat-Eye' : shape;
+                             return (
+                                 <div key={shape} className="flex flex-col items-center">
+                                    <button
+                                       key={shape}
+                                       onClick={() => handleShapeChange(shape)}
+                                       disabled={availabilityCount === 0 && !isSelected}
+                                       className={`w-full aspect-[4/3] flex items-center justify-center border-2 rounded-xl transition-all duration-300 ${isSelected ? 'border-primary bg-primary text-white scale-[1.02]' : 'border-divider bg-white text-secondary'} ${availabilityCount === 0 && !isSelected ? 'opacity-30' : ''}`}
+                                    >
+                                       <div className={`scale-90 ${isSelected ? 'text-white' : 'text-slate-800'}`}><Icon /></div>
+                                    </button>
+                                    <span className="text-[9px] font-bold text-slate-700 mt-1 text-center truncate w-full">{label}</span>
+                                    <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
+                                 </div>
+                             );
+                          })}
+                       </div>
+                    </div>
+
+                    {/* Color Filter */}
+                    <div>
+                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Color</h4>
+                       <div className="grid grid-cols-3 gap-3">
+                          {['Black', 'Tortoise', 'Clear', 'Gold', 'Blue', 'Red'].map(color => {
+                             const isSelected = pendingColors.includes(color);
+                             const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
+                             return (
+                                 <div key={color} className="flex flex-col items-center">
+                                    <button
+                                       key={color}
+                                       onClick={() => handleColorChange(color)}
+                                       disabled={availabilityCount === 0 && !isSelected}
+                                       className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isSelected ? 'ring-2 ring-primary ring-offset-2 scale-105' : 'hover:scale-105'} ${availabilityCount === 0 && !isSelected ? 'opacity-30' : ''}`}
+                                    >
+                                       <ColorSwatch color={color} isSelected={false} size="w-full h-full" />
+                                    </button>
+                                    <span className="text-[9px] font-bold text-slate-700 mt-1 text-center truncate w-full">{color}</span>
+                                    <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
+                                 </div>
+                             );
+                          })}
+                       </div>
+                    </div>
+
+                    {/* Material Filter */}
+                    <div>
+                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Material</h4>
+                       <div className="space-y-3">
+                          {['Acetate', 'Metal', 'Titanium', 'Plastic', 'TR90'].map(mat => {
+                             const isChecked = pendingMaterials.includes(mat);
+                             const handleToggle = () => {
+                                 setPendingMaterials(prev =>
+                                     prev.includes(mat) ? prev.filter(m => m !== mat) : [...prev, mat]
+                                 );
+                             };
+                             const availabilityCount = getAvailabilityCount('material', mat, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
+                             return (
+                                 <label key={mat} className="flex items-center gap-3 cursor-pointer group py-1">
+                                     <input
+                                         type="checkbox"
+                                         checked={isChecked}
+                                         onChange={handleToggle}
+                                         className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                                     />
+                                     <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                         {mat} <span className="text-[10px] text-slate-400 font-normal">({availabilityCount})</span>
+                                     </span>
+                                 </label>
+                             );
+                          })}
+                       </div>
+                    </div>
+
+                     {/* Accessory Type Filter (mobile) - shown only on accessories route */}
+                     {isAccessoriesRoute && (
+                       <div>
+                         <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Accessory Type</h4>
+                         <div className="space-y-3">
+                           {ACCESSORY_TYPE_OPTIONS.map(at => {
+                             const isChecked = pendingAccessoryTypes.includes(at);
+                             return (
+                               <label key={at} className="flex items-center gap-3 cursor-pointer group py-1">
+                                 <input
+                                   type="checkbox"
+                                   checked={isChecked}
+                                   onChange={() => setPendingAccessoryTypes(prev =>
+                                     prev.includes(at) ? prev.filter(a => a !== at) : [...prev, at]
+                                   )}
+                                   className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                                 />
+                                 <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">{at}</span>
+                               </label>
+                             );
+                           })}
+                         </div>
+                       </div>
+                     )}
+
+                    {/* Price Range Filter */}
+                    <div>
+                       <h4 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b border-divider pb-2">Price Range</h4>
+                       <div className="pt-2 pb-4 space-y-4">
+                          <div className="relative h-1 w-[90%] mx-auto bg-slate-100 rounded-full my-4">
+                              <div
+                                  className="absolute h-full bg-[#B78A5B] rounded-full"
+                                  style={{
+                                      left: `${(pendingMinPrice / 20000) * 100}%`,
+                                      right: `${100 - (pendingMaxPrice / 20000) * 100}%`
+                                  }}
+                              />
+                              <input
+                                  type="range"
+                                  min="0"
+                                  max="20000"
+                                  step="500"
+                                  value={pendingMinPrice}
+                                  onChange={handleMinChange}
+                                  className="absolute w-full h-1 pointer-events-none appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#B78A5B] [&::-webkit-slider-thumb]:appearance-none"
+                              />
+                              <input
+                                  type="range"
+                                  min="0"
+                                  max="20000"
+                                  step="500"
+                                  value={pendingMaxPrice}
+                                  onChange={handleMaxChange}
+                                  className="absolute w-full h-1 pointer-events-none appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#B78A5B] [&::-webkit-slider-thumb]:appearance-none"
+                              />
+                          </div>
+                          <div className="flex items-center gap-3">
+                              <div className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 text-center">
+                                  ₹{pendingMinPrice.toLocaleString()}
+                              </div>
+                              <span className="text-slate-400 font-bold">-</span>
+                              <div className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 text-center">
+                                  ₹{pendingMaxPrice.toLocaleString()}
+                              </div>
+                          </div>
+                       </div>
+                    </div>
+                </div>
 
                    <button
                      onClick={handleApplyFilters}
@@ -840,9 +1341,8 @@ const Category = () => {
                    >
                      Show Results ({filteredProducts.length})
                    </button>
-                </div>
-            </motion.div>
-          </>
+             </motion.div>
+           </>
         )}
       </AnimatePresence>
 

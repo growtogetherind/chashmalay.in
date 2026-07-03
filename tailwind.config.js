@@ -31,8 +31,8 @@ export default {
         'ej-surface-raised': '#f5f5f5',
       },
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        serif: ['system-ui', '-apple-system', 'sans-serif'], // Fallback
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['Playfair Display', 'Georgia', 'Cambria', 'serif'],
       },
       fontSize: {
         'ej-xs': '12px',

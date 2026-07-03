@@ -385,14 +385,19 @@ const AdminOrders = () => {
                                           )}
                                           {item.lens_selection.visionType && (
                                              <span className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded text-[9px] font-black uppercase tracking-widest border border-purple-100">
-                                                {item.lens_selection.visionType.title}
+                                                {item.lens_selection.visionType.name || item.lens_selection.visionType.title}
                                              </span>
                                           )}
-                                          {item.lens_selection.lensPackage && (
+                                          {(item.lens_selection.selectedLens || item.lens_selection.lensPackage) && (
                                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-                                                {item.lens_selection.lensPackage.name}
+                                                {item.lens_selection.selectedLens?.name || item.lens_selection.lensPackage?.name}
                                              </span>
                                           )}
+                                          {item.lens_selection.addons && item.lens_selection.addons.map((addon, aIdx) => (
+                                             <span key={aIdx} className="px-2 py-0.5 bg-amber-50 text-amber-600 rounded text-[9px] font-black uppercase tracking-widest border border-amber-100">
+                                                + {addon.name}
+                                             </span>
+                                          ))}
                                           {item.lens_selection.isContactLens && (
                                              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-black uppercase tracking-widest border border-blue-100">
                                                 Contact Lenses

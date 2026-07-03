@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800;900&display=swap');
+/* Font is inherited globally from index.css / tailwind.config.js (Inter) */
 
 :root {
   --color-surface-base: #000000;
@@ -9,14 +9,13 @@
   --radius-lg: 35px;
   --radius-xl: 50px;
   --radius-2xl: 100px;
-  --font-primary: 'Nunito Sans', sans-serif;
+  --font-primary: inherit;
 }
 
 .product-detail-page {
   background-color: #fbfaff;
   min-height: 100vh;
   padding-bottom: 120px;
-  font-family: var(--font-primary);
   color: #1a1a1a;
   padding-top: 100px;
 }
@@ -178,7 +177,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px 0;
-  font-weight: 900;
+  font-weight: 700;
   color: #1a1a1a;
   font-size: 11px;
   text-transform: uppercase;
@@ -215,7 +214,7 @@
   color: #090039;
   font-size: 24px;
   line-height: 1.1;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
@@ -227,7 +226,7 @@
   border-radius: 6px;
   padding: 10px 14px;
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: all 0.2s ease;
@@ -260,7 +259,7 @@
 .rating-score span {
   font-size: 30px;
   line-height: 1;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .rating-score-block p {
@@ -286,7 +285,7 @@
 .rating-label {
   color: #101010;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   text-align: right;
 }
 
@@ -390,7 +389,7 @@
   max-width: 400px;
   padding: 18px;
   border-radius: 16px;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
   letter-spacing: 0.3em;
@@ -409,8 +408,7 @@
 
 @media (max-width: 1024px) {
   .inline-cta-desktop {
-    display: block !important;
-    margin-bottom: 20px;
+    display: none !important;
   }
   
   .spec-grid-mobile {

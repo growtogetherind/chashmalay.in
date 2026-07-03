@@ -116,7 +116,7 @@ const Auth = () => {
                 <form onSubmit={handleForgotPassword} className="auth-form">
                   <div className="form-group">
                     <label>Email Address</label>
-                    <div className={`input-wrap ${mode === 'forgot' ? 'opacity-60 bg-gray-50 cursor-not-allowed' : ''}`}>
+                    <div className="input-wrap">
                       <span className="input-icon text-sm">@</span>
                       <input 
                         type="email" 
@@ -125,7 +125,6 @@ const Auth = () => {
                         value={form.email} 
                         onChange={handleChange} 
                         required 
-                        disabled={mode === 'forgot'}
                       />
                     </div>
                   </div>

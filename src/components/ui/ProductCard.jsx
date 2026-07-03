@@ -108,15 +108,15 @@ const ProductCard = ({ product }) => {
 
       {/* Info Area */}
       <div className="p-3 md:p-6">
-        <p className="text-[9px] md:text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-1 md:mb-2">
+        <p className="text-[9px] md:text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1 md:mb-2">
           {product.brand || 'Chashmalay'}
         </p>
         <Link to={productPath} className="block">
-          <h4 className="text-xs md:text-xl font-black text-slate-900 line-clamp-2 hover:text-primary transition-colors mb-1 md:mb-2">
+          <h4 className="text-xs md:text-lg font-normal text-slate-900 line-clamp-2 hover:text-primary transition-colors mb-1 md:mb-2">
             {product.name}
           </h4>
         </Link>
-        <p className="text-[10px] md:text-base text-slate-500 font-bold mb-2 md:mb-4 capitalize">
+        <p className="text-[10px] md:text-sm text-slate-500 font-normal mb-2 md:mb-4 capitalize">
           {product.category?.toLowerCase().includes('contact')
             ? `${product.disposable_type || 'Monthly'} • ${product.pack_size || '6 Lenses'}`
             : (product.frame_shape || product.frameShape || product.category || 'Eyeglasses')}
@@ -124,12 +124,12 @@ const ProductCard = ({ product }) => {
 
         {/* Colors */}
         {colors.length > 0 && (
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2.5 mb-4">
             {colors.slice(0, 4).map((c, i) => (
               <span
                 key={i}
-                className="w-4 h-4 rounded-full border border-gray-200 inline-block transition-transform hover:scale-110"
-                style={{ backgroundColor: getColorValue(c) }}
+                className="w-6 h-6 rounded-full border border-gray-200 inline-block transition-transform hover:scale-115 shadow-sm"
+                style={{ background: typeof c === 'object' && c.is_dual_tone && c.hex2 ? `linear-gradient(135deg, ${c.hex} 50%, ${c.hex2} 50%)` : getColorValue(c) }}
                 title={getColorLabel(c)}
               />
             ))}
@@ -139,9 +139,9 @@ const ProductCard = ({ product }) => {
         {/* Price Row */}
         <div className="flex items-center justify-between mt-2 md:mt-2.5 pt-2 border-t border-gray-50">
           <div className="flex items-baseline gap-1.5 md:gap-2.5">
-            <span className="text-sm md:text-2xl font-black text-slate-900">₹{price.toLocaleString()}</span>
+            <span className="text-sm md:text-xl font-medium text-slate-900">₹{price.toLocaleString()}</span>
             {originalPrice > price && (
-              <span className="text-[9px] md:text-sm text-slate-400 line-through">₹{originalPrice.toLocaleString()}</span>
+              <span className="text-[9px] md:text-xs text-slate-400 line-through font-normal">₹{originalPrice.toLocaleString()}</span>
             )}
           </div>
           {/* Stock indicator dots (like the reference) */}
