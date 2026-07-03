@@ -405,8 +405,8 @@ const Category = () => {
 
     const initialCat = [];
     if (name && name !== 'all') {
-      if (name.includes('glass')) initialCat.push('Eyeglasses');
-      else if (name.includes('sun')) initialCat.push('Sunglasses');
+      if (name.includes('sun')) initialCat.push('Sunglasses');
+      else if (name === 'eyeglasses' || name === 'reading-glasses' || (name.includes('glass') && !name.includes('sun'))) initialCat.push('Eyeglasses');
       else if (name.includes('contact') || name.includes('lens')) initialCat.push('Contact Lenses');
     }
     setSelectedCategories(initialCat);
