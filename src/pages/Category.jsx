@@ -105,6 +105,11 @@ const normalizeColorName = (value) => {
   if (['default', 'standard'].includes(normalizeText(cleaned))) return '';
   const hexMatch = cleaned.match(/^#[0-9a-f]{3,8}$/i);
   if (hexMatch) return HEX_COLOR_MAP[cleaned.toLowerCase()] || '';
+  // Check dual colors first — so "Black Gold" isn't stripped to just "Black"
+  const dualMatch = Object.keys(DUAL_COLOR_MAP).find(
+    (k) => normalizeText(k) === normalizeText(cleaned)
+  );
+  if (dualMatch) return dualMatch;
   const known = findOption(cleaned, COLOR_OPTIONS);
   return known || inferOptionFromText(cleaned, COLOR_OPTIONS) || toTitleCase(cleaned);
 };
