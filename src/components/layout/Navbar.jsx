@@ -92,7 +92,7 @@ const Navbar = () => {
               to="/"
               className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center group"
             >
-              <Logo className="h-11 md:h-13 w-auto transition-all duration-300 group-hover:scale-105" />
+              <Logo className="h-[62px] md:h-[70px] w-auto transition-all duration-300 group-hover:scale-105" />
             </Link>
 
             {/* Right – Icons */}
