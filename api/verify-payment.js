@@ -4,9 +4,17 @@
 
 import { createHmac } from 'crypto';
 
+import { verifyAuth } from './utils/auth.js';
+
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
     return response.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  try {
+    await verifyAuth(request);
+  } catch (authError) {
+    return response.status(authError.statusCode || 401).json({ error: authError.message });
   }
 
   const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;

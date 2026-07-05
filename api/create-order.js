@@ -1,9 +1,17 @@
 // api/create-order.js — Vercel Serverless Function
 // Creates a Razorpay order server-side so the KEY_SECRET never touches the browser.
 
+import { verifyAuth } from './utils/auth.js';
+
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
     return response.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  try {
+    await verifyAuth(request);
+  } catch (authError) {
+    return response.status(authError.statusCode || 401).json({ error: authError.message });
   }
 
   const KEY_ID = process.env.RAZORPAY_KEY_ID;

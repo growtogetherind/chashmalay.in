@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { db } from './utils/auth.js';
 
 export default async function handler(request, response) {
   // Protect the cron job from unauthorized access
@@ -24,30 +25,70 @@ export default async function handler(request, response) {
   });
 
   try {
-    // Calculate the date 3 days ago
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    // Calculate the date 30 days ago
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Search for images in the 'prescriptions' folder older than 3 days
-    const result = await cloudinary.search
-      .expression(`folder:prescriptions AND uploaded_at<${threeDaysAgo.toISOString()}`)
-      .max_results(500)
-      .execute();
+    // Get all prescriptions older than 30 days
+    const prescriptionsSnap = await db.collection('prescriptions')
+      .where('created_at', '<', thirtyDaysAgo)
+      .get();
 
-    const publicIds = result.resources.map(r => r.public_id);
-
-    if (publicIds.length === 0) {
-      return response.status(200).json({ message: 'No old prescriptions found to delete', count: 0 });
+    if (prescriptionsSnap.empty) {
+      return response.status(200).json({ message: 'No old prescriptions found to audit', count: 0 });
     }
 
-    // Delete the identified images
-    const deleteResult = await cloudinary.api.delete_resources(publicIds);
+    let deletedFirestoreCount = 0;
+    let deletedCloudinaryCount = 0;
+    const deletedPublicIds = [];
+    const deletedDocIds = [];
+
+    // Audit and process each old prescription doc
+    for (const rxDoc of prescriptionsSnap.docs) {
+      const rx = rxDoc.data();
+      const orderId = rx.order_id;
+      let isOrphaned = false;
+
+      if (!orderId) {
+        isOrphaned = true;
+      } else {
+        // Verify if order exists in Firestore
+        const orderDoc = await db.collection('orders').doc(orderId).get();
+        if (!orderDoc.exists) {
+          isOrphaned = true;
+        }
+      }
+
+      if (isOrphaned) {
+        // 1. Delete from Cloudinary if image_url exists
+        if (rx.image_url) {
+          const match = rx.image_url.match(/\/upload\/(?:v\d+\/)?(prescriptions\/[^.]+)/);
+          const publicId = match ? match[1] : null;
+          if (publicId) {
+            try {
+              await cloudinary.uploader.destroy(publicId);
+              deletedPublicIds.push(publicId);
+              deletedCloudinaryCount++;
+            } catch (clErr) {
+              console.error(`Failed to delete Cloudinary asset ${publicId}:`, clErr);
+            }
+          }
+        }
+
+        // 2. Delete the prescription document from Firestore
+        await db.collection('prescriptions').doc(rxDoc.id).delete();
+        deletedDocIds.push(rxDoc.id);
+        deletedFirestoreCount++;
+      }
+    }
 
     return response.status(200).json({
-      message: 'Successfully deleted old prescriptions',
-      count: publicIds.length,
-      deletedIds: publicIds,
-      details: deleteResult
+      message: 'Successfully audited and deleted orphaned prescriptions older than 30 days.',
+      auditedCount: prescriptionsSnap.size,
+      deletedFirestoreCount,
+      deletedCloudinaryCount,
+      deletedDocIds,
+      deletedPublicIds
     });
   } catch (error) {
     console.error("Cron job error deleting prescriptions:", error);

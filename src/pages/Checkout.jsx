@@ -17,13 +17,16 @@ const getSelectedColorName = (item) => {
   return typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
 };
 
-const InputField = ({ label, ...props }) => (
+const InputField = ({ label, error, ...props }) => (
   <div className="flex flex-col gap-1">
      {label && <label className="text-[10px] font-sans font-bold uppercase tracking-widest text-secondary opacity-70">{label}</label>}
      <input 
        {...props} 
-       className="w-full bg-transparent border-b border-divider py-3 outline-none focus:border-[#2FA4B7] transition-colors text-heading font-sans placeholder-body/50"
+       className={`w-full bg-transparent border-b py-3 outline-none focus:border-[#2FA4B7] transition-colors text-heading font-sans placeholder-body/50 ${
+         error ? 'border-rose-500' : 'border-divider'
+       }`}
      />
+     {error && <span className="text-[10px] text-rose-500 font-bold mt-1 uppercase tracking-wider">{error}</span>}
   </div>
 );
 
@@ -33,6 +36,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [address, setAddress] = useState({
     name: profile?.full_name || '',
@@ -76,10 +80,22 @@ const Checkout = () => {
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
-    if (!address.name || !address.phone || !address.line1 || !address.city || !address.pincode) {
-      toast.error('All shipping address fields are compulsory.');
+    const newErrors = {};
+    if (!address.name?.trim()) newErrors.name = 'Full name is required';
+    if (!address.phone?.trim()) newErrors.phone = 'Phone number is required';
+    else if (!/^\d{10}$/.test(address.phone.trim())) newErrors.phone = 'Please enter a valid 10-digit phone number';
+    if (!address.line1?.trim()) newErrors.line1 = 'Address line 1 is required';
+    if (!address.city?.trim()) newErrors.city = 'City is required';
+    if (!address.state?.trim()) newErrors.state = 'State is required';
+    if (!address.pincode?.trim()) newErrors.pincode = 'Postal code is required';
+    else if (!/^\d{6}$/.test(address.pincode.trim())) newErrors.pincode = 'Please enter a valid 6-digit postal code';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error('Please correct the validation errors on the form.');
       return;
     }
+    setErrors({});
     
     setProcessing(true);
 
@@ -164,10 +180,14 @@ const Checkout = () => {
     // STEP 1: Create order on server (KEY_SECRET never touches frontend)
     let razorpayOrderId, razorpayOrderAmount, razorpayOrderCurrency;
     try {
+      const token = await user.getIdToken();
       const amountInPaise = Math.round(finalTotal * 100);
       const orderRes = await fetch('/api/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           amount: amountInPaise,
           currency: 'INR',
@@ -203,9 +223,13 @@ const Checkout = () => {
         // STEP 3: Verify signature server-side before recording order
         setProcessing(true);
         try {
+          const token = await user.getIdToken();
           const verifyRes = await fetch('/api/verify-payment', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -291,19 +315,19 @@ const Checkout = () => {
                  </h2>
                  <form onSubmit={handleAddressSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       <InputField label="Full Name" name="name" value={address.name} onChange={handleAddressChange} placeholder="First & Last Name" required />
-                       <InputField label="Contact Number" name="phone" value={address.phone} onChange={handleAddressChange} placeholder="Mobile Number" required />
+                       <InputField label="Full Name" name="name" value={address.name} onChange={handleAddressChange} error={errors.name} placeholder="First & Last Name" required />
+                       <InputField label="Contact Number" name="phone" value={address.phone} onChange={handleAddressChange} error={errors.phone} placeholder="Mobile Number" required />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        <InputField label="Date of Birth (Optional)" name="dob" type="date" value={address.dob} onChange={handleAddressChange} />
                        <div className="hidden md:block" /> 
                     </div>
-                    <InputField label="Address Line 1" name="line1" value={address.line1} onChange={handleAddressChange} placeholder="House / Flat No., Street Name" required />
+                    <InputField label="Address Line 1" name="line1" value={address.line1} onChange={handleAddressChange} error={errors.line1} placeholder="House / Flat No., Street Name" required />
                     <InputField label="Address Line 2" name="line2" value={address.line2} onChange={handleAddressChange} placeholder="Landmark, Area (Optional)" />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                       <InputField label="City" name="city" value={address.city} onChange={handleAddressChange} placeholder="City City" required />
-                       <InputField label="State" name="state" value={address.state} onChange={handleAddressChange} placeholder="State" required />
-                       <InputField label="Postal Code" name="pincode" value={address.pincode} onChange={handleAddressChange} placeholder="Postal Code" maxLength={6} required />
+                       <InputField label="City" name="city" value={address.city} onChange={handleAddressChange} error={errors.city} placeholder="City City" required />
+                       <InputField label="State" name="state" value={address.state} onChange={handleAddressChange} error={errors.state} placeholder="State" required />
+                       <InputField label="Postal Code" name="pincode" value={address.pincode} onChange={handleAddressChange} error={errors.pincode} placeholder="Postal Code" maxLength={6} required />
                     </div>
                     <div className="pt-8 text-right">
                        <button type="submit" disabled={processing} className="btn-primary w-full md:w-auto">

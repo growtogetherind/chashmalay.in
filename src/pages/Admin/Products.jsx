@@ -91,6 +91,16 @@ const AdminProducts = () => {
   const [pendingGallery, setPendingGallery] = useState([]);
   const { confirm } = useConfirm();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    const totalPagesCount = Math.ceil(products.length / itemsPerPage);
+    if (currentPage > totalPagesCount && totalPagesCount > 0) {
+      setCurrentPage(totalPagesCount);
+    }
+  }, [products]);
+
   // Auto-save draft to localStorage
   useEffect(() => {
     if (showForm && !editing && form !== EMPTY_PRODUCT) {
@@ -374,6 +384,11 @@ const AdminProducts = () => {
     setToggling(prev => ({ ...prev, [p.id]: false }));
   };
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
   return (
     <div className="admin-page">
       <AdminSidebar />
@@ -395,7 +410,8 @@ const AdminProducts = () => {
               <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[3px]">Loading products...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              <div className="overflow-x-auto">
               <table className="admin-table">
                 <thead>
                   <tr>
@@ -409,7 +425,7 @@ const AdminProducts = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map(p => (
+                  {currentItems.map(p => (
                     <tr key={p.id} className="group">
                       <td>
                         <div className="flex items-center gap-5">
@@ -435,8 +451,8 @@ const AdminProducts = () => {
                       </td>
                       <td>
                         <div className={`text-sm font-bold flex items-center gap-2 ${p.stock_quantity <= 10 ? 'text-amber-600' : 'text-slate-900'}`}>
-                          <Package size={14} className={p.stock_quantity <= 10 ? 'text-amber-400' : 'text-slate-300'} />
-                          {p.stock_quantity}
+                           <Package size={14} className={p.stock_quantity <= 10 ? 'text-amber-400' : 'text-slate-300'} />
+                           {p.stock_quantity}
                         </div>
                         {p.stock_quantity <= 10 && <span className="text-[9px] font-bold text-amber-500 uppercase tracking-tighter mt-1 block">Critical Level</span>}
                       </td>
@@ -489,6 +505,44 @@ const AdminProducts = () => {
                 </tbody>
               </table>
             </div>
+
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+               <span className="text-xs text-slate-400 font-bold">
+                  Showing {products.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, products.length)} of {products.length} products
+               </span>
+               {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                     <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className="px-3 py-1.5 text-xs font-bold text-gray-500 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                     >
+                        Previous
+                     </button>
+                     {[...Array(totalPages)].map((_, i) => (
+                        <button
+                           key={i}
+                           onClick={() => setCurrentPage(i + 1)}
+                           className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+                              currentPage === i + 1
+                                 ? 'bg-emerald-500 text-white border-emerald-600'
+                                 : 'bg-white text-slate-500 border-slate-100 hover:bg-gray-50'
+                           }`}
+                        >
+                           {i + 1}
+                        </button>
+                     ))}
+                     <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        className="px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                     >
+                        Next
+                     </button>
+                  </div>
+               )}
+            </div>
+            </>
           )}
         </div>
       </main>

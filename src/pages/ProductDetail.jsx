@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState, useEffect, useRef } from 'react';
+import { Suspense, lazy, useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { Star, Heart, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Layers, ChevronRight, ChevronLeft, X, CheckCircle } from 'lucide-react';
@@ -61,6 +61,60 @@ const ProductDetail = () => {
 
   const sliderRef = useRef(null);
 
+  const colors = useMemo(() => {
+    if (!product) return [];
+    const baseColorName = product.color || product.frame_color || product.frameColor || 'Standard Edition';
+    const baseColorHex = product.color_hex || product.colorHex || '#e2e8f0';
+
+    const hasBaseColor = Array.isArray(product.colors) && product.colors.some(c => 
+      c.name?.toLowerCase() === baseColorName.toLowerCase()
+    );
+
+    return Array.isArray(product.colors) && product.colors.length > 0
+      ? (hasBaseColor
+          ? product.colors
+          : [
+              {
+                name: baseColorName,
+                hex: baseColorHex,
+                is_dual_tone: product.is_dual_tone || false,
+                hex2: product.hex2 || product.dual_color_hex || null,
+                image: product.frame_image || product.image || null,
+                image_side: product.images?.side || null,
+                image_model: product.images?.model || null,
+                is_base: true
+              },
+              ...product.colors
+            ]
+        )
+      : [
+          {
+            name: baseColorName,
+            hex: baseColorHex,
+            is_dual_tone: product.is_dual_tone || false,
+            hex2: product.hex2 || product.dual_color_hex || null,
+            image: product.frame_image || product.image || null,
+            image_side: product.images?.side || null,
+            image_model: product.images?.model || null,
+            is_base: true
+          }
+        ].filter(Boolean);
+  }, [product]);
+
+  useEffect(() => {
+    if (!product || colors.length === 0) return;
+    if (product.default_color) {
+      const idx = colors.findIndex(c => c.name?.toLowerCase() === product.default_color.toLowerCase());
+      if (idx !== -1) {
+        setActiveColor(idx);
+      } else {
+        setActiveColor(0);
+      }
+    } else {
+      setActiveColor(0);
+    }
+  }, [product, colors]);
+
   useEffect(() => {
     let isActive = true;
     const fetchProduct = async () => {
@@ -89,12 +143,6 @@ const ProductDetail = () => {
         const colorImages = (data.colors || []).map(c => c.image).filter(Boolean);
         data.gallery = Array.from(new Set([...singleImages, ...newGallery, ...colorImages])).filter(Boolean);
         setProduct(data);
-        if (data.default_color && data.colors.length > 0) {
-          const idx = data.colors.findIndex(c => c.name?.toLowerCase() === data.default_color.toLowerCase());
-          if (idx !== -1) {
-            setActiveColor(idx);
-          }
-        }
       }
       setLoading(false);
     };
@@ -232,24 +280,17 @@ const ProductDetail = () => {
     }
   };
 
-  const colors = Array.isArray(product.colors) && product.colors.length > 0
-    ? product.colors
-    : [
-        {
-          name: product.color || product.frame_color || product.frameColor || 'Standard Edition',
-          hex: product.color_hex || product.colorHex || '#94a3b8',
-          is_dual_tone: false
-        }
-      ].filter(Boolean);
-
   const selectedFrameColor = colors[activeColor] || null;
+  const mainGallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
   const colorGallery = selectedFrameColor
-    ? [selectedFrameColor.image, selectedFrameColor.image_side, selectedFrameColor.image_model].filter(Boolean)
+    ? (selectedFrameColor.is_base
+        ? mainGallery
+        : [selectedFrameColor.image, selectedFrameColor.image_side, selectedFrameColor.image_model].filter(Boolean)
+      )
     : [];
   
-  const mainGallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
   const gallery = colorGallery.length > 0
-    ? colorGallery
+    ? Array.from(new Set([...colorGallery, ...mainGallery]))
     : mainGallery;
 
   const activeImageUrl = gallery[activeImage] || gallery[0] || '';

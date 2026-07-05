@@ -47,11 +47,46 @@ const ProductCard = ({ product }) => {
   const frontImage = product.images?.front || product.frameImage || product.frame_image || product.image || product.images?.gallery?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image';
   const hoverImage = product.images?.model || product.model_image || product.images?.gallery?.[1] || frontImage;
   const activeImage = isHovered ? hoverImage : frontImage;
-  const colorCandidates = Array.isArray(product.colors) && product.colors.length
-    ? product.colors
-    : [product.color || product.frame_color || product.frameColor].filter(Boolean);
-  const colors = colorCandidates.filter((color) => {
-    const label = getColorLabel(color).trim().toLowerCase();
+  const baseColorName = product.color || product.frame_color || product.frameColor;
+  const baseColorHex = product.color_hex || product.colorHex;
+
+  const getCleanLabel = (c) => {
+    if (!c) return '';
+    return (typeof c === 'string' ? c : c.name || c.color || c.hex || '').trim().toLowerCase();
+  };
+
+  const colors = (() => {
+    const rawColors = Array.isArray(product.colors) ? product.colors : [];
+    if (rawColors.length > 0) {
+      const hasBase = baseColorName && rawColors.some(c => getCleanLabel(c) === baseColorName.toLowerCase());
+      if (hasBase) {
+        return rawColors;
+      } else if (baseColorName) {
+        return [
+          {
+            name: baseColorName,
+            hex: baseColorHex || '#e2e8f0',
+            is_dual_tone: product.is_dual_tone || false,
+            hex2: product.hex2 || product.dual_color_hex || null
+          },
+          ...rawColors
+        ];
+      }
+      return rawColors;
+    }
+    if (baseColorName) {
+      return [
+        {
+          name: baseColorName,
+          hex: baseColorHex || '#e2e8f0',
+          is_dual_tone: product.is_dual_tone || false,
+          hex2: product.hex2 || product.dual_color_hex || null
+        }
+      ];
+    }
+    return [];
+  })().filter(c => {
+    const label = getCleanLabel(c);
     return label && label !== 'standard' && label !== 'default';
   });
 

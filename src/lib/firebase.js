@@ -18,6 +18,26 @@ export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : nul
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
+export const writeAdminLog = async (action, targetId, metadata = {}) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+    const profileSnap = await getDoc(doc(db, "profiles", user.uid));
+    if (profileSnap.exists() && profileSnap.data().is_admin === true) {
+      await addDoc(collection(db, "admin_logs"), {
+        adminUid: user.uid,
+        adminName: profileSnap.data().full_name || 'Admin',
+        action,
+        targetId,
+        metadata,
+        timestamp: serverTimestamp()
+      });
+    }
+  } catch (error) {
+    console.error("Failed to write admin log:", error);
+  }
+};
+
 const toNumber = (value, fallback = 0) => {
   if (value === null || value === undefined || value === '') return fallback;
   const parsed = Number(value.toString().replace(/,/g, ''));
@@ -45,6 +65,9 @@ const bySortOrderThenName = (a, b) => {
   return byNameAsc(a, b);
 };
 
+// PUBLIC storefront settings — stored in `settings/global`, which is
+// world-readable. NEVER put secrets (API keys, bot tokens) in this object or
+// document; anyone can read it anonymously from Firestore.
 const DEFAULT_SETTINGS = {
   store_name: 'Chashmalay',
   contact_email: 'info@chashmalay.in',
@@ -56,12 +79,17 @@ const DEFAULT_SETTINGS = {
   free_shipping_min: 0,
   maintenance_mode: false,
   store_logo: '',
-  carousel_interval: 5,
-  telegram_bot_token: '',
-  telegram_chat_id: '',
-  fast2sms_api_key: '',
-  fast2sms_sender_id: 'FSTSMS'
+  carousel_interval: 5
 };
+
+// The set of keys that are SECRET and must live in the admin-only
+// `settings/private` document, never in `settings/global`.
+const PRIVATE_SETTING_KEYS = [
+  'telegram_bot_token',
+  'telegram_chat_id',
+  'fast2sms_api_key',
+  'fast2sms_sender_id'
+];
 
 export const getProductImage = (product = {}) => (
   product.images?.front ||
@@ -206,13 +234,15 @@ export const saveProduct = async (product, id = null) => {
     const payload = productPayload(product);
     if (id) {
       await updateDoc(doc(db, "products", id), { ...payload, updated_at: serverTimestamp() });
+      await writeAdminLog('edit_product', id, { name: payload.name });
     } else {
-      await addDoc(collection(db, "products"), {
+      const docRef = await addDoc(collection(db, "products"), {
         ...payload,
         created_at: serverTimestamp(),
         sku: payload.sku || `SKU-${Date.now()}`,
         status: payload.status || 'active'
       });
+      await writeAdminLog('create_product', docRef.id, { name: payload.name });
     }
     return { error: null };
   } catch (error) { return { error }; }
@@ -221,6 +251,7 @@ export const saveProduct = async (product, id = null) => {
 export const deleteProduct = async (id) => {
   try {
     await deleteDoc(doc(db, "products", id));
+    await writeAdminLog('delete_product', id);
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -566,6 +597,7 @@ export const updateOrderStatus = async (orderId, status) => {
     const previousStatus = orderSnap.exists() ? orderSnap.data().status : null;
     // 1. Update the order status
     await updateDoc(doc(db, "orders", orderId), { status, updated_at: serverTimestamp() });
+    await writeAdminLog('update_order_status', orderId, { status, previousStatus });
 
     // 2. If status is cancelled, restore stock
     if (status === 'cancelled' && previousStatus !== 'cancelled') {
@@ -764,13 +796,19 @@ export const subscribePrescriptions = (onData, onError, userId = null) => {
 
 export const savePrescription = async (data, id = null) => {
   try {
-    if (id) await updateDoc(doc(db, "prescriptions", id), { ...data, updated_at: serverTimestamp() });
-    else await addDoc(collection(db, "prescriptions"), { ...data, created_at: serverTimestamp() });
+    if (id) {
+      await updateDoc(doc(db, "prescriptions", id), { ...data, updated_at: serverTimestamp() });
+      await writeAdminLog('verify_prescription', id, { status: data.status });
+    } else {
+      await addDoc(collection(db, "prescriptions"), { ...data, created_at: serverTimestamp() });
+    }
     return { error: null };
   } catch (error) { return { error }; }
 };
 
 // --- Settings ---
+// Public settings live in `settings/global` (world-readable). Secrets live in
+// `settings/private` (admin-only per Firestore rules). Keep them separate.
 export const getSettings = async () => {
   try {
     const docSnap = await getDoc(doc(db, "settings", "global"));
@@ -794,9 +832,40 @@ export const subscribeSettings = (onData, onError) => {
   );
 };
 
-export const saveSettings = async (settings) => {
+// Admin-only: read the private secrets document. Returns {} for non-admins
+// (Firestore denies the read) so callers can safely spread the result.
+export const getPrivateSettings = async () => {
   try {
-    await setDoc(doc(db, "settings", "global"), { ...settings, updated_at: serverTimestamp() }, { merge: true });
+    const docSnap = await getDoc(doc(db, "settings", "private"));
+    return { data: docSnap.exists() ? docSnap.data() : {}, error: null };
+  } catch (error) { return { data: {}, error }; }
+};
+
+// Persist settings, routing each key to the correct document. Public keys go to
+// `settings/global`; the enumerated secret keys go to `settings/private`. This
+// guarantees a secret can never be accidentally written to the public doc.
+export const saveSettings = async (settings = {}) => {
+  try {
+    const publicData = {};
+    const privateData = {};
+    for (const [key, value] of Object.entries(settings)) {
+      if (key === 'updated_at') continue;
+      if (PRIVATE_SETTING_KEYS.includes(key)) privateData[key] = value;
+      else publicData[key] = value;
+    }
+
+    const writes = [
+      setDoc(doc(db, "settings", "global"), { ...publicData, updated_at: serverTimestamp() }, { merge: true })
+    ];
+    if (Object.keys(privateData).length > 0) {
+      writes.push(
+        setDoc(doc(db, "settings", "private"), { ...privateData, updated_at: serverTimestamp() }, { merge: true })
+      );
+    }
+    await Promise.all(writes);
+    await writeAdminLog('save_settings', 'global_private', { 
+      updatedKeys: Object.keys(settings).filter(k => k !== 'updated_at') 
+    });
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -807,6 +876,7 @@ export const toggleUserBlock = async (userId, isBlocked) => {
       is_blocked: isBlocked,
       updated_at: serverTimestamp()
     });
+    await writeAdminLog(isBlocked ? 'block_user' : 'unblock_user', userId);
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -1143,119 +1213,67 @@ const cleanCloudinaryUrl = (url) => {
   return url.replace(/\/upload\/[^/]+(?=\/v\d|\/[a-z0-9_-]+\/)/, '/upload');
 };
 
+// Sends an admin notification via Telegram. The bot token/chat id are SECRET
+// and never touch the browser — the request is proxied through the same-origin
+// serverless endpoint `/api/notify-telegram`, which reads them from server env.
 export const sendTelegramNotification = async (message, options = {}) => {
-  let BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || ""; // Fallback to env file
-  let CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";    // Fallback to env file
-  
+  if (!message) return;
   try {
-    const { data: settings } = await getSettings();
-    if (settings?.telegram_bot_token) {
-      BOT_TOKEN = settings.telegram_bot_token;
-    }
-    if (settings?.telegram_chat_id) {
-      CHAT_ID = settings.telegram_chat_id;
-    }
-  } catch (err) {
-    console.error("Error loading Telegram settings dynamically:", err);
-  }
-  
-  if (!BOT_TOKEN || !CHAT_ID) return;
+    const payload = { message };
+    if (options.reply_markup) payload.reply_markup = options.reply_markup;
 
-  try {
-    const payload = {
-      chat_id: CHAT_ID,
-      text: message,
-      parse_mode: 'Markdown'
-    };
-    
-    if (options.reply_markup) {
-      payload.reply_markup = options.reply_markup;
+    if (!auth.currentUser) {
+      const { signInAnonymously } = await import("firebase/auth");
+      await signInAnonymously(auth);
     }
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
 
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    await fetch("/api/notify-telegram", {
+      method: "POST",
+      headers,
       body: JSON.stringify(payload)
     });
   } catch (error) {
-    console.error("Telegram Notification Error:", error);
+    // Notifications are best-effort — never let a failed alert break the flow.
+    if (import.meta.env.DEV) console.error("Telegram Notification Error:", error);
   }
 };
 
+// Sends the order-confirmation SMS via the same-origin serverless proxy
+// `/api/send-sms`, which holds the Fast2SMS key server-side. There is NO
+// client-side fallback — that would require shipping the API key to the browser.
 export const sendOrderConfirmationSMS = async (phoneNumber, customerName, orderId, amount) => {
-  // 1. Try sending via secure Vercel same-origin serverless backend proxy first (bypasses browser CORS & protects API key)
+  if (!phoneNumber) return;
   try {
+    if (!auth.currentUser) {
+      const { signInAnonymously } = await import("firebase/auth");
+      await signInAnonymously(auth);
+    }
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
     const response = await fetch("/api/send-sms", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        phoneNumber,
-        customerName,
-        orderId,
-        amount
-      })
+      headers,
+      body: JSON.stringify({ phoneNumber, customerName, orderId, amount })
     });
 
     if (response.ok) {
-      const data = await response.json();
-      if (import.meta.env.DEV) console.log("SMS sent successfully via backend proxy:", data);
-      return;
-    }
-  } catch (backendError) {
-    console.warn("Backend proxy failed, trying client-side fallback (direct fetch):", backendError);
-  }
-
-  // 2. Client-side Fallback (Runs if backend serverless API is offline or returns error)
-  let API_KEY = import.meta.env.VITE_FAST2SMS_API_KEY || "";
-  let SENDER_ID = import.meta.env.VITE_FAST2SMS_SENDER_ID || "FSTSMS";
-
-  try {
-    const { data: settings } = await getSettings();
-    if (settings?.fast2sms_api_key) {
-      API_KEY = settings.fast2sms_api_key;
-    }
-    if (settings?.fast2sms_sender_id) {
-      SENDER_ID = settings.fast2sms_sender_id;
-    }
-  } catch (err) {
-    console.error("Error loading Fast2SMS settings dynamically:", err);
-  }
-
-  if (!API_KEY || !phoneNumber) return;
-
-  const cleanPhone = phoneNumber.replace(/\D/g, "").slice(-10);
-  const message = `Dear ${customerName}, your order #${orderId} of Rs. ${Math.round(amount)} has been successfully placed. Thank you for shopping with chashmaly.in!`;
-
-  try {
-    const params = new URLSearchParams();
-    params.append("route", "q"); // Using route 'q' for quick transactional
-    params.append("message", message);
-    params.append("numbers", cleanPhone);
-    params.append("language", "english");
-    params.append("flash", "0");
-
-    if (SENDER_ID) {
-      params.append("sender_id", SENDER_ID);
-    }
-
-    const response = await fetch("https://www.fast2sms.com/dev/bulkV2", {
-      method: "POST",
-      headers: {
-        "authorization": API_KEY,
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Cache-Control": "no-cache"
-      },
-      body: params
-    });
-
-    const data = await response.json();
-    if (!data.return) {
-      console.warn("Fast2SMS API returned false:", data);
+      if (import.meta.env.DEV) {
+        const data = await response.json().catch(() => ({}));
+        console.log("SMS sent successfully via backend proxy:", data);
+      }
+    } else if (import.meta.env.DEV) {
+      console.warn("SMS backend proxy returned non-OK status:", response.status);
     }
   } catch (error) {
-    console.error("Fast2SMS Notification Error:", error);
+    // Best-effort — a failed SMS must not interrupt order completion.
+    if (import.meta.env.DEV) console.error("SMS Notification Error:", error);
   }
 };
 

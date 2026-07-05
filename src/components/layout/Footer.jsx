@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Send } from 'lucide-react';
 import { subscribeSettings } from '../../lib/firebase';
+import toast from 'react-hot-toast';
 
 const Facebook = ({ size = 24, color = "currentColor", ...props }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -18,6 +19,8 @@ const Youtube = ({ size = 24, color = "currentColor", ...props }) => (
 
 const Footer = () => {
   const [settings, setSettings] = React.useState({});
+  const [newsletterEmail, setNewsletterEmail] = React.useState('');
+  const [newsletterSubmitting, setNewsletterSubmitting] = React.useState(false);
 
   React.useEffect(() => {
     const unsubscribe = subscribeSettings(setSettings);
@@ -27,6 +30,40 @@ const Footer = () => {
   const phone = settings.contact_phone || '+91-9319484119';
   const email = settings.contact_email || 'info@chashmalay.in';
   const address = settings.address || 'Karol Bagh, New Delhi - 110005, India';
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+
+    // Email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newsletterEmail)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+
+    setNewsletterSubmitting(true);
+    try {
+      const { addDoc, collection, serverTimestamp } = await import('firebase/firestore');
+      const { db } = await import('../../lib/firebase');
+      const { sanitizeTextInput } = await import('../../lib/utils');
+
+      const sanitizedEmail = sanitizeTextInput(newsletterEmail.trim().toLowerCase());
+
+      await addDoc(collection(db, 'newsletter_subscriptions'), {
+        email: sanitizedEmail,
+        created_at: serverTimestamp()
+      });
+
+      toast.success('Thank you for subscribing to our newsletter!');
+      setNewsletterEmail('');
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      toast.error('Failed to subscribe. Please try again.');
+    } finally {
+      setNewsletterSubmitting(false);
+    }
+  };
 
   return (
     <footer className="bg-white border-t border-gray-200">
@@ -119,16 +156,24 @@ const Footer = () => {
               <p className="text-xs text-gray-500 mb-3">
                 Subscribe to our newsletter to receive promotions and news
               </p>
-              <div className="flex overflow-hidden border border-gray-300 rounded">
+              <form onSubmit={handleNewsletterSubmit} className="flex overflow-hidden border border-gray-300 rounded">
                 <input
                   type="email"
                   placeholder="Your email address"
-                  className="text-xs px-3 py-2 flex-1 outline-none"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  disabled={newsletterSubmitting}
+                  className="text-xs px-3 py-2 flex-1 outline-none disabled:opacity-50"
+                  required
                 />
-                <button className="bg-primary text-white px-3 flex items-center hover:bg-blue-900 transition-colors">
-                  <Send size={13} />
+                <button
+                  type="submit"
+                  disabled={newsletterSubmitting}
+                  className="bg-primary text-white px-3 flex items-center hover:bg-blue-900 transition-colors disabled:opacity-50"
+                >
+                  <Send size={13} className={newsletterSubmitting ? "animate-pulse" : ""} />
                 </button>
-              </div>
+              </form>
             </div>
           </div>
         </div>

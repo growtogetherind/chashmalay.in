@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FileText, Download, Eye, Calendar, X, ExternalLink } from 'lucide-react';
-import { savePrescription, subscribePrescriptions } from '../../lib/firebase';
+import { savePrescription, subscribePrescriptions, db } from '../../lib/firebase';
+import { getDoc, doc } from 'firebase/firestore';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import toast from 'react-hot-toast';
 import '../Admin.css';
@@ -10,6 +11,9 @@ const AdminPrescriptions = () => {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [existingOrderIds, setExistingOrderIds] = useState(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     setLoading(true);
@@ -19,6 +23,29 @@ const AdminPrescriptions = () => {
     }, () => setLoading(false));
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (prescriptions.length === 0) return;
+
+    const checkOrders = async () => {
+      try {
+        const ids = [...new Set(prescriptions.map(p => p.order_id).filter(Boolean))];
+        if (ids.length === 0) return;
+
+        const existing = new Set();
+        await Promise.all(ids.map(async (oid) => {
+          const docSnap = await getDoc(doc(db, "orders", oid));
+          if (docSnap.exists()) {
+            existing.add(oid);
+          }
+        }));
+        setExistingOrderIds(existing);
+      } catch (err) {
+        console.error("Error auditing orders existence:", err);
+      }
+    };
+    checkOrders();
+  }, [prescriptions]);
 
   const handleVerify = async (id, status) => {
     setUpdating(true);
@@ -31,6 +58,15 @@ const AdminPrescriptions = () => {
     }
     setUpdating(false);
   };
+
+  const isUnlinked = (p) => {
+    return !p.order_id || !existingOrderIds.has(p.order_id);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = prescriptions.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(prescriptions.length / itemsPerPage);
 
   return (
     <div className="admin-page">
@@ -52,7 +88,8 @@ const AdminPrescriptions = () => {
               <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[3px]">Loading prescriptions...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              <div className="overflow-x-auto">
               <table className="admin-table">
                 <thead>
                   <tr>
@@ -63,7 +100,7 @@ const AdminPrescriptions = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {prescriptions.map(p => (
+                  {currentItems.map(p => (
                     <tr key={p.id} className="group">
                       <td>
                         <div className="flex items-center gap-5">
@@ -71,7 +108,14 @@ const AdminPrescriptions = () => {
                              <FileText size={22} strokeWidth={1.5} />
                            </div>
                            <div>
-                              <span className="font-black text-sm text-slate-900 block group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{p.user_name || 'Customer'}</span>
+                              <span className="font-black text-sm text-slate-900 block group-hover:text-emerald-600 transition-colors uppercase tracking-tight">
+                                {p.user_name || 'Customer'}
+                                {isUnlinked(p) && (
+                                  <span className="ml-2 inline-block bg-rose-50 text-rose-600 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-rose-100 shadow-sm animate-pulse">
+                                    Unlinked - No Order
+                                  </span>
+                                )}
+                              </span>
                               <span className="text-[10px] text-slate-400 font-mono font-bold tracking-widest mt-1">REG-ID: #{p.id.slice(0, 10).toUpperCase()}</span>
                            </div>
                         </div>
@@ -83,9 +127,9 @@ const AdminPrescriptions = () => {
                       </td>
                       <td>
                         <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[2px] border shadow-sm ${
-                          p.status === 'verified' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                          p.status === 'rejected' ? 'bg-red-50 text-red-600 border-red-100' :
-                          'bg-amber-50 text-amber-600 border-amber-100'
+                           p.status === 'verified' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                           p.status === 'rejected' ? 'bg-red-50 text-red-600 border-red-100' :
+                           'bg-amber-50 text-amber-600 border-amber-100'
                         }`}>
                           {p.status || 'pending audit'}
                         </span>
@@ -106,6 +150,44 @@ const AdminPrescriptions = () => {
                 </tbody>
               </table>
             </div>
+
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+               <span className="text-xs text-slate-400 font-bold">
+                  Showing {prescriptions.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, prescriptions.length)} of {prescriptions.length} prescriptions
+               </span>
+               {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                     <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className="px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-100 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                     >
+                        Previous
+                     </button>
+                     {[...Array(totalPages)].map((_, i) => (
+                        <button
+                           key={i}
+                           onClick={() => setCurrentPage(i + 1)}
+                           className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+                              currentPage === i + 1
+                                 ? 'bg-emerald-500 text-white border-emerald-600'
+                                 : 'bg-white text-slate-500 border-slate-100 hover:bg-gray-50'
+                           }`}
+                        >
+                           {i + 1}
+                        </button>
+                     ))}
+                     <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        className="px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-100 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                     >
+                        Next
+                     </button>
+                  </div>
+               )}
+            </div>
+            </>
           )}
         </div>
       </main>
@@ -134,6 +216,9 @@ const AdminPrescriptions = () => {
                         <div>
                            <p className="font-black text-slate-900 text-xl tracking-tight">{selected.user_name}</p>
                            <p className="text-[11px] text-slate-400 font-mono font-bold mt-1.5 uppercase tracking-widest">UID: {selected.user_id}</p>
+                           {selected.order_id && (
+                              <p className="text-[11px] text-slate-500 font-mono font-bold mt-1 uppercase tracking-widest">ORDER-ID: #{selected.order_id.slice(0, 8).toUpperCase()}</p>
+                           )}
                         </div>
                      </div>
                   </div>

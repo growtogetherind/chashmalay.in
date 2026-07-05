@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Save, Mail, Wrench, Globe, Truck, Bell, Eye, EyeOff, Send } from 'lucide-react';
-import { saveSettings, subscribeSettings } from '../../lib/firebase';
+import { saveSettings, subscribeSettings, getPrivateSettings } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import toast from 'react-hot-toast';
 import '../Admin.css';
@@ -30,10 +30,20 @@ const AdminSettings = () => {
   const [botUsername, setBotUsername] = useState('Chashmalay_bot');
 
   useEffect(() => {
+    // Public settings stream live from settings/global.
     const unsubscribe = subscribeSettings((data) => {
       setForm(prev => ({ ...prev, ...data }));
       setLoading(false);
     }, () => setLoading(false));
+
+    // Secrets (Telegram token/chat id) live in the admin-only settings/private
+    // doc and must be fetched separately to prefill the form.
+    getPrivateSettings().then(({ data }) => {
+      if (data && Object.keys(data).length) {
+        setForm(prev => ({ ...prev, ...data }));
+      }
+    });
+
     return unsubscribe;
   }, []);
 

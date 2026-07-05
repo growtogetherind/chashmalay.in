@@ -30,13 +30,17 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         (request.auth.uid == userId || isAdmin());
 
-      // Users can update their own profile but CANNOT set is_admin
-      allow write: if request.auth != null &&
+      // Allow users to create their own profile, ensuring is_admin is not set to true
+      allow create: if request.auth != null &&
         request.auth.uid == userId &&
-        !('is_admin' in request.resource.data.diff(resource.data).affectedKeys());
+        (!('is_admin' in request.resource.data) || request.resource.data.is_admin == false);
 
-      // Allow admins to write any profile field
-      allow write: if isAdmin();
+      // Allow users to update their own profile but CANNOT modify is_admin
+      allow update: if (request.auth != null &&
+        request.auth.uid == userId &&
+        request.resource.data.is_admin == resource.data.is_admin) || isAdmin();
+
+      allow delete: if isAdmin();
     }
 
     // ─── Cart Items ────────────────────────────────────────────────────────────
@@ -154,16 +158,47 @@ service cloud.firestore {
     }
 
     // ─── Settings ─────────────────────────────────────────────────────────────
-    match /settings/{settingId} {
+    // Firestore rules are ADDITIVE: if ANY matching rule grants access, it is
+    // allowed. A public-read wildcard (`/settings/{id}`) would therefore also
+    // expose a secrets document. So each settings doc is enumerated explicitly.
+    //
+    // Public storefront config (store name, contact, socials, shipping, carousel
+    // interval, maintenance flag). Contains NO secrets — safe for anonymous read.
+    match /settings/global {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // ─── Prescriptions ────────────────────────────────────────────────────────
+    // Sensitive integration secrets (Telegram bot token/chat id, Fast2SMS key).
+    // Admin-only read AND write. These must never reach the public bundle or an
+    // anonymous Firestore read; runtime message delivery uses server env vars.
+    match /settings/private {
+      allow read, write: if isAdmin();
+    }
+
     match /prescriptions/{prescriptionId} {
-      allow read: if isAdmin() || (request.auth != null && request.auth.uid == resource.data.user_id);
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.user_id;
-      allow update, delete: if isAdmin() || (request.auth != null && request.auth.uid == resource.data.user_id);
+      allow read: if isAdmin() || (request.auth != null && (request.auth.uid == resource.data.user_id || request.auth.uid == resource.data.guestId));
+      
+      allow create: if request.auth != null
+        && (
+          (request.resource.data.guestId == request.auth.uid && request.resource.data.guestId.matches('guest-.*'))
+          ||
+          (request.resource.data.user_id == request.auth.uid && !request.resource.data.user_id.matches('guest-.*'))
+        )
+        && !('verified' in request.resource.data)
+        && !('verified_at' in request.resource.data)
+        && !('orderId' in request.resource.data)
+        && !('order_id' in request.resource.data);
+
+      allow update: if isAdmin() || (
+        request.auth != null &&
+        (request.auth.uid == resource.data.user_id || request.auth.uid == resource.data.guestId) &&
+        request.resource.data.order_id == resource.data.order_id &&
+        request.resource.data.status == resource.data.status &&
+        !('verified_at' in request.resource.data)
+      );
+
+      allow delete: if isAdmin();
     }
   }
 }

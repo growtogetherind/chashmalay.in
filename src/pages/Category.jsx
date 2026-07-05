@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, ChevronDown, X, Filter, ArrowUpDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ui/ProductCard';
@@ -98,9 +98,15 @@ const getProductText = (product = {}) => [
 
 const normalizeColorName = (value) => {
   if (!value) return '';
-  const raw = typeof value === 'string'
-    ? value
-    : value.name || value.label || value.color || value.hex || '';
+  
+  if (typeof value === 'object') {
+    const rawName = value.name || value.label || value.color || '';
+    const cleaned = String(rawName).trim();
+    if (['default', 'standard'].includes(normalizeText(cleaned))) return '';
+    return toTitleCase(cleaned);
+  }
+
+  const raw = typeof value === 'string' ? value : '';
   const cleaned = String(raw).trim();
   if (['default', 'standard'].includes(normalizeText(cleaned))) return '';
   const hexMatch = cleaned.match(/^#[0-9a-f]{3,8}$/i);
@@ -127,6 +133,7 @@ const getProductColors = (product = {}) => {
 
   const inferred = inferOptionFromText(getProductText(product), COLOR_OPTIONS);
   const colors = explicitColors.length ? explicitColors : [inferred || 'Black'];
+
   return Array.from(new Set(colors));
 };
 
@@ -285,29 +292,42 @@ const DUAL_COLOR_MAP = {
   'Multicolor':   ['#E53E3E', '#3182CE'],
 };
 
-// ColorSwatch: renders a split circle for dual colors, solid for single
-const ColorSwatch = ({ color, isSelected, size = 'w-5 h-5' }) => {
-  const dual = DUAL_COLOR_MAP[color];
+const ColorSwatch = ({ color, isSelected, size = 'w-5 h-5', products = [] }) => {
   const borderCls = isSelected ? 'border-2 border-primary shadow-md' : 'border border-slate-200';
 
-  if (dual) {
-    return (
-      <div
-        className={`${size} rounded-full overflow-hidden flex-shrink-0 ${borderCls}`}
-        title={color}
-      >
-        {/* Top half */}
-        <div style={{ background: dual[0], height: '50%', width: '100%' }} />
-        {/* Bottom half */}
-        <div style={{ background: dual[1], height: '50%', width: '100%' }} />
-      </div>
-    );
-  }
+  const bgStyle = (() => {
+    const dual = DUAL_COLOR_MAP[color];
+    if (dual) {
+      return `linear-gradient(135deg, ${dual[0]} 50%, ${dual[1]} 50%)`;
+    }
+    for (const product of products) {
+      if (Array.isArray(product.colors)) {
+        const match = product.colors.find(c => c && toTitleCase(c.name || '').trim() === color.trim());
+        if (match) {
+          if (match.is_dual_tone && match.hex2) {
+            return `linear-gradient(135deg, ${match.hex} 50%, ${match.hex2} 50%)`;
+          }
+          if (match.hex) return match.hex;
+        }
+      }
+      const baseColor = product.color || product.frame_color || product.frameColor;
+      if (baseColor && toTitleCase(baseColor).trim() === color.trim()) {
+        if (product.is_dual_tone && (product.hex2 || product.dual_color_hex)) {
+          const h2 = product.hex2 || product.dual_color_hex;
+          return `linear-gradient(135deg, ${product.color_hex || product.colorHex || '#e2e8f0'} 50%, ${h2} 50%)`;
+        }
+        if (product.color_hex || product.colorHex) {
+          return product.color_hex || product.colorHex;
+        }
+      }
+    }
+    return getColorSwatch(color);
+  })();
 
   return (
     <div
       className={`${size} rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center ${borderCls}`}
-      style={{ background: getColorSwatch(color) }}
+      style={{ background: bgStyle }}
       title={color}
     >
       {isSelected && (
@@ -319,6 +339,8 @@ const ColorSwatch = ({ color, isSelected, size = 'w-5 h-5' }) => {
 
 const Category = () => {
   const { name } = useParams();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedShapes, setSelectedShapes] = useState([]);
@@ -456,8 +478,19 @@ const Category = () => {
       priceRange: [minPrice, maxPrice],
     };
 
-    return sortProducts(products.filter((product) => matchesFilters(product, selected)), sortBy);
-  }, [products, selectedShapes, selectedTypes, selectedColors, selectedThemes, selectedCategories, selectedMaterials, selectedAccessoryTypes, minPrice, maxPrice, sortBy]);
+    let result = products.filter((product) => matchesFilters(product, selected));
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(p =>
+        (p.name || '').toLowerCase().includes(q) ||
+        (p.brand || '').toLowerCase().includes(q) ||
+        (p.category || '').toLowerCase().includes(q)
+      );
+    }
+
+    return sortProducts(result, sortBy);
+  }, [products, selectedShapes, selectedTypes, selectedColors, selectedThemes, selectedCategories, selectedMaterials, selectedAccessoryTypes, minPrice, maxPrice, sortBy, searchQuery]);
 
   const typeOptions = React.useMemo(
     () => mergeOptions(FRAME_TYPE_OPTIONS, products.map((product) => product.frame_type)),
@@ -834,7 +867,7 @@ const Category = () => {
                                                         isSelected ? 'ring-2 ring-slate-950 ring-offset-2 scale-105' : 'hover:scale-105'
                                                     } ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
                                                 >
-                                                    <ColorSwatch color={color} isSelected={false} size="w-full h-full" />
+                                                    <ColorSwatch color={color} isSelected={false} size="w-full h-full" products={products} />
                                                 </button>
                                                 <span className="text-[10px] font-semibold text-slate-700 mt-1.5 text-center truncate w-full">{color}</span>
                                                 <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
@@ -1152,7 +1185,7 @@ const Category = () => {
                                        disabled={availabilityCount === 0 && !isSelected}
                                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isSelected ? 'ring-2 ring-primary ring-offset-2 scale-105' : 'hover:scale-105'} ${availabilityCount === 0 && !isSelected ? 'opacity-30' : ''}`}
                                     >
-                                       <ColorSwatch color={color} isSelected={false} size="w-full h-full" />
+                                       <ColorSwatch color={color} isSelected={false} size="w-full h-full" products={products} />
                                     </button>
                                     <span className="text-[9px] font-bold text-slate-700 mt-1 text-center truncate w-full">{color}</span>
                                     <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>

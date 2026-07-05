@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, Download, Search, Filter, MoreVertical, DownloadCloud, Settings, Bell } from 'lucide-react';
 import { subscribeAllOrders, updateOrderStatus as firebaseUpdateOrderStatus } from '../../lib/firebase';
-import { generateInvoice } from '../../lib/invoice';
+import { generateInvoice } from '../../lib/invoiceGenerator';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -47,6 +47,12 @@ const AdminOrders = () => {
   const [filter, setFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filter]);
 
   useEffect(() => {
     setLoading(true);
@@ -163,13 +169,17 @@ const AdminOrders = () => {
     URL.revokeObjectURL(url);
   };
 
-  // Stats for the top cards
   const stats = {
     new: orders.filter(o => o.status === 'pending').length,
     await: orders.filter(o => o.status === 'confirmed' || o.status === 'packed').length,
     onWay: orders.filter(o => o.status === 'shipped').length,
     delivered: orders.filter(o => o.status === 'delivered').length,
   };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   return (
     <div className="admin-page">
@@ -284,51 +294,84 @@ const AdminOrders = () => {
                     </tr>
                  </thead>
                  <tbody>
-                    {loading ? (
-                       <tr><td colSpan="9" className="text-center py-20 text-gray-400 font-bold">Fetching digital ledger...</td></tr>
-                    ) : filtered.length === 0 ? (
-                       <tr><td colSpan="9" className="text-center py-20 text-gray-400 font-bold">No orders found matching your criteria.</td></tr>
-                    ) : filtered.map(order => (
-                       <tr key={order.id}>
-                          <td><input type="checkbox" className="rounded" /></td>
-                          <td><span className="font-mono text-xs font-bold text-gray-400 tracking-widest uppercase">#{order.id?.slice(0, 8)}</span></td>
-                          <td>
-                             <div className="flex flex-col">
-                                <span className="text-gray-900 font-bold leading-none">{order.profiles?.full_name || order.shipping_address?.name || 'Guest'}</span>
-                                <span className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tighter">{order.shipping_address?.phone}</span>
-                             </div>
-                          </td>
-                          <td>
-                             <span className="bg-gray-50 text-gray-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                                {order.order_items?.[0]?.category || order.order_items?.[0]?.products?.category || 'Eyewear'}
-                             </span>
-                          </td>
-                          <td><span className="text-gray-900 font-extrabold">₹{Number(order.total_amount).toLocaleString()}</span></td>
-                          <td><span className="text-gray-500 text-xs font-bold">{new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleDateString('en-GB')}</span></td>
-                          <td><span className="text-gray-500 text-xs font-bold">{order.razorpay_payment_id ? 'Razorpay' : (order.payment_method || 'Pending')}</span></td>
-                          <td>
-                             <span className={`status-chip ${
-                                order.status === 'delivered' ? 'status-delivered' :
-                                order.status === 'shipped' ? 'status-shipped' :
-                                order.status === 'cancelled' ? 'status-cancelled' :
-                                order.status === 'confirmed' ? 'status-packed' :
-                                'status-confirmed'
-                             }`}>
-                                {order.status === 'pending' ? 'on way' : order.status}
-                             </span>
-                          </td>
-                          <td className="text-right">
-                             <button onClick={() => setSelectedOrder(order)} className="p-2 text-gray-400 hover:text-gray-900 transition-colors"><MoreVertical size={18} /></button>
-                          </td>
-                       </tr>
-                    ))}
-                 </tbody>
-              </table>
-           </div>
+                     {loading ? (
+                        <tr><td colSpan="9" className="text-center py-20 text-gray-400 font-bold">Fetching digital ledger...</td></tr>
+                     ) : filtered.length === 0 ? (
+                        <tr><td colSpan="9" className="text-center py-20 text-gray-400 font-bold">No orders found matching your criteria.</td></tr>
+                     ) : currentItems.map(order => (
+                        <tr key={order.id}>
+                           <td><input type="checkbox" className="rounded" /></td>
+                           <td><span className="font-mono text-xs font-bold text-gray-400 tracking-widest uppercase">#{order.id?.slice(0, 8)}</span></td>
+                           <td>
+                              <div className="flex flex-col">
+                                 <span className="text-gray-900 font-bold leading-none">{order.profiles?.full_name || order.shipping_address?.name || 'Guest'}</span>
+                                 <span className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tighter">{order.shipping_address?.phone}</span>
+                              </div>
+                           </td>
+                           <td>
+                              <span className="bg-gray-50 text-gray-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                                 {order.order_items?.[0]?.category || order.order_items?.[0]?.products?.category || 'Eyewear'}
+                              </span>
+                           </td>
+                           <td><span className="text-gray-900 font-extrabold">₹{Number(order.total_amount).toLocaleString()}</span></td>
+                           <td><span className="text-gray-500 text-xs font-bold">{new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleDateString('en-GB')}</span></td>
+                           <td><span className="text-gray-500 text-xs font-bold">{order.razorpay_payment_id ? 'Razorpay' : (order.payment_method || 'Pending')}</span></td>
+                           <td>
+                              <span className={`status-chip ${
+                                 order.status === 'delivered' ? 'status-delivered' :
+                                 order.status === 'shipped' ? 'status-shipped' :
+                                 order.status === 'cancelled' ? 'status-cancelled' :
+                                 order.status === 'confirmed' ? 'status-packed' :
+                                 'status-confirmed'
+                              }`}>
+                                 {order.status === 'pending' ? 'on way' : order.status}
+                              </span>
+                           </td>
+                           <td className="text-right">
+                              <button onClick={() => setSelectedOrder(order)} className="p-2 text-gray-400 hover:text-gray-900 transition-colors"><MoreVertical size={18} /></button>
+                           </td>
+                        </tr>
+                     ))}
+                  </tbody>
+               </table>
+            </div>
 
-           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
-              <span className="text-xs text-gray-400 font-bold">Showing {filtered.length} live orders</span>
-           </div>
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+               <span className="text-xs text-gray-400 font-bold">
+                  Showing {filtered.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filtered.length)} of {filtered.length} live orders
+               </span>
+               {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                     <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className="px-3 py-1.5 text-xs font-bold text-gray-500 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                     >
+                        Previous
+                     </button>
+                     {[...Array(totalPages)].map((_, i) => (
+                        <button
+                           key={i}
+                           onClick={() => setCurrentPage(i + 1)}
+                           className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+                              currentPage === i + 1
+                                 ? 'bg-purple-600 text-white border-purple-600'
+                                 : 'bg-white text-gray-500 border-gray-100 hover:bg-gray-50'
+                           }`}
+                        >
+                           {i + 1}
+                        </button>
+                     ))}
+                     <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        className="px-3 py-1.5 text-xs font-bold text-gray-500 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                     >
+                        Next
+                     </button>
+                  </div>
+               )}
+            </div>
         </div>
       </main>
 
