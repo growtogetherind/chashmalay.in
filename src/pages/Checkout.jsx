@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, ShoppingBag, Shield, CheckCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { createOrder } from '../lib/firebase';
 import { uploadImage, base64ToBlob } from '../lib/cloudinary';
 import toast from 'react-hot-toast';
 import { FadeIn } from '../components/ui/Motion';
@@ -181,7 +180,6 @@ const Checkout = () => {
     let razorpayOrderId, razorpayOrderAmount, razorpayOrderCurrency;
     try {
       const token = await user.getIdToken();
-      const amountInPaise = Math.round(finalTotal * 100);
       const orderRes = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 
@@ -189,9 +187,9 @@ const Checkout = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          amount: amountInPaise,
-          currency: 'INR',
-          receipt: `rcpt_${user.uid.slice(0, 8)}_${Date.now()}`,
+          items: cart,
+          address,
+          couponCode: coupon?.code || null
         }),
       });
 
@@ -218,7 +216,7 @@ const Checkout = () => {
       order_id: razorpayOrderId,
       name: 'Chashmalay.in',
       description: `Order for ${cart.length} item(s)`,
-      image: '/logo.png',
+      image: '/logo.webp',
       handler: async function (response) {
         // STEP 3: Verify signature server-side before recording order
         setProcessing(true);
@@ -242,17 +240,9 @@ const Checkout = () => {
             throw new Error(errBody.error || 'Payment verification failed.');
           }
 
-          // Signature verified — safe to record order in Firestore
-          const order = await createOrder({
-            userId: user.uid,
-            items: cart,
-            total: finalTotal,
-            address,
-            paymentId: response.razorpay_payment_id,
-            razorpayOrderId: response.razorpay_order_id,
-          });
+          const verifyData = await verifyRes.json();
           await emptyCart();
-          navigate(`/order-success/${order?.id}`);
+          navigate(`/order-success/${verifyData.order_id}`);
         } catch (err) {
           setProcessing(false);
           toast.error(err.message || ('Order creation failed. Contact support with Payment ID: ' + response.razorpay_payment_id));

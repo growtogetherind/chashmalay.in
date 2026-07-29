@@ -49,6 +49,34 @@
   ],
   "rewrites": [
     {
+      "source": "/logo.png",
+      "destination": "/logo.webp"
+    },
+    {
+      "source": "/assets/im/:name.png",
+      "destination": "/assets/im/:name.webp"
+    },
+    {
+      "source": "/assets/im/:name.jpg",
+      "destination": "/assets/im/:name.webp"
+    },
+    {
+      "source": "/assets/im/:name.jpeg",
+      "destination": "/assets/im/:name.webp"
+    },
+    {
+      "source": "/assets/im/all_img/:name.png",
+      "destination": "/assets/im/all_img/:name.webp"
+    },
+    {
+      "source": "/assets/im/all_img/:name.jpg",
+      "destination": "/assets/im/all_img/:name.webp"
+    },
+    {
+      "source": "/assets/im/all_img/:name.jpeg",
+      "destination": "/assets/im/all_img/:name.webp"
+    },
+    {
       "source": "/((?!api/|assets/|_next/|static/|favicon.ico).*)",
       "destination": "/index.html"
     }

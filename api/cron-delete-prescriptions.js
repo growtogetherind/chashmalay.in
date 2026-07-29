@@ -92,6 +92,6 @@ export default async function handler(request, response) {
     });
   } catch (error) {
     console.error("Cron job error deleting prescriptions:", error);
-    return response.status(500).json({ error: 'Internal Server Error', details: error.message });
+    return response.status(500).json({ error: 'Internal Server Error' });
   }
 }

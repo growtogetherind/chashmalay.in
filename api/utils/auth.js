@@ -4,8 +4,13 @@ import { join } from 'path';
 
 if (!admin.apps.length) {
   try {
-    const serviceAccountPath = join(process.cwd(), 'serviceAccountKey.json');
-    const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+    let serviceAccount;
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } else {
+      const serviceAccountPath = join(process.cwd(), 'serviceAccountKey.json');
+      serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+    }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });

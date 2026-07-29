@@ -61,9 +61,9 @@ async function seedEverything() {
     // 3. Seed Specific Category Products (Men, Women, Kids)
     console.log("🎯 Seeding Specific Category Products...");
     const specificProducts = [
-        { file: '26march-MEN.jpg.jpeg', name: 'Elite Men Collection', category: 'eyeglasses', price: 9999, brand: 'Titan Elite' },
-        { file: '26march-WOMEN.jpg.jpeg', name: 'Luxury Women Series', category: 'eyeglasses', price: 10999, brand: 'Chanel Style' },
-        { file: '26march-KIDS.jpg.jpeg', name: 'Junior Active Frames', category: 'eyeglasses', price: 4999, brand: 'Vision Kids' }
+        { file: '26march-MEN.jpg.webp', name: 'Elite Men Collection', category: 'eyeglasses', price: 9999, brand: 'Titan Elite' },
+        { file: '26march-WOMEN.jpg.webp', name: 'Luxury Women Series', category: 'eyeglasses', price: 10999, brand: 'Chanel Style' },
+        { file: '26march-KIDS.jpg.webp', name: 'Junior Active Frames', category: 'eyeglasses', price: 4999, brand: 'Vision Kids' }
     ];
 
     for (const sp of specificProducts) {
@@ -77,7 +77,7 @@ async function seedEverything() {
             price: sp.price,
             original_price: Math.floor(sp.price * 1.3),
             frame_image: `/assets/im/all_img/${sp.file}`,
-            model_image: "/assets/im/mdel.png",
+            model_image: "/assets/im/mdel.webp",
             is_new: true,
             is_active: true,
             is_featured: true, // Mark for 'Most Loved' section
@@ -105,7 +105,7 @@ async function seedEverything() {
                 price: 999 + (Math.floor(Math.random() * 5) * 200),
                 original_price: 1500,
                 frame_image: `/assets/im/contactlens/${file}`, 
-                model_image: "/assets/im/mdel.png",
+                model_image: "/assets/im/mdel.webp",
                 is_new: true,
                 is_active: true,
                 is_featured: false,
@@ -144,7 +144,7 @@ async function seedEverything() {
             price: price,
             original_price: Math.floor(price * 1.4),
             frame_image: `/assets/im/all_img/${file}`,
-            model_image: "/assets/im/mdel.png",
+            model_image: "/assets/im/mdel.webp",
             is_new: Math.random() > 0.8,
             is_active: true,
             stock_quantity: 50,

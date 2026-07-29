@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { auth, db, getProfile as fetchFirebaseProfile, updateProfile as updateFirebaseProfile } from '../lib/firebase';
+import { auth, db, getProfile as fetchFirebaseProfile, updateProfile as updateFirebaseProfile, writeAdminLog } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, updateProfile as updateAuthProfile, sendPasswordResetEmail } from 'firebase/auth';
 import toast from 'react-hot-toast';
@@ -18,6 +18,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
 
+  // Compute RBAC states dynamically
+  const resolvedRole = profile?.role || (profile?.is_admin ? 'admin' : 'customer');
+  const isSuperAdmin = resolvedRole === 'super_admin';
+  const isAdmin = resolvedRole === 'super_admin' || resolvedRole === 'admin' || profile?.is_admin || false;
+  const isManager = isAdmin || resolvedRole === 'manager';
+  const isStaff = isManager || resolvedRole === 'staff';
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -35,6 +42,7 @@ export const AuthProvider = ({ children }) => {
               email: currentUser.email,
               full_name: currentUser.displayName || 'Customer',
               is_admin: false,
+              role: 'customer',
               created_at: new Date()
             };
             await updateFirebaseProfile(currentUser.uid, profileData);
@@ -66,6 +74,34 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // ─── Admin Inactivity Auto-Logout ──────────────────────────────────────────
+  useEffect(() => {
+    if (!user || !isStaff) return;
+
+    let timeoutId;
+    const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(async () => {
+        await signOut();
+        toast('Session expired due to inactivity. Please sign in again.', {
+          icon: '⚠️',
+          duration: 6000,
+        });
+      }, INACTIVITY_LIMIT);
+    };
+
+    const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetTimer));
+    resetTimer();
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [user, isStaff]);
+
   const fetchProfile = async (userId) => {
     const { data, error } = await fetchFirebaseProfile(userId);
     if (!error) setProfile(data);
@@ -80,6 +116,7 @@ export const AuthProvider = ({ children }) => {
         email,
         full_name: fullName,
         is_admin: false,
+        role: 'customer',
         created_at: new Date()
       };
       
@@ -98,10 +135,17 @@ export const AuthProvider = ({ children }) => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       const profileResult = await fetchFirebaseProfile(result.user.uid);
-      if (!profileResult.error) setProfile(profileResult.data);
+      if (!profileResult.error) {
+        setProfile(profileResult.data);
+        const resolvedRole = profileResult.data?.role || (profileResult.data?.is_admin ? 'admin' : 'customer');
+        if (['super_admin', 'admin', 'manager', 'staff'].includes(resolvedRole)) {
+          await writeAdminLog('admin_login', result.user.uid, { email: result.user.email });
+        }
+      }
       toast.success(`Welcome back!`);
       return { user: result.user, profile: profileResult.data };
     } catch (error) {
+      await writeAdminLog('failed_login_attempt', null, { email, error: error.message });
       const errorMessage = (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password')
         ? 'Invalid user or password'
         : error.message;
@@ -123,12 +167,17 @@ export const AuthProvider = ({ children }) => {
           email: result.user.email,
           full_name: result.user.displayName,
           is_admin: false,
+          role: 'customer',
           created_at: new Date()
         };
         await updateFirebaseProfile(result.user.uid, profileData);
       }
       
       setProfile(profileData);
+      const resolvedRole = profileData?.role || (profileData?.is_admin ? 'admin' : 'customer');
+      if (['super_admin', 'admin', 'manager', 'staff'].includes(resolvedRole)) {
+        await writeAdminLog('admin_login', result.user.uid, { email: result.user.email, provider: 'google' });
+      }
       toast.success('Logged in with Google!');
       return { user: result.user, profile: profileData };
     } catch (error) {
@@ -138,6 +187,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signOut = async () => {
+    if (user) {
+      const resolvedRole = profile?.role || (profile?.is_admin ? 'admin' : 'customer');
+      if (['super_admin', 'admin', 'manager', 'staff'].includes(resolvedRole)) {
+        await writeAdminLog('admin_logout', user.uid, { email: user.email });
+      }
+    }
     await firebaseSignOut(auth);
     toast.success('Logged out successfully.');
   };
@@ -174,7 +229,11 @@ export const AuthProvider = ({ children }) => {
     profile,
     loading,
     profileLoading,
-    isAdmin: profile?.is_admin || false,
+    role: resolvedRole,
+    isSuperAdmin,
+    isAdmin,
+    isManager,
+    isStaff,
     signUp,
     signIn,
     signInWithGoogle,

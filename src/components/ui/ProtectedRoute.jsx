@@ -1,4 +1,3 @@
-
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,9 +11,9 @@ export const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Requires the user to be an admin
-export const AdminRoute = ({ children }) => {
-  const { user, isAdmin, loading, profileLoading } = useAuth();
+// Requires the user to be an admin role
+export const AdminRoute = ({ children, allowedRoles }) => {
+  const { user, role, loading, profileLoading } = useAuth();
   
   if (loading || profileLoading) {
     return <div className="min-h-screen flex items-center justify-center text-primary-blue font-black bg-white">
@@ -26,6 +25,10 @@ export const AdminRoute = ({ children }) => {
   }
   
   if (!user) return <Navigate to="/auth" replace />;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  
+  // Default to allowing any administrative roles
+  const roles = allowedRoles || ['super_admin', 'admin', 'manager', 'staff'];
+  if (!roles.includes(role)) return <Navigate to="/" replace />;
+  
   return children;
 };

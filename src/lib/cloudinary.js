@@ -1,4 +1,4 @@
-const MAX_IMAGE_UPLOAD_BYTES = 8 * 1024 * 1024;
+const MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set([
   'image/avif',
   'image/gif',
@@ -24,6 +24,17 @@ export const getCloudinarySrcSet = (url, widths = [320, 480, 640, 800, 1200, 160
 
 const validateImageFile = (file, maxBytes) => {
   if (!file) return "No file provided";
+  
+  // Extension whitelist pre-check
+  const fileName = file.name || "";
+  const extMatch = fileName.match(/\.([a-zA-Z0-9]+)$/);
+  if (!extMatch) return "File has no valid extension.";
+  const ext = extMatch[1].toLowerCase();
+  const allowedExtensions = new Set(['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif']);
+  if (!allowedExtensions.has(ext)) {
+    return "Only JPG, JPEG, PNG, WEBP, AVIF, or GIF images are allowed.";
+  }
+
   if (!ALLOWED_IMAGE_TYPES.has(file.type)) return "Only JPG, PNG, WEBP, AVIF, or GIF images can be uploaded.";
   if (file.size > maxBytes) return `Image must be smaller than ${Math.round(maxBytes / 1024 / 1024)}MB.`;
   return null;

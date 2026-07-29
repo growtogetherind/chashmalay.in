@@ -5,10 +5,8 @@
 // Required env vars (set in Vercel → Settings → Environment Variables):
 //   TELEGRAM_BOT_TOKEN   the bot token from @BotFather
 //   TELEGRAM_CHAT_ID     the destination chat id
-// (Legacy VITE_-prefixed names are accepted as a fallback but are deprecated —
-//  never expose these to the client bundle.)
 
-import { verifyAuth } from './utils/auth.js';
+import { verifyAdmin } from './utils/auth.js';
 
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
@@ -16,7 +14,7 @@ export default async function handler(request, response) {
   }
 
   try {
-    await verifyAuth(request);
+    await verifyAdmin(request);
   } catch (authError) {
     return response.status(authError.statusCode || 401).json({ error: authError.message });
   }

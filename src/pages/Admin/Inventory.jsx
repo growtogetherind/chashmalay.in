@@ -10,7 +10,15 @@ const AdminInventory = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [stockFilter, setStockFilter] = useState('all');
   const [saving, setSaving] = useState({});
@@ -75,7 +83,7 @@ const AdminInventory = () => {
         <div className="admin-topbar">
           <div className="admin-search-wrapper">
             <Search size={18} className="text-gray-400" />
-            <input type="text" placeholder="Search inventory..." value={search} onChange={e => setSearch(e.target.value)} />
+            <input type="text" placeholder="Search inventory..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
           </div>
           <div className="admin-user-nav">
              <button onClick={loadData} className={`w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors ${loading ? 'animate-spin' : ''}`}>

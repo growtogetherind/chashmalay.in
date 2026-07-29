@@ -1,10 +1,9 @@
 // api/verify-payment.js — Vercel Serverless Function
-// Verifies the Razorpay payment signature using HMAC-SHA256.
-// This MUST run server-side — the KEY_SECRET must never be sent to the browser.
+// Verifies the Razorpay payment signature and confirms the order transactionally.
 
 import { createHmac } from 'crypto';
-
 import { verifyAuth } from './utils/auth.js';
+import { confirmOrder } from './utils/orderHelper.js';
 
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
@@ -32,14 +31,13 @@ export default async function handler(request, response) {
   }
 
   try {
-    // Razorpay signature algorithm: HMAC-SHA256(order_id + "|" + payment_id, KEY_SECRET)
+    // 1. Verify Razorpay signature authenticity
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
     const expectedSignature = createHmac('sha256', KEY_SECRET)
       .update(body)
       .digest('hex');
 
     if (expectedSignature !== razorpay_signature) {
-      // IMPORTANT: Do NOT mark as paid if signatures don't match — this is a tampered request.
       console.warn('Razorpay signature mismatch. Possible tampered request.', {
         razorpay_order_id,
         razorpay_payment_id,
@@ -47,15 +45,20 @@ export default async function handler(request, response) {
       return response.status(400).json({ error: 'Payment verification failed. Signature mismatch.' });
     }
 
-    // Signatures match — payment is authentic
+    // 2. Perform transactional confirmation, stock update, and alerts on the backend
+    const confirmResult = await confirmOrder(razorpay_order_id, razorpay_payment_id);
+    if (!confirmResult.success) {
+      return response.status(500).json({ error: confirmResult.error || 'Failed to complete order confirmation.' });
+    }
+
     return response.status(200).json({
       success: true,
-      message: 'Payment verified successfully.',
+      message: 'Payment verified and order confirmed successfully.',
       payment_id: razorpay_payment_id,
       order_id: razorpay_order_id,
     });
   } catch (error) {
     console.error('verify-payment internal error:', error);
-    return response.status(500).json({ error: 'Internal server error.', details: error.message });
+    return response.status(500).json({ error: 'Internal server error.' });
   }
 }

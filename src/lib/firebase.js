@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,21 +18,46 @@ export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : nul
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-export const writeAdminLog = async (action, targetId, metadata = {}) => {
+let clientIp = null;
+const fetchClientIp = async () => {
+  if (clientIp) return clientIp;
+  try {
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
+    clientIp = data.ip;
+    return clientIp;
+  } catch (e) {
+    clientIp = 'unknown';
+    return clientIp;
+  }
+};
+
+export const writeAdminLog = async (action, targetId, metadata = {}, previousValue = null, newValue = null) => {
   try {
     const user = auth.currentUser;
-    if (!user) return;
-    const profileSnap = await getDoc(doc(db, "profiles", user.uid));
-    if (profileSnap.exists() && profileSnap.data().is_admin === true) {
-      await addDoc(collection(db, "admin_logs"), {
-        adminUid: user.uid,
-        adminName: profileSnap.data().full_name || 'Admin',
-        action,
-        targetId,
-        metadata,
-        timestamp: serverTimestamp()
-      });
+    const ip = typeof window !== 'undefined' ? await fetchClientIp() : 'unknown';
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
+
+    const logPayload = {
+      action,
+      targetId: targetId || null,
+      metadata: metadata || {},
+      previousValue: previousValue || null,
+      newValue: newValue || null,
+      ip,
+      userAgent,
+      timestamp: serverTimestamp()
+    };
+
+    if (user) {
+      logPayload.adminUid = user.uid;
+      logPayload.adminEmail = user.email || 'unknown';
+    } else {
+      logPayload.adminUid = 'unauthenticated';
+      logPayload.adminEmail = metadata.email || 'unknown';
     }
+
+    await addDoc(collection(db, "admin_logs"), logPayload);
   } catch (error) {
     console.error("Failed to write admin log:", error);
   }
@@ -168,13 +193,20 @@ const checkRateLimit = (action, limitMs = 5000) => {
 };
 
 // --- Products ---
-export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false } = {}) => {
+export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false, limitVal = null, startAfterDoc = null } = {}) => {
   try {
     let q = adminFilter ? query(collection(db, "products")) : query(collection(db, "products"), where("is_active", "==", true));
     if (category) q = query(q, where("category", "==", category));
     if (shape) q = query(q, where("shape", "==", shape));
     if (isFeatured !== undefined) q = query(q, where("is_featured", "==", isFeatured));
     if (isNew !== undefined) q = query(q, where("is_new", "==", isNew));
+
+    if (startAfterDoc) {
+      q = query(q, startAfter(startAfterDoc));
+    }
+    if (limitVal) {
+      q = query(q, limit(limitVal));
+    }
 
     const querySnapshot = await getDocs(q);
     let products = querySnapshot.docs.map(doc => normalizeProduct({ id: doc.id, ...doc.data() }));
@@ -233,8 +265,10 @@ export const saveProduct = async (product, id = null) => {
   try {
     const payload = productPayload(product);
     if (id) {
+      const prevDoc = await getDoc(doc(db, "products", id));
+      const prevData = prevDoc.exists() ? prevDoc.data() : null;
       await updateDoc(doc(db, "products", id), { ...payload, updated_at: serverTimestamp() });
-      await writeAdminLog('edit_product', id, { name: payload.name });
+      await writeAdminLog('edit_product', id, { name: payload.name }, prevData, payload);
     } else {
       const docRef = await addDoc(collection(db, "products"), {
         ...payload,
@@ -242,7 +276,7 @@ export const saveProduct = async (product, id = null) => {
         sku: payload.sku || `SKU-${Date.now()}`,
         status: payload.status || 'active'
       });
-      await writeAdminLog('create_product', docRef.id, { name: payload.name });
+      await writeAdminLog('create_product', docRef.id, { name: payload.name }, null, payload);
     }
     return { error: null };
   } catch (error) { return { error }; }
@@ -250,8 +284,10 @@ export const saveProduct = async (product, id = null) => {
 
 export const deleteProduct = async (id) => {
   try {
+    const prevDoc = await getDoc(doc(db, "products", id));
+    const prevData = prevDoc.exists() ? prevDoc.data() : null;
     await deleteDoc(doc(db, "products", id));
-    await writeAdminLog('delete_product', id);
+    await writeAdminLog('delete_product', id, prevData ? { name: prevData.name } : {}, prevData, null);
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -318,186 +354,8 @@ export const updateProfile = async (userId, updates) => {
 };
 
 // --- Orders ---
-export const createOrder = async ({ userId, items, total, address, paymentId, razorpayOrderId }) => {
-  if (!checkRateLimit(`createOrder_${userId}`, 10000)) {
-    throw new Error("Please wait before placing another order.");
-  }
-  const orderData = {
-    user_id: userId,
-    total_amount: total,
-    shipping_address: address,
-    razorpay_payment_id: paymentId,
-    razorpay_order_id: razorpayOrderId || null,
-    status: 'confirmed',
-    created_at: serverTimestamp()
-  };
-  const orderRef = await addDoc(collection(db, "orders"), orderData);
-
-  // Send Fast2SMS Order Confirmation
-  sendOrderConfirmationSMS(
-    address.phone,
-    address.name,
-    orderRef.id.slice(0, 8).toUpperCase(),
-    total
-  );
-
-  const batchPromises = items.map(async (item) => {
-    const pid = item.product_id || item.id;
-    const qty = item.quantity || 1;
-
-    if (pid && !pid.startsWith('custom-')) {
-      try {
-        // Use a transaction to check stock BEFORE decrementing (prevents overselling)
-        await runTransaction(db, async (transaction) => {
-          const productRef = doc(db, "products", pid);
-          const productSnap = await transaction.get(productRef);
-          if (!productSnap.exists()) return; // Product deleted — skip silently
-          const currentStock = productSnap.data().stock_quantity ?? 0;
-          if (currentStock < qty) {
-            // Stock ran out before their purchase; we log but do not throw
-            // (payment is already captured — must not break the order).
-            // Admin will see the negative stock and can resolve manually.
-            console.warn(`Low stock for ${pid}: requested ${qty}, available ${currentStock}`);
-          }
-          transaction.update(productRef, {
-            stock_quantity: increment(-qty),
-            updated_at: serverTimestamp()
-          });
-        });
-      } catch (stockError) {
-        console.error(`FAILED to decrement stock for ${pid}:`, stockError);
-      }
-    }
-
-    const basePrice = parseInt((item.price || item.consumersPrice || "0").toString().replace(/,/g, ''));
-    let lensTotal = 0;
-    if (item.lensSelection?.selectedLens?.price) lensTotal += Number(item.lensSelection.selectedLens.price);
-    if (item.lensSelection?.addons?.length) {
-      item.lensSelection.addons.forEach(a => { lensTotal += Number(a.price || 0); });
-    }
-    const finalItemPrice = basePrice + lensTotal;
-
-    // Check for prescriptions and save them to 'prescriptions' collection
-    const lens = item.lensSelection;
-    if (lens && (lens.prescriptionUrl || lens.manualDetails || lens.powerOption === 'later')) {
-      try {
-        // Strip any Cloudinary display-transform params so stored URL is always a clean direct link
-        const cleanRxUrl = cleanCloudinaryUrl(lens.prescriptionUrl);
-        await savePrescription({
-          user_id: userId,
-          user_name: address.name || 'Customer',
-          user_phone: address.phone || '',
-          order_id: orderRef.id,
-          product_name: item.name || 'Premium Eyewear',
-          image_url: cleanRxUrl || null,
-          right_eye: lens.manualDetails ? {
-            sph: lens.manualDetails.rightSph || '',
-            cyl: lens.manualDetails.rightCyl || '',
-            axis: lens.manualDetails.rightAxis || '',
-            add: lens.manualDetails.rightAddlPower || ''
-          } : null,
-          left_eye: lens.manualDetails ? {
-            sph: lens.manualDetails.leftSph || '',
-            cyl: lens.manualDetails.leftCyl || '',
-            axis: lens.manualDetails.leftAxis || '',
-            add: lens.manualDetails.leftAddlPower || ''
-          } : null,
-          status: 'pending'
-        });
-
-        // If a file was uploaded, trigger a dedicated Telegram notification
-        if (cleanRxUrl) {
-          sendTelegramNotification(`📑 *New Prescription Uploaded!*\n\n*Customer:* ${address.name}\n*Phone:* ${address.phone}\n*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()}\n*Item:* ${item.name || 'Eyewear'}\n\n🖼️ [View Uploaded Prescription](${cleanRxUrl})`);
-        }
-      } catch (e) {
-        console.error("Error saving prescription to database:", e);
-      }
-    }
-
-    return addDoc(collection(db, "order_items"), {
-      order_id: orderRef.id,
-      product_id: pid || `custom-${Date.now()}`,
-      quantity: qty,
-      price: finalItemPrice,
-      product_name: item.name || 'Premium Eyewear',
-      frame_image: getProductImage(item),
-      category: item.category || '',
-      brand: item.brand || '',
-      lens_selection: item.lensSelection || null,
-      selected_color: item.lensSelection?.selectedColor || null,
-      selected_size: item.lensSelection?.selectedSize || null,
-      cart_variant_key: item.cartVariantKey || item.firebaseId || null
-    });
-  });
-  await Promise.all(batchPromises);
-
-  // Generate detailed notification body for Telegram
-  let itemsDetail = '';
-  items.forEach((item, index) => {
-    const qty = item.quantity || 1;
-    const basePrice = parseInt((item.price || item.consumersPrice || "0").toString().replace(/,/g, ''));
-    let lensTotal = 0;
-    if (item.lensSelection?.selectedLens?.price) lensTotal += Number(item.lensSelection.selectedLens.price);
-    if (item.lensSelection?.addons?.length) {
-      item.lensSelection.addons.forEach(a => { lensTotal += Number(a.price || 0); });
-    }
-    const finalItemPrice = basePrice + lensTotal;
-    
-    const color = item.lensSelection?.selectedColor 
-      ? (typeof item.lensSelection.selectedColor === 'string' ? item.lensSelection.selectedColor : item.lensSelection.selectedColor.name)
-      : 'Standard';
-    const size = item.lensSelection?.selectedSize || 'Standard';
-
-    itemsDetail += `\n*${index + 1}. ${item.name}*\n`;
-    itemsDetail += `   • *Brand:* ${item.brand || 'Premium Edition'}\n`;
-    itemsDetail += `   • *Specs:* Color: ${color} | Size: ${size}\n`;
-    itemsDetail += `   • *Qty:* ${qty} x ₹${finalItemPrice.toLocaleString()} = ₹${(finalItemPrice * qty).toLocaleString()}\n`;
-    
-    if (item.lensSelection && item.lensSelection.visionType?.id !== 'frame') {
-      const ls = item.lensSelection;
-      if (ls.selectedLens) {
-        itemsDetail += `   • *Lens:* ${ls.selectedLens.name} — ${ls.visionType?.name || ls.category || 'N/A'} (₹${ls.selectedLens.price || 0})\n`;
-      }
-      if (ls.addons?.length) {
-        itemsDetail += `   • *Add-ons:* ${ls.addons.map(a => `${a.name} (₹${a.price})`).join(', ')}\n`;
-      }
-      if (ls.prescriptionUrl) {
-        itemsDetail += `   • *Prescription:* [View Uploaded Image](${cleanCloudinaryUrl(ls.prescriptionUrl)})\n`;
-      } else if (ls.manualDetails) {
-        const md = ls.manualDetails;
-        itemsDetail += `   • *Prescription (Manual Power):*\n`;
-        itemsDetail += `     OD (Right): SPH: ${md.rightSph || '-'} | CYL: ${md.rightCyl || '-'} | AXIS: ${md.rightAxis || '-'} | ADD: ${md.rightAddlPower || '-'}\n`;
-        itemsDetail += `     OS (Left):  SPH: ${md.leftSph || '-'} | CYL: ${md.leftCyl || '-'} | AXIS: ${md.leftAxis || '-'} | ADD: ${md.leftAddlPower || '-'}\n`;
-      } else {
-        itemsDetail += `   • *Prescription:* Upload Later (Follow-up via WhatsApp)\n`;
-      }
-    }
-  });
-
-  const fullOrderDescription = `🛒 *New Customer Order Placed!*
-
-*Order ID:* #${orderRef.id.slice(0, 8).toUpperCase()} (Full: \`${orderRef.id}\`)
-*Razorpay Payment ID:* \`${paymentId || 'N/A'}\`
-*Amount:* ₹${Number(total).toLocaleString()}
-*Status:* Confirmed
-
-*Customer Details:*
-• *Name:* ${address.name}
-• *Phone:* ${address.phone}
-• *DOB:* ${address.dob || 'Not Provided'}
-
-*Delivery Address:*
-${address.line1}${address.line2 ? `, ${address.line2}` : ''}
-${address.city}, ${address.state} - ${address.pincode}
-
-*Order Items:*${itemsDetail}
-
-_Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}_`;
-
-  // Send Telegram Notification
-  sendTelegramNotification(fullOrderDescription);
-
-  return { id: orderRef.id, ...orderData };
+export const createOrder = async () => {
+  throw new Error("Client-side order creation is disabled for security. Orders are verified and confirmed securely on the server.");
 };
 
 export const getUserOrders = async (userId) => {
@@ -561,6 +419,12 @@ export const getAllOrders = async () => {
 };
 
 const hydrateOrder = async (order) => {
+  // If order_items are already denormalized inside the order document, use them directly
+  if (order.order_items && Array.isArray(order.order_items)) {
+    return order;
+  }
+
+  // Fallback for legacy orders:
   const pSnap = order.user_id ? await getDoc(doc(db, "profiles", order.user_id)) : null;
   const itemsQ = query(collection(db, "order_items"), where("order_id", "==", order.id));
   const itemsSnap = await getDocs(itemsQ);
@@ -583,7 +447,7 @@ const hydrateOrder = async (order) => {
 };
 
 export const subscribeAllOrders = (onData, onError) => subscribeToQuery(
-  query(collection(db, "orders"), orderBy("created_at", "desc")),
+  query(collection(db, "orders"), orderBy("created_at", "desc"), limit(100)),
   async (orders) => {
     const hydrated = await Promise.all(orders.map(hydrateOrder));
     onData(hydrated);
@@ -597,7 +461,7 @@ export const updateOrderStatus = async (orderId, status) => {
     const previousStatus = orderSnap.exists() ? orderSnap.data().status : null;
     // 1. Update the order status
     await updateDoc(doc(db, "orders", orderId), { status, updated_at: serverTimestamp() });
-    await writeAdminLog('update_order_status', orderId, { status, previousStatus });
+    await writeAdminLog('update_order_status', orderId, { status, previousStatus }, { status: previousStatus }, { status });
 
     // 2. If status is cancelled, restore stock
     if (status === 'cancelled' && previousStatus !== 'cancelled') {
@@ -626,36 +490,33 @@ export const updateOrderStatus = async (orderId, status) => {
   }
 };
 
+export const subscribeRecentOrders = (onData, onError) => subscribeToQuery(
+  query(collection(db, "orders"), orderBy("created_at", "desc"), limit(6)),
+  async (orders) => {
+    const hydrated = await Promise.all(orders.map(hydrateOrder));
+    onData(hydrated);
+  },
+  onError
+);
+
 export const getDashboardStats = async () => {
   try {
-    const [ordersSnap, productsSnap, profilesSnap] = await Promise.all([
-      getDocs(query(collection(db, "orders"), orderBy("created_at", "desc"))),
-      getDocs(collection(db, "products")),
-      getDocs(collection(db, "profiles"))
-    ]);
-
-    const ordersRaw = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const orders = await Promise.all(ordersRaw.map(async (o) => {
-       const pSnap = await getDoc(doc(db, "profiles", o.user_id));
-       return { ...o, profiles: pSnap.exists() ? pSnap.data() : null };
-    }));
-    const revenue = orders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
-    const pendingOrders = orders.filter(o => o.status === 'pending').length;
-    const lowStockProducts = productsSnap.docs.filter(d => (d.data().stock_quantity || 0) <= 10).length;
-
-    return {
-      data: {
-        orders: orders,
-        orderCount: orders.length,
-        productCount: productsSnap.size,
-        profileCount: profilesSnap.size,
-        revenue,
-        pendingOrders,
-        lowStockProducts
-      },
-      error: null
-    };
+    const currentUser = auth.currentUser;
+    if (!currentUser) return { data: null, error: 'Unauthorized' };
+    const token = await currentUser.getIdToken();
+    const res = await fetch('/api/dashboard-stats', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+    const data = await res.json();
+    return { data, error: null };
   } catch (error) {
+    console.error("getDashboardStats error:", error);
     return { data: null, error };
   }
 };
@@ -663,28 +524,42 @@ export const getDashboardStats = async () => {
 export const subscribeDashboardStats = (onData, onError) => {
   let latestOrders = [];
   let latestProducts = [];
-  let latestProfiles = [];
+  let statsData = { orderCount: 0, profileCount: 0, productCount: 0, lowStockProducts: 0, pendingOrders: 0, revenue: 0 };
+
+  const fetchStats = async () => {
+    const { data } = await getDashboardStats();
+    if (data) {
+      statsData = data;
+      emit();
+    }
+  };
 
   const emit = () => {
-    const revenue = latestOrders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
     onData({
       orders: latestOrders,
-      orderCount: latestOrders.length,
-      productCount: latestProducts.length,
-      profileCount: latestProfiles.length,
-      revenue,
-      pendingOrders: latestOrders.filter(o => ['pending', 'confirmed'].includes(o.status)).length,
-      lowStockProducts: latestProducts.filter(p => (p.stock_quantity || 0) <= 10).length,
+      orderCount: statsData.orderCount || latestOrders.length,
+      productCount: statsData.productCount || latestProducts.length,
+      profileCount: statsData.profileCount,
+      revenue: statsData.revenue,
+      pendingOrders: statsData.pendingOrders,
+      lowStockProducts: statsData.lowStockProducts,
     });
   };
 
+  // Initial fetch of statistics
+  fetchStats();
+  // Poll stats every 30 seconds to keep counts and revenue updated
+  const intervalId = setInterval(fetchStats, 30000);
+
   const unsubs = [
-    subscribeAllOrders((orders) => { latestOrders = orders; emit(); }, onError),
+    subscribeRecentOrders((orders) => { latestOrders = orders; emit(); }, onError),
     subscribeProducts({ adminFilter: true }, (products) => { latestProducts = products; emit(); }, onError),
-    subscribeAllProfiles((profiles) => { latestProfiles = profiles; emit(); }, onError),
   ];
 
-  return () => unsubs.forEach((unsubscribe) => unsubscribe?.());
+  return () => {
+    clearInterval(intervalId);
+    unsubs.forEach((unsubscribe) => unsubscribe?.());
+  };
 };
 
 // --- Categories ---
@@ -735,15 +610,25 @@ const categoryPayload = (category = {}) => {
 export const saveCategory = async (category, id = null) => {
   try {
     const payload = categoryPayload(category);
-    if (id) await updateDoc(doc(db, "categories", id), { ...payload, updated_at: serverTimestamp() });
-    else await addDoc(collection(db, "categories"), { ...payload, created_at: serverTimestamp(), updated_at: serverTimestamp() });
+    if (id) {
+      const prevDoc = await getDoc(doc(db, "categories", id));
+      const prevData = prevDoc.exists() ? prevDoc.data() : null;
+      await updateDoc(doc(db, "categories", id), { ...payload, updated_at: serverTimestamp() });
+      await writeAdminLog('edit_category', id, { name: payload.name }, prevData, payload);
+    } else {
+      const docRef = await addDoc(collection(db, "categories"), { ...payload, created_at: serverTimestamp(), updated_at: serverTimestamp() });
+      await writeAdminLog('create_category', docRef.id, { name: payload.name }, null, payload);
+    }
     return { error: null };
   } catch (error) { return { error }; }
 };
 
 export const deleteCategory = async (id) => {
   try {
+    const prevDoc = await getDoc(doc(db, "categories", id));
+    const prevData = prevDoc.exists() ? prevDoc.data() : null;
     await deleteDoc(doc(db, "categories", id));
+    await writeAdminLog('delete_category', id, prevData ? { name: prevData.name } : {}, prevData, null);
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -765,15 +650,25 @@ export const subscribeBrands = (onData, onError) => subscribeToQuery(
 
 export const saveBrand = async (brand, id = null) => {
   try {
-    if (id) await updateDoc(doc(db, "brands", id), { ...brand, updated_at: serverTimestamp() });
-    else await addDoc(collection(db, "brands"), { ...brand, created_at: serverTimestamp() });
+    if (id) {
+      const prevDoc = await getDoc(doc(db, "brands", id));
+      const prevData = prevDoc.exists() ? prevDoc.data() : null;
+      await updateDoc(doc(db, "brands", id), { ...brand, updated_at: serverTimestamp() });
+      await writeAdminLog('edit_brand', id, { name: brand.name }, prevData, brand);
+    } else {
+      const docRef = await addDoc(collection(db, "brands"), { ...brand, created_at: serverTimestamp() });
+      await writeAdminLog('create_brand', docRef.id, { name: brand.name }, null, brand);
+    }
     return { error: null };
   } catch (error) { return { error }; }
 };
 
 export const deleteBrand = async (id) => {
   try {
+    const prevDoc = await getDoc(doc(db, "brands", id));
+    const prevData = prevDoc.exists() ? prevDoc.data() : null;
     await deleteDoc(doc(db, "brands", id));
+    await writeAdminLog('delete_brand', id, prevData ? { name: prevData.name } : {}, prevData, null);
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -854,6 +749,15 @@ export const saveSettings = async (settings = {}) => {
       else publicData[key] = value;
     }
 
+    // Load previous settings for diff
+    const [prevGlobalDoc, prevPrivateDoc] = await Promise.all([
+      getDoc(doc(db, "settings", "global")),
+      getDoc(doc(db, "settings", "private"))
+    ]);
+    const prevGlobal = prevGlobalDoc.exists() ? prevGlobalDoc.data() : {};
+    const prevPrivate = prevPrivateDoc.exists() ? prevPrivateDoc.data() : {};
+    const prevSettings = { ...prevGlobal, ...prevPrivate };
+
     const writes = [
       setDoc(doc(db, "settings", "global"), { ...publicData, updated_at: serverTimestamp() }, { merge: true })
     ];
@@ -865,18 +769,20 @@ export const saveSettings = async (settings = {}) => {
     await Promise.all(writes);
     await writeAdminLog('save_settings', 'global_private', { 
       updatedKeys: Object.keys(settings).filter(k => k !== 'updated_at') 
-    });
+    }, prevSettings, { ...prevSettings, ...settings });
     return { error: null };
   } catch (error) { return { error }; }
 };
 
 export const toggleUserBlock = async (userId, isBlocked) => {
   try {
+    const prevDoc = await getDoc(doc(db, "profiles", userId));
+    const prevData = prevDoc.exists() ? prevDoc.data() : null;
     await updateDoc(doc(db, "profiles", userId), {
       is_blocked: isBlocked,
       updated_at: serverTimestamp()
     });
-    await writeAdminLog(isBlocked ? 'block_user' : 'unblock_user', userId);
+    await writeAdminLog(isBlocked ? 'block_user' : 'unblock_user', userId, { email: prevData?.email }, prevData, { ...prevData, is_blocked: isBlocked });
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -896,7 +802,7 @@ export const getAllProfiles = async () => {
 
 export const subscribeAllProfiles = (onData, onError) => {
   return onSnapshot(
-    collection(db, "profiles"),
+    query(collection(db, "profiles"), limit(100)),
     (snapshot) => {
       const data = snapshot.docs.map(mapDoc);
       // Sort in-memory to ensure documents missing 'created_at' are still shown (at the end)
@@ -1088,10 +994,14 @@ export const saveCoupon = async (couponData, id = null) => {
       updated_at: serverTimestamp()
     };
     if (id) {
+      const prevDoc = await getDoc(doc(db, "coupons", id));
+      const prevData = prevDoc.exists() ? prevDoc.data() : null;
       await updateDoc(doc(db, "coupons", id), data);
+      await writeAdminLog('edit_coupon', id, { code: data.code }, prevData, data);
     } else {
       data.created_at = serverTimestamp();
-      await addDoc(collection(db, "coupons"), data);
+      const docRef = await addDoc(collection(db, "coupons"), data);
+      await writeAdminLog('create_coupon', docRef.id, { code: data.code }, null, data);
     }
     return { error: null };
   } catch (error) { return { error }; }
@@ -1099,7 +1009,10 @@ export const saveCoupon = async (couponData, id = null) => {
 
 export const deleteCoupon = async (id) => {
   try {
+    const prevDoc = await getDoc(doc(db, "coupons", id));
+    const prevData = prevDoc.exists() ? prevDoc.data() : null;
     await deleteDoc(doc(db, "coupons", id));
+    await writeAdminLog('delete_coupon', id, prevData ? { code: prevData.code } : {}, prevData, null);
     return { error: null };
   } catch (error) { return { error }; }
 };
@@ -1173,9 +1086,13 @@ export const subscribeCarouselItems = (onData, onError) => subscribeToQuery(
 export const saveCarouselItem = async (item, id = null) => {
   try {
     if (id) {
+      const prevDoc = await getDoc(doc(db, "carousel", id));
+      const prevData = prevDoc.exists() ? prevDoc.data() : null;
       await updateDoc(doc(db, "carousel", id), { ...item, updated_at: serverTimestamp() });
+      await writeAdminLog('edit_carousel_item', id, { title: item.title }, prevData, item);
     } else {
-      await addDoc(collection(db, "carousel"), { ...item, created_at: serverTimestamp() });
+      const docRef = await addDoc(collection(db, "carousel"), { ...item, created_at: serverTimestamp() });
+      await writeAdminLog('create_carousel_item', docRef.id, { title: item.title }, null, item);
     }
     return { error: null };
   } catch (error) { return { error }; }
@@ -1183,7 +1100,10 @@ export const saveCarouselItem = async (item, id = null) => {
 
 export const deleteCarouselItem = async (id) => {
   try {
+    const prevDoc = await getDoc(doc(db, "carousel", id));
+    const prevData = prevDoc.exists() ? prevDoc.data() : null;
     await deleteDoc(doc(db, "carousel", id));
+    await writeAdminLog('delete_carousel_item', id, prevData ? { title: prevData.title } : {}, prevData, null);
     return { error: null };
   } catch (error) { return { error }; }
 };

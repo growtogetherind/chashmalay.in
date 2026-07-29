@@ -213,10 +213,10 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
   };
 
   const getCategoryImage = (slug) => {
-    if (slug === 'single-vision') return '/assets/im/select_lens/single_vision.jpeg';
-    if (slug === 'bifocal') return '/assets/im/select_lens/bifocal.jpeg';
-    if (slug === 'progressive') return '/assets/im/select_lens/bifocal.jpeg';
-    return '/assets/im/select_lens/single_vision.jpeg';
+    if (slug === 'single-vision') return '/assets/im/select_lens/single_vision.webp';
+    if (slug === 'bifocal') return '/assets/im/select_lens/bifocal.webp';
+    if (slug === 'progressive') return '/assets/im/select_lens/bifocal.webp';
+    return '/assets/im/select_lens/single_vision.webp';
   };
 
   return (
@@ -256,7 +256,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     {categories.map((cat) => (
                       <button key={cat.id} className="vision-card" onClick={() => handleCategorySelect(cat)}>
                         <div className="vision-image-wrapper">
-                          <img src={getCategoryImage(cat.slug)} alt={cat.name} className="vision-image" onError={(e) => { e.target.src = '/assets/im/eyeglasses.png'; }} />
+                          <img src={getCategoryImage(cat.slug)} alt={cat.name} className="vision-image" onError={(e) => { e.target.src = '/assets/im/eyeglasses.webp'; }} />
                         </div>
                         <div className="vision-info">
                           <h4>{cat.name}</h4>
@@ -269,7 +269,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     {/* Frame Only Option */}
                     <button className="vision-card border-dashed border-slate-300 hover:border-slate-800" onClick={handleFrameOnlySelect}>
                       <div className="vision-image-wrapper">
-                        <img src="/assets/im/select_lens/frame_only.jpeg" alt="Frame Only" className="vision-image" onError={(e) => { e.target.src = '/assets/im/eyeglasses.png'; }} />
+                        <img src="/assets/im/select_lens/frame_only.webp" alt="Frame Only" className="vision-image" onError={(e) => { e.target.src = '/assets/im/eyeglasses.webp'; }} />
                       </div>
                       <div className="vision-info">
                         <h4>Frame Only</h4>
@@ -292,7 +292,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                         {lens.badge && <span className="package-tag">{lens.badge}</span>}
 
                         <div className="package-image-wrapper">
-                          <img src={lens.image_url || "/assets/im/select_lens/essential.jpeg"} alt={lens.name} className="package-image" onError={(e) => { e.target.src = "/assets/im/select_lens/essential.jpeg"; }} />
+                          <img src={lens.image_url || "/assets/im/select_lens/essential.webp"} alt={lens.name} className="package-image" onError={(e) => { e.target.src = "/assets/im/select_lens/essential.webp"; }} />
                         </div>
 
                         <div className="package-info">
@@ -449,7 +449,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     <button className="power-option-card" onClick={() => handlePowerSelect('manual')}>
                       <div className="flex items-center gap-4">
                         <div className="power-icon-wrapper">
-                          <img src="/assets/im/select_lens/mobile_manual.png" alt="Manual" onError={(e) => { e.target.src = '/assets/im/eyeglasses.png'; }} />
+                          <img src="/assets/im/select_lens/mobile_manual.png" alt="Manual" onError={(e) => { e.target.src = '/assets/im/eyeglasses.webp'; }} />
                         </div>
                         <div style={{ textAlign: 'left' }}>
                           <h5 style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#0f172a' }}>Enter Power Manually</h5>
@@ -462,7 +462,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     <button className="power-option-card" onClick={() => handlePowerSelect('later')}>
                       <div className="flex items-center gap-4">
                         <div className="power-icon-wrapper">
-                          <img src="/assets/im/select_lens/call_girl.png" alt="Later" onError={(e) => { e.target.src = '/assets/im/lens.png'; }} />
+                          <img src="/assets/im/select_lens/call_girl.webp" alt="Later" onError={(e) => { e.target.src = '/assets/im/lens.webp'; }} />
                         </div>
                         <div style={{ textAlign: 'left' }}>
                           <h5 style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#0f172a' }}>Provide Later on WhatsApp</h5>
@@ -493,7 +493,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                              src={product?.gallery?.[0] || product?.image || product?.frame_image || product?.images?.[0]}
                              alt="Frame"
                              style={{ width: '100%', height: '60px', objectFit: 'contain' }}
-                             onError={(e) => { e.target.src = '/assets/im/eyeglasses.png'; }}
+                             onError={(e) => { e.target.src = '/assets/im/eyeglasses.webp'; }}
                            />
                            <p style={{ fontSize: '11px', fontWeight: 'bold', color: '#0f172a', marginTop: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product?.name}</p>
                        </div>
@@ -502,7 +502,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                            <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '0.75rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                                <p style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px', letterSpacing: '1px' }}>Selected Lens</p>
                                <div style={{ width: '100%', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <img src={selections.selectedLens.image_url || "/assets/im/select_lens/essential.jpeg"} alt="Lens" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} onError={(e) => { e.target.src = '/assets/im/select_lens/essential.jpeg'; }} />
+                                  <img src={selections.selectedLens.image_url || "/assets/im/select_lens/essential.webp"} alt="Lens" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} onError={(e) => { e.target.src = '/assets/im/select_lens/essential.webp'; }} />
                                </div>
                                <p style={{ fontSize: '11px', fontWeight: 'bold', color: '#0f172a', marginTop: '6px' }}>{selections.selectedLens.name}</p>
                            </div>

@@ -27,7 +27,7 @@ export const generateInvoice = (order) => {
 
   // 1. Brand Logo (Placed at top left)
   try {
-    doc.addImage("/logo.png", "PNG", 14, 10, 25, 25);
+    doc.addImage("/logo.webp", "PNG", 14, 10, 25, 25);
   } catch (e) {
     console.error("Logo failed to load in PDF:", e);
   }

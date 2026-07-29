@@ -1,20 +1,29 @@
 import { useEffect, useState } from 'react';
-
 import { Users, Mail, Phone, ShoppingBag, X, ShieldAlert, ShieldCheck, ExternalLink, Search, Download } from 'lucide-react';
-import { toggleUserBlock, getUserOrders, subscribeAllProfiles } from '../../lib/firebase';
+import { toggleUserBlock, getUserOrders, subscribeAllProfiles, updateProfile, writeAdminLog } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import { useConfirm } from '../../context/ConfirmContext';
+import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 
 const AdminCustomers = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchTerm(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerOrders, setCustomerOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const { confirm } = useConfirm();
+  const { isSuperAdmin, user: currentUser } = useAuth();
 
   useEffect(() => {
     setLoading(true);
@@ -35,7 +44,7 @@ const AdminCustomers = () => {
     if (error) toast.error('Action failed');
     else {
       toast.success(newStatus ? 'User blocked' : 'User unblocked');
-      // No manual setCustomers call needed as we have a real-time subscription
+      await writeAdminLog(newStatus ? 'block_user' : 'unblock_user', customer.id, { email: customer.email });
       if (selectedCustomer?.id === customer.id) {
         setSelectedCustomer(prev => ({ ...prev, is_blocked: newStatus }));
       }
@@ -51,13 +60,14 @@ const AdminCustomers = () => {
   };
 
   const downloadCSV = () => {
-    const headers = ['Full Name', 'Email', 'Phone', 'Created At', 'Status'];
+    const headers = ['Full Name', 'Email', 'Phone', 'Created At', 'Status', 'Role'];
     const data = filtered.map(c => [
       c.full_name || 'Anonymous',
       c.email || 'N/A',
       c.phone || 'N/A',
       c.created_at ? new Date(c.created_at?.seconds * 1000).toLocaleDateString() : 'N/A',
-      c.is_blocked ? 'Blocked' : 'Active'
+      c.is_blocked ? 'Blocked' : 'Active',
+      c.role || (c.is_admin ? 'admin' : 'customer')
     ]);
 
     const csvContent = [
@@ -102,8 +112,8 @@ const AdminCustomers = () => {
               <input
                 type="text"
                 placeholder="Search by name or email..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="w-full pl-16 pr-8 py-5 bg-white border border-slate-200 rounded-2xl outline-none focus:border-emerald-500 text-slate-900 text-sm transition-all placeholder:text-slate-300 font-bold shadow-sm"
               />
            </div>
@@ -122,6 +132,7 @@ const AdminCustomers = () => {
                   <tr>
                     <th>Customer</th>
                     <th>Contact Details</th>
+                    <th>Clearance Role</th>
                     <th>Status</th>
                     <th className="text-right">Actions</th>
                   </tr>
@@ -153,6 +164,11 @@ const AdminCustomers = () => {
                         </div>
                       </td>
                       <td>
+                        <span className="text-xs font-bold uppercase text-slate-500 tracking-wider">
+                          {customer.role || (customer.is_admin ? 'admin' : 'customer')}
+                        </span>
+                      </td>
+                      <td>
                         <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[1.5px] border ${customer.is_blocked ? 'bg-red-50 text-red-500 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
                            {customer.is_blocked ? 'Blocked' : 'Active'}
                         </span>
@@ -169,7 +185,7 @@ const AdminCustomers = () => {
                   ))}
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan="4" className="text-center py-24 text-slate-300">
+                      <td colSpan="5" className="text-center py-24 text-slate-300">
                          <Users size={48} strokeWidth={1} className="mx-auto mb-4 opacity-20" />
                          <p className="text-[10px] font-black uppercase tracking-[3px]">No matching customers found</p>
                       </td>
@@ -188,7 +204,7 @@ const AdminCustomers = () => {
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">Identity Dossier: Profile Overview</h2>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] mt-2 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Secure Access Protocol Active
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Secure Access Protocol Active
                 </p>
               </div>
               <button onClick={() => setSelectedCustomer(null)} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-900 border border-slate-100 shadow-sm"><X size={20} /></button>
@@ -209,6 +225,54 @@ const AdminCustomers = () => {
                        {selectedCustomer.is_blocked ? 'Account: Suspended' : 'Status: Trusted Entity'}
                     </div>
 
+                    {/* Role Clearance Gated Dropdown */}
+                    <div className="w-full mt-6 text-left relative z-10">
+                      <label className="text-[9px] font-black uppercase tracking-[1.5px] text-slate-400 block mb-2">Security Role Clearance</label>
+                      {isSuperAdmin ? (
+                        <select
+                          value={selectedCustomer.role || (selectedCustomer.is_admin ? 'admin' : 'customer')}
+                          disabled={selectedCustomer.id === currentUser?.uid}
+                          onChange={async (e) => {
+                            const newRole = e.target.value;
+                            const prevRole = selectedCustomer.role || (selectedCustomer.is_admin ? 'admin' : 'customer');
+                            if (!(await confirm({
+                              title: 'Modify Authorization Clearance',
+                              message: `Are you sure you want to change the clearance of ${selectedCustomer.full_name} from [${prevRole.toUpperCase()}] to [${newRole.toUpperCase()}]?`
+                            }))) {
+                              return;
+                            }
+                            const is_admin = ['admin', 'super_admin'].includes(newRole);
+                            const { error } = await updateProfile(selectedCustomer.id, { role: newRole, is_admin });
+                            if (error) {
+                              toast.error('Failed to update role clearance.');
+                            } else {
+                              toast.success('Role clearance updated!');
+                              await writeAdminLog('permission_change', selectedCustomer.id, { 
+                                previousRole: prevRole, 
+                                newRole, 
+                                email: selectedCustomer.email 
+                              });
+                              setSelectedCustomer(prev => ({ ...prev, role: newRole, is_admin }));
+                            }
+                          }}
+                          className="w-full bg-white border border-slate-200 p-3 rounded-xl text-slate-900 text-xs font-bold focus:border-emerald-500 outline-none transition-all cursor-pointer"
+                        >
+                          <option value="customer">Customer / Guest</option>
+                          <option value="staff">Staff Member</option>
+                          <option value="manager">Manager</option>
+                          <option value="admin">Administrator</option>
+                          <option value="super_admin">Super Administrator</option>
+                        </select>
+                      ) : (
+                        <div className="bg-slate-100 border border-slate-200 text-slate-600 p-3 rounded-xl text-xs font-bold capitalize text-center">
+                          {selectedCustomer.role || (selectedCustomer.is_admin ? 'admin' : 'customer')}
+                        </div>
+                      )}
+                      {selectedCustomer.id === currentUser?.uid && (
+                        <span className="text-[8px] text-amber-500 font-bold mt-1 block">You cannot demote or modify your own role clearance.</span>
+                      )}
+                    </div>
+
                     <div className="w-full mt-12 pt-10 border-t border-slate-200/60 space-y-5 relative z-10">
                        <div className="flex items-center justify-between text-[11px]">
                           <span className="text-slate-400 font-black uppercase tracking-widest">Protocol Start</span>
@@ -225,7 +289,7 @@ const AdminCustomers = () => {
                 <div className="lg:col-span-8">
                   <div className="flex items-center justify-between mb-8">
                     <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[3px] flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Transaction History
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Transaction History
                     </h4>
                     <span className="px-4 py-2 bg-slate-50 border border-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm">{customerOrders.length} Records</span>
                   </div>
@@ -249,7 +313,7 @@ const AdminCustomers = () => {
                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}</p>
                                  <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
                                  <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">{order.status}</span>
-                               </div>
+                                </div>
                             </div>
                           </div>
                           <div className="text-right">

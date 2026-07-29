@@ -43,7 +43,15 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchTerm(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
   const [filter, setFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
@@ -261,7 +269,7 @@ const AdminOrders = () => {
            <div className="flex items-center gap-4 w-full md:w-auto">
               <div className="admin-search-wrapper !mb-0 min-w-[300px]">
                  <Search size={18} className="text-gray-400" />
-                 <input type="text" placeholder="Search orders..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                 <input type="text" placeholder="Search orders..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
               </div>
               <span className="text-gray-400 text-xs font-bold whitespace-nowrap">{filtered.length} orders</span>
            </div>

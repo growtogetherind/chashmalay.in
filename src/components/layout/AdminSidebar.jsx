@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import Logo from '../ui/Logo';
 
 const AdminSidebar = () => {
-  const { signOut } = useAuth();
+  const { signOut, isAdmin } = useAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -13,7 +13,7 @@ const AdminSidebar = () => {
     { path: '/admin', label: 'Dashboard', icon: <LayoutGrid size={20} /> },
     { path: '/admin/orders', label: 'Orders', icon: <Receipt size={20} /> },
     { path: '/admin/products', label: 'Products', icon: <Box size={20} /> },
-    { path: '/admin/customers', label: 'Customers', icon: <Users size={20} /> },
+    ...(isAdmin ? [{ path: '/admin/customers', label: 'Customers', icon: <Users size={20} /> }] : []),
     { path: '/admin/categories', label: 'Categories', icon: <Layers size={20} /> },
     { path: '/admin/brands', label: 'Brands', icon: <Tag size={20} /> },
     { path: '/admin/inventory', label: 'Inventory', icon: <Package size={20} /> },
@@ -27,7 +27,7 @@ const AdminSidebar = () => {
   ];
 
   const bottomItems = [
-    { path: '/admin/settings', label: 'Settings', icon: <Settings size={20} /> },
+    ...(isAdmin ? [{ path: '/admin/settings', label: 'Settings', icon: <Settings size={20} /> }] : []),
   ];
 
   const toggleMenu = () => setIsOpen(!isOpen);

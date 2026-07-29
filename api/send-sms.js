@@ -1,4 +1,4 @@
-import { verifyAuth } from './utils/auth.js';
+import { verifyAdmin } from './utils/auth.js';
 
 export default async function handler(request, response) {
   // Only allow POST requests
@@ -7,7 +7,7 @@ export default async function handler(request, response) {
   }
 
   try {
-    await verifyAuth(request);
+    await verifyAdmin(request);
   } catch (authError) {
     return response.status(authError.statusCode || 401).json({ error: authError.message });
   }
@@ -18,10 +18,7 @@ export default async function handler(request, response) {
     return response.status(400).json({ error: 'Missing required parameters' });
   }
 
-  // Load the API Key securely from the server environment. Prefer the
-  // non-VITE_ name (server-only); fall back to the legacy VITE_ name so existing
-  // deployments keep working, but that legacy name should be removed once the
-  // Vercel env is updated — a VITE_-prefixed var leaks into the client bundle.
+  // Load the API Key securely from the server environment.
   const API_KEY = process.env.FAST2SMS_API_KEY || process.env.VITE_FAST2SMS_API_KEY;
   const SENDER_ID = process.env.FAST2SMS_SENDER_ID || process.env.VITE_FAST2SMS_SENDER_ID || "FSTSMS";
 
@@ -57,12 +54,12 @@ export default async function handler(request, response) {
     const data = await fast2smsResponse.json();
 
     if (!data.return) {
-      return response.status(400).json({ error: 'Fast2SMS returned failure', details: data });
+      return response.status(400).json({ error: 'Fast2SMS returned failure' });
     }
 
-    return response.status(200).json({ success: true, message: 'SMS sent successfully via backend proxy', details: data });
+    return response.status(200).json({ success: true, message: 'SMS sent successfully' });
   } catch (error) {
     console.error("Fast2SMS Proxy Error:", error);
-    return response.status(500).json({ error: 'Internal Server Error', details: error.message });
+    return response.status(500).json({ error: 'Internal Server Error' });
   }
 }

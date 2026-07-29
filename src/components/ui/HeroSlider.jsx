@@ -14,7 +14,7 @@ const FALLBACK_SLIDES = [
     badge: 'New Collection',
     cta: 'Shop Now',
     ctaLink: '/category/sunglasses',
-    image: '/assets/im/all_img/WEBSITE_BANNER_1.jpg.jpeg',
+    image: '/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp',
     bg: '#f97416ff',
   },
   {
@@ -26,7 +26,7 @@ const FALLBACK_SLIDES = [
     badge: 'Flat 20% OFF',
     cta: 'Explore Now',
     ctaLink: '/category/eyeglasses',
-    image: '/assets/im/all_img/26march-website-banner.jpg.jpeg',
+    image: '/assets/im/all_img/26march-website-banner.jpg.webp',
     bg: '#111111',
   },
 ];
@@ -212,7 +212,7 @@ const HeroSlider = () => {
         {/* ─ Cell A: Tall photo (spans rows on lg) ─ */}
         <div className="sm:row-span-2 relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-900 h-48 sm:h-auto sm:min-h-[300px]">
           <img
-            src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.jpeg"
+            src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp"
             alt="Fashion Style"
             className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700"
             loading="lazy"
@@ -238,7 +238,7 @@ const HeroSlider = () => {
           {/* Model image — right half */}
           <div className="relative h-full w-2/5 flex-shrink-0 overflow-hidden">
             <img
-              src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.jpeg"
+              src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp"
               alt="Sunglasses Model"
               className="h-full w-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
@@ -255,7 +255,7 @@ const HeroSlider = () => {
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-900 h-32 sm:h-40 md:h-44">
             <img
-              src="/assets/im/all_img/26march-website-banner.jpg.jpeg"
+              src="/assets/im/all_img/26march-website-banner.jpg.webp"
               alt="Collection Style"
               className="absolute inset-0 w-full h-full object-cover brightness-75 hover:brightness-95 hover:scale-105 transition-all duration-400"
               loading="lazy"
@@ -264,12 +264,12 @@ const HeroSlider = () => {
           </div>
           <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-800 h-32 sm:h-40 md:h-44">
             <img
-              src="/assets/im/poster1.png"
+              src="/assets/im/poster1.webp"
               alt="Eyewear Style"
               className="absolute inset-0 w-full h-full object-cover brightness-75 hover:brightness-95 hover:scale-105 transition-all duration-400"
               loading="lazy"
               decoding="async"
-              onError={(e) => { e.target.src = '/assets/im/eyeglasses.png'; }}
+              onError={(e) => { e.target.src = '/assets/im/eyeglasses.webp'; }}
             />
           </div>
         </div>

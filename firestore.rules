@@ -2,45 +2,68 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ─── Admin Guard ───────────────────────────────────────────────────────────
-    // Reads the is_admin flag from the profile document.
-    // IMPORTANT: Until Firebase Custom Claims are implemented via a Cloud Function,
-    // this is the best client-side guard available. The profile write rule below
-    // prevents users from setting is_admin on themselves.
+    // ─── RBAC Helper Functions ──────────────────────────────────────────────────
+    
+    // Fetch user's role from their profile document
+    function getRole() {
+      return request.auth != null && exists(/databases/$(database)/documents/profiles/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role
+        : 'customer';
+    }
+
+    // Support legacy is_admin flag for backward compatibility
+    function isAdminLegacy() {
+      return request.auth != null && exists(/databases/$(database)/documents/profiles/$(request.auth.uid))
+        && get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.is_admin == true;
+    }
+
+    // Role hierarchies
+    function isSuperAdmin() {
+      return getRole() == 'super_admin';
+    }
+
     function isAdmin() {
-      return request.auth != null &&
-        exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.is_admin == true;
+      return isSuperAdmin() || getRole() == 'admin' || isAdminLegacy();
+    }
+
+    // Managers can manage catalog (products, coupons, categories) but not delete or edit credentials/settings
+    function isManager() {
+      return isAdmin() || getRole() == 'manager';
+    }
+
+    // Staff can view order/catalog and only update order statuses
+    function isStaff() {
+      return isManager() || getRole() == 'staff';
     }
 
     // ─── Products ──────────────────────────────────────────────────────────────
-    // Public read. Only admins can create/delete/update.
-    // Stock updates are now gated to admins only (previously any auth user could
-    // change stock_quantity — attack vector for store shutdown).
+    // Public read. Managers can create/update. Only Admins can delete.
     match /products/{productId} {
       allow read: if true;
-      allow create, delete: if isAdmin();
-      allow update: if isAdmin();
+      allow create, update: if isManager();
+      allow delete: if isAdmin();
     }
 
     // ─── Profiles ──────────────────────────────────────────────────────────────
-    // Users can read/write their own profile.
-    // CRITICAL FIX: Users cannot write `is_admin` field (prevents self-promotion).
+    // Users can read/write their own profile. Staff can view customer profiles.
+    // Super Admins can update roles. Users CANNOT change their own roles.
     match /profiles/{userId} {
       allow read: if request.auth != null &&
-        (request.auth.uid == userId || isAdmin());
+        (request.auth.uid == userId || isStaff());
 
-      // Allow users to create their own profile, ensuring is_admin is not set to true
+      // Allow users to create their own profile, ensuring is_admin & role are safe
       allow create: if request.auth != null &&
         request.auth.uid == userId &&
-        (!('is_admin' in request.resource.data) || request.resource.data.is_admin == false);
+        (!('is_admin' in request.resource.data) || request.resource.data.is_admin == false) &&
+        (!('role' in request.resource.data) || request.resource.data.role == 'customer');
 
-      // Allow users to update their own profile but CANNOT modify is_admin
+      // Allow users to update their profile details but block self-role modifications
       allow update: if (request.auth != null &&
         request.auth.uid == userId &&
-        request.resource.data.is_admin == resource.data.is_admin) || isAdmin();
+        request.resource.data.is_admin == resource.data.is_admin &&
+        (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)) || isSuperAdmin();
 
-      allow delete: if isAdmin();
+      allow delete: if isSuperAdmin();
     }
 
     // ─── Cart Items ────────────────────────────────────────────────────────────
@@ -52,62 +75,47 @@ service cloud.firestore {
     }
 
     // ─── Orders ───────────────────────────────────────────────────────────────
-    // CRITICAL FIX: Guest orders now require a positive total amount and
-    // cannot be created with status 'delivered' or 'cancelled' (prevents fake orders).
-    // Users can only read their own orders. Admins can read all.
+    // Staff/Admins can read all. Clients can read own.
+    // Client creation is blocked (must go via server APIs).
+    // Staff can update order status but not total amounts.
     match /orders/{orderId} {
-      allow read: if isAdmin() ||
+      allow read: if isStaff() ||
         (request.auth != null && request.auth.uid == resource.data.user_id);
 
-      // Allow order creation for authenticated users
-      allow create: if request.auth != null &&
-        request.resource.data.total_amount > 0 &&
-        request.resource.data.status == 'confirmed';
+      allow create: if false;
 
-      // Allow guest order creation with restrictions
-      allow create: if request.auth == null &&
-        request.resource.data.total_amount > 0 &&
-        request.resource.data.status == 'confirmed' &&
-        request.resource.data.user_id.matches('guest-.*');
-
-      // Users can only cancel their own confirmed orders
+      // Staff can update order status; users can cancel confirmed orders
       allow update: if isAdmin() ||
+        (isStaff() &&
+         request.resource.data.user_id == resource.data.user_id &&
+         request.resource.data.total_amount == resource.data.total_amount) ||
         (request.auth != null &&
          request.auth.uid == resource.data.user_id &&
          request.resource.data.status == 'cancelled' &&
          resource.data.status == 'confirmed');
+
+      allow delete: if isSuperAdmin();
     }
 
     // ─── Order Items ──────────────────────────────────────────────────────────
-    // CRITICAL FIX: Previously any authenticated user could read ALL order_items.
-    // Now users can only read items belonging to their own orders.
     match /order_items/{itemId} {
-      allow read: if isAdmin() ||
+      allow read: if isStaff() ||
         (request.auth != null &&
          get(/databases/$(database)/documents/orders/$(resource.data.order_id)).data.user_id
            == request.auth.uid);
 
-      // Allow order_items creation for authenticated users creating a real order
-      allow create: if request.auth != null;
-
-      // Allow guest order_items (for guest checkout flow)
-      allow create: if request.auth == null;
-
-      // Admins can correct prescription/lens details from the order screen.
+      allow create: if false;
       allow update, delete: if isAdmin();
     }
 
     // ─── Coupons ──────────────────────────────────────────────────────────────
-    // Admin only write. Public read is required for client-side coupon lookup.
-    // TODO (server-side): Move coupon validation to a Cloud Function to prevent
-    // client-side discount manipulation.
     match /coupons/{couponId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
 
     // ─── Reviews ──────────────────────────────────────────────────────────────
-    // Publicly readable. Only logged-in, verified users can write their own review.
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if request.auth != null &&
@@ -116,68 +124,63 @@ service cloud.firestore {
         request.resource.data.rating is number &&
         request.resource.data.rating >= 1 &&
         request.resource.data.rating <= 5;
-      allow update, delete: if isAdmin();
+      allow update, delete: if isManager();
     }
 
-    // ─── Offers ───────────────────────────────────────────────────────────────
+    // ─── Offers & Carousel & Brands & Categories ──────────────────────────────
     match /offers/{offerId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
-
-    // ─── Carousel ─────────────────────────────────────────────────────────────
     match /carousel/{itemId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
-
-    // ─── Brands ───────────────────────────────────────────────────────────────
     match /brands/{brandId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
-
-    // ─── Categories ───────────────────────────────────────────────────────────
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
 
     // ─── Lens System (Categories, Lenses, Addons) ─────────────────────────────
     match /lens_categories/{catId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
     match /lenses/{lensId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
     match /lens_addons/{addonId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isManager();
+      allow delete: if isAdmin();
     }
 
     // ─── Settings ─────────────────────────────────────────────────────────────
-    // Firestore rules are ADDITIVE: if ANY matching rule grants access, it is
-    // allowed. A public-read wildcard (`/settings/{id}`) would therefore also
-    // expose a secrets document. So each settings doc is enumerated explicitly.
-    //
-    // Public storefront config (store name, contact, socials, shipping, carousel
-    // interval, maintenance flag). Contains NO secrets — safe for anonymous read.
+    // Global: readable by public storefront, editable by Admin/SuperAdmin.
     match /settings/global {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Sensitive integration secrets (Telegram bot token/chat id, Fast2SMS key).
-    // Admin-only read AND write. These must never reach the public bundle or an
-    // anonymous Firestore read; runtime message delivery uses server env vars.
+    // Private integration secrets (Telegram tokens, Fast2SMS keys): editable & readable by Super Admin ONLY.
     match /settings/private {
-      allow read, write: if isAdmin();
+      allow read, write: if isSuperAdmin();
     }
 
+    // ─── Prescriptions ────────────────────────────────────────────────────────
     match /prescriptions/{prescriptionId} {
-      allow read: if isAdmin() || (request.auth != null && (request.auth.uid == resource.data.user_id || request.auth.uid == resource.data.guestId));
+      allow read: if isStaff() || (request.auth != null && (request.auth.uid == resource.data.user_id || request.auth.uid == resource.data.guestId));
       
       allow create: if request.auth != null
         && (
@@ -190,7 +193,7 @@ service cloud.firestore {
         && !('orderId' in request.resource.data)
         && !('order_id' in request.resource.data);
 
-      allow update: if isAdmin() || (
+      allow update: if isStaff() || (
         request.auth != null &&
         (request.auth.uid == resource.data.user_id || request.auth.uid == resource.data.guestId) &&
         request.resource.data.order_id == resource.data.order_id &&
@@ -199,6 +202,15 @@ service cloud.firestore {
       );
 
       allow delete: if isAdmin();
+    }
+
+    // ─── Admin Logs (Audit Logs) ──────────────────────────────────────────────
+    // Write-only collection for integrity. Anyone authenticated can write, but nobody can update or delete.
+    // Only Staff/Admins can read logs.
+    match /admin_logs/{logId} {
+      allow create: if true; // Allow logging logins and failures
+      allow read: if isStaff();
+      allow update, delete: if false; // Immutable audit trail
     }
   }
 }
