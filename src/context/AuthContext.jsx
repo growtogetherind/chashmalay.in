@@ -170,6 +170,20 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
+    
+    // Check if the user is on a mobile device where popups are historically buggy/unreliable.
+    // If mobile, directly use redirect login to avoid popup blocks entirely.
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      try {
+        await signInWithRedirect(auth, provider);
+        return;
+      } catch (error) {
+        toast.error(error.message);
+        throw error;
+      }
+    }
+
     try {
       const result = await signInWithPopup(auth, provider);
       
@@ -195,8 +209,8 @@ export const AuthProvider = ({ children }) => {
       toast.success('Logged in with Google!');
       return { user: result.user, profile: profileData };
     } catch (error) {
-      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/popup-blocked') {
-        toast.loading('Popup blocked or closed. Trying redirect login instead...');
+      if (error.code === 'auth/popup-blocked') {
+        toast.loading('Popup blocked by browser. Redirecting to Google login...');
         try {
           await signInWithRedirect(auth, provider);
           return;
@@ -204,6 +218,11 @@ export const AuthProvider = ({ children }) => {
           toast.error(redirectError.message);
           throw redirectError;
         }
+      }
+      // If user closed the popup voluntarily, we do NOT trigger a redirect fallback.
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast.error('Sign-in cancelled.');
+        throw error;
       }
       toast.error(error.message);
       throw error;
