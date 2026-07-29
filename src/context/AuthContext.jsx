@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db, getProfile as fetchFirebaseProfile, updateProfile as updateFirebaseProfile, writeAdminLog } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, updateProfile as updateAuthProfile, sendPasswordResetEmail } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, updateProfile as updateAuthProfile, sendPasswordResetEmail } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext({});
@@ -72,6 +72,20 @@ export const AuthProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  // Handle redirect login results on mount
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          toast.success('Logged in with Google!');
+        }
+      })
+      .catch((error) => {
+        console.error("Redirect login error:", error);
+        toast.error(error.message || 'Redirect login failed.');
+      });
   }, []);
 
   // ─── Admin Inactivity Auto-Logout ──────────────────────────────────────────
