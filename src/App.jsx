@@ -10,7 +10,6 @@ import Navbar from './components/layout/Navbar.jsx';
 import BottomNav from './components/layout/BottomNav.jsx';
 import Footer from './components/layout/Footer.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
-import { ReactLenis } from '@studio-freight/react-lenis';
 import CartDrawer from './components/ui/CartDrawer.jsx';
 import { subscribeSettings } from './lib/firebase';
 import './index.css';
@@ -94,14 +93,7 @@ const PublicRoutes = ({ settings }) => {
   }
 
   return (
-    <ReactLenis root options={{ 
-      duration: 1.5, 
-      lerp: 0.08, 
-      smoothWheel: true, 
-      wheelMultiplier: 1, 
-      touchMultiplier: 2,
-      infinite: false 
-    }}>
+    <>
       <Navbar />
       <main className="main-content">
         <ErrorBoundary>
@@ -135,7 +127,7 @@ const PublicRoutes = ({ settings }) => {
       </main>
       <Footer />
       <BottomNav />
-    </ReactLenis>
+    </>
   );
 };
 
