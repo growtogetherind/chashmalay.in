@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db, getProfile as fetchFirebaseProfile, updateProfile as updateFirebaseProfile, writeAdminLog } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, updateProfile as updateAuthProfile, sendPasswordResetEmail } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, updateProfile as updateAuthProfile, sendPasswordResetEmail } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext({});
@@ -155,8 +155,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
     try {
-      const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       
       const { data } = await fetchFirebaseProfile(result.user.uid);
@@ -181,6 +181,16 @@ export const AuthProvider = ({ children }) => {
       toast.success('Logged in with Google!');
       return { user: result.user, profile: profileData };
     } catch (error) {
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/popup-blocked') {
+        toast.loading('Popup blocked or closed. Trying redirect login instead...');
+        try {
+          await signInWithRedirect(auth, provider);
+          return;
+        } catch (redirectError) {
+          toast.error(redirectError.message);
+          throw redirectError;
+        }
+      }
       toast.error(error.message);
       throw error;
     }

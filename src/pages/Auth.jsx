@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -11,12 +11,22 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ fullName: '', email: '', password: '' });
-  const { signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
+  const { user, profile, signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [resetLoading, setResetLoading] = useState(false);
 
   const from = location.state?.from || '/';
+
+  useEffect(() => {
+    if (user && profile) {
+      if (profile.is_admin || ['super_admin', 'admin', 'manager', 'staff'].includes(profile.role)) {
+        navigate('/admin');
+      } else {
+        navigate(from);
+      }
+    }
+  }, [user, profile, navigate, from]);
 
   const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
