@@ -157,6 +157,12 @@ const categoryMatches = (productCategory, routeName) => {
     return category.includes('contact') || category === 'contacts';
   }
 
+  // Support Eyewear and Eyeglasses matching
+  if ((target === 'eyeglasses' || target === 'eyewear') &&
+      (category === 'eyeglasses' || category === 'eyewear')) {
+    return true;
+  }
+
   return category === target ||
     category.replace(/\s+/g, '-') === routeName ||
     category.replace(/\s+/g, '') === target.replace(/\s+/g, '');
@@ -432,9 +438,22 @@ const Category = () => {
 
     const initialCat = [];
     if (name && name !== 'all') {
-      if (name.includes('sun')) initialCat.push('Sunglasses');
-      else if (name === 'eyeglasses' || name === 'reading-glasses' || (name.includes('glass') && !name.includes('sun'))) initialCat.push('Eyeglasses');
-      else if (name.includes('contact') || name.includes('lens')) initialCat.push('Contact Lenses');
+      const normalizedRoute = name.toLowerCase();
+      if (normalizedRoute.includes('sun')) {
+        initialCat.push('Sunglasses');
+      } else if (normalizedRoute === 'eyeglasses') {
+        initialCat.push('Eyewear', 'Eyeglasses');
+      } else if (normalizedRoute === 'reading-glasses') {
+        initialCat.push('Reading Glasses');
+      } else if (normalizedRoute === 'clip-on-glasses') {
+        initialCat.push('Clip-on Glasses');
+      } else if (normalizedRoute.includes('contact') || normalizedRoute.includes('lens')) {
+        initialCat.push('Contact Lenses');
+      } else if (normalizedRoute.includes('accessor')) {
+        initialCat.push('Accessories');
+      } else {
+        initialCat.push(toTitleCase(name));
+      }
     }
     setSelectedCategories(initialCat);
     setPendingCategories(initialCat);
