@@ -28,9 +28,14 @@ const getColorLabel = (color) => {
 };
 
 const getColorValue = (color) => {
+  if (!color) return '#E5E7EB';
+  if (typeof color === 'object') {
+    if (color.hex) return color.hex;
+    if (color.color_code) return color.color_code;
+    if (color.colorCode) return color.colorCode;
+  }
   const label = getColorLabel(color);
   if (!label) return '#E5E7EB';
-  if (typeof color === 'object' && color.hex) return color.hex;
   return COLOR_SWATCH_MAP[label] || (/^#[0-9a-f]{3,8}$/i.test(label) ? label : '#E5E7EB');
 };
 

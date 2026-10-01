@@ -63,42 +63,57 @@ const ProductDetail = () => {
 
   const colors = useMemo(() => {
     if (!product) return [];
-    const baseColorName = product.color || product.frame_color || product.frameColor || 'Standard Edition';
-    const baseColorHex = product.color_hex || product.colorHex || '#e2e8f0';
+    if (Array.isArray(product.colors) && product.colors.length > 0) {
+      return product.colors.map(c => {
+        const hex = c.hex || c.color_code || c.colorCode || '#1A1A1A';
+        const hex2 = c.hex2 || c.dual_color_hex || null;
+        const front = c.images?.front || c.image || c.front || '';
+        const side = c.images?.side || c.image_side || c.side || '';
+        const model = c.images?.model || c.image_model || '';
+        const gallery = Array.isArray(c.images?.gallery) && c.images.gallery.length > 0
+          ? c.images.gallery
+          : Array.isArray(c.gallery) && c.gallery.length > 0
+            ? c.gallery
+            : [front, side, model].filter(Boolean);
+        return {
+          ...c,
+          name: c.name || 'Standard',
+          hex,
+          hex2,
+          color_code: hex,
+          image: front,
+          image_side: side,
+          image_model: model,
+          gallery: gallery.length > 0 ? gallery : [front].filter(Boolean)
+        };
+      });
+    }
 
-    const hasBaseColor = Array.isArray(product.colors) && product.colors.some(c => 
-      c.name?.toLowerCase() === baseColorName.toLowerCase()
-    );
+    const baseColorName = product.color || product.frame_color || product.frameColor || 'Standard';
+    const baseColorHex = product.color_hex || product.colorHex || '#1A1A1A';
+    const front = product.images?.front || product.frame_image || product.image || '';
+    const side = product.images?.side || '';
+    const model = product.images?.model || '';
+    const gallery = Array.isArray(product.images?.gallery) && product.images.gallery.length > 0
+      ? product.images.gallery
+      : Array.isArray(product.gallery) && product.gallery.length > 0
+        ? product.gallery
+        : [front, side, model].filter(Boolean);
 
-    return Array.isArray(product.colors) && product.colors.length > 0
-      ? (hasBaseColor
-          ? product.colors
-          : [
-              {
-                name: baseColorName,
-                hex: baseColorHex,
-                is_dual_tone: product.is_dual_tone || false,
-                hex2: product.hex2 || product.dual_color_hex || null,
-                image: product.frame_image || product.image || null,
-                image_side: product.images?.side || null,
-                image_model: product.images?.model || null,
-                is_base: true
-              },
-              ...product.colors
-            ]
-        )
-      : [
-          {
-            name: baseColorName,
-            hex: baseColorHex,
-            is_dual_tone: product.is_dual_tone || false,
-            hex2: product.hex2 || product.dual_color_hex || null,
-            image: product.frame_image || product.image || null,
-            image_side: product.images?.side || null,
-            image_model: product.images?.model || null,
-            is_base: true
-          }
-        ].filter(Boolean);
+    return [
+      {
+        name: baseColorName,
+        hex: baseColorHex,
+        color_code: baseColorHex,
+        is_dual_tone: product.is_dual_tone || false,
+        hex2: product.hex2 || product.dual_color_hex || null,
+        image: front,
+        image_side: side,
+        image_model: model,
+        gallery: gallery.length > 0 ? gallery : [front].filter(Boolean),
+        is_base: true
+      }
+    ];
   }, [product]);
 
   useEffect(() => {
@@ -259,9 +274,11 @@ const ProductDetail = () => {
   const showColorSelection = product.show_color_selection !== false;
   const showSizeSelection = product.show_size_selection !== false;
 
+  const selectedFrameColor = colors[activeColor] || null;
+
   const handleDirectAddToCart = async () => {
     try {
-      const selectedColor = (product.colors && product.colors.length > 0) ? product.colors[activeColor] : null;
+      const selectedColor = selectedFrameColor;
       const lensSelection = {
         visionType: null,
         selectedLens: null,
@@ -280,18 +297,21 @@ const ProductDetail = () => {
     }
   };
 
-  const selectedFrameColor = colors[activeColor] || null;
-  const mainGallery = product.gallery?.length ? product.gallery : [product.frame_image || product.image].filter(Boolean);
-  const colorGallery = selectedFrameColor
-    ? (selectedFrameColor.is_base
-        ? mainGallery
-        : [selectedFrameColor.image, selectedFrameColor.image_side, selectedFrameColor.image_model].filter(Boolean)
-      )
-    : [];
-  
-  const gallery = colorGallery.length > 0
-    ? Array.from(new Set([...colorGallery, ...mainGallery]))
-    : mainGallery;
+  const gallery = useMemo(() => {
+    if (selectedFrameColor && Array.isArray(selectedFrameColor.gallery) && selectedFrameColor.gallery.length > 0) {
+      return selectedFrameColor.gallery;
+    }
+    if (selectedFrameColor && (selectedFrameColor.image || selectedFrameColor.image_side)) {
+      return [selectedFrameColor.image, selectedFrameColor.image_side, selectedFrameColor.image_model].filter(Boolean);
+    }
+    if (Array.isArray(product?.images?.gallery) && product.images.gallery.length > 0) {
+      return product.images.gallery;
+    }
+    if (Array.isArray(product?.gallery) && product.gallery.length > 0) {
+      return product.gallery;
+    }
+    return [product?.images?.front || product?.frame_image || product?.image].filter(Boolean);
+  }, [selectedFrameColor, product]);
 
   const activeImageUrl = gallery[activeImage] || gallery[0] || '';
 
@@ -444,7 +464,15 @@ const ProductDetail = () => {
                       }}  
                         className={`relative w-14 h-14 rounded-full border-2 transition-all p-1.5 ${activeColor === i ? 'border-slate-900 scale-110 shadow-xl' : 'border-slate-100 hover:border-slate-300'}`}
                       >
-                        <div className="w-full h-full rounded-full border border-black/5" style={{ background: c.is_dual_tone && c.hex2 ? `linear-gradient(135deg, ${c.hex} 50%, ${c.hex2} 50%)` : c.hex }} title={c.name} />
+                        <div 
+                          className="w-full h-full rounded-full border border-slate-300 shadow-sm" 
+                          style={{ 
+                            background: c.is_dual_tone && c.hex2 
+                              ? `linear-gradient(135deg, ${c.hex || c.color_code} 50%, ${c.hex2} 50%)` 
+                              : (c.hex || c.color_code || '#1A1A1A') 
+                          }} 
+                          title={c.name} 
+                        />
                         {activeColor === i && <div className="absolute -top-1 -right-1 w-5 h-5 bg-slate-900 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg"><CheckCircle size={10} /></div>}
                       </button>
                     ))}

@@ -982,7 +982,31 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Prestige Square Acetate",
+    name: "Chashmalay Neo Round Pastel & Matte",
+    brand: "Chashmalay",
+    category: "eyeglasses",
+    shape: "Round",
+    type: "Full Rim",
+    material: "TR90",
+    gender: "Unisex",
+    price: 1099,
+    original_price: 2199,
+    shapeCode: "RN",
+    num: "0321",
+    desc: "Refined round Boston silhouette engineered with an ergonomic keyhole nose bridge, lightweight TR90 flex structure, and soft-touch pastel & matte finishes.",
+    tags: "round, boston, keyhole, pastel, frosted, lightweight, tr90, unisex, daily wear",
+    colorways: [
+      { name: "Frosted Crystal White", hex: "#E2E8F0", front: "DSC_8239.webp", side: "DSC_8239.webp", code: "WHT" },
+      { name: "Mint Seafoam Green", hex: "#A7F3D0", front: "DSC_8240.webp", side: "DSC_8240.webp", code: "MNT" },
+      { name: "Ice Glacier Blue", hex: "#BAE6FD", front: "DSC_8242.webp", side: "DSC_8242.webp", code: "BLU" },
+      { name: "Blush Rose Pink", hex: "#FBCFE8", front: "DSC_8243.webp", side: "DSC_8243.webp", code: "PNK" },
+      { name: "Royal Cobalt Blue", hex: "#1D4ED8", front: "DSC_8244.webp", side: "DSC_8244.webp", code: "RBLU" },
+      { name: "Slate Teal Green", hex: "#0F766E", front: "DSC_8246.webp", side: "DSC_8246.webp", code: "TEA" },
+      { name: "Matte Raven Black", hex: "#18181B", front: "DSC_8247.webp", side: "DSC_8247.webp", code: "BLK" }
+    ]
+  },
+  {
+    name: "Chashmalay Heritage Rivet Acetate Square",
     brand: "Chashmalay",
     category: "eyeglasses",
     shape: "Square",
@@ -992,14 +1016,11 @@ const catalogDefs = [
     price: 1199,
     original_price: 2399,
     shapeCode: "SQ",
-    num: "0321",
-    desc: "Substantial square frames engineered with premium acetate depth, smooth nose bevels, and reinforced core-wire temples.",
-    tags: "square, prestige, acetate, corewire, classic",
+    num: "0323",
+    desc: "Substantial square frames engineered with premium acetate depth, smooth nose bevels, and dual silver rivet pin accents on the front endpieces.",
+    tags: "square, rivet, acetate, classic, unisex",
     colorways: [
-      { name: "Dark Walnut Tortoise", hex: "#451A03", front: "DSC_8239.webp", side: "DSC_8240.webp", code: "HVN" },
-      { name: "Smoke Translucent", hex: "#4B5563", front: "DSC_8242.webp", side: "DSC_8243.webp", code: "CLR" },
-      { name: "Piano Black", hex: "#000000", front: "DSC_8244.webp", side: "DSC_8246.webp", code: "BLK" },
-      { name: "Matte Olive", hex: "#14532D", front: "DSC_8247.webp", side: "DSC_8248.webp", code: "GRN" }
+      { name: "Gloss Noir Silver Rivet", hex: "#111827", front: "DSC_8248.webp", side: "DSC_8248.webp", code: "BLK" }
     ]
   },
   {
@@ -1070,12 +1091,16 @@ function buildCatalog() {
 
       return {
         name: c.name,
+        hex: c.hex,
         color_code: c.hex,
+        image: frontUrl,
+        image_side: sideUrl,
         images: {
           front: frontUrl,
           side: sideUrl,
-          gallery: gallery
-        }
+          gallery: gallery.length > 0 ? gallery : [frontUrl].filter(Boolean)
+        },
+        gallery: gallery.length > 0 ? gallery : [frontUrl].filter(Boolean)
       };
     });
 
@@ -1100,6 +1125,11 @@ function buildCatalog() {
       available_sizes: ["M", "L"],
       available_colors: availableColors,
       default_color: defaultColor,
+      color: defaultColor,
+      color_hex: def.colorways[0].hex,
+      frame_color: defaultColor,
+      frame_image: primaryColorFrontUrl,
+      image: primaryColorFrontUrl,
       tags: def.tags,
       is_active: true,
       is_new: true,
@@ -1111,6 +1141,7 @@ function buildCatalog() {
         zoom: "",
         gallery: [primaryColorFrontUrl, primaryColorSideUrl].filter(Boolean)
       },
+      gallery: [primaryColorFrontUrl, primaryColorSideUrl].filter(Boolean),
       colors: colors
     });
   }
