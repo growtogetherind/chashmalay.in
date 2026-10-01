@@ -1,0 +1,57 @@
+product_id,product_category,frame_shape,frame_type,material,variant_count,total_images,primary_image_count,review_required
+CHM-001,Eyeglasses,Square,Full Rim,Acetate,2,4,2,false
+CHM-002,Eyeglasses,Wayfarer,Full Rim,Acetate,1,1,1,false
+CHM-003,Clip-On Glasses,Square,Full Rim,TR90 / Flexible Polymer,1,2,1,false
+CHM-004,Eyeglasses,Wayfarer,Full Rim,Acetate,1,2,1,false
+CHM-005,Eyeglasses,Rectangle,Full Rim,TR90 / Flexible Polymer,2,4,2,false
+CHM-006,Eyeglasses,Square,Full Rim,Acetate,1,2,1,false
+CHM-007,Eyeglasses,Square,Full Rim,Acetate,3,6,3,false
+CHM-008,Eyeglasses,Geometric,Full Rim,Metal,3,6,3,false
+CHM-009,Eyeglasses,Aviator,Full Rim,Metal,3,6,3,false
+CHM-010,Eyeglasses,Cat Eye,Full Rim,Acetate,3,6,3,false
+CHM-011,Reading Glasses,Oval,Full Rim,Metal,3,6,3,false
+CHM-012,Eyeglasses,Browline,Half Rim / Semi Rimless,Acetate,3,6,3,false
+CHM-013,Eyeglasses,Geometric,Full Rim,Metal,3,6,3,false
+CHM-014,Eyeglasses,Rectangle,Half Rim / Semi Rimless,Metal,3,6,3,false
+CHM-015,Eyeglasses,Round,Full Rim,Acetate,3,6,3,false
+CHM-016,Eyeglasses,Square,Full Rim,TR90 / Flexible Polymer,3,6,3,false
+CHM-017,Eyeglasses,Rectangle,Full Rim,Acetate,3,6,3,false
+CHM-018,Eyeglasses,Square,Full Rim,Acetate,3,6,3,false
+CHM-019,Eyeglasses,Rectangle,Rimless,Metal,3,6,3,false
+CHM-020,Eyeglasses,Square,Full Rim,TR90 / Flexible Polymer,3,6,3,false
+CHM-021,Eyeglasses,Cat Eye,Full Rim,Acetate,3,6,3,false
+CHM-022,Eyeglasses,Round,Full Rim,Acetate,3,6,3,false
+CHM-023,Eyeglasses,Geometric,Full Rim,Metal,3,6,3,false
+CHM-024,Sunglasses,Aviator,Full Rim,Metal,3,6,3,false
+CHM-025,Eyeglasses,Oval,Full Rim,Acetate,3,6,3,false
+CHM-026,Clip-On Glasses,Rectangle,Full Rim,TR90 / Flexible Polymer,3,6,3,false
+CHM-027,Kids Eyewear,Wayfarer,Full Rim,TR90 / Flexible Polymer,3,6,3,false
+CHM-028,Reading Glasses,Square,Full Rim,Plastic,3,6,3,false
+CHM-029,Eyeglasses,Rectangle,Full Rim,Metal,3,6,3,false
+CHM-030,Eyeglasses,Rectangle,Rimless,Metal,3,5,3,false
+CHM-031,Sunglasses,Aviator,Full Rim,Metal,1,1,1,false
+CHM-032,Sunglasses,Wayfarer,Full Rim,Acetate,1,2,1,false
+CHM-033,Eyeglasses,Square,Full Rim,Acetate,1,1,1,false
+CHM-034,Accessories,Rectangle,Full Rim,Plastic,2,3,2,false
+CHM-035,Eyeglasses,Rectangle,Full Rim,Mixed,1,1,1,false
+CHM-036,Eyeglasses,Square,Full Rim,Acetate,3,4,3,false
+CHM-037,Eyeglasses,Square,Full Rim,Acetate,3,6,3,false
+CHM-038,Eyeglasses,Browline,Half Rim / Semi Rimless,Acetate,2,4,2,false
+CHM-039,Eyeglasses,Geometric,Full Rim,Metal,3,6,3,false
+CHM-040,Eyeglasses,Wayfarer,Full Rim,Acetate,3,6,3,false
+CHM-041,Eyeglasses,Aviator,Full Rim,Metal,3,6,3,false
+CHM-042,Eyeglasses,Cat Eye,Full Rim,Metal,3,6,3,false
+CHM-043,Reading Glasses,Round,Full Rim,Metal,3,6,3,false
+CHM-044,Eyeglasses,Square,Full Rim,Acetate,3,6,3,false
+CHM-045,Eyeglasses,Rectangle,Half Rim / Semi Rimless,Metal,3,6,3,false
+CHM-046,Eyeglasses,Round,Full Rim,Metal,3,6,3,false
+CHM-047,Eyeglasses,Square,Full Rim,Acetate,3,6,3,false
+CHM-048,Reading Glasses,Oval,Full Rim,Metal,3,6,3,false
+CHM-049,Eyeglasses,Rectangle,Full Rim,TR90 / Flexible Polymer,3,6,3,false
+CHM-050,Eyeglasses,Aviator,Full Rim,Metal,3,6,3,false
+CHM-051,Eyeglasses,Cat Eye,Full Rim,Acetate,3,6,3,false
+CHM-052,Eyeglasses,Wayfarer,Full Rim,Acetate,3,6,3,false
+CHM-053,Eyeglasses,Geometric,Full Rim,Metal,3,6,3,false
+CHM-054,Eyeglasses,Round,Full Rim,TR90 / Flexible Polymer,7,7,7,false
+CHM-055,Eyeglasses,Square,Full Rim,Acetate,1,1,1,false
+CHM-056,Eyeglasses,Square,Full Rim,Metal,1,1,1,false

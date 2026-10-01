@@ -1,0 +1,968 @@
+{
+  "CHM-001": {
+    "V01_MATTE_BLACK_RED": {
+      "primary": "RGP_2738.webp",
+      "gallery": [
+        "RGP_2739.webp"
+      ]
+    },
+    "V02_MATTE_BLACK_BLUE": {
+      "primary": "RGP_2740.webp",
+      "gallery": [
+        "RGP_2741.webp"
+      ]
+    }
+  },
+  "CHM-002": {
+    "V01_CRYSTAL_SMOKE_GREY": {
+      "primary": "RGP_2743.webp",
+      "gallery": []
+    }
+  },
+  "CHM-003": {
+    "V01_NAVY_BLUE_RED": {
+      "primary": "RGP_2744.webp",
+      "gallery": [
+        "RGP_2745.webp"
+      ]
+    }
+  },
+  "CHM-004": {
+    "V01_MATTE_BLACK": {
+      "primary": "RGP_2746.webp",
+      "gallery": [
+        "RGP_2747.webp"
+      ]
+    }
+  },
+  "CHM-005": {
+    "V01_SMOKE_GREY_LIME": {
+      "primary": "RGP_2748.webp",
+      "gallery": [
+        "RGP_2749.webp"
+      ]
+    },
+    "V02_MATTE_BLACK_CRIMSON": {
+      "primary": "RGP_2750.webp",
+      "gallery": [
+        "RGP_2751.webp"
+      ]
+    }
+  },
+  "CHM-006": {
+    "V01_GLOSSY_BLACK_CAMO": {
+      "primary": "RGP_2753.webp",
+      "gallery": [
+        "RGP_2754.webp"
+      ]
+    }
+  },
+  "CHM-007": {
+    "V01_MATTE_BLACK_GOLD": {
+      "primary": "RGP_2755.webp",
+      "gallery": [
+        "RGP_2757.webp"
+      ]
+    },
+    "V02_DARK_TORTOISE_AMBER": {
+      "primary": "RGP_2758.webp",
+      "gallery": [
+        "RGP_2759.webp"
+      ]
+    },
+    "V03_TRANSPARENT_OLIVE": {
+      "primary": "RGP_2760.webp",
+      "gallery": [
+        "RGP_2761.webp"
+      ]
+    }
+  },
+  "CHM-008": {
+    "V01_ROSE_GOLD": {
+      "primary": "RGP_2762.webp",
+      "gallery": [
+        "RGP_2763.webp"
+      ]
+    },
+    "V02_GUNMETAL_BLACK": {
+      "primary": "RGP_2764.webp",
+      "gallery": [
+        "RGP_2765.webp"
+      ]
+    },
+    "V03_METALLIC_GOLD": {
+      "primary": "RGP_2766.webp",
+      "gallery": [
+        "RGP_2767.webp"
+      ]
+    }
+  },
+  "CHM-009": {
+    "V01_GUNMETAL_SILVER": {
+      "primary": "RGP_2769.webp",
+      "gallery": [
+        "RGP_2770.webp"
+      ]
+    },
+    "V02_VINTAGE_GOLD": {
+      "primary": "RGP_2771.webp",
+      "gallery": [
+        "RGP_2773.webp"
+      ]
+    },
+    "V03_MATTE_BLACK": {
+      "primary": "RGP_2774.webp",
+      "gallery": [
+        "RGP_2775.webp"
+      ]
+    }
+  },
+  "CHM-010": {
+    "V01_BURGUNDY_WINE": {
+      "primary": "RGP_2776.webp",
+      "gallery": [
+        "RGP_2777.webp"
+      ]
+    },
+    "V02_HAVANA_TORTOISE": {
+      "primary": "RGP_2778.webp",
+      "gallery": [
+        "RGP_2779.webp"
+      ]
+    },
+    "V03_MIDNIGHT_BLACK": {
+      "primary": "RGP_2780.webp",
+      "gallery": [
+        "RGP_2781.webp"
+      ]
+    }
+  },
+  "CHM-011": {
+    "V01_SLEEK_SILVER": {
+      "primary": "RGP_2782.webp",
+      "gallery": [
+        "RGP_2783.webp"
+      ]
+    },
+    "V02_CHAMPAGNE_GOLD": {
+      "primary": "RGP_2784.webp",
+      "gallery": [
+        "RGP_2785.webp"
+      ]
+    },
+    "V03_MATTE_BLACK": {
+      "primary": "RGP_2786.webp",
+      "gallery": [
+        "RGP_2787.webp"
+      ]
+    }
+  },
+  "CHM-012": {
+    "V01_GLOSS_BLACK_GOLD": {
+      "primary": "RGP_2788.webp",
+      "gallery": [
+        "RGP_2789.webp"
+      ]
+    },
+    "V02_DARK_HAVANA_TORTOISE": {
+      "primary": "RGP_2790.webp",
+      "gallery": [
+        "RGP_2791.webp"
+      ]
+    },
+    "V03_TRANSPARENT_GREY_SILVER": {
+      "primary": "RGP_2792.webp",
+      "gallery": [
+        "RGP_2793.webp"
+      ]
+    }
+  },
+  "CHM-013": {
+    "V01_ROSE_GOLD_COPPER": {
+      "primary": "RGP_2794.webp",
+      "gallery": [
+        "RGP_2795.webp"
+      ]
+    },
+    "V02_GUNMETAL_GREY": {
+      "primary": "RGP_2796.webp",
+      "gallery": [
+        "RGP_2797.webp"
+      ]
+    },
+    "V03_BRUSHED_GOLD": {
+      "primary": "RGP_2798.webp",
+      "gallery": [
+        "RGP_2799.webp"
+      ]
+    }
+  },
+  "CHM-014": {
+    "V01_MATTE_BLACK": {
+      "primary": "RGP_2800.webp",
+      "gallery": [
+        "RGP_2801.webp"
+      ]
+    },
+    "V02_GUNMETAL_STEEL": {
+      "primary": "RGP_2803.webp",
+      "gallery": [
+        "RGP_2804.webp"
+      ]
+    },
+    "V03_DEEP_NAVY": {
+      "primary": "RGP_2805.webp",
+      "gallery": [
+        "RGP_2806.webp"
+      ]
+    }
+  },
+  "CHM-015": {
+    "V01_CRYSTAL_TRANSPARENT": {
+      "primary": "RGP_2807.webp",
+      "gallery": [
+        "RGP_2808.webp"
+      ]
+    },
+    "V02_AMBER_HONEY": {
+      "primary": "RGP_2809.webp",
+      "gallery": [
+        "RGP_2810.webp"
+      ]
+    },
+    "V03_PIANO_BLACK": {
+      "primary": "RGP_2811.webp",
+      "gallery": [
+        "RGP_2812.webp"
+      ]
+    }
+  },
+  "CHM-016": {
+    "V01_MATTE_OLIVE_GREEN": {
+      "primary": "RGP_2813.webp",
+      "gallery": [
+        "RGP_2814.webp"
+      ]
+    },
+    "V02_DARK_WALNUT_BROWN": {
+      "primary": "RGP_2815.webp",
+      "gallery": [
+        "RGP_2816.webp"
+      ]
+    },
+    "V03_ONYX_BLACK": {
+      "primary": "RGP_2818.webp",
+      "gallery": [
+        "RGP_2819.webp"
+      ]
+    }
+  },
+  "CHM-017": {
+    "V01_CHARCOAL_GREY": {
+      "primary": "RGP_2820.webp",
+      "gallery": [
+        "RGP_2821.webp"
+      ]
+    },
+    "V02_DEEP_COBALT": {
+      "primary": "RGP_2822.webp",
+      "gallery": [
+        "RGP_2823.webp"
+      ]
+    },
+    "V03_MATTE_RAVEN": {
+      "primary": "RGP_2824.webp",
+      "gallery": [
+        "RGP_2825.webp"
+      ]
+    }
+  },
+  "CHM-018": {
+    "V01_BURGUNDY_TORTOISE": {
+      "primary": "RGP_2826.webp",
+      "gallery": [
+        "RGP_2827.webp"
+      ]
+    },
+    "V02_SMOKY_TRANSLUCENT": {
+      "primary": "RGP_2828.webp",
+      "gallery": [
+        "RGP_2829.webp"
+      ]
+    },
+    "V03_CLASSIC_JET_BLACK": {
+      "primary": "RGP_2830.webp",
+      "gallery": [
+        "RGP_2831.webp"
+      ]
+    }
+  },
+  "CHM-019": {
+    "V01_BRUSHED_SILVER": {
+      "primary": "RGP_2832.webp",
+      "gallery": [
+        "RGP_2833.webp"
+      ]
+    },
+    "V02_CHAMPAGNE_GOLD": {
+      "primary": "RGP_2834.webp",
+      "gallery": [
+        "RGP_2835.webp"
+      ]
+    },
+    "V03_GUNMETAL": {
+      "primary": "RGP_2836.webp",
+      "gallery": [
+        "RGP_2837.webp"
+      ]
+    }
+  },
+  "CHM-020": {
+    "V01_MATTE_BLACK_SILVER": {
+      "primary": "RGP_2838.webp",
+      "gallery": [
+        "RGP_2839.webp"
+      ]
+    },
+    "V02_MILITARY_OLIVE": {
+      "primary": "RGP_2840.webp",
+      "gallery": [
+        "RGP_2841.webp"
+      ]
+    },
+    "V03_NAVY_BLUE_GUNMETAL": {
+      "primary": "RGP_2842.webp",
+      "gallery": [
+        "RGP_2843.webp"
+      ]
+    }
+  },
+  "CHM-021": {
+    "V01_ROSE_QUARTZ_CLEAR": {
+      "primary": "RGP_2845.webp",
+      "gallery": [
+        "RGP_2846.webp"
+      ]
+    },
+    "V02_LEOPARD_HAVANA": {
+      "primary": "RGP_2847.webp",
+      "gallery": [
+        "RGP_2848.webp"
+      ]
+    },
+    "V03_GLOSS_BLACK": {
+      "primary": "RGP_2850.webp",
+      "gallery": [
+        "RGP_2851.webp"
+      ]
+    }
+  },
+  "CHM-022": {
+    "V01_TORTOISE_AMBER": {
+      "primary": "RGP_2852.webp",
+      "gallery": [
+        "RGP_2853.webp"
+      ]
+    },
+    "V02_TRANSPARENT_CRYSTAL": {
+      "primary": "RGP_2854.webp",
+      "gallery": [
+        "RGP_2855.webp"
+      ]
+    },
+    "V03_MIDNIGHT_BLACK": {
+      "primary": "RGP_2856.webp",
+      "gallery": [
+        "RGP_2857.webp"
+      ]
+    }
+  },
+  "CHM-023": {
+    "V01_BRUSHED_BRONZE": {
+      "primary": "RGP_2858.webp",
+      "gallery": [
+        "RGP_2859.webp"
+      ]
+    },
+    "V02_POLISHED_SILVER": {
+      "primary": "RGP_2860.webp",
+      "gallery": [
+        "RGP_2861.webp"
+      ]
+    },
+    "V03_MATTE_BLACK": {
+      "primary": "RGP_2862.webp",
+      "gallery": [
+        "RGP_2863.webp"
+      ]
+    }
+  },
+  "CHM-024": {
+    "V01_GUNMETAL_MATTE_SMOKE": {
+      "primary": "RGP_2864.webp",
+      "gallery": [
+        "RGP_2865.webp"
+      ]
+    },
+    "V02_WARM_GOLD_BROWN": {
+      "primary": "RGP_2866.webp",
+      "gallery": [
+        "RGP_2867.webp"
+      ]
+    },
+    "V03_STEALTH_BLACK_DARK_TINT": {
+      "primary": "RGP_2868.webp",
+      "gallery": [
+        "RGP_2869.webp"
+      ]
+    }
+  },
+  "CHM-025": {
+    "V01_BLUSH_PEACH": {
+      "primary": "RGP_2870.webp",
+      "gallery": [
+        "RGP_2871.webp"
+      ]
+    },
+    "V02_HONEY_DEMI": {
+      "primary": "RGP_2872.webp",
+      "gallery": [
+        "RGP_2873.webp"
+      ]
+    },
+    "V03_JET_BLACK": {
+      "primary": "RGP_2874.webp",
+      "gallery": [
+        "RGP_2875.webp"
+      ]
+    }
+  },
+  "CHM-026": {
+    "V01_MATTE_BLACK_ORANGE": {
+      "primary": "RGP_2876.webp",
+      "gallery": [
+        "RGP_2877.webp"
+      ]
+    },
+    "V02_CHARCOAL_BLUE": {
+      "primary": "RGP_2878.webp",
+      "gallery": [
+        "RGP_2879.webp"
+      ]
+    },
+    "V03_SOLID_BLACK": {
+      "primary": "RGP_2880.webp",
+      "gallery": [
+        "RGP_2881.webp"
+      ]
+    }
+  },
+  "CHM-027": {
+    "V01_MATTE_BROWN_TORTOISE": {
+      "primary": "RGP_2882.webp",
+      "gallery": [
+        "RGP_2883.webp"
+      ]
+    },
+    "V02_FROSTED_GREY": {
+      "primary": "RGP_2884.webp",
+      "gallery": [
+        "RGP_2885.webp"
+      ]
+    },
+    "V03_DEEP_INK_BLACK": {
+      "primary": "RGP_2886.webp",
+      "gallery": [
+        "RGP_2887.webp"
+      ]
+    }
+  },
+  "CHM-028": {
+    "V01_AMBER_TORTOISE": {
+      "primary": "RGP_2888.webp",
+      "gallery": [
+        "RGP_2889.webp"
+      ]
+    },
+    "V02_CRYSTAL_CLEAR": {
+      "primary": "RGP_2890.webp",
+      "gallery": [
+        "RGP_2891.webp"
+      ]
+    },
+    "V03_MIDNIGHT_BLACK": {
+      "primary": "RGP_2892.webp",
+      "gallery": [
+        "RGP_2893.webp"
+      ]
+    }
+  },
+  "CHM-029": {
+    "V01_GUNMETAL_SILVER": {
+      "primary": "RGP_2894.webp",
+      "gallery": [
+        "RGP_2895.webp"
+      ]
+    },
+    "V02_CLASSIC_GOLD": {
+      "primary": "RGP_2896.webp",
+      "gallery": [
+        "RGP_2897.webp"
+      ]
+    },
+    "V03_MATTE_BLACK": {
+      "primary": "RGP_2898.webp",
+      "gallery": [
+        "RGP_2899.webp"
+      ]
+    }
+  },
+  "CHM-030": {
+    "V01_POLISHED_CHROME": {
+      "primary": "RGP_2900.webp",
+      "gallery": [
+        "RGP_2901.webp"
+      ]
+    },
+    "V02_ROSE_GOLD": {
+      "primary": "RGP_2902.webp",
+      "gallery": [
+        "RGP_2903.webp"
+      ]
+    },
+    "V03_STEALTH_GRAPHITE": {
+      "primary": "RGP_2904.webp",
+      "gallery": []
+    }
+  },
+  "CHM-031": {
+    "V01_MATTE_BLACK_SMOKE": {
+      "primary": "DSC_8035.webp",
+      "gallery": []
+    }
+  },
+  "CHM-032": {
+    "V01_MATTE_BLACK_POLARIZED": {
+      "primary": "DSC_8077.webp",
+      "gallery": [
+        "DSC_8073.webp"
+      ]
+    }
+  },
+  "CHM-033": {
+    "V01_GLOSS_BLACK": {
+      "primary": "DSC_8080.webp",
+      "gallery": []
+    }
+  },
+  "CHM-034": {
+    "V01_NAVY_BLUE_ORANGE": {
+      "primary": "DSC_8090.webp",
+      "gallery": []
+    },
+    "V02_PASTEL_PUFFER_MULTI": {
+      "primary": "DSC_8092.webp",
+      "gallery": [
+        "DSC_8093.webp"
+      ]
+    }
+  },
+  "CHM-035": {
+    "V01_GLOSS_BLACK_GOLD_ACCENT": {
+      "primary": "DSC_8095.webp",
+      "gallery": []
+    }
+  },
+  "CHM-036": {
+    "V01_TRANSPARENT_CRYSTAL_GREY": {
+      "primary": "DSC_8105.webp",
+      "gallery": [
+        "DSC_8103.webp"
+      ]
+    },
+    "V02_GLOSS_BLACK_GOLD": {
+      "primary": "DSC_8106.webp",
+      "gallery": []
+    },
+    "V03_FOREST_GREEN_GOLD": {
+      "primary": "DSC_8108.webp",
+      "gallery": []
+    }
+  },
+  "CHM-037": {
+    "V01_POLISHED_BLACK_GOLD": {
+      "primary": "DSC_8109.webp",
+      "gallery": [
+        "DSC_8110.webp"
+      ]
+    },
+    "V02_TRANSLUCENT_BROWN_GOLD": {
+      "primary": "DSC_8111.webp",
+      "gallery": [
+        "DSC_8112.webp"
+      ]
+    },
+    "V03_CRYSTAL_ICE_SILVER": {
+      "primary": "DSC_8113.webp",
+      "gallery": [
+        "DSC_8115.webp"
+      ]
+    }
+  },
+  "CHM-038": {
+    "V01_BLACK_GOLD_CLEAR": {
+      "primary": "DSC_8117.webp",
+      "gallery": [
+        "DSC_8118.webp"
+      ]
+    },
+    "V02_HAVANA_GOLD_CLEAR": {
+      "primary": "DSC_8119.webp",
+      "gallery": [
+        "DSC_8121.webp"
+      ]
+    }
+  },
+  "CHM-039": {
+    "V01_SLEEK_GUNMETAL": {
+      "primary": "DSC_8122.webp",
+      "gallery": [
+        "DSC_8123.webp"
+      ]
+    },
+    "V02_POLISHED_GOLD": {
+      "primary": "DSC_8124.webp",
+      "gallery": [
+        "DSC_8125.webp"
+      ]
+    },
+    "V03_MATTE_BLACK": {
+      "primary": "DSC_8126.webp",
+      "gallery": [
+        "DSC_8127.webp"
+      ]
+    }
+  },
+  "CHM-040": {
+    "V01_MATTE_BLACK": {
+      "primary": "DSC_8128.webp",
+      "gallery": [
+        "DSC_8130.webp"
+      ]
+    },
+    "V02_DARK_TORTOISE": {
+      "primary": "DSC_8131.webp",
+      "gallery": [
+        "DSC_8137.webp"
+      ]
+    },
+    "V03_TRANSPARENT_CHARCOAL": {
+      "primary": "DSC_8139.webp",
+      "gallery": [
+        "DSC_8140.webp"
+      ]
+    }
+  },
+  "CHM-041": {
+    "V01_BRUSHED_GUNMETAL": {
+      "primary": "DSC_8142.webp",
+      "gallery": [
+        "DSC_8145.webp"
+      ]
+    },
+    "V02_RADIANT_GOLD": {
+      "primary": "DSC_8146.webp",
+      "gallery": [
+        "DSC_8149.webp"
+      ]
+    },
+    "V03_STEALTH_BLACK": {
+      "primary": "DSC_8150.webp",
+      "gallery": [
+        "DSC_8151.webp"
+      ]
+    }
+  },
+  "CHM-042": {
+    "V01_ROSE_GOLD_SILVER": {
+      "primary": "DSC_8152.webp",
+      "gallery": [
+        "DSC_8153.webp"
+      ]
+    },
+    "V02_CHAMPAGNE_GOLD": {
+      "primary": "DSC_8154.webp",
+      "gallery": [
+        "DSC_8155.webp"
+      ]
+    },
+    "V03_MIDNIGHT_BLACK": {
+      "primary": "DSC_8156.webp",
+      "gallery": [
+        "DSC_8157.webp"
+      ]
+    }
+  },
+  "CHM-043": {
+    "V01_ANTIQUED_GOLD": {
+      "primary": "DSC_8158.webp",
+      "gallery": [
+        "DSC_8159.webp"
+      ]
+    },
+    "V02_POLISHED_SILVER": {
+      "primary": "DSC_8160.webp",
+      "gallery": [
+        "DSC_8162.webp"
+      ]
+    },
+    "V03_MATTE_BLACK": {
+      "primary": "DSC_8163.webp",
+      "gallery": [
+        "DSC_8164.webp"
+      ]
+    }
+  },
+  "CHM-044": {
+    "V01_GLOSS_JET_BLACK": {
+      "primary": "DSC_8165.webp",
+      "gallery": [
+        "DSC_8166.webp"
+      ]
+    },
+    "V02_AMBER_HAVANA": {
+      "primary": "DSC_8167.webp",
+      "gallery": [
+        "DSC_8168.webp"
+      ]
+    },
+    "V03_CRYSTAL_GREY": {
+      "primary": "DSC_8170.webp",
+      "gallery": [
+        "DSC_8171.webp"
+      ]
+    }
+  },
+  "CHM-045": {
+    "V01_GUNMETAL_BLACK": {
+      "primary": "DSC_8172.webp",
+      "gallery": [
+        "DSC_8173.webp"
+      ]
+    },
+    "V02_BRUSHED_SILVER": {
+      "primary": "DSC_8174.webp",
+      "gallery": [
+        "DSC_8175.webp"
+      ]
+    },
+    "V03_DEEP_NAVY_BLUE": {
+      "primary": "DSC_8176.webp",
+      "gallery": [
+        "DSC_8177.webp"
+      ]
+    }
+  },
+  "CHM-046": {
+    "V01_CHAMPAGNE_GOLD": {
+      "primary": "DSC_8179.webp",
+      "gallery": [
+        "DSC_8181.webp"
+      ]
+    },
+    "V02_DARK_GRAPHITE": {
+      "primary": "DSC_8182.webp",
+      "gallery": [
+        "DSC_8183.webp"
+      ]
+    },
+    "V03_SATIN_BLACK": {
+      "primary": "DSC_8184.webp",
+      "gallery": [
+        "DSC_8185.webp"
+      ]
+    }
+  },
+  "CHM-047": {
+    "V01_PIANO_BLACK": {
+      "primary": "DSC_8186.webp",
+      "gallery": [
+        "DSC_8187.webp"
+      ]
+    },
+    "V02_HAVANA_BROWN": {
+      "primary": "DSC_8188.webp",
+      "gallery": [
+        "DSC_8190.webp"
+      ]
+    },
+    "V03_TRANSPARENT_OLIVE_GREY": {
+      "primary": "DSC_8191.webp",
+      "gallery": [
+        "DSC_8192.webp"
+      ]
+    }
+  },
+  "CHM-048": {
+    "V01_POLISHED_SILVER": {
+      "primary": "DSC_8193.webp",
+      "gallery": [
+        "DSC_8195.webp"
+      ]
+    },
+    "V02_CLASSIC_GOLD": {
+      "primary": "DSC_8196.webp",
+      "gallery": [
+        "DSC_8197.webp"
+      ]
+    },
+    "V03_MATTE_BLACK": {
+      "primary": "DSC_8198.webp",
+      "gallery": [
+        "DSC_8199.webp"
+      ]
+    }
+  },
+  "CHM-049": {
+    "V01_MATTE_BLACK_RED": {
+      "primary": "DSC_8200.webp",
+      "gallery": [
+        "DSC_8201.webp"
+      ]
+    },
+    "V02_MATTE_BLACK_BLUE": {
+      "primary": "DSC_8202.webp",
+      "gallery": [
+        "DSC_8204.webp"
+      ]
+    },
+    "V03_SMOKE_GREY": {
+      "primary": "DSC_8208.webp",
+      "gallery": [
+        "DSC_8209.webp"
+      ]
+    }
+  },
+  "CHM-050": {
+    "V01_GOLD_CLEAR": {
+      "primary": "DSC_8210.webp",
+      "gallery": [
+        "DSC_8212.webp"
+      ]
+    },
+    "V02_SILVER_CLEAR": {
+      "primary": "DSC_8213.webp",
+      "gallery": [
+        "DSC_8216.webp"
+      ]
+    },
+    "V03_GUNMETAL_CLEAR": {
+      "primary": "DSC_8217.webp",
+      "gallery": [
+        "DSC_8218.webp"
+      ]
+    }
+  },
+  "CHM-051": {
+    "V01_DEEP_RUBY_RED": {
+      "primary": "DSC_8219.webp",
+      "gallery": [
+        "DSC_8220.webp"
+      ]
+    },
+    "V02_TORTOISE_HAVANA": {
+      "primary": "DSC_8221.webp",
+      "gallery": [
+        "DSC_8222.webp"
+      ]
+    },
+    "V03_MIDNIGHT_BLACK": {
+      "primary": "DSC_8223.webp",
+      "gallery": [
+        "DSC_8225.webp"
+      ]
+    }
+  },
+  "CHM-052": {
+    "V01_GLOSS_BLACK": {
+      "primary": "DSC_8226.webp",
+      "gallery": [
+        "DSC_8227.webp"
+      ]
+    },
+    "V02_CRYSTAL_TRANSPARENT": {
+      "primary": "DSC_8228.webp",
+      "gallery": [
+        "DSC_8229.webp"
+      ]
+    },
+    "V03_AMBER_TORTOISE": {
+      "primary": "DSC_8230.webp",
+      "gallery": [
+        "DSC_8231.webp"
+      ]
+    }
+  },
+  "CHM-053": {
+    "V01_GOLD_CLEAR": {
+      "primary": "DSC_8232.webp",
+      "gallery": [
+        "DSC_8233.webp"
+      ]
+    },
+    "V02_SILVER_CLEAR": {
+      "primary": "DSC_8234.webp",
+      "gallery": [
+        "DSC_8235.webp"
+      ]
+    },
+    "V03_BLACK_CLEAR": {
+      "primary": "DSC_8236.webp",
+      "gallery": [
+        "DSC_8237.webp"
+      ]
+    }
+  },
+  "CHM-054": {
+    "V01_FROSTED_CRYSTAL_WHITE": {
+      "primary": "DSC_8239.webp",
+      "gallery": []
+    },
+    "V02_MINT_SEAFOAM_GREEN": {
+      "primary": "DSC_8240.webp",
+      "gallery": []
+    },
+    "V03_ICE_GLACIER_BLUE": {
+      "primary": "DSC_8242.webp",
+      "gallery": []
+    },
+    "V04_BLUSH_ROSE_PINK": {
+      "primary": "DSC_8243.webp",
+      "gallery": []
+    },
+    "V05_ROYAL_COBALT_BLUE": {
+      "primary": "DSC_8244.webp",
+      "gallery": []
+    },
+    "V06_SLATE_TEAL_GREEN": {
+      "primary": "DSC_8246.webp",
+      "gallery": []
+    },
+    "V07_MATTE_RAVEN_BLACK": {
+      "primary": "DSC_8247.webp",
+      "gallery": []
+    }
+  },
+  "CHM-055": {
+    "V01_GLOSS_NOIR_SILVER_RIVET": {
+      "primary": "DSC_8248.webp",
+      "gallery": []
+    }
+  },
+  "CHM-056": {
+    "V01_GUNMETAL_SLATE": {
+      "primary": "DSC_8250.webp",
+      "gallery": []
+    }
+  }
+}

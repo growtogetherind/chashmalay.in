@@ -1,0 +1,149 @@
+variant_id,product_id,color_description,image_count,primary_image_filename,confidence_score
+CHM-001-V01,CHM-001,"Matte Black Red",2,RGP_2738.webp,HIGH
+CHM-001-V02,CHM-001,"Matte Black Blue",2,RGP_2740.webp,HIGH
+CHM-002-V01,CHM-002,"Crystal Smoke Grey",1,RGP_2743.webp,HIGH
+CHM-003-V01,CHM-003,"Navy Blue Red",2,RGP_2744.webp,HIGH
+CHM-004-V01,CHM-004,"Matte Black",2,RGP_2746.webp,HIGH
+CHM-005-V01,CHM-005,"Smoke Grey Lime",2,RGP_2748.webp,HIGH
+CHM-005-V02,CHM-005,"Matte Black Crimson",2,RGP_2750.webp,HIGH
+CHM-006-V01,CHM-006,"Glossy Black Camo",2,RGP_2753.webp,HIGH
+CHM-007-V01,CHM-007,"Matte Black Gold",2,RGP_2755.webp,HIGH
+CHM-007-V02,CHM-007,"Dark Tortoise Amber",2,RGP_2758.webp,HIGH
+CHM-007-V03,CHM-007,"Transparent Olive",2,RGP_2760.webp,HIGH
+CHM-008-V01,CHM-008,"Rose Gold",2,RGP_2762.webp,HIGH
+CHM-008-V02,CHM-008,"Gunmetal Black",2,RGP_2764.webp,HIGH
+CHM-008-V03,CHM-008,"Metallic Gold",2,RGP_2766.webp,HIGH
+CHM-009-V01,CHM-009,"Gunmetal Silver",2,RGP_2769.webp,HIGH
+CHM-009-V02,CHM-009,"Vintage Gold",2,RGP_2771.webp,HIGH
+CHM-009-V03,CHM-009,"Matte Black",2,RGP_2774.webp,HIGH
+CHM-010-V01,CHM-010,"Burgundy Wine",2,RGP_2776.webp,HIGH
+CHM-010-V02,CHM-010,"Havana Tortoise",2,RGP_2778.webp,HIGH
+CHM-010-V03,CHM-010,"Midnight Black",2,RGP_2780.webp,HIGH
+CHM-011-V01,CHM-011,"Sleek Silver",2,RGP_2782.webp,HIGH
+CHM-011-V02,CHM-011,"Champagne Gold",2,RGP_2784.webp,HIGH
+CHM-011-V03,CHM-011,"Matte Black",2,RGP_2786.webp,HIGH
+CHM-012-V01,CHM-012,"Gloss Black Gold",2,RGP_2788.webp,HIGH
+CHM-012-V02,CHM-012,"Dark Havana Tortoise",2,RGP_2790.webp,HIGH
+CHM-012-V03,CHM-012,"Transparent Grey Silver",2,RGP_2792.webp,HIGH
+CHM-013-V01,CHM-013,"Rose Gold Copper",2,RGP_2794.webp,HIGH
+CHM-013-V02,CHM-013,"Gunmetal Grey",2,RGP_2796.webp,HIGH
+CHM-013-V03,CHM-013,"Brushed Gold",2,RGP_2798.webp,HIGH
+CHM-014-V01,CHM-014,"Matte Black",2,RGP_2800.webp,HIGH
+CHM-014-V02,CHM-014,"Gunmetal Steel",2,RGP_2803.webp,HIGH
+CHM-014-V03,CHM-014,"Deep Navy",2,RGP_2805.webp,HIGH
+CHM-015-V01,CHM-015,"Crystal Transparent",2,RGP_2807.webp,HIGH
+CHM-015-V02,CHM-015,"Amber Honey",2,RGP_2809.webp,HIGH
+CHM-015-V03,CHM-015,"Piano Black",2,RGP_2811.webp,HIGH
+CHM-016-V01,CHM-016,"Matte Olive Green",2,RGP_2813.webp,HIGH
+CHM-016-V02,CHM-016,"Dark Walnut Brown",2,RGP_2815.webp,HIGH
+CHM-016-V03,CHM-016,"Onyx Black",2,RGP_2818.webp,HIGH
+CHM-017-V01,CHM-017,"Charcoal Grey",2,RGP_2820.webp,HIGH
+CHM-017-V02,CHM-017,"Deep Cobalt",2,RGP_2822.webp,HIGH
+CHM-017-V03,CHM-017,"Matte Raven",2,RGP_2824.webp,HIGH
+CHM-018-V01,CHM-018,"Burgundy Tortoise",2,RGP_2826.webp,HIGH
+CHM-018-V02,CHM-018,"Smoky Translucent",2,RGP_2828.webp,HIGH
+CHM-018-V03,CHM-018,"Classic Jet Black",2,RGP_2830.webp,HIGH
+CHM-019-V01,CHM-019,"Brushed Silver",2,RGP_2832.webp,HIGH
+CHM-019-V02,CHM-019,"Champagne Gold",2,RGP_2834.webp,HIGH
+CHM-019-V03,CHM-019,"Gunmetal",2,RGP_2836.webp,HIGH
+CHM-020-V01,CHM-020,"Matte Black Silver",2,RGP_2838.webp,HIGH
+CHM-020-V02,CHM-020,"Military Olive",2,RGP_2840.webp,HIGH
+CHM-020-V03,CHM-020,"Navy Blue Gunmetal",2,RGP_2842.webp,HIGH
+CHM-021-V01,CHM-021,"Rose Quartz Clear",2,RGP_2845.webp,HIGH
+CHM-021-V02,CHM-021,"Leopard Havana",2,RGP_2847.webp,HIGH
+CHM-021-V03,CHM-021,"Gloss Black",2,RGP_2850.webp,HIGH
+CHM-022-V01,CHM-022,"Tortoise Amber",2,RGP_2852.webp,HIGH
+CHM-022-V02,CHM-022,"Transparent Crystal",2,RGP_2854.webp,HIGH
+CHM-022-V03,CHM-022,"Midnight Black",2,RGP_2856.webp,HIGH
+CHM-023-V01,CHM-023,"Brushed Bronze",2,RGP_2858.webp,HIGH
+CHM-023-V02,CHM-023,"Polished Silver",2,RGP_2860.webp,HIGH
+CHM-023-V03,CHM-023,"Matte Black",2,RGP_2862.webp,HIGH
+CHM-024-V01,CHM-024,"Gunmetal Matte Smoke",2,RGP_2864.webp,HIGH
+CHM-024-V02,CHM-024,"Warm Gold Brown",2,RGP_2866.webp,HIGH
+CHM-024-V03,CHM-024,"Stealth Black Dark Tint",2,RGP_2868.webp,HIGH
+CHM-025-V01,CHM-025,"Blush Peach",2,RGP_2870.webp,HIGH
+CHM-025-V02,CHM-025,"Honey Demi",2,RGP_2872.webp,HIGH
+CHM-025-V03,CHM-025,"Jet Black",2,RGP_2874.webp,HIGH
+CHM-026-V01,CHM-026,"Matte Black Orange",2,RGP_2876.webp,HIGH
+CHM-026-V02,CHM-026,"Charcoal Blue",2,RGP_2878.webp,HIGH
+CHM-026-V03,CHM-026,"Solid Black",2,RGP_2880.webp,HIGH
+CHM-027-V01,CHM-027,"Matte Brown Tortoise",2,RGP_2882.webp,HIGH
+CHM-027-V02,CHM-027,"Frosted Grey",2,RGP_2884.webp,HIGH
+CHM-027-V03,CHM-027,"Deep Ink Black",2,RGP_2886.webp,HIGH
+CHM-028-V01,CHM-028,"Amber Tortoise",2,RGP_2888.webp,HIGH
+CHM-028-V02,CHM-028,"Crystal Clear",2,RGP_2890.webp,HIGH
+CHM-028-V03,CHM-028,"Midnight Black",2,RGP_2892.webp,HIGH
+CHM-029-V01,CHM-029,"Gunmetal Silver",2,RGP_2894.webp,HIGH
+CHM-029-V02,CHM-029,"Classic Gold",2,RGP_2896.webp,HIGH
+CHM-029-V03,CHM-029,"Matte Black",2,RGP_2898.webp,HIGH
+CHM-030-V01,CHM-030,"Polished Chrome",2,RGP_2900.webp,HIGH
+CHM-030-V02,CHM-030,"Rose Gold",2,RGP_2902.webp,HIGH
+CHM-030-V03,CHM-030,"Stealth Graphite",1,RGP_2904.webp,HIGH
+CHM-031-V01,CHM-031,"Matte Black Smoke",1,DSC_8035.webp,HIGH
+CHM-032-V01,CHM-032,"Matte Black Polarized",2,DSC_8077.webp,HIGH
+CHM-033-V01,CHM-033,"Gloss Black",1,DSC_8080.webp,HIGH
+CHM-034-V01,CHM-034,"Navy Blue Orange",1,DSC_8090.webp,HIGH
+CHM-034-V02,CHM-034,"Pastel Puffer Multi",2,DSC_8092.webp,HIGH
+CHM-035-V01,CHM-035,"Gloss Black Gold Accent",1,DSC_8095.webp,HIGH
+CHM-036-V01,CHM-036,"Transparent Crystal Grey",2,DSC_8105.webp,HIGH
+CHM-036-V02,CHM-036,"Gloss Black Gold",1,DSC_8106.webp,HIGH
+CHM-036-V03,CHM-036,"Forest Green Gold",1,DSC_8108.webp,HIGH
+CHM-037-V01,CHM-037,"Polished Black Gold",2,DSC_8109.webp,HIGH
+CHM-037-V02,CHM-037,"Translucent Brown Gold",2,DSC_8111.webp,HIGH
+CHM-037-V03,CHM-037,"Crystal Ice Silver",2,DSC_8113.webp,HIGH
+CHM-038-V01,CHM-038,"Black Gold Clear",2,DSC_8117.webp,HIGH
+CHM-038-V02,CHM-038,"Havana Gold Clear",2,DSC_8119.webp,HIGH
+CHM-039-V01,CHM-039,"Sleek Gunmetal",2,DSC_8122.webp,HIGH
+CHM-039-V02,CHM-039,"Polished Gold",2,DSC_8124.webp,HIGH
+CHM-039-V03,CHM-039,"Matte Black",2,DSC_8126.webp,HIGH
+CHM-040-V01,CHM-040,"Matte Black",2,DSC_8128.webp,HIGH
+CHM-040-V02,CHM-040,"Dark Tortoise",2,DSC_8131.webp,HIGH
+CHM-040-V03,CHM-040,"Transparent Charcoal",2,DSC_8139.webp,HIGH
+CHM-041-V01,CHM-041,"Brushed Gunmetal",2,DSC_8142.webp,HIGH
+CHM-041-V02,CHM-041,"Radiant Gold",2,DSC_8146.webp,HIGH
+CHM-041-V03,CHM-041,"Stealth Black",2,DSC_8150.webp,HIGH
+CHM-042-V01,CHM-042,"Rose Gold Silver",2,DSC_8152.webp,HIGH
+CHM-042-V02,CHM-042,"Champagne Gold",2,DSC_8154.webp,HIGH
+CHM-042-V03,CHM-042,"Midnight Black",2,DSC_8156.webp,HIGH
+CHM-043-V01,CHM-043,"Antiqued Gold",2,DSC_8158.webp,HIGH
+CHM-043-V02,CHM-043,"Polished Silver",2,DSC_8160.webp,HIGH
+CHM-043-V03,CHM-043,"Matte Black",2,DSC_8163.webp,HIGH
+CHM-044-V01,CHM-044,"Gloss Jet Black",2,DSC_8165.webp,HIGH
+CHM-044-V02,CHM-044,"Amber Havana",2,DSC_8167.webp,HIGH
+CHM-044-V03,CHM-044,"Crystal Grey",2,DSC_8170.webp,HIGH
+CHM-045-V01,CHM-045,"Gunmetal Black",2,DSC_8172.webp,HIGH
+CHM-045-V02,CHM-045,"Brushed Silver",2,DSC_8174.webp,HIGH
+CHM-045-V03,CHM-045,"Deep Navy Blue",2,DSC_8176.webp,HIGH
+CHM-046-V01,CHM-046,"Champagne Gold",2,DSC_8179.webp,HIGH
+CHM-046-V02,CHM-046,"Dark Graphite",2,DSC_8182.webp,HIGH
+CHM-046-V03,CHM-046,"Satin Black",2,DSC_8184.webp,HIGH
+CHM-047-V01,CHM-047,"Piano Black",2,DSC_8186.webp,HIGH
+CHM-047-V02,CHM-047,"Havana Brown",2,DSC_8188.webp,HIGH
+CHM-047-V03,CHM-047,"Transparent Olive Grey",2,DSC_8191.webp,HIGH
+CHM-048-V01,CHM-048,"Polished Silver",2,DSC_8193.webp,HIGH
+CHM-048-V02,CHM-048,"Classic Gold",2,DSC_8196.webp,HIGH
+CHM-048-V03,CHM-048,"Matte Black",2,DSC_8198.webp,HIGH
+CHM-049-V01,CHM-049,"Matte Black Red",2,DSC_8200.webp,HIGH
+CHM-049-V02,CHM-049,"Matte Black Blue",2,DSC_8202.webp,HIGH
+CHM-049-V03,CHM-049,"Smoke Grey",2,DSC_8208.webp,HIGH
+CHM-050-V01,CHM-050,"Gold Clear",2,DSC_8210.webp,HIGH
+CHM-050-V02,CHM-050,"Silver Clear",2,DSC_8213.webp,HIGH
+CHM-050-V03,CHM-050,"Gunmetal Clear",2,DSC_8217.webp,HIGH
+CHM-051-V01,CHM-051,"Deep Ruby Red",2,DSC_8219.webp,HIGH
+CHM-051-V02,CHM-051,"Tortoise Havana",2,DSC_8221.webp,HIGH
+CHM-051-V03,CHM-051,"Midnight Black",2,DSC_8223.webp,HIGH
+CHM-052-V01,CHM-052,"Gloss Black",2,DSC_8226.webp,HIGH
+CHM-052-V02,CHM-052,"Crystal Transparent",2,DSC_8228.webp,HIGH
+CHM-052-V03,CHM-052,"Amber Tortoise",2,DSC_8230.webp,HIGH
+CHM-053-V01,CHM-053,"Gold Clear",2,DSC_8232.webp,HIGH
+CHM-053-V02,CHM-053,"Silver Clear",2,DSC_8234.webp,HIGH
+CHM-053-V03,CHM-053,"Black Clear",2,DSC_8236.webp,HIGH
+CHM-054-V01,CHM-054,"Frosted Crystal White",1,DSC_8239.webp,HIGH
+CHM-054-V02,CHM-054,"Mint Seafoam Green",1,DSC_8240.webp,HIGH
+CHM-054-V03,CHM-054,"Ice Glacier Blue",1,DSC_8242.webp,HIGH
+CHM-054-V04,CHM-054,"Blush Rose Pink",1,DSC_8243.webp,HIGH
+CHM-054-V05,CHM-054,"Royal Cobalt Blue",1,DSC_8244.webp,HIGH
+CHM-054-V06,CHM-054,"Slate Teal Green",1,DSC_8246.webp,HIGH
+CHM-054-V07,CHM-054,"Matte Raven Black",1,DSC_8247.webp,HIGH
+CHM-055-V01,CHM-055,"Gloss Noir Silver Rivet",1,DSC_8248.webp,HIGH
+CHM-056-V01,CHM-056,"Gunmetal Slate",1,DSC_8250.webp,HIGH

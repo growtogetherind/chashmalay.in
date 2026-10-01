@@ -4,6 +4,7 @@
 serviceAccountKey.json
 # Credential and key files — NEVER commit these
 *.csv
+!catalog_output/*.csv
 token.txt
 *.pem
 *.key
