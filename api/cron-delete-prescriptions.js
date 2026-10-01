@@ -9,9 +9,9 @@ export default async function handler(request, response) {
   }
 
   // Ensure Cloudinary is configured
-  const cloudName = process.env.VITE_CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const cloudName = process.env.VITE_CLOUDINARY_CLOUD_NAME || 'dpv40ou2c';
+  const apiKey = process.env.CLOUDINARY_API_KEY || process.env.VITE_CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET || process.env.VITE_CLOUDINARY_API_SECRET;
 
   if (!cloudName || !apiKey || !apiSecret) {
     return response.status(500).json({ error: 'Cloudinary credentials missing' });
