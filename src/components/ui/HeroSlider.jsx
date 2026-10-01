@@ -74,13 +74,13 @@ const HeroSlider = () => {
     }
   }, [slides.length, next, settings.carousel_interval]);
 
-  if (loading) return (
+  if (loading || !slides || slides.length === 0 || !slides[current]) return (
     <div className="h-64 bg-gray-100 flex items-center justify-center mx-3 my-3 rounded-2xl">
       <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
-  const slide = slides[current];
+  const slide = slides[current] || FALLBACK_SLIDES[0];
 
   return (
     <div className="w-full bg-white px-3 sm:px-5 md:px-8 py-4 space-y-3 sm:space-y-4">
