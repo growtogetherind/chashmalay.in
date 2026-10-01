@@ -55,14 +55,15 @@ const Auth = () => {
 
   const handleGoogle = async () => {
     try { 
-      const { profile: loggedInProfile } = await signInWithGoogle(); 
-      if (loggedInProfile?.is_admin) {
+      const res = await signInWithGoogle(); 
+      if (res?.profile?.is_admin) {
         navigate('/admin');
-      } else {
+      } else if (res?.user) {
         navigate(from);
       }
+    } catch {
+      // Handled in AuthContext
     }
-    catch (err) { toast.error(err.message); }
   };
 
   const handleForgotPassword = async (e) => {

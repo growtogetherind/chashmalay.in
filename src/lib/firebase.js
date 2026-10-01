@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBv9Lm2xw_0jvBNWvOdFUx8PQxkg7soSec",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "chashmalay.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "chashmalay",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "chashmalay.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "1048138384235",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1048138384235:web:05acdaaa982d4e790e022e",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-RR5CTN9G54"
 };
 
 const app = initializeApp(firebaseConfig);
