@@ -10,10 +10,10 @@ const ALLOWED_IMAGE_TYPES = new Set([
 const uploadEndpoint = (cloudName) => `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
 export const transformCloudinaryUrl = (url, { width = 800, crop = 'scale' } = {}) => {
-  if (!url || !url.includes('/upload/')) return url || '';
+  if (!url || typeof url !== 'string' || !url.includes('/upload/')) return url || '';
 
-  const transform = ['f_auto', 'q_auto', `c_${crop}`, `w_${width}`].join(',');
-  return url.replace('/upload/', `/upload/${transform}/`);
+  const transform = `f_auto,q_auto,c_${crop},w_${width}`;
+  return url.replace(/\/upload\/(?:(?:[a-z]_[a-z0-9_]+,?)+[\\/])?/, `/upload/${transform}/`);
 };
 
 export const getCloudinarySrcSet = (url, widths = [320, 480, 640, 800, 1200, 1600]) => (
@@ -175,11 +175,11 @@ export const uploadImage = async (file, folder = 'products', options = {}) => {
   if (validationError) return { url: null, error: validationError };
 
   try {
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dpv40ou2c';
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'g65f7lye';
 
-    if (!cloudName) throw new Error("Cloudinary Cloud Name is missing from environment variables.");
-    if (!uploadPreset) throw new Error("Cloudinary upload preset is missing from environment variables.");
+    if (!cloudName) throw new Error("Cloudinary Cloud Name is missing.");
+    if (!uploadPreset) throw new Error("Cloudinary upload preset is missing.");
 
     // Compress the image before uploading to make the upload ultra-fast and smooth!
     let uploadFile = file;
