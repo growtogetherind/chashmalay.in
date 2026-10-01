@@ -353,6 +353,34 @@ export const updateProfile = async (userId, updates) => {
   } catch (error) { return { error }; }
 };
 
+// --- Store Data Cleanup & Purge ---
+export const purgeStoreData = async ({ products = true, orders = true, prescriptions = true, reviews = true } = {}) => {
+  const collectionsToPurge = [];
+  if (products) collectionsToPurge.push("products");
+  if (orders) collectionsToPurge.push("orders", "order_items");
+  if (prescriptions) collectionsToPurge.push("prescriptions");
+  if (reviews) collectionsToPurge.push("reviews");
+
+  const summary = {};
+  for (const colName of collectionsToPurge) {
+    try {
+      const snap = await getDocs(collection(db, colName));
+      let deleted = 0;
+      await Promise.all(snap.docs.map(async (docSnap) => {
+        await deleteDoc(docSnap.ref);
+        deleted++;
+      }));
+      summary[colName] = deleted;
+    } catch (err) {
+      console.error(`Error purging ${colName}:`, err);
+      summary[colName] = { error: err.message };
+    }
+  }
+
+  await writeAdminLog('purge_store_data', 'system', { summary });
+  return { data: summary, error: null };
+};
+
 // --- Orders ---
 export const createOrder = async () => {
   throw new Error("Client-side order creation is disabled for security. Orders are verified and confirmed securely on the server.");
