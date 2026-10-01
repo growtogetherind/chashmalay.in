@@ -288,7 +288,23 @@ export const bulkImportCatalog = async (products, onProgress) => {
   for (let i = 0; i < products.length; i++) {
     const p = products[i];
     try {
-      const res = await saveProduct(p);
+      let existingId = null;
+      if (p.sku) {
+        const skuQ = query(collection(db, "products"), where("sku", "==", p.sku));
+        const skuSnap = await getDocs(skuQ);
+        if (!skuSnap.empty) {
+          existingId = skuSnap.docs[0].id;
+        }
+      }
+      if (!existingId && p.name) {
+        const nameQ = query(collection(db, "products"), where("name", "==", p.name));
+        const nameSnap = await getDocs(nameQ);
+        if (!nameSnap.empty) {
+          existingId = nameSnap.docs[0].id;
+        }
+      }
+
+      const res = await saveProduct(p, existingId);
       if (res?.error) {
         console.error(`Import error for "${p.name}":`, res.error);
         throw res.error;

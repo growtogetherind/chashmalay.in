@@ -157,6 +157,31 @@ const categoryMatches = (productCategory, routeName) => {
     return category.includes('contact') || category === 'contacts';
   }
 
+  // Clip-on matching
+  if (target.includes('clip') && category.includes('clip')) {
+    return true;
+  }
+
+  // Reading glasses matching
+  if (target.includes('read') && category.includes('read')) {
+    return true;
+  }
+
+  // Computer glasses matching
+  if (target.includes('computer') && category.includes('computer')) {
+    return true;
+  }
+
+  // Sunglasses matching
+  if (target.includes('sun') && category.includes('sun')) {
+    return true;
+  }
+
+  // Accessories matching
+  if (target.includes('accessor') && category.includes('accessor')) {
+    return true;
+  }
+
   // Support Eyewear and Eyeglasses matching
   if ((target === 'eyeglasses' || target === 'eyewear') &&
       (category === 'eyeglasses' || category === 'eyewear')) {
@@ -219,9 +244,13 @@ const getFilterValues = (product, attr) => {
   if (attr === 'type') return [product.frame_type].filter(Boolean);
   if (attr === 'color') return product.filter_colors || [product.color].filter(Boolean);
   if (attr === 'category') {
-    if (categoryMatches(product.category, 'eyeglasses')) return ['Eyeglasses'];
-    if (categoryMatches(product.category, 'sunglasses')) return ['Sunglasses'];
-    if (categoryMatches(product.category, 'contact-lenses')) return ['Contact Lenses'];
+    if (categoryMatches(product.category, 'clip-on-glasses')) return ['Clip-on Glasses', 'Clip-On Glasses', 'clip-on-glasses', 'clip-on'];
+    if (categoryMatches(product.category, 'computer-glasses')) return ['Computer Glasses', 'computer-glasses'];
+    if (categoryMatches(product.category, 'reading-glasses')) return ['Reading Glasses', 'reading-glasses'];
+    if (categoryMatches(product.category, 'sunglasses')) return ['Sunglasses', 'sunglasses'];
+    if (categoryMatches(product.category, 'contact-lenses')) return ['Contact Lenses', 'contacts'];
+    if (categoryMatches(product.category, 'accessories')) return ['Accessories', 'accessories'];
+    if (categoryMatches(product.category, 'eyeglasses')) return ['Eyewear', 'Eyeglasses', 'eyeglasses'];
     return [product.category].filter(Boolean);
   }
   if (attr === 'material') return [product.frame_material].filter(Boolean);
@@ -439,14 +468,18 @@ const Category = () => {
     const initialCat = [];
     if (name && name !== 'all') {
       const normalizedRoute = name.toLowerCase();
-      if (normalizedRoute.includes('sun')) {
+      if (['men', 'man', 'gents', 'women', 'woman', 'ladies', 'kids', 'child', 'children', 'all'].includes(normalizedRoute)) {
+        // Gender and "all" routes must NOT set category filters
+      } else if (normalizedRoute.includes('sun')) {
         initialCat.push('Sunglasses');
-      } else if (normalizedRoute === 'eyeglasses') {
+      } else if (normalizedRoute === 'eyeglasses' || normalizedRoute === 'eyewear') {
         initialCat.push('Eyewear', 'Eyeglasses');
-      } else if (normalizedRoute === 'reading-glasses') {
+      } else if (normalizedRoute.includes('clip')) {
+        initialCat.push('Clip-on Glasses', 'Clip-On Glasses');
+      } else if (normalizedRoute.includes('computer')) {
+        initialCat.push('Computer Glasses');
+      } else if (normalizedRoute.includes('reading')) {
         initialCat.push('Reading Glasses');
-      } else if (normalizedRoute === 'clip-on-glasses') {
-        initialCat.push('Clip-on Glasses');
       } else if (normalizedRoute.includes('contact') || normalizedRoute.includes('lens')) {
         initialCat.push('Contact Lenses');
       } else if (normalizedRoute.includes('accessor')) {
@@ -619,10 +652,24 @@ const Category = () => {
         breadcrumbs: ['Home', 'Shop', 'Contact Lenses']
       };
     }
-    if (s.includes('read') || s.includes('comp')) {
+    if (s.includes('clip')) {
+      return {
+        title: 'Clip-On Glasses',
+        subtitle: 'Versatile 2-in-1 magnetic clip-on frames that switch seamlessly from indoor clear lenses to outdoor polarized sunglasses.',
+        breadcrumbs: ['Home', 'Shop', 'Clip-On Glasses']
+      };
+    }
+    if (s.includes('computer')) {
+      return {
+        title: 'Computer Glasses',
+        subtitle: 'Anti-glare blue-light filtering frames designed to reduce eye strain, screen fatigue, and headaches during screen work.',
+        breadcrumbs: ['Home', 'Shop', 'Computer Glasses']
+      };
+    }
+    if (s.includes('read')) {
       return {
         title: 'Reading Glasses',
-        subtitle: 'Magnified precision optical wear tailored for reading and digital screen work. Ergonomic comfort for long tasks.',
+        subtitle: 'Magnified precision optical wear tailored for reading and close work with ergonomic, lightweight comfort.',
         breadcrumbs: ['Home', 'Shop', 'Reading Glasses']
       };
     }
