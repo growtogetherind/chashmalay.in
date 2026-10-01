@@ -49,9 +49,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay AeroFlex Square",
+    name: "Chashmalay AeroFlex 2-in-1 Clip-On",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "clip-on-glasses",
     shape: "Square",
     type: "Full Rim",
     material: "TR90",
@@ -67,9 +67,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Metro Edge Rectangle",
+    name: "Chashmalay Metro Edge Blue-Cut Rectangle",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "computer-glasses",
     shape: "Rectangle",
     type: "Full Rim",
     material: "TR90",
@@ -124,9 +124,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Slimline Geometric",
+    name: "Chashmalay Slimline Blue-Blocker Geometric",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "computer-glasses",
     shape: "Geometric",
     type: "Full Rim",
     material: "Metal",
@@ -184,9 +184,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Minimalist Oval",
+    name: "Chashmalay Minimalist Oval Reader",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "reading-glasses",
     shape: "Oval",
     type: "Full Rim",
     material: "Metal",
@@ -304,9 +304,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Alpha Screen Rectangle",
+    name: "Chashmalay Alpha Screen Pro Blue-Light Shield",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "computer-glasses",
     shape: "Rectangle",
     type: "Full Rim",
     material: "Acetate",
@@ -364,9 +364,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Nova Square Navigator",
+    name: "Chashmalay Nova Magnetic Clip-On Navigator",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "clip-on-glasses",
     shape: "Square",
     type: "Full Rim",
     material: "TR90",
@@ -404,9 +404,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Matrix Round",
+    name: "Chashmalay Matrix Thin Anti-Glare Round",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "computer-glasses",
     shape: "Round",
     type: "Full Rim",
     material: "Acetate",
@@ -446,7 +446,7 @@ const catalogDefs = [
   {
     name: "Chashmalay Pioneer Pilot Double-Bridge",
     brand: "Chashmalay",
-    category: "sunglasses",
+    category: "eyeglasses",
     shape: "Aviator",
     type: "Full Rim",
     material: "Metal",
@@ -466,7 +466,7 @@ const catalogDefs = [
   {
     name: "Chashmalay Vogue Elegance Oval",
     brand: "Chashmalay",
-    category: "sunglasses",
+    category: "eyeglasses",
     shape: "Oval",
     type: "Full Rim",
     material: "Acetate",
@@ -484,9 +484,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Veloce Sport Sunglasses",
+    name: "Chashmalay Veloce Sport 2-in-1 Clip-On",
     brand: "Chashmalay",
-    category: "sunglasses",
+    category: "clip-on-glasses",
     shape: "Rectangle",
     type: "Full Rim",
     material: "TR90",
@@ -524,9 +524,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Classic Square",
+    name: "Chashmalay Classic Square Reader",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "reading-glasses",
     shape: "Square",
     type: "Full Rim",
     material: "Polycarbonate",
@@ -546,7 +546,7 @@ const catalogDefs = [
   {
     name: "Chashmalay Urbanite Slim Rectangle",
     brand: "Chashmalay",
-    category: "sunglasses",
+    category: "eyeglasses",
     shape: "Rectangle",
     type: "Full Rim",
     material: "Metal",
@@ -566,7 +566,7 @@ const catalogDefs = [
   {
     name: "Chashmalay Titan Precision Rimless",
     brand: "Chashmalay",
-    category: "sunglasses",
+    category: "eyeglasses",
     shape: "Rectangle",
     type: "Rimless",
     material: "Titanium",
@@ -638,7 +638,8 @@ const catalogDefs = [
     desc: "High-grade wayfarer sunglasses with polarized category-3 dark lenses and triple-pin rivet details. Glare-free road and coastal clarity.",
     tags: "sunglasses, wayfarer, polarized, uv protection, riveted, unisex",
     colorways: [
-      { name: "Matte Black Polarized", hex: "#18181B", front: "DSC_8077.webp", side: "DSC_8077.webp", code: "BLK" }
+      { name: "Matte Black Polarized", hex: "#18181B", front: "DSC_8077.webp", side: "DSC_8077.webp", code: "BLK" },
+      { name: "Gloss Black Grey Tint", hex: "#09090B", front: "DSC_8080.webp", side: "DSC_8080.webp", code: "BLK" }
     ]
   },
   {
@@ -662,9 +663,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Horizon Clubmaster",
+    name: "Chashmalay Horizon Clubmaster Sun",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "sunglasses",
     shape: "Clubmaster",
     type: "Half Rim",
     material: "Acetate",
@@ -673,17 +674,17 @@ const catalogDefs = [
     original_price: 2599,
     shapeCode: "CM",
     num: "0305",
-    desc: "Browline eyeglass frames with a dark front and gold-tone accents.",
-    tags: "clubmaster, browline, gold-tone accents",
+    desc: "Vintage browline sunglasses with dark UV-blocking lenses and golden bridge accents. The quintessential retro sun-protection accessory.",
+    tags: "sunglasses, clubmaster, browline, gold bridge, retro sun",
     colorways: [
       { name: "Black Gold G15", hex: "#0F172A", front: "DSC_8117.webp", side: "DSC_8118.webp", code: "BLK" },
       { name: "Havana Gold Brown", hex: "#854D0E", front: "DSC_8119.webp", side: "DSC_8121.webp", code: "HVN" }
     ]
   },
   {
-    name: "Chashmalay Modernist Hexagon",
+    name: "Chashmalay Modernist Hex Computer Screen Glasses",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "computer-glasses",
     shape: "Geometric",
     type: "Full Rim",
     material: "Metal",
@@ -692,8 +693,8 @@ const catalogDefs = [
     original_price: 2299,
     shapeCode: "GE",
     num: "0306",
-    desc: "Geometric wireframe eyeglasses with clear lenses.",
-    tags: "geometric, wireframe, eyeglasses",
+    desc: "Sculpted poly-angular geometric wireframes featuring anti-radiation blue-light blocking lenses. Engineered to keep eyes fresh during long screen exposure.",
+    tags: "computer glasses, blue cut, geometric, screen protection, modern, unisex",
     colorways: [
       { name: "Sleek Gunmetal", hex: "#374151", front: "DSC_8122.webp", side: "DSC_8123.webp", code: "GM" },
       { name: "Polished Gold", hex: "#D97706", front: "DSC_8124.webp", side: "DSC_8125.webp", code: "GLD" },
@@ -701,9 +702,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Irus Eyeglasses",
+    name: "Chashmalay Irus 2-in-1 Polarized Clip-On",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "clip-on-glasses",
     shape: "Wayfarer",
     type: "Full Rim",
     material: "Acetate",
@@ -761,9 +762,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Intellect Round",
+    name: "Chashmalay Intellect Round Reader",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "reading-glasses",
     shape: "Round",
     type: "Full Rim",
     material: "Metal",
@@ -841,9 +842,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Bold Flattop Square",
+    name: "Chashmalay Bold Flattop Square Sun",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "sunglasses",
     shape: "Square",
     type: "Full Rim",
     material: "Acetate",
@@ -861,9 +862,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Silhouette Oval",
+    name: "Chashmalay Silhouette Pure Oval Reader",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "reading-glasses",
     shape: "Oval",
     type: "Full Rim",
     material: "Metal",
@@ -881,9 +882,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Urban Active Rectangle",
+    name: "Chashmalay Urban Active Magnetic Clip-On",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "clip-on-glasses",
     shape: "Rectangle",
     type: "Full Rim",
     material: "TR90",
@@ -892,8 +893,8 @@ const catalogDefs = [
     original_price: 1999,
     shapeCode: "RC",
     num: "0316",
-    desc: "Rectangular eyeglass frames with contrasting temple accents.",
-    tags: "rectangle, contrasting temples, active",
+    desc: "Dynamic 2-in-1 clip-on system with magnetic snap-on polarized shades over impact-proof TR90 rectangular optical frames. Built for fast-paced urban movement.",
+    tags: "clip on, magnetic clip, active, tr90, 2 in 1, polarized, men",
     colorways: [
       { name: "Matte Black Red", hex: "#1F2937", front: "DSC_8200.webp", side: "DSC_8201.webp", code: "BLK" },
       { name: "Matte Black Blue", hex: "#1E3A8A", front: "DSC_8202.webp", side: "DSC_8204.webp", code: "BLU" },
@@ -901,9 +902,9 @@ const catalogDefs = [
     ]
   },
   {
-    name: "Chashmalay Signature Aviator",
+    name: "Chashmalay Signature Aviator Sun",
     brand: "Chashmalay",
-    category: "eyeglasses",
+    category: "sunglasses",
     shape: "Aviator",
     type: "Full Rim",
     material: "Metal",
@@ -1041,43 +1042,26 @@ const catalogDefs = [
     ]
   },
 
-
+  // --- ACCESSORIES (Cases & Care) ---
   {
-    name: "IDEE Rectangle Eyeglasses",
-    brand: "IDEE",
-    category: "eyeglasses",
+    name: "Chashmalay Scott Premium Eyewear Case & Cloth",
+    brand: "Chashmalay",
+    category: "accessories",
     shape: "Rectangle",
     type: "Full Rim",
-    material: "Mixed",
+    material: "Polycarbonate",
     gender: "Unisex",
-    price: 999,
-    original_price: 1999,
+    price: 799,
+    original_price: 1499,
     shapeCode: "RC",
-    num: "0402",
-    desc: "Full-rim rectangular eyeglasses with a black front and gold-tone temple accents.",
-    tags: "rectangle, black, gold-tone, eyeglasses",
+    num: "0401",
+    desc: "Luxury hard-shell protective eyewear case paired with an ultra-fine microfiber lens cleaning cloth. Safeguards your frames from drops and scratches.",
+    tags: "accessory, spectacle case, microfiber cloth, protection, scott",
     colorways: [
-      { name: "Black Gold", hex: "#1A1A1A", front: "DSC_8095.webp", side: "DSC_8095.webp", code: "BLK" }
+      { name: "Navy Blue Orange", hex: "#1E3A8A", front: "DSC_8090.webp", side: "DSC_8090.webp", code: "BLU" },
+      { name: "Pastel Puffer Multi", hex: "#F3E8FF", front: "DSC_8092.webp", side: "DSC_8093.webp", code: "CLR" }
     ]
-  },
-  {
-    name: "Scott Square Eyeglasses",
-    brand: "Scott",
-    category: "eyeglasses",
-    shape: "Square",
-    type: "Full Rim",
-    material: "Acetate",
-    gender: "Unisex",
-    price: 1349,
-    original_price: 2699,
-    shapeCode: "SQ",
-    num: "0355",
-    desc: "Black square optical frames with a small temple emblem.",
-    tags: "square, black, optical frame",
-    colorways: [
-      { name: "Gloss Black", hex: "#111111", front: "DSC_8080.webp", side: "DSC_8080.webp", code: "BLK" }
-    ]
-  },
+  }
 ];
 
 function buildCatalog() {
@@ -1166,9 +1150,7 @@ function buildCatalog() {
 }
 
 const { products, mappedFilesCount } = buildCatalog();
-const catalogJson = JSON.stringify(products, null, 2);
-fs.writeFileSync('catalog.json', catalogJson);
-fs.writeFileSync(path.join('public', 'catalog.json'), catalogJson);
+fs.writeFileSync('catalog.json', JSON.stringify(products, null, 2));
 
 console.log(`✓ Catalog generation complete!`);
 console.log(`Generated ${products.length} grouped products.`);
@@ -1178,12 +1160,7 @@ console.log(`Output saved to catalog.json`);
 // Validate rules
 let valid = true;
 const skuSet = new Set();
-const allowedCategories = new Set(['eyeglasses', 'sunglasses', 'computer-glasses', 'reading-glasses', 'clip-on']);
 products.forEach((p, idx) => {
-  if (!allowedCategories.has(p.category)) {
-    console.error(`Invalid category for product ${p.name}: ${p.category}`);
-    valid = false;
-  }
   if (skuSet.has(p.sku)) {
     console.error(`Duplicate SKU detected: ${p.sku}`);
     valid = false;

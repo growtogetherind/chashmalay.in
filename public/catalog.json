@@ -176,9 +176,9 @@
     ]
   },
   {
-    "name": "Chashmalay AeroFlex Square",
+    "name": "Chashmalay AeroFlex 2-in-1 Clip-On",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "clip-on-glasses",
     "accessory_type": "",
     "sku": "CSM-SQ-0203-BLU",
     "price": 999,
@@ -245,9 +245,9 @@
     ]
   },
   {
-    "name": "Chashmalay Metro Edge Rectangle",
+    "name": "Chashmalay Metro Edge Blue-Cut Rectangle",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "computer-glasses",
     "accessory_type": "",
     "sku": "CSM-RC-0204-GRN",
     "price": 949,
@@ -512,9 +512,9 @@
     ]
   },
   {
-    "name": "Chashmalay Slimline Geometric",
+    "name": "Chashmalay Slimline Blue-Blocker Geometric",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "computer-glasses",
     "accessory_type": "",
     "sku": "CSM-GE-0207-RGD",
     "price": 1049,
@@ -839,9 +839,9 @@
     ]
   },
   {
-    "name": "Chashmalay Minimalist Oval",
+    "name": "Chashmalay Minimalist Oval Reader",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "reading-glasses",
     "accessory_type": "",
     "sku": "CSM-OV-0210-SLV",
     "price": 899,
@@ -1493,9 +1493,9 @@
     ]
   },
   {
-    "name": "Chashmalay Alpha Screen Rectangle",
+    "name": "Chashmalay Alpha Screen Pro Blue-Light Shield",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "computer-glasses",
     "accessory_type": "",
     "sku": "CSM-RC-0216-GM",
     "price": 999,
@@ -1820,9 +1820,9 @@
     ]
   },
   {
-    "name": "Chashmalay Nova Square Navigator",
+    "name": "Chashmalay Nova Magnetic Clip-On Navigator",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "clip-on-glasses",
     "accessory_type": "",
     "sku": "CSM-SQ-0219-BLK",
     "price": 1099,
@@ -2038,9 +2038,9 @@
     ]
   },
   {
-    "name": "Chashmalay Matrix Round",
+    "name": "Chashmalay Matrix Thin Anti-Glare Round",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "computer-glasses",
     "accessory_type": "",
     "sku": "CSM-RN-0221-HVN",
     "price": 999,
@@ -2258,7 +2258,7 @@
   {
     "name": "Chashmalay Pioneer Pilot Double-Bridge",
     "brand": "Chashmalay",
-    "category": "sunglasses",
+    "category": "eyeglasses",
     "accessory_type": "",
     "sku": "CSM-AV-0223-GM",
     "price": 1199,
@@ -2367,7 +2367,7 @@
   {
     "name": "Chashmalay Vogue Elegance Oval",
     "brand": "Chashmalay",
-    "category": "sunglasses",
+    "category": "eyeglasses",
     "accessory_type": "",
     "sku": "CSM-OV-0224-RGD",
     "price": 1099,
@@ -2474,9 +2474,9 @@
     ]
   },
   {
-    "name": "Chashmalay Veloce Sport Sunglasses",
+    "name": "Chashmalay Veloce Sport 2-in-1 Clip-On",
     "brand": "Chashmalay",
-    "category": "sunglasses",
+    "category": "clip-on-glasses",
     "accessory_type": "",
     "sku": "CSM-RC-0225-BLK",
     "price": 999,
@@ -2692,9 +2692,9 @@
     ]
   },
   {
-    "name": "Chashmalay Classic Square",
+    "name": "Chashmalay Classic Square Reader",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "reading-glasses",
     "accessory_type": "",
     "sku": "CSM-SQ-0227-HVN",
     "price": 799,
@@ -2803,7 +2803,7 @@
   {
     "name": "Chashmalay Urbanite Slim Rectangle",
     "brand": "Chashmalay",
-    "category": "sunglasses",
+    "category": "eyeglasses",
     "accessory_type": "",
     "sku": "CSM-RC-0228-SLV",
     "price": 999,
@@ -2912,7 +2912,7 @@
   {
     "name": "Chashmalay Titan Precision Rimless",
     "brand": "Chashmalay",
-    "category": "sunglasses",
+    "category": "eyeglasses",
     "accessory_type": "",
     "sku": "CSM-RC-0229-SLV",
     "price": 1499,
@@ -3211,7 +3211,8 @@
       "L"
     ],
     "available_colors": [
-      "Matte Black Polarized"
+      "Matte Black Polarized",
+      "Gloss Black Grey Tint"
     ],
     "default_color": "Matte Black Polarized",
     "color": "Matte Black Polarized",
@@ -3253,6 +3254,23 @@
         },
         "gallery": [
           "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp"
+        ]
+      },
+      {
+        "name": "Gloss Black Grey Tint",
+        "hex": "#09090B",
+        "color_code": "#09090B",
+        "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+        "image_side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp"
+          ]
+        },
+        "gallery": [
+          "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp"
         ]
       }
     ]
@@ -3367,15 +3385,15 @@
     ]
   },
   {
-    "name": "Chashmalay Horizon Clubmaster",
+    "name": "Chashmalay Horizon Clubmaster Sun",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "sunglasses",
     "accessory_type": "",
     "sku": "CSM-CM-0305-BLK",
     "price": 1299,
     "original_price": 2599,
     "discount_price": 1299,
-    "description": "Browline eyeglass frames with a dark front and gold-tone accents.",
+    "description": "Vintage browline sunglasses with dark UV-blocking lenses and golden bridge accents. The quintessential retro sun-protection accessory.",
     "stock_quantity": 50,
     "gender": "Unisex",
     "frame_type": "Half Rim",
@@ -3396,7 +3414,7 @@
     "frame_color": "Black Gold G15",
     "frame_image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/cy4m5ree1ghaaghtnhot.webp",
     "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/cy4m5ree1ghaaghtnhot.webp",
-    "tags": "clubmaster, browline, gold-tone accents",
+    "tags": "sunglasses, clubmaster, browline, gold bridge, retro sun",
     "is_active": true,
     "is_new": true,
     "is_featured": false,
@@ -3456,15 +3474,15 @@
     ]
   },
   {
-    "name": "Chashmalay Modernist Hexagon",
+    "name": "Chashmalay Modernist Hex Computer Screen Glasses",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "computer-glasses",
     "accessory_type": "",
     "sku": "CSM-GE-0306-GM",
     "price": 1149,
     "original_price": 2299,
     "discount_price": 1149,
-    "description": "Geometric wireframe eyeglasses with clear lenses.",
+    "description": "Sculpted poly-angular geometric wireframes featuring anti-radiation blue-light blocking lenses. Engineered to keep eyes fresh during long screen exposure.",
     "stock_quantity": 50,
     "gender": "Unisex",
     "frame_type": "Full Rim",
@@ -3486,7 +3504,7 @@
     "frame_color": "Sleek Gunmetal",
     "frame_image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/tqaqdgzql6pkl52lvwbj.webp",
     "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/tqaqdgzql6pkl52lvwbj.webp",
-    "tags": "geometric, wireframe, eyeglasses",
+    "tags": "computer glasses, blue cut, geometric, screen protection, modern, unisex",
     "is_active": true,
     "is_new": true,
     "is_featured": false,
@@ -3565,9 +3583,9 @@
     ]
   },
   {
-    "name": "Chashmalay Irus Eyeglasses",
+    "name": "Chashmalay Irus 2-in-1 Polarized Clip-On",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "clip-on-glasses",
     "accessory_type": "",
     "sku": "CSM-WY-0307-BLK",
     "price": 1199,
@@ -3892,9 +3910,9 @@
     ]
   },
   {
-    "name": "Chashmalay Intellect Round",
+    "name": "Chashmalay Intellect Round Reader",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "reading-glasses",
     "accessory_type": "",
     "sku": "CSM-RN-0310-GLD",
     "price": 899,
@@ -4328,9 +4346,9 @@
     ]
   },
   {
-    "name": "Chashmalay Bold Flattop Square",
+    "name": "Chashmalay Bold Flattop Square Sun",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "sunglasses",
     "accessory_type": "",
     "sku": "CSM-SQ-0314-BLK",
     "price": 1399,
@@ -4437,9 +4455,9 @@
     ]
   },
   {
-    "name": "Chashmalay Silhouette Oval",
+    "name": "Chashmalay Silhouette Pure Oval Reader",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "reading-glasses",
     "accessory_type": "",
     "sku": "CSM-OV-0315-SLV",
     "price": 899,
@@ -4546,15 +4564,15 @@
     ]
   },
   {
-    "name": "Chashmalay Urban Active Rectangle",
+    "name": "Chashmalay Urban Active Magnetic Clip-On",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "clip-on-glasses",
     "accessory_type": "",
     "sku": "CSM-RC-0316-BLK",
     "price": 999,
     "original_price": 1999,
     "discount_price": 999,
-    "description": "Rectangular eyeglass frames with contrasting temple accents.",
+    "description": "Dynamic 2-in-1 clip-on system with magnetic snap-on polarized shades over impact-proof TR90 rectangular optical frames. Built for fast-paced urban movement.",
     "stock_quantity": 50,
     "gender": "Men",
     "frame_type": "Full Rim",
@@ -4576,7 +4594,7 @@
     "frame_color": "Matte Black Red",
     "frame_image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qo88tkjgwktkiad00hxj.webp",
     "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qo88tkjgwktkiad00hxj.webp",
-    "tags": "rectangle, contrasting temples, active",
+    "tags": "clip on, magnetic clip, active, tr90, 2 in 1, polarized, men",
     "is_active": true,
     "is_new": true,
     "is_featured": false,
@@ -4655,9 +4673,9 @@
     ]
   },
   {
-    "name": "Chashmalay Signature Aviator",
+    "name": "Chashmalay Signature Aviator Sun",
     "brand": "Chashmalay",
-    "category": "eyeglasses",
+    "category": "sunglasses",
     "accessory_type": "",
     "sku": "CSM-AV-0317-GLD",
     "price": 1349,
@@ -5400,135 +5418,88 @@
     ]
   },
   {
-    "name": "IDEE Rectangle Eyeglasses",
-    "brand": "IDEE",
-    "category": "eyeglasses",
-    "accessory_type": "",
-    "sku": "CSM-RC-0402-BLK",
-    "price": 999,
-    "original_price": 1999,
-    "discount_price": 999,
-    "description": "Full-rim rectangular eyeglasses with a black front and gold-tone temple accents.",
+    "name": "Chashmalay Scott Premium Eyewear Case & Cloth",
+    "brand": "Chashmalay",
+    "category": "accessories",
+    "accessory_type": "Spectacle Case",
+    "sku": "CSM-RC-0401-BLU",
+    "price": 799,
+    "original_price": 1499,
+    "discount_price": 799,
+    "description": "Luxury hard-shell protective eyewear case paired with an ultra-fine microfiber lens cleaning cloth. Safeguards your frames from drops and scratches.",
     "stock_quantity": 50,
     "gender": "Unisex",
     "frame_type": "Full Rim",
     "frame_shape": "Rectangle",
-    "frame_material": "Mixed",
+    "frame_material": "Polycarbonate",
     "lens_type": "Single Vision",
     "available_sizes": [
       "M",
       "L"
     ],
     "available_colors": [
-      "Black Gold"
+      "Navy Blue Orange",
+      "Pastel Puffer Multi"
     ],
-    "default_color": "Black Gold",
-    "color": "Black Gold",
-    "color_hex": "#1A1A1A",
-    "frame_color": "Black Gold",
-    "frame_image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
-    "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
-    "tags": "rectangle, black, gold-tone, eyeglasses",
+    "default_color": "Navy Blue Orange",
+    "color": "Navy Blue Orange",
+    "color_hex": "#1E3A8A",
+    "frame_color": "Navy Blue Orange",
+    "frame_image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+    "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+    "tags": "accessory, spectacle case, microfiber cloth, protection, scott",
     "is_active": true,
     "is_new": true,
     "is_featured": false,
     "images": {
-      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
-      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
       "model": "",
       "zoom": "",
       "gallery": [
-        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
-        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp"
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp"
       ]
     },
     "gallery": [
-      "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
-      "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp"
+      "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+      "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp"
     ],
     "colors": [
       {
-        "name": "Black Gold",
-        "hex": "#1A1A1A",
-        "color_code": "#1A1A1A",
-        "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
-        "image_side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
+        "name": "Navy Blue Orange",
+        "hex": "#1E3A8A",
+        "color_code": "#1E3A8A",
+        "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+        "image_side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
         "images": {
-          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
-          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp",
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
           "gallery": [
-            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp"
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp"
           ]
         },
         "gallery": [
-          "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/purwha0doessbxaw25j3.webp"
+          "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp"
         ]
-      }
-    ]
-  },
-  {
-    "name": "Scott Square Eyeglasses",
-    "brand": "Scott",
-    "category": "eyeglasses",
-    "accessory_type": "",
-    "sku": "CSM-SQ-0355-BLK",
-    "price": 1349,
-    "original_price": 2699,
-    "discount_price": 1349,
-    "description": "Black square optical frames with a small temple emblem.",
-    "stock_quantity": 50,
-    "gender": "Unisex",
-    "frame_type": "Full Rim",
-    "frame_shape": "Square",
-    "frame_material": "Acetate",
-    "lens_type": "Single Vision",
-    "available_sizes": [
-      "M",
-      "L"
-    ],
-    "available_colors": [
-      "Gloss Black"
-    ],
-    "default_color": "Gloss Black",
-    "color": "Gloss Black",
-    "color_hex": "#111111",
-    "frame_color": "Gloss Black",
-    "frame_image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-    "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-    "tags": "square, black, optical frame",
-    "is_active": true,
-    "is_new": true,
-    "is_featured": false,
-    "images": {
-      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-      "model": "",
-      "zoom": "",
-      "gallery": [
-        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp"
-      ]
-    },
-    "gallery": [
-      "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-      "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp"
-    ],
-    "colors": [
+      },
       {
-        "name": "Gloss Black",
-        "hex": "#111111",
-        "color_code": "#111111",
-        "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-        "image_side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+        "name": "Pastel Puffer Multi",
+        "hex": "#F3E8FF",
+        "color_code": "#F3E8FF",
+        "image": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/o2sleh3umb3abg1hma0r.webp",
+        "image_side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/xqevnvwructrvi8bmdgq.webp",
         "images": {
-          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
-          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/o2sleh3umb3abg1hma0r.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/xqevnvwructrvi8bmdgq.webp",
           "gallery": [
-            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp"
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/o2sleh3umb3abg1hma0r.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/xqevnvwructrvi8bmdgq.webp"
           ]
         },
         "gallery": [
-          "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp"
+          "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/o2sleh3umb3abg1hma0r.webp",
+          "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/xqevnvwructrvi8bmdgq.webp"
         ]
       }
     ]
