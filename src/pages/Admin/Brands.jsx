@@ -20,7 +20,8 @@ const DEFAULT_BRANDS = [
   { name: 'Nova', description: 'Advanced technology lenses and stylish frames', logo: '' },
   { name: 'Yash', description: 'Quality everyday affordable frames', logo: '' },
   { name: 'Nikon', description: 'Legendary optical performance and premium lenses', logo: '' },
-  { name: 'Bonzer', description: 'Contemporary durable everyday eyewear', logo: '' }
+  { name: 'Bonzer', description: 'Contemporary durable everyday eyewear', logo: '' },
+  { name: 'Hyat Hunter Classic', description: 'Classic and refined premium optical eyewear', logo: '' }
 ];
 
 const AdminBrands = () => {
