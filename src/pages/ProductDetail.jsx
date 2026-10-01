@@ -65,6 +65,19 @@ const ProductDetail = () => {
     if (!product) return [];
     if (Array.isArray(product.colors) && product.colors.length > 0) {
       return product.colors.map(c => {
+        if (!c) return { name: 'Standard', hex: '#1A1A1A', color_code: '#1A1A1A', gallery: [] };
+        if (typeof c === 'string') {
+          const img = product.images?.front || product.frame_image || product.image || '';
+          return {
+            name: c,
+            hex: '#1A1A1A',
+            color_code: '#1A1A1A',
+            image: img,
+            image_side: '',
+            image_model: '',
+            gallery: [img].filter(Boolean)
+          };
+        }
         const hex = c.hex || c.color_code || c.colorCode || '#1A1A1A';
         const hex2 = c.hex2 || c.dual_color_hex || null;
         const front = c.images?.front || c.image || c.front || '';
@@ -115,6 +128,24 @@ const ProductDetail = () => {
       }
     ];
   }, [product]);
+
+  const selectedFrameColor = colors[activeColor] || null;
+
+  const gallery = useMemo(() => {
+    if (selectedFrameColor && Array.isArray(selectedFrameColor.gallery) && selectedFrameColor.gallery.length > 0) {
+      return selectedFrameColor.gallery;
+    }
+    if (selectedFrameColor && (selectedFrameColor.image || selectedFrameColor.image_side)) {
+      return [selectedFrameColor.image, selectedFrameColor.image_side, selectedFrameColor.image_model].filter(Boolean);
+    }
+    if (Array.isArray(product?.images?.gallery) && product.images.gallery.length > 0) {
+      return product.images.gallery;
+    }
+    if (Array.isArray(product?.gallery) && product.gallery.length > 0) {
+      return product.gallery;
+    }
+    return [product?.images?.front || product?.frame_image || product?.image].filter(Boolean);
+  }, [selectedFrameColor, product]);
 
   useEffect(() => {
     if (!product || colors.length === 0) return;
@@ -274,8 +305,6 @@ const ProductDetail = () => {
   const showColorSelection = product.show_color_selection !== false;
   const showSizeSelection = product.show_size_selection !== false;
 
-  const selectedFrameColor = colors[activeColor] || null;
-
   const handleDirectAddToCart = async () => {
     try {
       const selectedColor = selectedFrameColor;
@@ -296,22 +325,6 @@ const ProductDetail = () => {
       toast.error('Failed to add to cart.');
     }
   };
-
-  const gallery = useMemo(() => {
-    if (selectedFrameColor && Array.isArray(selectedFrameColor.gallery) && selectedFrameColor.gallery.length > 0) {
-      return selectedFrameColor.gallery;
-    }
-    if (selectedFrameColor && (selectedFrameColor.image || selectedFrameColor.image_side)) {
-      return [selectedFrameColor.image, selectedFrameColor.image_side, selectedFrameColor.image_model].filter(Boolean);
-    }
-    if (Array.isArray(product?.images?.gallery) && product.images.gallery.length > 0) {
-      return product.images.gallery;
-    }
-    if (Array.isArray(product?.gallery) && product.gallery.length > 0) {
-      return product.gallery;
-    }
-    return [product?.images?.front || product?.frame_image || product?.image].filter(Boolean);
-  }, [selectedFrameColor, product]);
 
   const activeImageUrl = gallery[activeImage] || gallery[0] || '';
 
