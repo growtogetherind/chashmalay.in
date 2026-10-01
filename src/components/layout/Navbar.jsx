@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, User, Heart, Menu, X, Phone, MapPin, LogOut, Package, ChevronRight } from 'lucide-react';
+import { Search, ShoppingBag, User, Heart, Menu, X, Phone, MapPin, LogOut, Package, ChevronRight, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -13,7 +13,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { cartCount, toggleCart } = useCart();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, isAdmin, signOut } = useAuth();
   const profileRef = useRef(null);
   const navigate = useNavigate();
 
@@ -170,6 +170,19 @@ const Navbar = () => {
 
                           {/* Menu Items */}
                           <div className="py-2">
+                            {isAdmin && (
+                              <Link
+                                to="/admin"
+                                onClick={() => setIsProfileOpen(false)}
+                                className="flex items-center justify-between gap-3 px-4 py-2.5 bg-amber-50/80 hover:bg-amber-100 text-amber-950 transition-colors group border-b border-amber-100/80"
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <Shield size={15} className="text-amber-600" />
+                                  <span className="text-sm font-bold text-amber-900">Admin Dashboard</span>
+                                </div>
+                                <ChevronRight size={13} className="text-amber-500 group-hover:text-amber-700" />
+                              </Link>
+                            )}
                             {[
                               { label: 'My Account', path: '/account', icon: <User size={15} /> },
                               { label: 'My Orders', path: '/account/orders', icon: <Package size={15} /> },
@@ -336,6 +349,16 @@ const Navbar = () => {
                 <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-1">
                   {user ? (
                     <>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-3 py-3 rounded-xl bg-amber-50 text-amber-900 hover:bg-amber-100 transition-all font-bold border border-amber-200"
+                        >
+                          <Shield size={17} strokeWidth={2} className="text-amber-600" />
+                          <span className="text-sm font-bold">Admin Dashboard</span>
+                        </Link>
+                      )}
                       <Link
                         to="/account"
                         onClick={() => setIsMobileMenuOpen(false)}

@@ -6,6 +6,20 @@ import toast from 'react-hot-toast';
 
 const AuthContext = createContext({});
 
+export const ADMIN_EMAILS = [
+  'chashmalayshorts@gmail.com',
+  'admin@gmail.com'
+];
+
+export const checkIsAdminEmail = (email) => {
+  if (!email) return false;
+  const envAdmins = import.meta.env.VITE_ADMIN_EMAILS
+    ? import.meta.env.VITE_ADMIN_EMAILS.split(',').map(e => e.trim().toLowerCase())
+    : [];
+  const allAdmins = [...new Set([...ADMIN_EMAILS, ...envAdmins])];
+  return allAdmins.includes(email.trim().toLowerCase());
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');
@@ -19,9 +33,13 @@ export const AuthProvider = ({ children }) => {
   const [profileLoading, setProfileLoading] = useState(false);
 
   // Compute RBAC states dynamically
-  const resolvedRole = profile?.role || (profile?.is_admin ? 'admin' : 'customer');
-  const isSuperAdmin = resolvedRole === 'super_admin';
-  const isAdmin = resolvedRole === 'super_admin' || resolvedRole === 'admin' || profile?.is_admin || false;
+  const userEmail = (user?.email || '').toLowerCase();
+  const isHardcodedAdmin = checkIsAdminEmail(userEmail);
+  const resolvedRole = isHardcodedAdmin
+    ? (profile?.role === 'super_admin' ? 'super_admin' : 'admin')
+    : (profile?.role || (profile?.is_admin ? 'admin' : 'customer'));
+  const isSuperAdmin = resolvedRole === 'super_admin' || (isHardcodedAdmin && (userEmail === 'chashmalayshorts@gmail.com' || profile?.role === 'super_admin'));
+  const isAdmin = isSuperAdmin || resolvedRole === 'admin' || profile?.is_admin || isHardcodedAdmin || false;
   const isManager = isAdmin || resolvedRole === 'manager';
   const isStaff = isManager || resolvedRole === 'staff';
 
@@ -31,6 +49,9 @@ export const AuthProvider = ({ children }) => {
       if (currentUser) {
         setProfileLoading(true);
         try {
+          const currentEmail = (currentUser.email || '').toLowerCase();
+          const shouldBeAdmin = checkIsAdminEmail(currentEmail);
+
           // Check for existing profile
           const { data, error } = await fetchFirebaseProfile(currentUser.uid);
           
@@ -40,16 +61,25 @@ export const AuthProvider = ({ children }) => {
             // Create missing profile for both normal and Google users
             const profileData = {
               email: currentUser.email,
-              full_name: currentUser.displayName || 'Customer',
-              is_admin: false,
-              role: 'customer',
+              full_name: currentUser.displayName || (shouldBeAdmin ? 'Admin' : 'Customer'),
+              is_admin: shouldBeAdmin,
+              role: shouldBeAdmin ? 'super_admin' : 'customer',
               created_at: new Date()
             };
             await updateFirebaseProfile(currentUser.uid, profileData);
             setProfile(profileData);
           } else {
-            // Profile exists, set it
-            setProfile(data);
+            // Profile exists: if user is designated as admin, automatically ensure Firestore profile has admin privileges!
+            let updatedData = data;
+            if (shouldBeAdmin && (!data.is_admin || !['super_admin', 'admin'].includes(data.role))) {
+              updatedData = {
+                ...data,
+                is_admin: true,
+                role: 'super_admin'
+              };
+              await updateFirebaseProfile(currentUser.uid, { is_admin: true, role: 'super_admin' });
+            }
+            setProfile(updatedData);
             
             // Optional: If it's a Google user, ensure display name/email is up to date
             if (currentUser.providerData.some(p => p.providerId === 'google.com')) {
@@ -77,9 +107,14 @@ export const AuthProvider = ({ children }) => {
   // Handle redirect login results on mount
   useEffect(() => {
     getRedirectResult(auth)
-      .then((result) => {
+      .then(async (result) => {
         if (result) {
-          toast.success('Logged in with Google!');
+          const userEmail = (result.user.email || '').toLowerCase();
+          const shouldBeAdmin = checkIsAdminEmail(userEmail);
+          if (shouldBeAdmin) {
+            await updateFirebaseProfile(result.user.uid, { is_admin: true, role: 'super_admin' });
+          }
+          toast.success(shouldBeAdmin ? 'Welcome Admin!' : 'Logged in with Google!');
         }
       })
       .catch((error) => {
@@ -187,18 +222,28 @@ export const AuthProvider = ({ children }) => {
     try {
       const result = await signInWithPopup(auth, provider);
       
+      const userEmail = (result.user.email || '').toLowerCase();
+      const shouldBeAdmin = checkIsAdminEmail(userEmail);
+
       const { data } = await fetchFirebaseProfile(result.user.uid);
       let profileData = data;
 
       if (!data) {
         profileData = {
           email: result.user.email,
-          full_name: result.user.displayName,
-          is_admin: false,
-          role: 'customer',
+          full_name: result.user.displayName || (shouldBeAdmin ? 'Admin' : 'Customer'),
+          is_admin: shouldBeAdmin,
+          role: shouldBeAdmin ? 'super_admin' : 'customer',
           created_at: new Date()
         };
         await updateFirebaseProfile(result.user.uid, profileData);
+      } else if (shouldBeAdmin && (!data.is_admin || !['super_admin', 'admin'].includes(data.role))) {
+        profileData = {
+          ...data,
+          is_admin: true,
+          role: 'super_admin'
+        };
+        await updateFirebaseProfile(result.user.uid, { is_admin: true, role: 'super_admin' });
       }
       
       setProfile(profileData);
@@ -206,7 +251,7 @@ export const AuthProvider = ({ children }) => {
       if (['super_admin', 'admin', 'manager', 'staff'].includes(resolvedRole)) {
         await writeAdminLog('admin_login', result.user.uid, { email: result.user.email, provider: 'google' });
       }
-      toast.success('Logged in with Google!');
+      toast.success(shouldBeAdmin ? 'Welcome Admin!' : 'Logged in with Google!');
       return { user: result.user, profile: profileData };
     } catch (error) {
       if (error.code === 'auth/popup-blocked') {

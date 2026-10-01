@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Package, MapPin, Edit3, LogOut, ChevronRight, Cake } from 'lucide-react';
+import { User, Package, MapPin, Edit3, LogOut, ChevronRight, Cake, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getUserOrders } from '../lib/firebase';
 import toast from 'react-hot-toast';
@@ -15,7 +15,7 @@ const ORDER_STATUS_COLORS = {
 };
 
 const Account = () => {
-  const { user, profile, updateProfile, signOut } = useAuth();
+  const { user, profile, isAdmin, updateProfile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('orders');
   const [orders, setOrders] = useState([]);
   const [editMode, setEditMode] = useState(false);
@@ -65,6 +65,11 @@ const Account = () => {
               <Icon size={18} /> {label}
             </button>
           ))}
+          {isAdmin && (
+            <Link to="/admin" className="account-nav-item text-amber-600 font-bold bg-amber-50/60 hover:bg-amber-100/70 border border-amber-200/60">
+              <Shield size={18} className="text-amber-600" /> Admin Panel
+            </Link>
+          )}
           <button onClick={signOut} className="account-nav-item text-red-500">
             <LogOut size={18} /> Logout
           </button>

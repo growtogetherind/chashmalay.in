@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, checkIsAdminEmail } from '../context/AuthContext';
 import Logo from '../components/ui/Logo';
 import toast from 'react-hot-toast';
 import './Auth.css';
@@ -20,7 +20,10 @@ const Auth = () => {
 
   useEffect(() => {
     if (user && profile) {
-      if (profile.is_admin || ['super_admin', 'admin', 'manager', 'staff'].includes(profile.role)) {
+      const isUserAdmin = profile.is_admin || 
+        ['super_admin', 'admin', 'manager', 'staff'].includes(profile.role) ||
+        checkIsAdminEmail(user.email);
+      if (isUserAdmin) {
         navigate('/admin');
       } else {
         navigate(from);
@@ -36,7 +39,10 @@ const Auth = () => {
     try {
       if (mode === 'login') {
         const { profile: loggedInProfile } = await signIn(form.email, form.password);
-        if (loggedInProfile?.is_admin) {
+        const isUserAdmin = loggedInProfile?.is_admin || 
+          ['super_admin', 'admin', 'manager', 'staff'].includes(loggedInProfile?.role) ||
+          checkIsAdminEmail(form.email);
+        if (isUserAdmin) {
           navigate('/admin');
         } else {
           navigate(from);
@@ -56,7 +62,10 @@ const Auth = () => {
   const handleGoogle = async () => {
     try { 
       const res = await signInWithGoogle(); 
-      if (res?.profile?.is_admin) {
+      const isUserAdmin = res?.profile?.is_admin || 
+        ['super_admin', 'admin', 'manager', 'staff'].includes(res?.profile?.role) ||
+        checkIsAdminEmail(res?.user?.email);
+      if (isUserAdmin) {
         navigate('/admin');
       } else if (res?.user) {
         navigate(from);
