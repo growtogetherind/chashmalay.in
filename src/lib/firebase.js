@@ -288,12 +288,16 @@ export const bulkImportCatalog = async (products, onProgress) => {
   for (let i = 0; i < products.length; i++) {
     const p = products[i];
     try {
-      const res = await upsertProduct(p);
-      if (res.error) throw res.error;
+      const res = await saveProduct(p);
+      if (res?.error) {
+        console.error(`Import error for "${p.name}":`, res.error);
+        throw res.error;
+      }
       imported++;
       if (onProgress) onProgress(imported, products.length, p.name);
     } catch (err) {
-      errors.push({ name: p.name, error: err.message });
+      console.error(`Failed to import "${p.name}":`, err);
+      errors.push({ name: p.name, error: err.message || String(err) });
     }
   }
   return { imported, total: products.length, errors };
