@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Save, Mail, Wrench, Globe, Truck, Bell, Eye, EyeOff, Send, Trash2, AlertTriangle } from 'lucide-react';
-import { saveSettings, subscribeSettings, getPrivateSettings, purgeStoreData } from '../../lib/firebase';
+import { Save, Mail, Wrench, Globe, Truck, Bell, Eye, EyeOff, Send, Trash2, AlertTriangle, UploadCloud, CheckCircle2 } from 'lucide-react';
+import { saveSettings, subscribeSettings, getPrivateSettings, purgeStoreData, bulkImportCatalog } from '../../lib/firebase';
 import { useConfirm } from '../../context/ConfirmContext';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import toast from 'react-hot-toast';
@@ -26,11 +26,52 @@ const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [purging, setPurging] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(null);
 
   const [showToken, setShowToken] = useState(false);
   const [fetchingChatId, setFetchingChatId] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
   const [botUsername, setBotUsername] = useState('Chashmalay_bot');
+
+  const handleImportCatalog = async () => {
+    const isConfirmed = await confirm({
+      title: 'Publish Catalog to Live Store',
+      message: 'This will read catalog.json (52 products with real Cloudinary images) and import them into your active store inventory. Existing products will remain intact.',
+      confirmText: 'Publish Products Now',
+      type: 'info'
+    });
+
+    if (!isConfirmed) return;
+
+    setImporting(true);
+    const toastId = toast.loading('Fetching catalog.json...');
+    try {
+      const res = await fetch('/catalog.json');
+      if (!res.ok) throw new Error('Could not load catalog.json from server');
+      const products = await res.json();
+      
+      toast.loading(`Publishing 0/${products.length} products...`, { id: toastId });
+      
+      const result = await bulkImportCatalog(products, (current, total, name) => {
+        setImportProgress({ current, total, name });
+        if (current % 5 === 0 || current === total) {
+          toast.loading(`Publishing ${current}/${total}: ${name}`, { id: toastId });
+        }
+      });
+
+      if (result.errors.length > 0) {
+        toast.success(`Published ${result.imported}/${result.total} products with ${result.errors.length} warnings.`, { id: toastId, duration: 6000 });
+      } else {
+        toast.success(`🎉 Successfully published all ${result.imported} products to the live store!`, { id: toastId, duration: 6000 });
+      }
+    } catch (err) {
+      toast.error('Failed to import catalog: ' + err.message, { id: toastId });
+    } finally {
+      setImporting(false);
+      setImportProgress(null);
+    }
+  };
 
   const handlePurgeData = async () => {
     const isConfirmed = await confirm({
@@ -387,6 +428,40 @@ const AdminSettings = () => {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Product Catalog Batch Importer */}
+              <div className="admin-card !p-10 relative overflow-hidden group hover:shadow-2xl hover:shadow-primary/10 transition-all border-emerald-200 bg-emerald-50/20">
+                <div className="absolute top-0 right-0 p-10 opacity-[0.04] group-hover:opacity-[0.08] transition-opacity pointer-events-none text-emerald-600"><UploadCloud size={120} /></div>
+                <h3 className="text-[11px] font-black uppercase tracking-[3px] text-emerald-700 flex items-center gap-4 mb-4">
+                  <span className="w-10 h-0.5 bg-emerald-500/40"></span> Catalog Publishing — Ready Batch
+                </h3>
+                <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+                  Publish <strong>52 pre-processed eyewear products</strong> (278 Cloudinary hosted images across all colorways and angles) from <code>catalog.json</code> directly to your live storefront.
+                </p>
+                {importProgress && (
+                  <div className="mb-6 p-4 bg-white rounded-2xl border border-emerald-200 shadow-sm">
+                    <div className="flex justify-between text-xs font-bold text-slate-700 mb-2">
+                      <span className="truncate max-w-[70%]">Publishing: {importProgress.name}</span>
+                      <span>{importProgress.current} / {importProgress.total}</span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="bg-emerald-600 h-full transition-all duration-300 rounded-full"
+                        style={{ width: `${(importProgress.current / importProgress.total) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleImportCatalog}
+                  disabled={importing}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20 disabled:opacity-50"
+                >
+                  <UploadCloud size={16} />
+                  <span>{importing ? `PUBLISHING (${importProgress?.current || 0}/${importProgress?.total || 52})...` : 'PUBLISH 52 PRODUCTS TO LIVE STORE'}</span>
+                </button>
               </div>
 
               {/* Danger Zone: Purge Store Data */}

@@ -282,6 +282,23 @@ export const saveProduct = async (product, id = null) => {
   } catch (error) { return { error }; }
 };
 
+export const bulkImportCatalog = async (products, onProgress) => {
+  let imported = 0;
+  const errors = [];
+  for (let i = 0; i < products.length; i++) {
+    const p = products[i];
+    try {
+      const res = await upsertProduct(p);
+      if (res.error) throw res.error;
+      imported++;
+      if (onProgress) onProgress(imported, products.length, p.name);
+    } catch (err) {
+      errors.push({ name: p.name, error: err.message });
+    }
+  }
+  return { imported, total: products.length, errors };
+};
+
 export const deleteProduct = async (id) => {
   try {
     const prevDoc = await getDoc(doc(db, "products", id));

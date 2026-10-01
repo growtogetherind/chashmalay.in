@@ -1,0 +1,3881 @@
+[
+  {
+    "name": "Chashmalay Neo Square Acetate",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0201-BLK",
+    "price": 999,
+    "original_price": 1999,
+    "discount_price": 999,
+    "description": "Bold square frames crafted from lightweight acetate with signature contrast accents for sharp, contemporary styling. Perfect for everyday office and casual wear.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black Red",
+      "Matte Black Blue"
+    ],
+    "default_color": "Matte Black Red",
+    "tags": "square, modern, acetate, lightweight, daily wear, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ypntaucgnxenx34ft9sj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/eb6nib7ufjpojoopyfr5.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ypntaucgnxenx34ft9sj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/eb6nib7ufjpojoopyfr5.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black Red",
+        "color_code": "#1A1A1A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ypntaucgnxenx34ft9sj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/eb6nib7ufjpojoopyfr5.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ypntaucgnxenx34ft9sj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/eb6nib7ufjpojoopyfr5.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black Blue",
+        "color_code": "#1E293B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/r9sdpphxqdsewhito5ti.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/tujenwzmijzuqagdzqqb.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/r9sdpphxqdsewhito5ti.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/tujenwzmijzuqagdzqqb.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Urban Classic Wayfarer",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-WY-0202-CLR",
+    "price": 1099,
+    "original_price": 2199,
+    "discount_price": 1099,
+    "description": "Timeless wayfarer silhouette accented with subtle rivet hardware and tailored ergonomic temples. Designed for balanced comfort and versatile styling.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Wayfarer",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Crystal Smoke Grey",
+      "Matte Black"
+    ],
+    "default_color": "Crystal Smoke Grey",
+    "tags": "wayfarer, classic, acetate, rivet, stylish, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/t3mdoa9ey0ifdsif8c7e.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/t3mdoa9ey0ifdsif8c7e.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/t3mdoa9ey0ifdsif8c7e.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/t3mdoa9ey0ifdsif8c7e.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Crystal Smoke Grey",
+        "color_code": "#64748B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/t3mdoa9ey0ifdsif8c7e.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/t3mdoa9ey0ifdsif8c7e.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/t3mdoa9ey0ifdsif8c7e.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#1A1A1A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/b446uavdjqt2ja20rdbs.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/zrl4d7slhmfwam0vajqa.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/b446uavdjqt2ja20rdbs.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/zrl4d7slhmfwam0vajqa.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay AeroFlex Sport Square",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0203-BLU",
+    "price": 899,
+    "original_price": 1799,
+    "discount_price": 899,
+    "description": "Ultra-flexible TR90 frames with energetic temple grip tips and an active square profile. Featherlight construction ensures fatigue-free all-day wear.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "TR90",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Navy Blue Red"
+    ],
+    "default_color": "Navy Blue Red",
+    "tags": "square, sport, tr90, flexible, lightweight, active wear",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ku6ypwnanan85u0glh4n.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ektl1gdutic0sxqzivp8.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ku6ypwnanan85u0glh4n.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ektl1gdutic0sxqzivp8.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Navy Blue Red",
+        "color_code": "#1E3A8A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ku6ypwnanan85u0glh4n.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ektl1gdutic0sxqzivp8.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ku6ypwnanan85u0glh4n.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853825/chashmalay/products/ektl1gdutic0sxqzivp8.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Metro Edge Rectangle",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0204-GRN",
+    "price": 949,
+    "original_price": 1899,
+    "discount_price": 949,
+    "description": "Clean-lined rectangular frames engineered with structured brow geometry and comfortable rubberized temple tips. Excellent for professional and daily computer use.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "TR90",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Smoke Grey Lime",
+      "Matte Black Crimson"
+    ],
+    "default_color": "Smoke Grey Lime",
+    "tags": "rectangle, executive, tr90, modern, office wear, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/wac9iieqvk6il80tvpne.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/qbbsf5kmo7bmhlvon1lv.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/wac9iieqvk6il80tvpne.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/qbbsf5kmo7bmhlvon1lv.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Smoke Grey Lime",
+        "color_code": "#4B5563",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/wac9iieqvk6il80tvpne.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/qbbsf5kmo7bmhlvon1lv.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/wac9iieqvk6il80tvpne.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/qbbsf5kmo7bmhlvon1lv.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black Crimson",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/fnnzpxbpov3kds3oogii.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/bzjpxl8ox8wzz8xqpzly.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/fnnzpxbpov3kds3oogii.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/bzjpxl8ox8wzz8xqpzly.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Artisan Trapezoid",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0205-BLK",
+    "price": 1199,
+    "original_price": 2399,
+    "discount_price": 1199,
+    "description": "Sophisticated trapezoidal design with premium acetate craftsmanship and distinctive inner-temple detailing. Elevates modern minimalist wardrobes.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Glossy Black Camo"
+    ],
+    "default_color": "Glossy Black Camo",
+    "tags": "square, trapezoid, acetate, artisan, stylish, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/oo4tzok7c5dvbtrka9oo.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/fpw1q7oiwygekgo4t7ll.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/oo4tzok7c5dvbtrka9oo.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/fpw1q7oiwygekgo4t7ll.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Glossy Black Camo",
+        "color_code": "#0F172A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/oo4tzok7c5dvbtrka9oo.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/fpw1q7oiwygekgo4t7ll.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/oo4tzok7c5dvbtrka9oo.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/fpw1q7oiwygekgo4t7ll.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Horizon Bold Square",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0206-BLK",
+    "price": 1299,
+    "original_price": 2599,
+    "discount_price": 1299,
+    "description": "Architectural square profile featuring bold rims, polished metal hinge accents, and ergonomic temple curvature. A confident statement piece for modern trendsetters.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black Gold",
+      "Dark Tortoise Amber",
+      "Transparent Olive"
+    ],
+    "default_color": "Matte Black Gold",
+    "tags": "square, bold, statement, acetate, gold hinge, trendsetter",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/iib4hd9ckjnvjo1wocc7.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/agivmmtbfroog5gokdb1.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/iib4hd9ckjnvjo1wocc7.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/agivmmtbfroog5gokdb1.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black Gold",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/iib4hd9ckjnvjo1wocc7.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/agivmmtbfroog5gokdb1.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853826/chashmalay/products/iib4hd9ckjnvjo1wocc7.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/agivmmtbfroog5gokdb1.webp"
+          ]
+        }
+      },
+      {
+        "name": "Dark Tortoise Amber",
+        "color_code": "#78350F",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/udtvy9zr5antcey9ecwy.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/emxyadavvchedc2qgus8.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/udtvy9zr5antcey9ecwy.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/emxyadavvchedc2qgus8.webp"
+          ]
+        }
+      },
+      {
+        "name": "Transparent Olive",
+        "color_code": "#3F6212",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/d3iwd2hbezvpbbbbu6ua.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/wuzvm3zdrqvdtl3ziy4f.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/d3iwd2hbezvpbbbbu6ua.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/wuzvm3zdrqvdtl3ziy4f.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Slimline Geometric Round",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-GE-0207-RGD",
+    "price": 1049,
+    "original_price": 2099,
+    "discount_price": 1049,
+    "description": "Subtle poly-angled geometric rims crafted with fine metal alloys and silicone nose pads. Delivers an intellectual, refined look with lightweight comfort.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Geometric",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Rose Gold",
+      "Gunmetal Black",
+      "Metallic Gold"
+    ],
+    "default_color": "Rose Gold",
+    "tags": "geometric, round, slim metal, intellectual, lightweight",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/pzakpiwv9pxjd0ydzisa.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/jdqh0fovcavrnej9qntr.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/pzakpiwv9pxjd0ydzisa.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/jdqh0fovcavrnej9qntr.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Rose Gold",
+        "color_code": "#B76E79",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/pzakpiwv9pxjd0ydzisa.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/jdqh0fovcavrnej9qntr.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/pzakpiwv9pxjd0ydzisa.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/jdqh0fovcavrnej9qntr.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gunmetal Black",
+        "color_code": "#374151",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/fu9qruqbdrfpgthd3efx.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/e4dmjjcnencs5ixldcjo.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/fu9qruqbdrfpgthd3efx.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/e4dmjjcnencs5ixldcjo.webp"
+          ]
+        }
+      },
+      {
+        "name": "Metallic Gold",
+        "color_code": "#D97706",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/rv33oe7mmabclhnwqhsj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/e8uujltczrwzuhlnkla7.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/rv33oe7mmabclhnwqhsj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853827/chashmalay/products/e8uujltczrwzuhlnkla7.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Retro Vintage Aviator",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-AV-0208-SLV",
+    "price": 1149,
+    "original_price": 2299,
+    "discount_price": 1149,
+    "description": "Iconic dual-bridge aviator refreshed with modern slimline metalwork and sleek temples. An enduring aesthetic suited for any face shape.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Aviator",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gunmetal Silver",
+      "Vintage Gold",
+      "Matte Black"
+    ],
+    "default_color": "Gunmetal Silver",
+    "tags": "aviator, double bridge, classic, vintage, metal, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/roifmbu1c60zd5dfccuq.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/z2wzliay50afqk1xzezr.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/roifmbu1c60zd5dfccuq.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/z2wzliay50afqk1xzezr.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gunmetal Silver",
+        "color_code": "#4B5563",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/roifmbu1c60zd5dfccuq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/z2wzliay50afqk1xzezr.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/roifmbu1c60zd5dfccuq.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/z2wzliay50afqk1xzezr.webp"
+          ]
+        }
+      },
+      {
+        "name": "Vintage Gold",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/pemqwety1ezbbktlmw0o.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/s4xxf1ylim6yvufqfx3p.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/pemqwety1ezbbktlmw0o.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/s4xxf1ylim6yvufqfx3p.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#1F2937",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/sfxa6fxex1ejsmoibvu9.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/mihxdfdjbyakkhlzfecs.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/sfxa6fxex1ejsmoibvu9.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/mihxdfdjbyakkhlzfecs.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Cat-Eye Bloom",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-CE-0209-BRN",
+    "price": 1199,
+    "original_price": 2399,
+    "discount_price": 1199,
+    "description": "Chic cat-eye frames featuring sculpted upswept browlines and radiant color transitions. Elevates both professional and party aesthetics.",
+    "stock_quantity": 50,
+    "gender": "Women",
+    "frame_type": "Full Rim",
+    "frame_shape": "Cat Eye",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Burgundy Wine",
+      "Havana Tortoise",
+      "Midnight Black"
+    ],
+    "default_color": "Burgundy Wine",
+    "tags": "cat eye, feminine, upswept, acetate, chic, women",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/zjixqb8mxzeisaqsbeom.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/fftv2c1nhmr8ta8e2k0z.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/zjixqb8mxzeisaqsbeom.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/fftv2c1nhmr8ta8e2k0z.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Burgundy Wine",
+        "color_code": "#5C1D24",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/zjixqb8mxzeisaqsbeom.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/fftv2c1nhmr8ta8e2k0z.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/zjixqb8mxzeisaqsbeom.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/fftv2c1nhmr8ta8e2k0z.webp"
+          ]
+        }
+      },
+      {
+        "name": "Havana Tortoise",
+        "color_code": "#8B5A2B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/ogkzwbotuwr9xz9vjhqs.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/qgq1q74stak9mdjcegxy.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/ogkzwbotuwr9xz9vjhqs.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853828/chashmalay/products/qgq1q74stak9mdjcegxy.webp"
+          ]
+        }
+      },
+      {
+        "name": "Midnight Black",
+        "color_code": "#09090B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/gre8bngchrwiosykqric.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/syxsisqp5gqkxykyxocd.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/gre8bngchrwiosykqric.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/syxsisqp5gqkxykyxocd.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Minimalist Oval",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-OV-0210-SLV",
+    "price": 999,
+    "original_price": 1999,
+    "discount_price": 999,
+    "description": "Gently curved oval rims crafted from resilient metal alloy with anti-slip temple tips. Timeless simplicity engineered for all-day focus.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Oval",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Sleek Silver",
+      "Champagne Gold",
+      "Matte Black"
+    ],
+    "default_color": "Sleek Silver",
+    "tags": "oval, minimalist, metal, lightweight, daily wear",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/btypjbpq75ah2935yjru.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/yowyqs3q79zkfnsq3zhv.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/btypjbpq75ah2935yjru.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/yowyqs3q79zkfnsq3zhv.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Sleek Silver",
+        "color_code": "#9CA3AF",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/btypjbpq75ah2935yjru.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/yowyqs3q79zkfnsq3zhv.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/btypjbpq75ah2935yjru.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/yowyqs3q79zkfnsq3zhv.webp"
+          ]
+        }
+      },
+      {
+        "name": "Champagne Gold",
+        "color_code": "#D4AF37",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/a0cjvmpaojimnjtbocer.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/sbkrzzp7prd4wqutvlfl.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/a0cjvmpaojimnjtbocer.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/sbkrzzp7prd4wqutvlfl.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/dxhccbzp7ljvxcyfaxix.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/w8wteqzf9tb15vceu2io.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/dxhccbzp7ljvxcyfaxix.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/w8wteqzf9tb15vceu2io.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Clubmaster Heritage",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-CM-0211-BLK",
+    "price": 1249,
+    "original_price": 2499,
+    "discount_price": 1249,
+    "description": "Distinguished browline design combining bold acetate upper rims with slender metal eyewires. A vintage scholarly aesthetic reimagined for contemporary lifestyle.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Half Rim",
+    "frame_shape": "Clubmaster",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gloss Black Gold",
+      "Dark Havana Tortoise",
+      "Transparent Grey Silver"
+    ],
+    "default_color": "Gloss Black Gold",
+    "tags": "clubmaster, browline, retro, half rim, acetate metal",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/dn6dpjp004zg2ikdax5i.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/neo7s1krv1x0ykiqc0vl.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/dn6dpjp004zg2ikdax5i.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/neo7s1krv1x0ykiqc0vl.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gloss Black Gold",
+        "color_code": "#0F172A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/dn6dpjp004zg2ikdax5i.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/neo7s1krv1x0ykiqc0vl.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853829/chashmalay/products/dn6dpjp004zg2ikdax5i.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/neo7s1krv1x0ykiqc0vl.webp"
+          ]
+        }
+      },
+      {
+        "name": "Dark Havana Tortoise",
+        "color_code": "#713F12",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/olk3jagm7dtiz4cqp3zw.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/cazhfoyb1awrliabuuwu.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/olk3jagm7dtiz4cqp3zw.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/cazhfoyb1awrliabuuwu.webp"
+          ]
+        }
+      },
+      {
+        "name": "Transparent Grey Silver",
+        "color_code": "#4B5563",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/xjkwiva6z8jonafhd3lo.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/fpqri3vxvsip7kq3v6ts.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/xjkwiva6z8jonafhd3lo.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/fpqri3vxvsip7kq3v6ts.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay UltraLight Hexagon",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-GE-0212-RGD",
+    "price": 1099,
+    "original_price": 2199,
+    "discount_price": 1099,
+    "description": "Sharply defined hexagonal metal rims that bring a modern edge to classic round aesthetics. Premium plated finish for long-lasting corrosion resistance.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Geometric",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Rose Gold Copper",
+      "Gunmetal Grey",
+      "Brushed Gold"
+    ],
+    "default_color": "Rose Gold Copper",
+    "tags": "hexagon, geometric, metal, trendy, youth, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/u4wpdhcdyfbg0jn42lrw.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/bialmwhldyomvczctips.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/u4wpdhcdyfbg0jn42lrw.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/bialmwhldyomvczctips.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Rose Gold Copper",
+        "color_code": "#BE185D",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/u4wpdhcdyfbg0jn42lrw.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/bialmwhldyomvczctips.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/u4wpdhcdyfbg0jn42lrw.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/bialmwhldyomvczctips.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gunmetal Grey",
+        "color_code": "#374151",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/y9iqkkazwrw2rgdweirz.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/qhsnaezp7bbmnc6kpxkr.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/y9iqkkazwrw2rgdweirz.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853830/chashmalay/products/qhsnaezp7bbmnc6kpxkr.webp"
+          ]
+        }
+      },
+      {
+        "name": "Brushed Gold",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/hcb5al7vrahp1yzellfw.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/kbomyohtzdy4p7cguykn.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/hcb5al7vrahp1yzellfw.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/kbomyohtzdy4p7cguykn.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Executive Semi-Rimless",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0213-BLK",
+    "price": 1199,
+    "original_price": 2399,
+    "discount_price": 1199,
+    "description": "Understated semi-rimless rectangular frame designed for effortless executive style. Lightweight and unobtrusive for intensive reading and screen time.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Half Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black",
+      "Gunmetal Steel",
+      "Deep Navy"
+    ],
+    "default_color": "Matte Black",
+    "tags": "half rim, executive, semi rimless, metal, rectangular, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/pumllhuxjw3fyy8o31t5.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/jwa3vvtghfjhcvjdbx5d.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/pumllhuxjw3fyy8o31t5.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/jwa3vvtghfjhcvjdbx5d.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/pumllhuxjw3fyy8o31t5.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/jwa3vvtghfjhcvjdbx5d.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/pumllhuxjw3fyy8o31t5.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/jwa3vvtghfjhcvjdbx5d.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gunmetal Steel",
+        "color_code": "#4B5563",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/jcoom8weft2glbhxroq9.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/czuqjvjuvbybikwun7xx.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/jcoom8weft2glbhxroq9.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/czuqjvjuvbybikwun7xx.webp"
+          ]
+        }
+      },
+      {
+        "name": "Deep Navy",
+        "color_code": "#1E3A8A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/cd8b6vt2ol8gngmfdhz9.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/ciolw3nnwjgbix7jowk1.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/cd8b6vt2ol8gngmfdhz9.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853831/chashmalay/products/ciolw3nnwjgbix7jowk1.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Studio Modern Round",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RN-0214-CLR",
+    "price": 1049,
+    "original_price": 2099,
+    "discount_price": 1049,
+    "description": "Perfect circular frames with keyhole nose bridge and sculpted temple tips. An artistic classic favored by creative minds and design enthusiasts.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Round",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Crystal Transparent",
+      "Amber Honey",
+      "Piano Black"
+    ],
+    "default_color": "Crystal Transparent",
+    "tags": "round, keyhole bridge, retro, acetate, artistic, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/f4qzewpj6uyooxy30hif.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/bnyxytn9qu8oqnymodjs.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/f4qzewpj6uyooxy30hif.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/bnyxytn9qu8oqnymodjs.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Crystal Transparent",
+        "color_code": "#E5E7EB",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/f4qzewpj6uyooxy30hif.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/bnyxytn9qu8oqnymodjs.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/f4qzewpj6uyooxy30hif.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/bnyxytn9qu8oqnymodjs.webp"
+          ]
+        }
+      },
+      {
+        "name": "Amber Honey",
+        "color_code": "#D97706",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/o8j6ztyyys4dcr8qneof.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/sc3dx92tksprbrrnwixk.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/o8j6ztyyys4dcr8qneof.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/sc3dx92tksprbrrnwixk.webp"
+          ]
+        }
+      },
+      {
+        "name": "Piano Black",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/ppj5afrpnrcnuuulnird.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/y1htlnk29lshpgqldgtz.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/ppj5afrpnrcnuuulnird.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/y1htlnk29lshpgqldgtz.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Prism Angular Square",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0215-GRN",
+    "price": 899,
+    "original_price": 1799,
+    "discount_price": 899,
+    "description": "Beveled square edges with high impact resistance and featherweight comfort. Crafted for daily commute and dynamic city life.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "TR90",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Olive Green",
+      "Dark Walnut Brown",
+      "Onyx Black"
+    ],
+    "default_color": "Matte Olive Green",
+    "tags": "square, angular, tr90, impact resistant, daily wear",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/p5wmw7kba5p6782lu4qj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/pte6rsc0levp3s1ripkn.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/p5wmw7kba5p6782lu4qj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/pte6rsc0levp3s1ripkn.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Olive Green",
+        "color_code": "#365314",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/p5wmw7kba5p6782lu4qj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/pte6rsc0levp3s1ripkn.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/p5wmw7kba5p6782lu4qj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/pte6rsc0levp3s1ripkn.webp"
+          ]
+        }
+      },
+      {
+        "name": "Dark Walnut Brown",
+        "color_code": "#451A03",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/rpcg9myk1htyd8r3oysq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/dietrh7bk8k4nd86byzh.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/rpcg9myk1htyd8r3oysq.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853832/chashmalay/products/dietrh7bk8k4nd86byzh.webp"
+          ]
+        }
+      },
+      {
+        "name": "Onyx Black",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/qn83od5sriqvzoijjuou.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/ohyi70vca8b32tkjrfut.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/qn83od5sriqvzoijjuou.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/ohyi70vca8b32tkjrfut.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Alpha Narrow Rectangle",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0216-GM",
+    "price": 999,
+    "original_price": 1999,
+    "discount_price": 999,
+    "description": "Compact rectangular silhouette delivering razor-sharp facial symmetry. Streamlined build fits seamlessly inside helmets and audio headsets.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Charcoal Grey",
+      "Deep Cobalt",
+      "Matte Raven"
+    ],
+    "default_color": "Charcoal Grey",
+    "tags": "narrow, rectangle, sleek, compact, office wear",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/bj4zqs77knfbt0kyhlss.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/ebsv6c63nnhk7riwu6gv.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/bj4zqs77knfbt0kyhlss.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/ebsv6c63nnhk7riwu6gv.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Charcoal Grey",
+        "color_code": "#374151",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/bj4zqs77knfbt0kyhlss.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/ebsv6c63nnhk7riwu6gv.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/bj4zqs77knfbt0kyhlss.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/ebsv6c63nnhk7riwu6gv.webp"
+          ]
+        }
+      },
+      {
+        "name": "Deep Cobalt",
+        "color_code": "#1D4ED8",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/el3bm912weap9xulske2.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/n3d8jpgm30ixpws7yw7m.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/el3bm912weap9xulske2.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/n3d8jpgm30ixpws7yw7m.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Raven",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/sky7nbtc7odnxepcoflx.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/zzbnaalcgtxupyfskofi.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/sky7nbtc7odnxepcoflx.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/zzbnaalcgtxupyfskofi.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Contour Soft Square",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0217-BRN",
+    "price": 1049,
+    "original_price": 2099,
+    "discount_price": 1049,
+    "description": "Gently rounded square profile designed to soften angular jawlines. Features integrated hypoallergenic nose pads for lasting comfort.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Burgundy Tortoise",
+      "Smoky Translucent",
+      "Classic Jet Black"
+    ],
+    "default_color": "Burgundy Tortoise",
+    "tags": "soft square, contour, acetate, comfortable, everyday",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/fzqh9rwlsijxd9syoks3.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/f1b6zfvofbxlcno5bmc2.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/fzqh9rwlsijxd9syoks3.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/f1b6zfvofbxlcno5bmc2.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Burgundy Tortoise",
+        "color_code": "#4C0519",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/fzqh9rwlsijxd9syoks3.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/f1b6zfvofbxlcno5bmc2.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853833/chashmalay/products/fzqh9rwlsijxd9syoks3.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/f1b6zfvofbxlcno5bmc2.webp"
+          ]
+        }
+      },
+      {
+        "name": "Smoky Translucent",
+        "color_code": "#6B7280",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/h6lwvkkib0ylndxls532.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/bctrqptes09p3jrrgky8.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/h6lwvkkib0ylndxls532.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853834/chashmalay/products/bctrqptes09p3jrrgky8.webp"
+          ]
+        }
+      },
+      {
+        "name": "Classic Jet Black",
+        "color_code": "#09090B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/df8poelpiegzqfv2i4by.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/fz5ope8evbi9qxrbpkqq.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/df8poelpiegzqfv2i4by.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/fz5ope8evbi9qxrbpkqq.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Luxe Rimless Titanium",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0218-SLV",
+    "price": 1499,
+    "original_price": 2999,
+    "discount_price": 1499,
+    "description": "Unobstructed visual freedom engineered with high-tensile titanium bridge and temple arms. The pinnacle of ultra-light luxury and understated prestige.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Rimless",
+    "frame_shape": "Rectangle",
+    "frame_material": "Titanium",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Brushed Silver",
+      "Champagne Gold",
+      "Gunmetal"
+    ],
+    "default_color": "Brushed Silver",
+    "tags": "rimless, titanium, premium, featherlight, executive, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853842/chashmalay/products/akjfkci4rg7wsk14mmqv.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/iy4kvsb0ma4fvfgz3skn.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853842/chashmalay/products/akjfkci4rg7wsk14mmqv.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/iy4kvsb0ma4fvfgz3skn.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Brushed Silver",
+        "color_code": "#94A3B8",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853842/chashmalay/products/akjfkci4rg7wsk14mmqv.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/iy4kvsb0ma4fvfgz3skn.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853842/chashmalay/products/akjfkci4rg7wsk14mmqv.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/iy4kvsb0ma4fvfgz3skn.webp"
+          ]
+        }
+      },
+      {
+        "name": "Champagne Gold",
+        "color_code": "#CA8A04",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/to7je83wciozqp3mataq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/rcpn97qxujur8cg4owru.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/to7je83wciozqp3mataq.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/rcpn97qxujur8cg4owru.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gunmetal",
+        "color_code": "#334155",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/ywpdbzaayxcgrkms8x5s.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853840/chashmalay/products/ddouysymabie7ms8iijf.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/ywpdbzaayxcgrkms8x5s.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853840/chashmalay/products/ddouysymabie7ms8iijf.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Nova Flattop Navigator",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0219-BLK",
+    "price": 1099,
+    "original_price": 2199,
+    "discount_price": 1099,
+    "description": "Bold straight browline with navigator lenses and high-durability construction. Command attention with a modern masculine silhouette.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "TR90",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black Silver",
+      "Military Olive",
+      "Navy Blue Gunmetal"
+    ],
+    "default_color": "Matte Black Silver",
+    "tags": "flattop, navigator, bold browline, masculine, modern",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/qoovj8wjsn1y7svekm0v.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/cvuegb7ejayzacewgmqu.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/qoovj8wjsn1y7svekm0v.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/cvuegb7ejayzacewgmqu.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black Silver",
+        "color_code": "#1F2937",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/qoovj8wjsn1y7svekm0v.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/cvuegb7ejayzacewgmqu.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853841/chashmalay/products/qoovj8wjsn1y7svekm0v.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/cvuegb7ejayzacewgmqu.webp"
+          ]
+        }
+      },
+      {
+        "name": "Military Olive",
+        "color_code": "#3F6212",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/sfwpcaofaaodcnemdqon.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/dezvlbyvcqngflbvgcmz.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/sfwpcaofaaodcnemdqon.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/dezvlbyvcqngflbvgcmz.webp"
+          ]
+        }
+      },
+      {
+        "name": "Navy Blue Gunmetal",
+        "color_code": "#1E3A8A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853842/chashmalay/products/wkeno3rorm8cfwyvzft9.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/jtngjyparw4zbi8go81l.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853842/chashmalay/products/wkeno3rorm8cfwyvzft9.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/jtngjyparw4zbi8go81l.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Flare Butterfly Cat-Eye",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-CE-0220-RGD",
+    "price": 1149,
+    "original_price": 2299,
+    "discount_price": 1149,
+    "description": "Dramatic butterfly flare temples with sculpted beveling and glossy gloss finish. An alluring statement accessory for high-fashion dressing.",
+    "stock_quantity": 50,
+    "gender": "Women",
+    "frame_type": "Full Rim",
+    "frame_shape": "Cat Eye",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Rose Quartz Clear",
+      "Leopard Havana",
+      "Gloss Black"
+    ],
+    "default_color": "Rose Quartz Clear",
+    "tags": "cat eye, butterfly, glamorous, acetate, fashion, women",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/uqqpgb6senjwx962bytq.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/ryynd5weifs6k7fcpoe6.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/uqqpgb6senjwx962bytq.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/ryynd5weifs6k7fcpoe6.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Rose Quartz Clear",
+        "color_code": "#F43F5E",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/uqqpgb6senjwx962bytq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/ryynd5weifs6k7fcpoe6.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/uqqpgb6senjwx962bytq.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/ryynd5weifs6k7fcpoe6.webp"
+          ]
+        }
+      },
+      {
+        "name": "Leopard Havana",
+        "color_code": "#92400E",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/wqynxwngiyzeker374f2.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/u9m2ac79vncobtdd73c9.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853843/chashmalay/products/wqynxwngiyzeker374f2.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/u9m2ac79vncobtdd73c9.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gloss Black",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/yg5ljgrax8nl1kqtawlc.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/vq4dgqu8l4ypu6t97ase.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/yg5ljgrax8nl1kqtawlc.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/vq4dgqu8l4ypu6t97ase.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Matrix Thin Acetate Round",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RN-0221-HVN",
+    "price": 999,
+    "original_price": 1999,
+    "discount_price": 999,
+    "description": "Slender-profile acetate circles designed with high elasticity hinges and smooth edges. Offers vintage academia charm with all-day lightness.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Round",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Tortoise Amber",
+      "Transparent Crystal",
+      "Midnight Black"
+    ],
+    "default_color": "Tortoise Amber",
+    "tags": "round, thin acetate, academic, retro, lightweight",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/xlcnnqcosqnihhozcdwo.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/oc8nbgibj4g9bueongtm.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/xlcnnqcosqnihhozcdwo.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/oc8nbgibj4g9bueongtm.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Tortoise Amber",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/xlcnnqcosqnihhozcdwo.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/oc8nbgibj4g9bueongtm.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853844/chashmalay/products/xlcnnqcosqnihhozcdwo.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/oc8nbgibj4g9bueongtm.webp"
+          ]
+        }
+      },
+      {
+        "name": "Transparent Crystal",
+        "color_code": "#F3F4F6",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/katrc9gryqj5lhni9cpw.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/rv0dokt0tq78wfe4lrb4.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/katrc9gryqj5lhni9cpw.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/rv0dokt0tq78wfe4lrb4.webp"
+          ]
+        }
+      },
+      {
+        "name": "Midnight Black",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/ex81vs2gkvsholuluozk.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/uzxc1qfyfgwfkzdrm21o.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/ex81vs2gkvsholuluozk.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/uzxc1qfyfgwfkzdrm21o.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Apex Octagon Metal",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-GE-0222-BRN",
+    "price": 1099,
+    "original_price": 2199,
+    "discount_price": 1099,
+    "description": "Eight-sided octagonal geometry forged from high-grade metallic alloy. Balances avant-garde fashion with understated refinement.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Geometric",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Brushed Bronze",
+      "Polished Silver",
+      "Matte Black"
+    ],
+    "default_color": "Brushed Bronze",
+    "tags": "octagon, geometric, metal, avant-garde, stylish",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/fdptumcxcp2rzvsbcpag.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/jcb1tcuwzkxbuzymux71.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/fdptumcxcp2rzvsbcpag.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/jcb1tcuwzkxbuzymux71.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Brushed Bronze",
+        "color_code": "#78350F",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/fdptumcxcp2rzvsbcpag.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/jcb1tcuwzkxbuzymux71.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/fdptumcxcp2rzvsbcpag.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/jcb1tcuwzkxbuzymux71.webp"
+          ]
+        }
+      },
+      {
+        "name": "Polished Silver",
+        "color_code": "#E5E7EB",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/wcf2cmptaqtqmiftpjl0.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/iceorkbjbohsg1kbbxb8.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/wcf2cmptaqtqmiftpjl0.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853845/chashmalay/products/iceorkbjbohsg1kbbxb8.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#1F2937",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/jcvgqjsh2mpg8i2jbrzz.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/weekssiwn0wd1e9mufda.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/jcvgqjsh2mpg8i2jbrzz.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/weekssiwn0wd1e9mufda.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Pioneer Pilot Double-Bridge",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-AV-0223-GM",
+    "price": 1199,
+    "original_price": 2399,
+    "discount_price": 1199,
+    "description": "Rugged double-bridge aviator featuring masculine squared-off teardrop lenses and reinforced flex hinges. Built for dependable daily performance.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Aviator",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gunmetal Matte",
+      "Warm Gold",
+      "Stealth Black"
+    ],
+    "default_color": "Gunmetal Matte",
+    "tags": "pilot, aviator, double bridge, metal, men, rugged",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/srsaubxwgqntfupntboh.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/aux6vnlgjyiwjcrfnpzw.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/srsaubxwgqntfupntboh.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/aux6vnlgjyiwjcrfnpzw.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gunmetal Matte",
+        "color_code": "#374151",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/srsaubxwgqntfupntboh.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/aux6vnlgjyiwjcrfnpzw.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/srsaubxwgqntfupntboh.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/aux6vnlgjyiwjcrfnpzw.webp"
+          ]
+        }
+      },
+      {
+        "name": "Warm Gold",
+        "color_code": "#D97706",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/pxecwai6du7f7ifv2aos.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/ex6txmjprdgqmr8l9nih.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/pxecwai6du7f7ifv2aos.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/ex6txmjprdgqmr8l9nih.webp"
+          ]
+        }
+      },
+      {
+        "name": "Stealth Black",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/umw6tly1hsfi3hvwhbe8.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/ns7vzhoyn3mqxaej2z13.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853846/chashmalay/products/umw6tly1hsfi3hvwhbe8.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/ns7vzhoyn3mqxaej2z13.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Vogue Elegance Oval",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-OV-0224-RGD",
+    "price": 1099,
+    "original_price": 2199,
+    "discount_price": 1099,
+    "description": "Graceful elongated oval frames crafted with soft beveling and high-gloss luster. Harmonizes beautifully with petite to medium facial features.",
+    "stock_quantity": 50,
+    "gender": "Women",
+    "frame_type": "Full Rim",
+    "frame_shape": "Oval",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Blush Peach",
+      "Honey Demi",
+      "Jet Black"
+    ],
+    "default_color": "Blush Peach",
+    "tags": "oval, elegant, acetate, soft curves, feminine",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/u5abcbm3oobveemuqu8j.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/qybdh0fyxnxjqcuvwdcc.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/u5abcbm3oobveemuqu8j.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/qybdh0fyxnxjqcuvwdcc.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Blush Peach",
+        "color_code": "#FB7185",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/u5abcbm3oobveemuqu8j.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/qybdh0fyxnxjqcuvwdcc.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/u5abcbm3oobveemuqu8j.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/qybdh0fyxnxjqcuvwdcc.webp"
+          ]
+        }
+      },
+      {
+        "name": "Honey Demi",
+        "color_code": "#A16207",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/li6ydq6qt8imawwb5pgv.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/yhl5dgbjr4p3m2nzybet.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/li6ydq6qt8imawwb5pgv.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/yhl5dgbjr4p3m2nzybet.webp"
+          ]
+        }
+      },
+      {
+        "name": "Jet Black",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/v9lussxxz7tnryaueld8.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/nmxpokbxibiezp12az1o.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/v9lussxxz7tnryaueld8.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853847/chashmalay/products/nmxpokbxibiezp12az1o.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Veloce Sport Wrap",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0225-BLK",
+    "price": 899,
+    "original_price": 1799,
+    "discount_price": 899,
+    "description": "Aerodynamic rectangular frame with snug wraparound temple contouring. Engineered for cycling, sports, and outdoor dynamism.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "TR90",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black Orange",
+      "Charcoal Blue",
+      "Solid Black"
+    ],
+    "default_color": "Matte Black Orange",
+    "tags": "sport, wrap, tr90, flexible, active, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/sqp5dzlncxwb5wqt51ep.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/uagvapten5gi6ldcwqzy.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/sqp5dzlncxwb5wqt51ep.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/uagvapten5gi6ldcwqzy.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black Orange",
+        "color_code": "#EA580C",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/sqp5dzlncxwb5wqt51ep.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/uagvapten5gi6ldcwqzy.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/sqp5dzlncxwb5wqt51ep.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/uagvapten5gi6ldcwqzy.webp"
+          ]
+        }
+      },
+      {
+        "name": "Charcoal Blue",
+        "color_code": "#2563EB",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/ijcsc3szmbkx4ktptvjy.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/zk3vaxsrrw8mgjidoiuo.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/ijcsc3szmbkx4ktptvjy.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/zk3vaxsrrw8mgjidoiuo.webp"
+          ]
+        }
+      },
+      {
+        "name": "Solid Black",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/umj8k8cdjqrnhp0uu1s9.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/owvzsd7iacsc6pkh5bgh.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/umj8k8cdjqrnhp0uu1s9.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/owvzsd7iacsc6pkh5bgh.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Kinetic Wayfarer",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-WY-0226-BRN",
+    "price": 949,
+    "original_price": 1899,
+    "discount_price": 949,
+    "description": "Contemporary update on the legendary wayfarer shape using ultra-resilient polymer. Lightweight, sweat-resistant, and effortless to pair with any outfit.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Wayfarer",
+    "frame_material": "TR90",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Brown Tortoise",
+      "Frosted Grey",
+      "Deep Ink Black"
+    ],
+    "default_color": "Matte Brown Tortoise",
+    "tags": "wayfarer, kinetic, tr90, durable, everyday casual",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/swv3blzriaa3azzlzonp.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/pwhoun5sfdh6zodshic8.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/swv3blzriaa3azzlzonp.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/pwhoun5sfdh6zodshic8.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Brown Tortoise",
+        "color_code": "#78350F",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/swv3blzriaa3azzlzonp.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/pwhoun5sfdh6zodshic8.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/swv3blzriaa3azzlzonp.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/pwhoun5sfdh6zodshic8.webp"
+          ]
+        }
+      },
+      {
+        "name": "Frosted Grey",
+        "color_code": "#9CA3AF",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/t7cvctdvidog1waiozpa.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/igaaot1vbdippjo2h7zk.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853848/chashmalay/products/t7cvctdvidog1waiozpa.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/igaaot1vbdippjo2h7zk.webp"
+          ]
+        }
+      },
+      {
+        "name": "Deep Ink Black",
+        "color_code": "#09090B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/xmf6p02ycmhbmqwnf6pz.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/xuxomgrtre5dxbxmemsf.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/xmf6p02ycmhbmqwnf6pz.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/xuxomgrtre5dxbxmemsf.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Classic Square Reader",
+    "brand": "Chashmalay",
+    "category": "reading-glasses",
+    "sku": "CSM-SQ-0227-HVN",
+    "price": 799,
+    "original_price": 1599,
+    "discount_price": 799,
+    "description": "Compact, crystal-clear reading frame with spring hinges for effortless pocketability and strain-free magnification. Perfect for books, menus, and screens.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Polycarbonate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Amber Tortoise",
+      "Crystal Clear",
+      "Midnight Black"
+    ],
+    "default_color": "Amber Tortoise",
+    "tags": "reading glasses, square, compact, lightweight, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/qxxtqbsva7xmywpkoyhz.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/bcb7wga6b282qddgzaqt.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/qxxtqbsva7xmywpkoyhz.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/bcb7wga6b282qddgzaqt.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Amber Tortoise",
+        "color_code": "#92400E",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/qxxtqbsva7xmywpkoyhz.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/bcb7wga6b282qddgzaqt.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/qxxtqbsva7xmywpkoyhz.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/bcb7wga6b282qddgzaqt.webp"
+          ]
+        }
+      },
+      {
+        "name": "Crystal Clear",
+        "color_code": "#E5E7EB",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/phwndjg4zl0nglyajyj9.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/bbhagcyb6wjcmwgsace7.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/phwndjg4zl0nglyajyj9.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/bbhagcyb6wjcmwgsace7.webp"
+          ]
+        }
+      },
+      {
+        "name": "Midnight Black",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/nlxzghas3ftdedlk52vr.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/qnztywiunzbu9ptbgufi.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/nlxzghas3ftdedlk52vr.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/qnztywiunzbu9ptbgufi.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Urbanite Slim Rectangle",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0228-SLV",
+    "price": 999,
+    "original_price": 1999,
+    "discount_price": 999,
+    "description": "Ultra-slim metal wireframe with sleek rectangular profile and adjustable silicone bridge pads. Discreet, comfortable, and timelessly smart.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gunmetal Silver",
+      "Classic Gold",
+      "Matte Black"
+    ],
+    "default_color": "Gunmetal Silver",
+    "tags": "slim metal, rectangle, professional, sleek, lightweight",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/m3b5m4vqtmadkvcqfynq.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/ulw10qfchcihxp17gwzx.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/m3b5m4vqtmadkvcqfynq.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/ulw10qfchcihxp17gwzx.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gunmetal Silver",
+        "color_code": "#475569",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/m3b5m4vqtmadkvcqfynq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/ulw10qfchcihxp17gwzx.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853849/chashmalay/products/m3b5m4vqtmadkvcqfynq.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/ulw10qfchcihxp17gwzx.webp"
+          ]
+        }
+      },
+      {
+        "name": "Classic Gold",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/fwvvzhtxpmnvvofwei3k.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/qhmwbugsgdjzgnsllk5x.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/fwvvzhtxpmnvvofwei3k.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/qhmwbugsgdjzgnsllk5x.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#0F172A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/cpxzte3emyqncnqjuw9v.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/xtnuuknwltbvofundq0j.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/cpxzte3emyqncnqjuw9v.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/xtnuuknwltbvofundq0j.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Titan Precision Rimless",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0229-SLV",
+    "price": 1499,
+    "original_price": 2999,
+    "discount_price": 1499,
+    "description": "Featherlight titanium rimless spectacles offering an unobstructed field of vision. Engineered for discerning professionals who value precision craftsmanship.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Rimless",
+    "frame_shape": "Rectangle",
+    "frame_material": "Titanium",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Polished Chrome",
+      "Rose Gold",
+      "Stealth Graphite"
+    ],
+    "default_color": "Polished Chrome",
+    "tags": "rimless, titanium, precision, minimalist, executive",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/t9rbgszjwqvppnn3hqqx.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/xyukhnyja4tc8cscdkpl.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/t9rbgszjwqvppnn3hqqx.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/xyukhnyja4tc8cscdkpl.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Polished Chrome",
+        "color_code": "#CBD5E1",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/t9rbgszjwqvppnn3hqqx.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/xyukhnyja4tc8cscdkpl.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/t9rbgszjwqvppnn3hqqx.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/xyukhnyja4tc8cscdkpl.webp"
+          ]
+        }
+      },
+      {
+        "name": "Rose Gold",
+        "color_code": "#BE185D",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/gupqz6ljxi7jmdbgglrs.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/hnwb5mcx2hxe24e7xbij.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853850/chashmalay/products/gupqz6ljxi7jmdbgglrs.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/hnwb5mcx2hxe24e7xbij.webp"
+          ]
+        }
+      },
+      {
+        "name": "Stealth Graphite",
+        "color_code": "#1E293B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/b9wwyz3ctsbmftejnihf.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/b9wwyz3ctsbmftejnihf.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/b9wwyz3ctsbmftejnihf.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Pilot Shield Polarized",
+    "brand": "Chashmalay",
+    "category": "sunglasses",
+    "sku": "CSM-AV-0301-BLK",
+    "price": 1299,
+    "original_price": 2599,
+    "discount_price": 1299,
+    "description": "Iconic teardrop aviator sunglasses featuring dark polarized sun lenses and robust double-bridge architecture. Provides 100% UV protection with timeless style.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Aviator",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black Smoke"
+    ],
+    "default_color": "Matte Black Smoke",
+    "tags": "sunglasses, aviator, double bridge, polarized, sun protection",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/dfqwsdawtnbrlauszbna.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/dfqwsdawtnbrlauszbna.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/dfqwsdawtnbrlauszbna.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/dfqwsdawtnbrlauszbna.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black Smoke",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/dfqwsdawtnbrlauszbna.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/dfqwsdawtnbrlauszbna.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/dfqwsdawtnbrlauszbna.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Scott Signature Navigator",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0302-CLR",
+    "price": 1499,
+    "original_price": 2999,
+    "discount_price": 1499,
+    "description": "Premium Scott Signature Edition square navigator with ribbed metallic hinge accents and high-gloss acetate rims. Presented in our signature leatherette case.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Transparent Crystal Grey",
+      "Gloss Black Gold",
+      "Forest Green Gold"
+    ],
+    "default_color": "Transparent Crystal Grey",
+    "tags": "navigator, square, signature, premium acetate, gold hinge, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/k4cltmp0dizfkizj1s04.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/pbjo9jfzqwuinfl4jejz.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/k4cltmp0dizfkizj1s04.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/pbjo9jfzqwuinfl4jejz.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Transparent Crystal Grey",
+        "color_code": "#6B7280",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/k4cltmp0dizfkizj1s04.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/pbjo9jfzqwuinfl4jejz.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/k4cltmp0dizfkizj1s04.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/pbjo9jfzqwuinfl4jejz.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gloss Black Gold",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/tzcyyq23dlba3ex0i3w0.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/qclwfgcyeykodrqui5so.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/tzcyyq23dlba3ex0i3w0.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/qclwfgcyeykodrqui5so.webp"
+          ]
+        }
+      },
+      {
+        "name": "Forest Green Gold",
+        "color_code": "#14532D",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/v7b66ydgqqi5wvqdfbft.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/v7b66ydgqqi5wvqdfbft.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/v7b66ydgqqi5wvqdfbft.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Scott Polarized Wayfarer",
+    "brand": "Chashmalay",
+    "category": "sunglasses",
+    "sku": "CSM-WY-0303-BLK",
+    "price": 1399,
+    "original_price": 2799,
+    "discount_price": 1399,
+    "description": "High-grade wayfarer sunglasses with polarized category-3 dark lenses and triple-pin rivet details. Glare-free road and coastal clarity.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Wayfarer",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black Polarized",
+      "Gloss Black Grey Tint"
+    ],
+    "default_color": "Matte Black Polarized",
+    "tags": "sunglasses, wayfarer, polarized, uv protection, riveted, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black Polarized",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/wqa8hmjsqcjxxcn1giuq.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gloss Black Grey Tint",
+        "color_code": "#09090B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853851/chashmalay/products/pxq0jqtpridlswr67pid.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Scott Slim Wire Temple Square",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0304-BLK",
+    "price": 1349,
+    "original_price": 2699,
+    "discount_price": 1349,
+    "description": "Refined square frame pairing polished black acetate front with slim golden wire temples. Exudes contemporary boardroom elegance.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Polished Black Gold",
+      "Translucent Brown Gold",
+      "Crystal Ice Silver"
+    ],
+    "default_color": "Polished Black Gold",
+    "tags": "square, wire temple, gold accent, acetate, elegant",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/d3mniwxdn78ffdjak9wj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/flazyar4fd755xa1tiy6.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/d3mniwxdn78ffdjak9wj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/flazyar4fd755xa1tiy6.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Polished Black Gold",
+        "color_code": "#0A0A0A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/d3mniwxdn78ffdjak9wj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/flazyar4fd755xa1tiy6.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/d3mniwxdn78ffdjak9wj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/flazyar4fd755xa1tiy6.webp"
+          ]
+        }
+      },
+      {
+        "name": "Translucent Brown Gold",
+        "color_code": "#78350F",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/f6hnlzzeyjfnp3q83flt.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/n1bzr8jdoqgwonumg2mj.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/f6hnlzzeyjfnp3q83flt.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/n1bzr8jdoqgwonumg2mj.webp"
+          ]
+        }
+      },
+      {
+        "name": "Crystal Ice Silver",
+        "color_code": "#E2E8F0",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/yny8f99sqdkx3w3a6cil.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/dzebqxtvujzh7trsaqmu.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/yny8f99sqdkx3w3a6cil.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/dzebqxtvujzh7trsaqmu.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Horizon Clubmaster Sun",
+    "brand": "Chashmalay",
+    "category": "sunglasses",
+    "sku": "CSM-CM-0305-BLK",
+    "price": 1299,
+    "original_price": 2599,
+    "discount_price": 1299,
+    "description": "Vintage browline sunglasses with dark UV-blocking lenses and golden bridge accents. The quintessential retro sun-protection accessory.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Half Rim",
+    "frame_shape": "Clubmaster",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Black Gold G15",
+      "Havana Gold Brown"
+    ],
+    "default_color": "Black Gold G15",
+    "tags": "sunglasses, clubmaster, browline, gold bridge, retro sun",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/cy4m5ree1ghaaghtnhot.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/qsxnfnvjzt5wqgva5mxb.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/cy4m5ree1ghaaghtnhot.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/qsxnfnvjzt5wqgva5mxb.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Black Gold G15",
+        "color_code": "#0F172A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/cy4m5ree1ghaaghtnhot.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/qsxnfnvjzt5wqgva5mxb.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/cy4m5ree1ghaaghtnhot.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/qsxnfnvjzt5wqgva5mxb.webp"
+          ]
+        }
+      },
+      {
+        "name": "Havana Gold Brown",
+        "color_code": "#854D0E",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/et5dydxf8sllqp53sqyx.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/vesqj8liirkauuhjdpme.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/et5dydxf8sllqp53sqyx.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853853/chashmalay/products/vesqj8liirkauuhjdpme.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Modernist Geometric Hex",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-GE-0306-GM",
+    "price": 1149,
+    "original_price": 2299,
+    "discount_price": 1149,
+    "description": "Sculpted geometric contours rendered in featherlight metal wire with silicone nose bridges. Clean, futuristic, and comfortably balanced.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Geometric",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Sleek Gunmetal",
+      "Polished Gold",
+      "Matte Black"
+    ],
+    "default_color": "Sleek Gunmetal",
+    "tags": "geometric, modern, metal, slim, urban, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/tqaqdgzql6pkl52lvwbj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/arcuarjrspfe5vrdybzs.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/tqaqdgzql6pkl52lvwbj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/arcuarjrspfe5vrdybzs.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Sleek Gunmetal",
+        "color_code": "#374151",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/tqaqdgzql6pkl52lvwbj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/arcuarjrspfe5vrdybzs.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/tqaqdgzql6pkl52lvwbj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/arcuarjrspfe5vrdybzs.webp"
+          ]
+        }
+      },
+      {
+        "name": "Polished Gold",
+        "color_code": "#D97706",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/leh0fhzimy4skya8n1ny.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/kqntoxmm3mcba7sz8eom.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/leh0fhzimy4skya8n1ny.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/kqntoxmm3mcba7sz8eom.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/bdcfwayjhfcf6m8vihq8.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/oxyazqax4o2yptjgp5dv.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/bdcfwayjhfcf6m8vihq8.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/oxyazqax4o2yptjgp5dv.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Studio Classic Wayfarer",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-WY-0307-BLK",
+    "price": 1099,
+    "original_price": 2199,
+    "discount_price": 1099,
+    "description": "Classic everyday wayfarer featuring smooth curved brow and durable 5-barrel hinges. Flattering on square, round, and heart-shaped faces alike.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Wayfarer",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black",
+      "Dark Tortoise",
+      "Transparent Charcoal"
+    ],
+    "default_color": "Matte Black",
+    "tags": "wayfarer, everyday, acetate, versatile, classic",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/z5sp3copvl4jgrnsj8dj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/ypdonpx4un3pdiu0nfch.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/z5sp3copvl4jgrnsj8dj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/ypdonpx4un3pdiu0nfch.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/z5sp3copvl4jgrnsj8dj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/ypdonpx4un3pdiu0nfch.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853854/chashmalay/products/z5sp3copvl4jgrnsj8dj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/ypdonpx4un3pdiu0nfch.webp"
+          ]
+        }
+      },
+      {
+        "name": "Dark Tortoise",
+        "color_code": "#713F12",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/y0vvuvvekrcillklz8ai.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/mggadduinlj4vcrqjtrh.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/y0vvuvvekrcillklz8ai.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/mggadduinlj4vcrqjtrh.webp"
+          ]
+        }
+      },
+      {
+        "name": "Transparent Charcoal",
+        "color_code": "#4B5563",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/zb0fdugzkshl4mbmj20o.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/y2zcxybj4qwjigrf8oqe.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/zb0fdugzkshl4mbmj20o.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/y2zcxybj4qwjigrf8oqe.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Edge Aviator Metal",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-AV-0308-GM",
+    "price": 1199,
+    "original_price": 2399,
+    "discount_price": 1199,
+    "description": "Angular pilot teardrop frames with reinforced brow bar and micro-textured temple grips. Combines military heritage with modern comfort.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Aviator",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Brushed Gunmetal",
+      "Radiant Gold",
+      "Stealth Black"
+    ],
+    "default_color": "Brushed Gunmetal",
+    "tags": "aviator, pilot, angular, double bridge, metal, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/p1r3ccpnraebmp4lvmxj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/njbhahmdpakwzilgydim.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/p1r3ccpnraebmp4lvmxj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/njbhahmdpakwzilgydim.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Brushed Gunmetal",
+        "color_code": "#334155",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/p1r3ccpnraebmp4lvmxj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/njbhahmdpakwzilgydim.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/p1r3ccpnraebmp4lvmxj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853855/chashmalay/products/njbhahmdpakwzilgydim.webp"
+          ]
+        }
+      },
+      {
+        "name": "Radiant Gold",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/p2jhnf7f2fkmfuslew9k.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/asuzstqtrykkwloz0gpv.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/p2jhnf7f2fkmfuslew9k.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/asuzstqtrykkwloz0gpv.webp"
+          ]
+        }
+      },
+      {
+        "name": "Stealth Black",
+        "color_code": "#0F172A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/rcmm0wionoz31o5c07vq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/w5c8xv54ah9anlne6qen.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/rcmm0wionoz31o5c07vq.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/w5c8xv54ah9anlne6qen.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Vogue Cat-Eye Metal",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-CE-0309-RGD",
+    "price": 1149,
+    "original_price": 2299,
+    "discount_price": 1149,
+    "description": "Slender metal cat-eye frames featuring delicate crown styling and featherweight temples. An effortless lift that brightens everyday looks.",
+    "stock_quantity": 50,
+    "gender": "Women",
+    "frame_type": "Full Rim",
+    "frame_shape": "Cat Eye",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Rose Gold Silver",
+      "Champagne Gold",
+      "Midnight Black"
+    ],
+    "default_color": "Rose Gold Silver",
+    "tags": "cat eye, slim metal, feminine, graceful, women",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/svdyquxpgvirkifuhcz0.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/gyhw9mdciltdqg6laqtd.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/svdyquxpgvirkifuhcz0.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/gyhw9mdciltdqg6laqtd.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Rose Gold Silver",
+        "color_code": "#BE185D",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/svdyquxpgvirkifuhcz0.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/gyhw9mdciltdqg6laqtd.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/svdyquxpgvirkifuhcz0.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/gyhw9mdciltdqg6laqtd.webp"
+          ]
+        }
+      },
+      {
+        "name": "Champagne Gold",
+        "color_code": "#CA8A04",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/qp5h8fnem7r39pmctbpf.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/q6zubufizhlg61h7riqd.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/qp5h8fnem7r39pmctbpf.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853856/chashmalay/products/q6zubufizhlg61h7riqd.webp"
+          ]
+        }
+      },
+      {
+        "name": "Midnight Black",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/x4eqldhfai6af782odu3.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/x7cl0qdugtiq87lnvp6f.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/x4eqldhfai6af782odu3.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/x7cl0qdugtiq87lnvp6f.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Retro Round Wire",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RN-0310-GLD",
+    "price": 999,
+    "original_price": 1999,
+    "discount_price": 999,
+    "description": "Iconic circular wireframes inspired by vintage intellect. Ultra-thin profile that feels practically weightless on the nose and ears.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Round",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Antiqued Gold",
+      "Polished Silver",
+      "Matte Black"
+    ],
+    "default_color": "Antiqued Gold",
+    "tags": "round, wireframe, intellectual, vintage, lightweight",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/dzismrg9vf0amxq5pr3s.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/zbuqwwpqnerpfi8qvici.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/dzismrg9vf0amxq5pr3s.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/zbuqwwpqnerpfi8qvici.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Antiqued Gold",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/dzismrg9vf0amxq5pr3s.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/zbuqwwpqnerpfi8qvici.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/dzismrg9vf0amxq5pr3s.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/zbuqwwpqnerpfi8qvici.webp"
+          ]
+        }
+      },
+      {
+        "name": "Polished Silver",
+        "color_code": "#94A3B8",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/pqh2dt1orc0vxltyzhrl.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/ytl5gkqajq2dvxdqhgcm.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/pqh2dt1orc0vxltyzhrl.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/ytl5gkqajq2dvxdqhgcm.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/uegwlejiukd7y3qppuru.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/iehr7ltzdlv2k1m6pd6i.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/uegwlejiukd7y3qppuru.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853857/chashmalay/products/iehr7ltzdlv2k1m6pd6i.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Matrix Square Acetate",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0311-BLK",
+    "price": 1049,
+    "original_price": 2099,
+    "discount_price": 1049,
+    "description": "Structured square frame with smooth beveled eyewires and comfortable saddle bridge. Designed for confident, versatile all-day wear.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gloss Jet Black",
+      "Amber Havana",
+      "Crystal Grey"
+    ],
+    "default_color": "Gloss Jet Black",
+    "tags": "square, structured, acetate, saddle bridge, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/nbf7nqd9fyl4s9x1kt4f.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/xpoz96zq2fc6t6c7ywso.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/nbf7nqd9fyl4s9x1kt4f.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/xpoz96zq2fc6t6c7ywso.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gloss Jet Black",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/nbf7nqd9fyl4s9x1kt4f.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/xpoz96zq2fc6t6c7ywso.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/nbf7nqd9fyl4s9x1kt4f.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/xpoz96zq2fc6t6c7ywso.webp"
+          ]
+        }
+      },
+      {
+        "name": "Amber Havana",
+        "color_code": "#854D0E",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/tm58mhhjyfbu2myckyke.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/wacqcroxrevcemynj8gw.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/tm58mhhjyfbu2myckyke.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/wacqcroxrevcemynj8gw.webp"
+          ]
+        }
+      },
+      {
+        "name": "Crystal Grey",
+        "color_code": "#6B7280",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/zrr0ti0vuebksaoujbro.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/nhcgcllfvwtoovtwnl19.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/zrr0ti0vuebksaoujbro.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/nhcgcllfvwtoovtwnl19.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Elite Semi-Rimless Rectangular",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0312-GM",
+    "price": 1199,
+    "original_price": 2399,
+    "discount_price": 1199,
+    "description": "Polished half-rim rectangular metal frame with reinforced acetate temple sleeves. Professional, distinguished, and built to last.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Half Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gunmetal Black",
+      "Brushed Silver",
+      "Deep Navy Blue"
+    ],
+    "default_color": "Gunmetal Black",
+    "tags": "half rim, rectangular, metal, executive, sharp, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/rccdrsa7sqx5rgqlvkyf.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/ebm1qgacpupgsayxwhza.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/rccdrsa7sqx5rgqlvkyf.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/ebm1qgacpupgsayxwhza.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gunmetal Black",
+        "color_code": "#1E293B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/rccdrsa7sqx5rgqlvkyf.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/ebm1qgacpupgsayxwhza.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/rccdrsa7sqx5rgqlvkyf.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/ebm1qgacpupgsayxwhza.webp"
+          ]
+        }
+      },
+      {
+        "name": "Brushed Silver",
+        "color_code": "#CBD5E1",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/lefvcghlbgg8jg3q4p3v.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/tgnowro1evoarg7kwfsk.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/lefvcghlbgg8jg3q4p3v.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853858/chashmalay/products/tgnowro1evoarg7kwfsk.webp"
+          ]
+        }
+      },
+      {
+        "name": "Deep Navy Blue",
+        "color_code": "#1E3A8A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/mtziim7kzygyxnn6zqyl.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/nhbnqetgv40dj861nnvx.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/mtziim7kzygyxnn6zqyl.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/nhbnqetgv40dj861nnvx.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Aero Titanium Round",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RN-0313-GLD",
+    "price": 1399,
+    "original_price": 2799,
+    "discount_price": 1399,
+    "description": "Premium titanium round frames offering featherlight flexibility and superior hypoallergenic skin comfort. Tailored for subtle luxury.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Round",
+    "frame_material": "Titanium",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Champagne Gold",
+      "Dark Graphite",
+      "Satin Black"
+    ],
+    "default_color": "Champagne Gold",
+    "tags": "titanium, round, ultra light, hypoallergenic, premium",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/h1icleoj8hhtaf8lf0iw.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/ipsdmgbifdijhozup5vu.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/h1icleoj8hhtaf8lf0iw.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/ipsdmgbifdijhozup5vu.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Champagne Gold",
+        "color_code": "#D4AF37",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/h1icleoj8hhtaf8lf0iw.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/ipsdmgbifdijhozup5vu.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/h1icleoj8hhtaf8lf0iw.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/ipsdmgbifdijhozup5vu.webp"
+          ]
+        }
+      },
+      {
+        "name": "Dark Graphite",
+        "color_code": "#374151",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/fuhpzolpjsotc1k9cc4v.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/iyeuugfthyevohegjhmk.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/fuhpzolpjsotc1k9cc4v.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/iyeuugfthyevohegjhmk.webp"
+          ]
+        }
+      },
+      {
+        "name": "Satin Black",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/pkqgb1oqkhy654issp56.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/erynyloikbysnshavc03.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/pkqgb1oqkhy654issp56.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853859/chashmalay/products/erynyloikbysnshavc03.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Bold Flattop Square Sun",
+    "brand": "Chashmalay",
+    "category": "sunglasses",
+    "sku": "CSM-SQ-0314-BLK",
+    "price": 1399,
+    "original_price": 2799,
+    "discount_price": 1399,
+    "description": "Oversized flattop sunglasses with dark UV400 protective lenses and high-density acetate construction. A commanding head-turning statement silhouette.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Piano Black Dark Tint",
+      "Havana Brown Tint",
+      "Transparent Olive Grey"
+    ],
+    "default_color": "Piano Black Dark Tint",
+    "tags": "sunglasses, flattop, oversized, bold, uv400, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/z6qqq86zbt5wjj11zsfm.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/kklid9s9bmkkbvwrsbi1.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/z6qqq86zbt5wjj11zsfm.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/kklid9s9bmkkbvwrsbi1.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Piano Black Dark Tint",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/z6qqq86zbt5wjj11zsfm.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/kklid9s9bmkkbvwrsbi1.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/z6qqq86zbt5wjj11zsfm.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/kklid9s9bmkkbvwrsbi1.webp"
+          ]
+        }
+      },
+      {
+        "name": "Havana Brown Tint",
+        "color_code": "#713F12",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/lcqaezdz1moebordslpu.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/k5hz7v71jobo46qzhmde.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/lcqaezdz1moebordslpu.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/k5hz7v71jobo46qzhmde.webp"
+          ]
+        }
+      },
+      {
+        "name": "Transparent Olive Grey",
+        "color_code": "#365314",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/ardxze8cla61abgqrd7l.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/sy9aqmlgk9syhya7yboy.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/ardxze8cla61abgqrd7l.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/sy9aqmlgk9syhya7yboy.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Silhouette Pure Oval",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-OV-0315-SLV",
+    "price": 1049,
+    "original_price": 2099,
+    "discount_price": 1049,
+    "description": "Understated oval wireframe engineered with clean flowing lines and ergonomic temple curvature. Natural ease and versatile style.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Oval",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Polished Silver",
+      "Classic Gold",
+      "Matte Black"
+    ],
+    "default_color": "Polished Silver",
+    "tags": "oval, wireframe, minimalist, comfortable, clean",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/mnq38t8tzqd5ceyx3ueq.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/fr99pwytlvv6cq1hjnkm.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/mnq38t8tzqd5ceyx3ueq.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/fr99pwytlvv6cq1hjnkm.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Polished Silver",
+        "color_code": "#94A3B8",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/mnq38t8tzqd5ceyx3ueq.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/fr99pwytlvv6cq1hjnkm.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/mnq38t8tzqd5ceyx3ueq.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/fr99pwytlvv6cq1hjnkm.webp"
+          ]
+        }
+      },
+      {
+        "name": "Classic Gold",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/wkihcz014wnzgvl2ec6j.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/in5yatnrkorwedonhqjv.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/wkihcz014wnzgvl2ec6j.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/in5yatnrkorwedonhqjv.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black",
+        "color_code": "#18181B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/bpeudi9abmhtaibzkyvu.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/bcruhplbkiz6authwleq.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853860/chashmalay/products/bpeudi9abmhtaibzkyvu.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/bcruhplbkiz6authwleq.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Urban Active Rectangle",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-RC-0316-BLK",
+    "price": 899,
+    "original_price": 1799,
+    "discount_price": 899,
+    "description": "High-flexibility rectangular spectacles built from resilient TR90 polymer with dual-tone temple tips. Built to keep pace with an active lifestyle.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "TR90",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Matte Black Red",
+      "Matte Black Blue",
+      "Smoke Grey"
+    ],
+    "default_color": "Matte Black Red",
+    "tags": "rectangle, tr90, flexible, active, durable, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qo88tkjgwktkiad00hxj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/gnyhzxhybj0ldn67jvxg.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qo88tkjgwktkiad00hxj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/gnyhzxhybj0ldn67jvxg.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Matte Black Red",
+        "color_code": "#1F2937",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qo88tkjgwktkiad00hxj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/gnyhzxhybj0ldn67jvxg.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qo88tkjgwktkiad00hxj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/gnyhzxhybj0ldn67jvxg.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Black Blue",
+        "color_code": "#1E3A8A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/gnouzhjdapeaabgoymwj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/ow2uzvqt7o3i3x4i6ftn.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/gnouzhjdapeaabgoymwj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/ow2uzvqt7o3i3x4i6ftn.webp"
+          ]
+        }
+      },
+      {
+        "name": "Smoke Grey",
+        "color_code": "#4B5563",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/dnuy7ucibnisgysxpehi.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/cq6ipl2pojij8zgimpwo.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/dnuy7ucibnisgysxpehi.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/cq6ipl2pojij8zgimpwo.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Signature Aviator Sun",
+    "brand": "Chashmalay",
+    "category": "sunglasses",
+    "sku": "CSM-AV-0317-GLD",
+    "price": 1349,
+    "original_price": 2699,
+    "discount_price": 1349,
+    "description": "Refined metal aviator sunglasses with gradient sun lenses and comfortable adjustable bridge pads. Supreme UV protection and effortless charisma.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Aviator",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gold Brown Gradient",
+      "Silver Grey Gradient",
+      "Gunmetal Dark Grey"
+    ],
+    "default_color": "Gold Brown Gradient",
+    "tags": "sunglasses, aviator, gradient lenses, uv protection, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qvieckft1mitowzqdtl6.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/g3x0p9b7z9rvd5hf6qsn.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qvieckft1mitowzqdtl6.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/g3x0p9b7z9rvd5hf6qsn.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gold Brown Gradient",
+        "color_code": "#D97706",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qvieckft1mitowzqdtl6.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/g3x0p9b7z9rvd5hf6qsn.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/qvieckft1mitowzqdtl6.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853861/chashmalay/products/g3x0p9b7z9rvd5hf6qsn.webp"
+          ]
+        }
+      },
+      {
+        "name": "Silver Grey Gradient",
+        "color_code": "#94A3B8",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/ikvrs7g79sumhyiayoin.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/mjebbgywbtkxpaiqoekp.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/ikvrs7g79sumhyiayoin.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/mjebbgywbtkxpaiqoekp.webp"
+          ]
+        }
+      },
+      {
+        "name": "Gunmetal Dark Grey",
+        "color_code": "#1E293B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/labpdslj03yphs5bszlw.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/ocidcq0skuquwittxhls.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/labpdslj03yphs5bszlw.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/ocidcq0skuquwittxhls.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Neo Cat-Eye Acetate",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-CE-0318-BRN",
+    "price": 1149,
+    "original_price": 2299,
+    "discount_price": 1149,
+    "description": "Sleek cat-eye with modern angular corners and vibrant rich pigmentation. Creates an instant uplifting aesthetic for daily eyewear.",
+    "stock_quantity": 50,
+    "gender": "Women",
+    "frame_type": "Full Rim",
+    "frame_shape": "Cat Eye",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Deep Ruby Red",
+      "Tortoise Havana",
+      "Midnight Black"
+    ],
+    "default_color": "Deep Ruby Red",
+    "tags": "cat eye, modern, acetate, stylish, women",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/pxqhydxldgrfjx5mjwd5.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/rhiwjdwau5ry59bfzyax.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/pxqhydxldgrfjx5mjwd5.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/rhiwjdwau5ry59bfzyax.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Deep Ruby Red",
+        "color_code": "#991B1B",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/pxqhydxldgrfjx5mjwd5.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/rhiwjdwau5ry59bfzyax.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/pxqhydxldgrfjx5mjwd5.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/rhiwjdwau5ry59bfzyax.webp"
+          ]
+        }
+      },
+      {
+        "name": "Tortoise Havana",
+        "color_code": "#854D0E",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/cum8fo0lsr42ulmy7kg8.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/qouugtcsj8qqhxtgrqzz.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/cum8fo0lsr42ulmy7kg8.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853862/chashmalay/products/qouugtcsj8qqhxtgrqzz.webp"
+          ]
+        }
+      },
+      {
+        "name": "Midnight Black",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/kigdpuubemvobbxpq8cj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/pn6e6dlvkgsqumbun7pw.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/kigdpuubemvobbxpq8cj.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/pn6e6dlvkgsqumbun7pw.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Horizon Wayfarer",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-WY-0319-BLK",
+    "price": 1049,
+    "original_price": 2099,
+    "discount_price": 1049,
+    "description": "Subtle trapezoidal wayfarer profile sculpted from rich acetate with soft polished bevels. A perennial optical staple.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Wayfarer",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gloss Black",
+      "Crystal Transparent",
+      "Amber Tortoise"
+    ],
+    "default_color": "Gloss Black",
+    "tags": "wayfarer, timeless, acetate, daily wear, unisex",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/zvow5ojothukjrshhw53.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/ntv8rkluu7zmiggydtlc.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/zvow5ojothukjrshhw53.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/ntv8rkluu7zmiggydtlc.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gloss Black",
+        "color_code": "#0A0A0A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/zvow5ojothukjrshhw53.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/ntv8rkluu7zmiggydtlc.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/zvow5ojothukjrshhw53.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/ntv8rkluu7zmiggydtlc.webp"
+          ]
+        }
+      },
+      {
+        "name": "Crystal Transparent",
+        "color_code": "#F3F4F6",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/sinj2duhyf8odpva9svr.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/r5xmzgzvvk0zon4j1uvx.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/sinj2duhyf8odpva9svr.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/r5xmzgzvvk0zon4j1uvx.webp"
+          ]
+        }
+      },
+      {
+        "name": "Amber Tortoise",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/hcmiesonowvzdhompthy.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/dsnwgjdxags9kfirvkyt.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/hcmiesonowvzdhompthy.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/dsnwgjdxags9kfirvkyt.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Geometric Octa Sun",
+    "brand": "Chashmalay",
+    "category": "sunglasses",
+    "sku": "CSM-GE-0320-GLD",
+    "price": 1299,
+    "original_price": 2599,
+    "discount_price": 1299,
+    "description": "Futuristic eight-sided geometric sunglasses with UV400 tinted lenses and slimline metal alloy temples. For distinct, bold street style.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Geometric",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gold Green Tint",
+      "Silver Blue Tint",
+      "Black Dark Smoke"
+    ],
+    "default_color": "Gold Green Tint",
+    "tags": "sunglasses, geometric, octagon, metal, uv400, streetwear",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/xlhh3rpugy8jx6w7r031.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/w1ef7f91jgban0xnl8sm.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/xlhh3rpugy8jx6w7r031.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/w1ef7f91jgban0xnl8sm.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gold Green Tint",
+        "color_code": "#B45309",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/xlhh3rpugy8jx6w7r031.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/w1ef7f91jgban0xnl8sm.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853863/chashmalay/products/xlhh3rpugy8jx6w7r031.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/w1ef7f91jgban0xnl8sm.webp"
+          ]
+        }
+      },
+      {
+        "name": "Silver Blue Tint",
+        "color_code": "#2563EB",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/vwzvaci8tpwbzaefmms0.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/pic27ufkhzv5ewc6i2uu.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/vwzvaci8tpwbzaefmms0.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/pic27ufkhzv5ewc6i2uu.webp"
+          ]
+        }
+      },
+      {
+        "name": "Black Dark Smoke",
+        "color_code": "#111827",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/lwacsrinoz4br3p2wnd7.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/sfs81xaymujhej8ygq3z.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/lwacsrinoz4br3p2wnd7.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/sfs81xaymujhej8ygq3z.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Prestige Square Acetate",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0321-HVN",
+    "price": 1199,
+    "original_price": 2399,
+    "discount_price": 1199,
+    "description": "Substantial square frames engineered with premium acetate depth, smooth nose bevels, and reinforced core-wire temples.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Acetate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Dark Walnut Tortoise",
+      "Smoke Translucent",
+      "Piano Black",
+      "Matte Olive"
+    ],
+    "default_color": "Dark Walnut Tortoise",
+    "tags": "square, prestige, acetate, corewire, classic",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/y3vetar9klk9pe8dojri.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/jwmidxs8wk7dirwa8zer.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/y3vetar9klk9pe8dojri.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/jwmidxs8wk7dirwa8zer.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Dark Walnut Tortoise",
+        "color_code": "#451A03",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/y3vetar9klk9pe8dojri.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/jwmidxs8wk7dirwa8zer.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/y3vetar9klk9pe8dojri.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/jwmidxs8wk7dirwa8zer.webp"
+          ]
+        }
+      },
+      {
+        "name": "Smoke Translucent",
+        "color_code": "#4B5563",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/sczkpvai5nj5jjfhezsn.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/qemvjebfhyhbb6nunyxq.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/sczkpvai5nj5jjfhezsn.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853864/chashmalay/products/qemvjebfhyhbb6nunyxq.webp"
+          ]
+        }
+      },
+      {
+        "name": "Piano Black",
+        "color_code": "#000000",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/d5bd8kif6l2pcp3rmyyo.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/yjqzpsgavx9tay0ffwsr.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/d5bd8kif6l2pcp3rmyyo.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/yjqzpsgavx9tay0ffwsr.webp"
+          ]
+        }
+      },
+      {
+        "name": "Matte Olive",
+        "color_code": "#14532D",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/vvqeoztg8yk5j7hc8pi5.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/yzus9qcubhdbixbn4exg.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/vvqeoztg8yk5j7hc8pi5.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/yzus9qcubhdbixbn4exg.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Executive Metal Navigator",
+    "brand": "Chashmalay",
+    "category": "eyeglasses",
+    "sku": "CSM-SQ-0322-GM",
+    "price": 1249,
+    "original_price": 2499,
+    "discount_price": 1249,
+    "description": "Streamlined squared metal navigator frame with ribbed brow bar and high-durability flex hinges. Engineered for sharp executive style.",
+    "stock_quantity": 50,
+    "gender": "Men",
+    "frame_type": "Full Rim",
+    "frame_shape": "Square",
+    "frame_material": "Metal",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Gunmetal Slate"
+    ],
+    "default_color": "Gunmetal Slate",
+    "tags": "navigator, metal, executive, sharp, men",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/re8u7f8funmegdikytwj.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/re8u7f8funmegdikytwj.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/re8u7f8funmegdikytwj.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/re8u7f8funmegdikytwj.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Gunmetal Slate",
+        "color_code": "#334155",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/re8u7f8funmegdikytwj.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/re8u7f8funmegdikytwj.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853865/chashmalay/products/re8u7f8funmegdikytwj.webp"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chashmalay Scott Premium Eyewear Case & Cloth",
+    "brand": "Chashmalay",
+    "category": "reading-glasses",
+    "sku": "CSM-RC-0401-BLU",
+    "price": 799,
+    "original_price": 1499,
+    "discount_price": 799,
+    "description": "Luxury hard-shell protective eyewear case paired with an ultra-fine microfiber lens cleaning cloth. Safeguards your frames from drops and scratches.",
+    "stock_quantity": 50,
+    "gender": "Unisex",
+    "frame_type": "Full Rim",
+    "frame_shape": "Rectangle",
+    "frame_material": "Polycarbonate",
+    "lens_type": "Single Vision",
+    "available_sizes": [
+      "M",
+      "L"
+    ],
+    "available_colors": [
+      "Navy Blue Orange",
+      "Pastel Puffer Multi"
+    ],
+    "default_color": "Navy Blue Orange",
+    "tags": "accessory, spectacle case, microfiber cloth, protection, scott",
+    "is_active": true,
+    "is_new": true,
+    "is_featured": false,
+    "images": {
+      "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+      "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+      "model": "",
+      "zoom": "",
+      "gallery": [
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+        "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp"
+      ]
+    },
+    "colors": [
+      {
+        "name": "Navy Blue Orange",
+        "color_code": "#1E3A8A",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/rjsacln1imlhn5dqpwkz.webp"
+          ]
+        }
+      },
+      {
+        "name": "Pastel Puffer Multi",
+        "color_code": "#F3E8FF",
+        "images": {
+          "front": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/o2sleh3umb3abg1hma0r.webp",
+          "side": "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/xqevnvwructrvi8bmdgq.webp",
+          "gallery": [
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/o2sleh3umb3abg1hma0r.webp",
+            "https://res.cloudinary.com/dpv40ou2c/image/upload/v1790853852/chashmalay/products/xqevnvwructrvi8bmdgq.webp"
+          ]
+        }
+      }
+    ]
+  }
+]

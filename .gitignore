@@ -36,3 +36,8 @@ dist-ssr
 *.sw?
 .vercel
 .env*
+
+# Raw product image folders (never commit to git)
+Chashmalay img 1/
+Chashmalay img 2/
+*Chashmalay img*
