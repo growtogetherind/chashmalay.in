@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Save, Mail, Wrench, Globe, Truck, Bell, Eye, EyeOff, Send, Trash2, AlertTriangle } from 'lucide-react';
-import { saveSettings, subscribeSettings, getPrivateSettings, purgeStoreData } from '../../lib/firebase';
-import { useConfirm } from '../../context/ConfirmContext';
+import { Save, Mail, Wrench, Globe, Truck, Bell, Eye, EyeOff, Send } from 'lucide-react';
+import { saveSettings, subscribeSettings, getPrivateSettings } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 
 const AdminSettings = () => {
-  const { confirm } = useConfirm();
   const [form, setForm] = useState({
     store_name: 'Chashmalay',
     contact_email: '',
@@ -25,43 +23,11 @@ const AdminSettings = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [purging, setPurging] = useState(false);
 
   const [showToken, setShowToken] = useState(false);
   const [fetchingChatId, setFetchingChatId] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
   const [botUsername, setBotUsername] = useState('Chashmalay_bot');
-
-  const handlePurgeData = async () => {
-    const isConfirmed = await confirm({
-      title: '⚠️ PERMANENTLY DELETE ALL PRODUCTS & ORDERS?',
-      message: 'This will completely wipe all Products, Orders, Order Items, Prescriptions, and Reviews from Firestore. This cannot be undone. Are you sure you want to proceed?'
-    });
-
-    if (!isConfirmed) return;
-
-    setPurging(true);
-    const toastId = toast.loading('Purging products, orders, prescriptions & reviews...');
-    try {
-      const { data, error } = await purgeStoreData({
-        products: true,
-        orders: true,
-        prescriptions: true,
-        reviews: true
-      });
-
-      if (error) {
-        toast.error('Failed to purge store data: ' + error.message, { id: toastId });
-      } else {
-        const total = (data.products || 0) + (data.orders || 0) + (data.prescriptions || 0) + (data.reviews || 0);
-        toast.success(`Successfully deleted ${total} records! (Products: ${data.products || 0}, Orders: ${data.orders || 0}, Prescriptions: ${data.prescriptions || 0}, Reviews: ${data.reviews || 0})`, { id: toastId, duration: 6000 });
-      }
-    } catch (err) {
-      toast.error(err.message || 'Error purging store data', { id: toastId });
-    } finally {
-      setPurging(false);
-    }
-  };
 
   useEffect(() => {
     // Public settings stream live from settings/global.
@@ -387,34 +353,6 @@ const AdminSettings = () => {
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Danger Zone: Purge Store Data */}
-              <div className="admin-card !p-10 relative overflow-hidden group hover:shadow-2xl hover:shadow-red-500/10 transition-all border-red-200 bg-red-50/20">
-                <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity pointer-events-none text-red-500"><Trash2 size={120} /></div>
-                <h3 className="text-[11px] font-black uppercase tracking-[3px] text-red-600 flex items-center gap-4 mb-4">
-                  <span className="w-10 h-0.5 bg-red-500/40"></span> Danger Zone — Data Reset
-                </h3>
-                <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-                  Permanently wipe all <strong>Products</strong>, <strong>Orders</strong>, <strong>Prescriptions</strong>, and <strong>Reviews</strong> from Firestore.
-                </p>
-                <div className="p-4 bg-white/80 border border-red-200 rounded-2xl mb-6">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={18} />
-                    <p className="text-[11px] text-slate-600 font-medium">
-                      This action cannot be undone. All product inventory, past customer orders, and reviews will be permanently deleted.
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handlePurgeData}
-                  disabled={purging}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 disabled:opacity-50"
-                >
-                  <Trash2 size={16} />
-                  <span>{purging ? 'PURGING DATA...' : 'DELETE ALL PRODUCTS & ORDERS'}</span>
-                </button>
               </div>
             </div>
           </form>
