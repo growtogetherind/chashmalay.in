@@ -17,23 +17,31 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.is_admin == true;
     }
 
+    // Direct email authentication for designated system administrators
+    function isDesignatedAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'chashmalayshorts@gmail.com' ||
+        request.auth.token.email == 'admin@gmail.com'
+      );
+    }
+
     // Role hierarchies
     function isSuperAdmin() {
-      return getRole() == 'super_admin';
+      return isDesignatedAdmin() || getRole() == 'super_admin';
     }
 
     function isAdmin() {
-      return isSuperAdmin() || getRole() == 'admin' || isAdminLegacy();
+      return isDesignatedAdmin() || isSuperAdmin() || getRole() == 'admin' || isAdminLegacy();
     }
 
     // Managers can manage catalog (products, coupons, categories) but not delete or edit credentials/settings
     function isManager() {
-      return isAdmin() || getRole() == 'manager';
+      return isDesignatedAdmin() || isAdmin() || getRole() == 'manager';
     }
 
     // Staff can view order/catalog and only update order statuses
     function isStaff() {
-      return isManager() || getRole() == 'staff';
+      return isDesignatedAdmin() || isManager() || getRole() == 'staff';
     }
 
     // ─── Products ──────────────────────────────────────────────────────────────
@@ -52,10 +60,14 @@ service cloud.firestore {
         (request.auth.uid == userId || isStaff());
 
       // Allow users to create their own profile, ensuring is_admin & role are safe
-      allow create: if request.auth != null &&
-        request.auth.uid == userId &&
-        (!('is_admin' in request.resource.data) || request.resource.data.is_admin == false) &&
-        (!('role' in request.resource.data) || request.resource.data.role == 'customer');
+      allow create: if request.auth != null && (
+        isDesignatedAdmin() ||
+        (
+          request.auth.uid == userId &&
+          (!('is_admin' in request.resource.data) || request.resource.data.is_admin == false) &&
+          (!('role' in request.resource.data) || request.resource.data.role == 'customer')
+        )
+      );
 
       // Allow users to update their profile details but block self-role modifications
       allow update: if (request.auth != null &&
