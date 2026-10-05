@@ -460,7 +460,7 @@ const AdminSettings = () => {
                   className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20 disabled:opacity-50"
                 >
                   <UploadCloud size={16} />
-                  <span>{importing ? `PUBLISHING (${importProgress?.current || 0}/${importProgress?.total || 52})...` : 'PUBLISH 52 PRODUCTS TO LIVE STORE'}</span>
+                  <span>{importing ? `PUBLISHING (${importProgress?.current || 0}/${importProgress?.total || 67})...` : 'PUBLISH 67 PRODUCTS TO LIVE STORE'}</span>
                 </button>
               </div>
 
