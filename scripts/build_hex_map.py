@@ -1,0 +1,107 @@
+import json
+
+with open('scripts/upload_plan_199.json', 'r', encoding='utf-8') as f:
+    plan = json.load(f)
+
+colors = sorted(list(set(item['color'] for item in plan)))
+print(f"Total unique colors in plan: {len(colors)}")
+
+color_hex_defaults = {
+    'Matte Black Red': '#1A1A1A',
+    'Matte Black Blue': '#1E293B',
+    'Crystal Smoke Grey': '#64748B',
+    'Navy Blue Red': '#1E3A8A',
+    'Matte Black': '#1A1A1A',
+    'Smoke Grey Lime': '#4B5563',
+    'Matte Black Crimson': '#18181B',
+    'Glossy Black Camo': '#111827',
+    'Matte Black Gold': '#1F2937',
+    'Dark Tortoise Amber': '#78350F',
+    'Transparent Olive': '#52525B',
+    'Rose Gold': '#E0A899',
+    'Gunmetal Black': '#374151',
+    'Metallic Gold': '#D97706',
+    'Gunmetal Silver': '#4B5563',
+    'Vintage Gold': '#B45309',
+    'Burgundy Wine': '#7F1D1D',
+    'Havana Tortoise': '#92400E',
+    'Midnight Black': '#0F172A',
+    'Sleek Silver': '#94A3B8',
+    'Champagne Gold': '#D4AF37',
+    'Gloss Black Gold': '#1A1A1A',
+    'Dark Havana Tortoise': '#713F12',
+    'Transparent Grey Silver': '#9CA3AF',
+    'Rose Gold Copper': '#D97706',
+    'Gunmetal Grey': '#4B5563',
+    'Brushed Gold': '#EAB308',
+    'Gunmetal Steel': '#334155',
+    'Deep Navy': '#0F172A',
+    'Crystal Transparent': '#CBD5E1',
+    'Amber Honey': '#D97706',
+    'Piano Black': '#09090B',
+    'Matte Olive Green': '#3F6212',
+    'Dark Walnut Brown': '#451A03',
+    'Onyx Black': '#18181B',
+    'Charcoal Grey': '#374151',
+    'Deep Cobalt': '#1D4ED8',
+    'Matte Raven': '#1E293B',
+    'Burgundy Tortoise': '#831843',
+    'Smoky Translucent': '#6B7280',
+    'Classic Jet Black': '#09090B',
+    'Brushed Silver': '#94A3B8',
+    'Gunmetal': '#475569',
+    'Matte Black Silver': '#1E293B',
+    'Military Olive': '#4D5D53',
+    'Navy Blue Gunmetal': '#1E3A8A',
+    'Rose Quartz Clear': '#FDA4AF',
+    'Leopard Havana': '#78350F',
+    'Gloss Black': '#000000',
+    'Tortoise Amber': '#B45309',
+    'Brushed Bronze': '#854D0E',
+    'Polished Silver': '#CBD5E1',
+    'Warm Gold Brown': '#A16207',
+    'Stealth Black Dark Tint': '#0F172A',
+    'Blush Peach': '#FDBA74',
+    'Honey Demi': '#CA8A04',
+    'Jet Black': '#000000',
+    'Matte Black Orange': '#1E293B',
+    'Charcoal Blue': '#334155',
+    'Solid Black': '#0A0A0A',
+    'Matte Brown Tortoise': '#713F12',
+    'Frosted Grey': '#9CA3AF',
+    'Deep Ink Black': '#0B0F19',
+    'Amber Tortoise': '#9A3412',
+    'Crystal Clear': '#E2E8F0',
+    'Classic Gold': '#EAB308',
+    'Polished Chrome': '#E2E8F0',
+    'Stealth Graphite': '#1E293B',
+    'Gloss Noir Silver Rivet': '#0F172A',
+    'Gunmetal Slate': '#334155',
+    'Mint Seafoam Green': '#6EE7B7',
+    'Ice Glacier Blue': '#93C5FD',
+    'Blush Rose Pink': '#F472B6',
+    'Royal Cobalt Blue': '#2563EB',
+    'Slate Teal Green': '#0D9488',
+    'Frosted Crystal White': '#F8FAFC',
+    'Gold Clear': '#FDE047',
+    'Silver Clear': '#E2E8F0',
+    'Black Clear': '#18181B',
+    'Tortoise Havana': '#78350F',
+    'Deep Ruby Red': '#991B1B',
+    'Gunmetal Clear': '#4B5563',
+    'Smoke Grey': '#6B7280',
+    'Transparent Olive Grey': '#64748B',
+    'Havana Brown': '#854D0E',
+    'Satin Black': '#1C1917',
+    'Deep Navy Blue': '#172554',
+    'Gloss Jet Black': '#020617'
+}
+
+hex_map = {}
+for c in colors:
+    hex_map[c] = color_hex_defaults.get(c, '#1A1A1A')
+
+with open('scripts/color_hex_map.json', 'w', encoding='utf-8') as f:
+    json.dump(hex_map, f, indent=2)
+
+print("Saved color_hex_map.json successfully!")

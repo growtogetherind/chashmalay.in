@@ -1,0 +1,2537 @@
+[
+  {
+    "group": "G1",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 9,
+    "structureType": "Multiple products in group",
+    "productsCount": 4,
+    "products": [
+      {
+        "name": "Chashmalay Neo Square Acetate",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black Red": [
+            {
+              "filename": "RGP_2738.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2739.webp",
+              "role": "side"
+            }
+          ],
+          "Matte Black Blue": [
+            {
+              "filename": "RGP_2740.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2741.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Crystal Clear Wayfarer",
+        "shape": "Wayfarer",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Crystal Smoke Grey": [
+            {
+              "filename": "RGP_2743.webp",
+              "role": "front"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay AeroFlex 2-in-1 Clip-On",
+        "shape": "Square",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Navy Blue Red": [
+            {
+              "filename": "RGP_2744.webp",
+              "role": "FRONT"
+            },
+            {
+              "filename": "RGP_2745.webp",
+              "role": "FRONT"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Urban Classic Wayfarer",
+        "shape": "Wayfarer",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black": [
+            {
+              "filename": "RGP_2746.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2747.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G2",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 4,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Metro Edge Blue-Cut Rectangle",
+        "shape": "Rectangle",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Smoke Grey Lime": [
+            {
+              "filename": "RGP_2748.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2749.webp",
+              "role": "side"
+            }
+          ],
+          "Matte Black Crimson": [
+            {
+              "filename": "RGP_2750.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2751.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G3",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Artisan Trapezoid",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Glossy Black Camo": [
+            {
+              "filename": "RGP_2753.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2754.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G4",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Horizon Bold Square",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black Gold": [
+            {
+              "filename": "RGP_2755.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2757.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G5",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Horizon Bold Square",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Dark Tortoise Amber": [
+            {
+              "filename": "RGP_2758.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2759.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G6",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Horizon Bold Square",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Transparent Olive": [
+            {
+              "filename": "RGP_2760.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2761.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G7",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 4,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Slimline Blue-Blocker Geometric",
+        "shape": "Geometric",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Rose Gold": [
+            {
+              "filename": "RGP_2762.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2763.webp",
+              "role": "side"
+            }
+          ],
+          "Gunmetal Black": [
+            {
+              "filename": "RGP_2764.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2765.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G8",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Slimline Blue-Blocker Geometric",
+        "shape": "Geometric",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Metallic Gold": [
+            {
+              "filename": "RGP_2766.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2767.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G9",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Retro Vintage Aviator",
+        "shape": "Aviator",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gunmetal Silver": [
+            {
+              "filename": "RGP_2769.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2770.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G10",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Retro Vintage Aviator",
+        "shape": "Aviator",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Vintage Gold": [
+            {
+              "filename": "RGP_2771.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2773.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G11",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 4,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Retro Vintage Aviator",
+        "shape": "Aviator",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black": [
+            {
+              "filename": "RGP_2774.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2775.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Cat-Eye Bloom",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Burgundy Wine": [
+            {
+              "filename": "RGP_2776.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2777.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G12",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Cat-Eye Bloom",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Havana Tortoise": [
+            {
+              "filename": "RGP_2778.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2779.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G13",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Cat-Eye Bloom",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Midnight Black": [
+            {
+              "filename": "RGP_2780.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2781.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G14",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 6,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Minimalist Oval Reader",
+        "shape": "Oval",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Sleek Silver": [
+            {
+              "filename": "RGP_2782.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2783.webp",
+              "role": "side"
+            }
+          ],
+          "Champagne Gold": [
+            {
+              "filename": "RGP_2784.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2785.webp",
+              "role": "side"
+            }
+          ],
+          "Matte Black": [
+            {
+              "filename": "RGP_2786.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2787.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G15",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 6,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Clubmaster Heritage",
+        "shape": "Clubmaster",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gloss Black Gold": [
+            {
+              "filename": "RGP_2788.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2789.webp",
+              "role": "side"
+            }
+          ],
+          "Dark Havana Tortoise": [
+            {
+              "filename": "RGP_2790.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2791.webp",
+              "role": "side"
+            }
+          ],
+          "Transparent Grey Silver": [
+            {
+              "filename": "RGP_2792.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2793.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G16",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay UltraLight Hexagon",
+        "shape": "Geometric",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Rose Gold Copper": [
+            {
+              "filename": "RGP_2794.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2795.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G17",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 6,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay UltraLight Hexagon",
+        "shape": "Geometric",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gunmetal Grey": [
+            {
+              "filename": "RGP_2796.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2797.webp",
+              "role": "side"
+            }
+          ],
+          "Brushed Gold": [
+            {
+              "filename": "RGP_2798.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2799.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Executive Semi-Rimless",
+        "shape": "Rectangle",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black": [
+            {
+              "filename": "RGP_2800.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2801.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G18",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Executive Semi-Rimless",
+        "shape": "Rectangle",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gunmetal Steel": [
+            {
+              "filename": "RGP_2803.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2804.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G19",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Executive Semi-Rimless",
+        "shape": "Rectangle",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Deep Navy": [
+            {
+              "filename": "RGP_2805.webp",
+              "role": "front"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Studio Modern Round",
+        "shape": "Round",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Crystal Transparent": [
+            {
+              "filename": "RGP_2807.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G20",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Studio Modern Round",
+        "shape": "Round",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Crystal Transparent": [
+            {
+              "filename": "RGP_2808.webp",
+              "role": "side"
+            }
+          ],
+          "Amber Honey": [
+            {
+              "filename": "RGP_2810.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G21",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Studio Modern Round",
+        "shape": "Round",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Piano Black": [
+            {
+              "filename": "RGP_2811.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2812.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G22",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Prism Angular Square",
+        "shape": "Square",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Olive Green": [
+            {
+              "filename": "RGP_2814.webp",
+              "role": "side"
+            }
+          ],
+          "Dark Walnut Brown": [
+            {
+              "filename": "RGP_2815.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G23",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 3,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Prism Angular Square",
+        "shape": "Square",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Dark Walnut Brown": [
+            {
+              "filename": "RGP_2816.webp",
+              "role": "side"
+            }
+          ],
+          "Onyx Black": [
+            {
+              "filename": "RGP_2818.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2819.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G24",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Alpha Screen Pro Blue-Light Shield",
+        "shape": "Rectangle",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Charcoal Grey": [
+            {
+              "filename": "RGP_2820.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2821.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G25",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 10,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Alpha Screen Pro Blue-Light Shield",
+        "shape": "Rectangle",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Deep Cobalt": [
+            {
+              "filename": "RGP_2822.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2823.webp",
+              "role": "side"
+            }
+          ],
+          "Matte Raven": [
+            {
+              "filename": "RGP_2824.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2825.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Contour Soft Square",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Burgundy Tortoise": [
+            {
+              "filename": "RGP_2826.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2827.webp",
+              "role": "side"
+            }
+          ],
+          "Smoky Translucent": [
+            {
+              "filename": "RGP_2828.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2829.webp",
+              "role": "side"
+            }
+          ],
+          "Classic Jet Black": [
+            {
+              "filename": "RGP_2830.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2831.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G26",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Luxe Rimless Titanium",
+        "shape": "Rectangle",
+        "material": "Titanium",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Brushed Silver": [
+            {
+              "filename": "RGP_2832.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2833.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G27",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Luxe Rimless Titanium",
+        "shape": "Rectangle",
+        "material": "Titanium",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Champagne Gold": [
+            {
+              "filename": "RGP_2834.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2835.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G28",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 4,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Luxe Rimless Titanium",
+        "shape": "Rectangle",
+        "material": "Titanium",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gunmetal": [
+            {
+              "filename": "RGP_2836.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2837.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Nova Navigator Optical",
+        "shape": "Square",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black Silver": [
+            {
+              "filename": "RGP_2838.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2839.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G29",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 0,
+    "status": "Empty Group",
+    "products": []
+  },
+  {
+    "group": "G30",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Nova Navigator Optical",
+        "shape": "Square",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Military Olive": [
+            {
+              "filename": "RGP_2840.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2841.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G31",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Nova Navigator Optical",
+        "shape": "Square",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Navy Blue Gunmetal": [
+            {
+              "filename": "RGP_2842.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2843.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G32",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Flare Butterfly Cat-Eye",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Rose Quartz Clear": [
+            {
+              "filename": "RGP_2845.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2846.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G33",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 0,
+    "status": "Empty Group",
+    "products": []
+  },
+  {
+    "group": "G34",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Flare Butterfly Cat-Eye",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Leopard Havana": [
+            {
+              "filename": "RGP_2847.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2848.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G35",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Flare Butterfly Cat-Eye",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gloss Black": [
+            {
+              "filename": "RGP_2850.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2851.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G36",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Matrix Thin Anti-Glare Round",
+        "shape": "Round",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Tortoise Amber": [
+            {
+              "filename": "RGP_2852.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2853.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G37",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Matrix Thin Anti-Glare Round",
+        "shape": "Round",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Transparent Crystal": [
+            {
+              "filename": "RGP_2854.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2855.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G38",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Matrix Thin Anti-Glare Round",
+        "shape": "Round",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Midnight Black": [
+            {
+              "filename": "RGP_2856.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2857.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G39",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Apex Octagon Metal",
+        "shape": "Geometric",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Brushed Bronze": [
+            {
+              "filename": "RGP_2858.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2859.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G40",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Apex Octagon Metal",
+        "shape": "Geometric",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Polished Silver": [
+            {
+              "filename": "RGP_2860.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2861.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG41",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 7,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Pioneer Pilot Double-Bridge Sun",
+        "shape": "Aviator",
+        "material": "Metal",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Warm Gold Brown": [
+            {
+              "filename": "RGP_2866.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2867.webp",
+              "role": "side"
+            }
+          ],
+          "Stealth Black Dark Tint": [
+            {
+              "filename": "RGP_2868.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2869.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Vogue Elegance Oval",
+        "shape": "Oval",
+        "material": "Acetate",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Blush Peach": [
+            {
+              "filename": "RGP_2870.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2871.webp",
+              "role": "side"
+            }
+          ],
+          "Honey Demi": [
+            {
+              "filename": "RGP_2872.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG42",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 7,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Vogue Elegance Oval",
+        "shape": "Oval",
+        "material": "Acetate",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Honey Demi": [
+            {
+              "filename": "RGP_2873.webp",
+              "role": "side"
+            }
+          ],
+          "Jet Black": [
+            {
+              "filename": "RGP_2874.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2875.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Veloce Sport 2-in-1 Clip-On",
+        "shape": "Rectangle",
+        "material": "TR90",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Matte Black Orange": [
+            {
+              "filename": "RGP_2876.webp",
+              "role": "FRONT"
+            },
+            {
+              "filename": "RGP_2877.webp",
+              "role": "FRONT"
+            }
+          ],
+          "Charcoal Blue": [
+            {
+              "filename": "RGP_2878.webp",
+              "role": "FRONT"
+            },
+            {
+              "filename": "RGP_2879.webp",
+              "role": "FRONT"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG43",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 3,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Veloce Sport 2-in-1 Clip-On",
+        "shape": "Rectangle",
+        "material": "TR90",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Solid Black": [
+            {
+              "filename": "RGP_2880.webp",
+              "role": "FRONT"
+            },
+            {
+              "filename": "RGP_2881.webp",
+              "role": "FRONT"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Kinetic Junior Wayfarer",
+        "shape": "Wayfarer",
+        "material": "TR90",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Matte Brown Tortoise": [
+            {
+              "filename": "RGP_2882.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG44",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 3,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Kinetic Junior Wayfarer",
+        "shape": "Wayfarer",
+        "material": "TR90",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Matte Brown Tortoise": [
+            {
+              "filename": "RGP_2883.webp",
+              "role": "side"
+            }
+          ],
+          "Frosted Grey": [
+            {
+              "filename": "RGP_2884.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2885.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG45",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 3,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Kinetic Junior Wayfarer",
+        "shape": "Wayfarer",
+        "material": "TR90",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Deep Ink Black": [
+            {
+              "filename": "RGP_2886.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2887.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Classic Square Reader",
+        "shape": "Square",
+        "material": "Polycarbonate",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Amber Tortoise": [
+            {
+              "filename": "RGP_2888.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG46",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Classic Square Reader",
+        "shape": "Square",
+        "material": "Polycarbonate",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Amber Tortoise": [
+            {
+              "filename": "RGP_2889.webp",
+              "role": "side"
+            }
+          ],
+          "Crystal Clear": [
+            {
+              "filename": "RGP_2890.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG47",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Classic Square Reader",
+        "shape": "Square",
+        "material": "Polycarbonate",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Crystal Clear": [
+            {
+              "filename": "RGP_2891.webp",
+              "role": "side"
+            }
+          ],
+          "Midnight Black": [
+            {
+              "filename": "RGP_2892.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG48",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 2,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Classic Square Reader",
+        "shape": "Square",
+        "material": "Polycarbonate",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Midnight Black": [
+            {
+              "filename": "RGP_2893.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Urbanite Slim Rectangle",
+        "shape": "Rectangle",
+        "material": "Metal",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Gunmetal Silver": [
+            {
+              "filename": "RGP_2894.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG49",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Urbanite Slim Rectangle",
+        "shape": "Rectangle",
+        "material": "Metal",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Gunmetal Silver": [
+            {
+              "filename": "RGP_2895.webp",
+              "role": "side"
+            }
+          ],
+          "Classic Gold": [
+            {
+              "filename": "RGP_2896.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG50",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Urbanite Slim Rectangle",
+        "shape": "Rectangle",
+        "material": "Metal",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Classic Gold": [
+            {
+              "filename": "RGP_2897.webp",
+              "role": "side"
+            }
+          ],
+          "Matte Black": [
+            {
+              "filename": "RGP_2898.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG51",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 3,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Titan Precision Rimless",
+        "shape": "Rectangle",
+        "material": "Titanium",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Polished Chrome": [
+            {
+              "filename": "RGP_2900.webp",
+              "role": "front"
+            },
+            {
+              "filename": "RGP_2901.webp",
+              "role": "side"
+            }
+          ],
+          "Rose Gold": [
+            {
+              "filename": "RGP_2902.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "SG52",
+    "category": "Sunglasses",
+    "productType": "Sunglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Titan Precision Rimless",
+        "shape": "Rectangle",
+        "material": "Titanium",
+        "category": "Sunglasses",
+        "productType": "Sunglasses",
+        "colors": {
+          "Rose Gold": [
+            {
+              "filename": "RGP_2903.webp",
+              "role": "side"
+            }
+          ],
+          "Stealth Graphite": [
+            {
+              "filename": "RGP_2904.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G53",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Heritage Rivet Acetate Square",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gloss Noir Silver Rivet": [
+            {
+              "filename": "DSC_8248.webp",
+              "role": "front"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Executive Metal Navigator",
+        "shape": "Square",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gunmetal Slate": [
+            {
+              "filename": "DSC_8250.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G54",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 5,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Neo Round Pastel & Matte",
+        "shape": "Round",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Mint Seafoam Green": [
+            {
+              "filename": "DSC_8240.webp",
+              "role": "front"
+            }
+          ],
+          "Ice Glacier Blue": [
+            {
+              "filename": "DSC_8242.webp",
+              "role": "front"
+            }
+          ],
+          "Blush Rose Pink": [
+            {
+              "filename": "DSC_8243.webp",
+              "role": "front"
+            }
+          ],
+          "Royal Cobalt Blue": [
+            {
+              "filename": "DSC_8244.webp",
+              "role": "front"
+            }
+          ],
+          "Slate Teal Green": [
+            {
+              "filename": "DSC_8246.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G55",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 7,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Geometric Octa Optical",
+        "shape": "Geometric",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gold Clear": [
+            {
+              "filename": "DSC_8232.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8233.webp",
+              "role": "side"
+            }
+          ],
+          "Silver Clear": [
+            {
+              "filename": "DSC_8234.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8235.webp",
+              "role": "side"
+            }
+          ],
+          "Black Clear": [
+            {
+              "filename": "DSC_8236.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8237.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Neo Round Pastel & Matte",
+        "shape": "Round",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Frosted Crystal White": [
+            {
+              "filename": "DSC_8239.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G56",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Horizon Wayfarer",
+        "shape": "Wayfarer",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Crystal Transparent": [
+            {
+              "filename": "DSC_8228.webp",
+              "role": "front"
+            }
+          ],
+          "Amber Tortoise": [
+            {
+              "filename": "DSC_8230.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G57",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 3,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Neo Cat-Eye Acetate",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Midnight Black": [
+            {
+              "filename": "DSC_8225.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Horizon Wayfarer",
+        "shape": "Wayfarer",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gloss Black": [
+            {
+              "filename": "DSC_8226.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8227.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G58",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Neo Cat-Eye Acetate",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Tortoise Havana": [
+            {
+              "filename": "DSC_8222.webp",
+              "role": "side"
+            }
+          ],
+          "Midnight Black": [
+            {
+              "filename": "DSC_8223.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G59",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Neo Cat-Eye Acetate",
+        "shape": "Cat Eye",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Deep Ruby Red": [
+            {
+              "filename": "DSC_8219.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8220.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G60",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Signature Aviator Optical",
+        "shape": "Aviator",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gold Clear": [
+            {
+              "filename": "DSC_8212.webp",
+              "role": "side"
+            }
+          ],
+          "Silver Clear": [
+            {
+              "filename": "DSC_8216.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G61",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Signature Aviator Optical",
+        "shape": "Aviator",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Silver Clear": [
+            {
+              "filename": "DSC_8213.webp",
+              "role": "front"
+            }
+          ],
+          "Gunmetal Clear": [
+            {
+              "filename": "DSC_8218.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G62",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 0,
+    "status": "Empty Group",
+    "products": []
+  },
+  {
+    "group": "G63",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 3,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Urban Active Rectangle Optical",
+        "shape": "Rectangle",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black Blue": [
+            {
+              "filename": "DSC_8204.webp",
+              "role": "side"
+            }
+          ],
+          "Smoke Grey": [
+            {
+              "filename": "DSC_8208.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8209.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G64",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Urban Active Rectangle Optical",
+        "shape": "Rectangle",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black Red": [
+            {
+              "filename": "DSC_8200.webp",
+              "role": "front"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Signature Aviator Optical",
+        "shape": "Aviator",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gunmetal Clear": [
+            {
+              "filename": "DSC_8217.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G65",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Silhouette Pure Oval Reader",
+        "shape": "Oval",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black": [
+            {
+              "filename": "DSC_8199.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Urban Active Rectangle Optical",
+        "shape": "Rectangle",
+        "material": "TR90",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Matte Black Red": [
+            {
+              "filename": "DSC_8201.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G66",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Bold Flattop Square Optical",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Transparent Olive Grey": [
+            {
+              "filename": "DSC_8192.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Silhouette Pure Oval Reader",
+        "shape": "Oval",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Polished Silver": [
+            {
+              "filename": "DSC_8193.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G67",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 5,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Bold Flattop Square Optical",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Piano Black": [
+            {
+              "filename": "DSC_8186.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8187.webp",
+              "role": "side"
+            }
+          ],
+          "Havana Brown": [
+            {
+              "filename": "DSC_8188.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8190.webp",
+              "role": "side"
+            }
+          ],
+          "Transparent Olive Grey": [
+            {
+              "filename": "DSC_8191.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G68",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 0,
+    "status": "Empty Group",
+    "products": []
+  },
+  {
+    "group": "G69",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple images",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Aero Titanium Round",
+        "shape": "Round",
+        "material": "Titanium",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Satin Black": [
+            {
+              "filename": "DSC_8184.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8185.webp",
+              "role": "side"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G70",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 2,
+    "structureType": "One product with multiple color variants",
+    "productsCount": 1,
+    "products": [
+      {
+        "name": "Chashmalay Elite Semi-Rimless Rectangular",
+        "shape": "Rectangle",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Brushed Silver": [
+            {
+              "filename": "DSC_8175.webp",
+              "role": "side"
+            }
+          ],
+          "Deep Navy Blue": [
+            {
+              "filename": "DSC_8176.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "group": "G71",
+    "category": "Glasses",
+    "productType": "Eyeglasses",
+    "fileCount": 4,
+    "structureType": "Multiple products in group",
+    "productsCount": 2,
+    "products": [
+      {
+        "name": "Chashmalay Intellect Round Reader",
+        "shape": "Round",
+        "material": "Metal",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Polished Silver": [
+            {
+              "filename": "DSC_8162.webp",
+              "role": "side"
+            }
+          ],
+          "Matte Black": [
+            {
+              "filename": "DSC_8163.webp",
+              "role": "front"
+            },
+            {
+              "filename": "DSC_8164.webp",
+              "role": "side"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Chashmalay Matrix Square Acetate",
+        "shape": "Square",
+        "material": "Acetate",
+        "category": "Glasses",
+        "productType": "Eyeglasses",
+        "colors": {
+          "Gloss Jet Black": [
+            {
+              "filename": "DSC_8165.webp",
+              "role": "front"
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

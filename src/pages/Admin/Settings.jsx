@@ -37,7 +37,7 @@ const AdminSettings = () => {
   const handleImportCatalog = async () => {
     const isConfirmed = await confirm({
       title: 'Publish Catalog to Live Store',
-      message: 'This will read catalog.json (52 products with real Cloudinary images) and import them into your active store inventory. Existing products will remain intact.',
+      message: 'This will read catalog.json (44 products with 199 real Cloudinary images across 112 color variants) and import them into your active store inventory. Existing products will remain intact.',
       confirmText: 'Publish Products Now',
       type: 'info'
     });
@@ -437,7 +437,7 @@ const AdminSettings = () => {
                   <span className="w-10 h-0.5 bg-emerald-500/40"></span> Catalog Publishing — Ready Batch
                 </h3>
                 <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-                  Publish <strong>52 pre-processed eyewear products</strong> (278 Cloudinary hosted images across all colorways and angles) from <code>catalog.json</code> directly to your live storefront.
+                  Publish <strong>44 pre-processed eyewear products</strong> (199 Cloudinary hosted images across 112 colorways and angles) from <code>catalog.json</code> directly to your live storefront.
                 </p>
                 {importProgress && (
                   <div className="mb-6 p-4 bg-white rounded-2xl border border-emerald-200 shadow-sm">
