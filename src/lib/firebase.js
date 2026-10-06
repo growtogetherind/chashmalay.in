@@ -269,6 +269,7 @@ export const saveProduct = async (product, id = null) => {
       const prevData = prevDoc.exists() ? prevDoc.data() : null;
       await updateDoc(doc(db, "products", id), { ...payload, updated_at: serverTimestamp() });
       await writeAdminLog('edit_product', id, { name: payload.name }, prevData, payload);
+      return { id, error: null };
     } else {
       const docRef = await addDoc(collection(db, "products"), {
         ...payload,
@@ -277,9 +278,9 @@ export const saveProduct = async (product, id = null) => {
         status: payload.status || 'active'
       });
       await writeAdminLog('create_product', docRef.id, { name: payload.name }, null, payload);
+      return { id: docRef.id, error: null };
     }
-    return { error: null };
-  } catch (error) { return { error }; }
+  } catch (error) { return { id: null, error }; }
 };
 
 export const bulkImportCatalog = async (products, onProgress) => {

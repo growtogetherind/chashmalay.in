@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn } from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
+import ImageZoomModal from '../../components/ui/ImageZoomModal';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 import AdminSidebar from '../../components/layout/AdminSidebar';
@@ -89,6 +90,7 @@ const AdminProducts = () => {
   const [activeTab, setActiveTab] = useState('basic');
   const [pendingImages, setPendingImages] = useState({});
   const [pendingGallery, setPendingGallery] = useState([]);
+  const [zoomModal, setZoomModal] = useState({ isOpen: false, imageUrl: '', images: [], initialIndex: 0, title: '' });
   const { confirm } = useConfirm();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -388,6 +390,7 @@ const AdminProducts = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(products.length / itemsPerPage);
+  const isLocalhost = Boolean(import.meta.env.DEV) || (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname));
 
   return (
     <div className="admin-page">
@@ -398,9 +401,19 @@ const AdminProducts = () => {
             <h1 className="admin-title">Products</h1>
             <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">{products.length} products in your store</p>
           </div>
-          <button onClick={handleNewProduct} className="admin-primary-btn px-6 shadow-lg shadow-emerald-500/20">
-            <Plus size={18} /> <span className="ml-1">Add Product</span>
-          </button>
+          <div className="flex items-center gap-3">
+            {isLocalhost && (
+              <Link 
+                to="/admin/quick-add" 
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Zap size={16} className="fill-white" /> <span>Quick Add</span>
+              </Link>
+            )}
+            <button onClick={handleNewProduct} className="admin-primary-btn px-6 shadow-lg shadow-emerald-500/20">
+              <Plus size={18} /> <span className="ml-1">Add Product</span>
+            </button>
+          </div>
         </div>
 
         <div className="admin-card">
@@ -429,8 +442,40 @@ const AdminProducts = () => {
                     <tr key={p.id} className="group">
                       <td>
                         <div className="flex items-center gap-5">
-                          <div className="w-14 h-14 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center overflow-hidden transition-all group-hover:border-emerald-500/30 shadow-sm p-1.5">
-                             {p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0] ? <img src={p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0]} className="w-full h-full object-contain" /> : <ImageIcon size={20} className="text-slate-300" />}
+                          <div 
+                            className="w-14 h-14 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center overflow-hidden transition-all group-hover:border-emerald-500/30 shadow-sm p-1.5 relative cursor-pointer group/thumb"
+                            onClick={() => {
+                              const thumbUrl = p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0];
+                              if (thumbUrl) {
+                                const allImgs = [
+                                  p.images?.front,
+                                  p.images?.side,
+                                  p.images?.model,
+                                  p.images?.zoom,
+                                  p.frame_image,
+                                  p.image,
+                                  ...(p.images?.gallery || [])
+                                ].filter(Boolean);
+                                const uniqueImgs = [...new Set(allImgs)];
+                                setZoomModal({
+                                  isOpen: true,
+                                  imageUrl: thumbUrl,
+                                  title: `${p.name || 'Product'} Preview`,
+                                  images: uniqueImgs,
+                                  initialIndex: 0
+                                });
+                              }
+                            }}
+                            title="Click to Zoom Image"
+                          >
+                             {p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0] ? (
+                               <>
+                                 <img src={p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0]} className="w-full h-full object-contain" />
+                                 <div className="absolute inset-0 bg-slate-900/40 rounded-2xl opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                                   <ZoomIn size={14} className="text-white drop-shadow" />
+                                 </div>
+                               </>
+                             ) : <ImageIcon size={20} className="text-slate-300" />}
                           </div>
                           <div>
                             <span className="font-bold text-sm text-slate-900 block group-hover:text-emerald-600 transition-colors truncate max-w-[200px]">{p.name}</span>
@@ -905,8 +950,32 @@ const AdminProducts = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {(form.colors || []).map((color, index) => (
                         <div key={index} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl group hover:border-emerald-200 transition-all shadow-sm">
-                          <div className="w-12 h-12 rounded-xl bg-slate-50 p-1 border border-slate-100 flex items-center justify-center shrink-0">
-                            {color.image ? <img src={color.image} className="w-full h-full object-contain" /> : <Palette size={20} className="text-slate-200" />}
+                          <div 
+                            className={`w-12 h-12 rounded-xl bg-slate-50 p-1 border border-slate-100 flex items-center justify-center shrink-0 relative ${color.image ? 'cursor-pointer group/img' : ''}`}
+                            onClick={() => {
+                              if (color.image) {
+                                const colorImgs = [color.image, color.image_side, color.image_model].filter(Boolean);
+                                setZoomModal({
+                                  isOpen: true,
+                                  imageUrl: color.image,
+                                  title: `${color.name || 'Color Variant'} Inspection`,
+                                  images: colorImgs,
+                                  initialIndex: 0
+                                });
+                              }
+                            }}
+                            title={color.image ? 'Click to Zoom Variant Image' : ''}
+                          >
+                            {color.image ? (
+                              <>
+                                <img src={color.image} className="w-full h-full object-contain" />
+                                <div className="absolute inset-0 bg-slate-900/40 rounded-xl opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                  <ZoomIn size={14} className="text-white drop-shadow" />
+                                </div>
+                              </>
+                            ) : (
+                              <Palette size={20} className="text-slate-200" />
+                            )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-black text-slate-900 truncate uppercase">{color.name || 'Untitled Variant'}</p>
@@ -921,6 +990,25 @@ const AdminProducts = () => {
                             </div>
                           </div>
                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {color.image && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const colorImgs = [color.image, color.image_side, color.image_model].filter(Boolean);
+                                  setZoomModal({
+                                    isOpen: true,
+                                    imageUrl: color.image,
+                                    title: `${color.name || 'Color Variant'} Inspection`,
+                                    images: colorImgs,
+                                    initialIndex: 0
+                                  });
+                                }}
+                                className="p-2 text-slate-400 hover:text-emerald-600 transition-colors"
+                                title="Zoom Image"
+                              >
+                                <ZoomIn size={16} />
+                              </button>
+                            )}
                             <button
                               type="button"
                               onClick={() => handleOpenColorModal(index)}
@@ -979,24 +1067,44 @@ const AdminProducts = () => {
                             className="absolute inset-0 opacity-0 cursor-pointer z-10"
                           />
                           {form.images?.[img.id] && (
-                            <div className="absolute inset-0 bg-emerald-900/10 opacity-0 group-hover:opacity-100 flex flex-col gap-3 items-center justify-center transition-all backdrop-blur-[2px] z-20 pointer-events-none">
-                              <div className="bg-white/90 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-600 shadow-xl">Recalibrate Media</div>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setForm(prev => ({ ...prev, images: { ...prev.images, [img.id]: '' } }));
-                                  setPendingImages(prev => {
-                                    const next = { ...prev };
-                                    delete next[`images.${img.id}`];
-                                    return next;
-                                  });
-                                }}
-                                className="pointer-events-auto bg-white text-red-500 hover:bg-red-50 hover:text-red-600 hover:scale-110 p-2.5 rounded-full shadow-xl transition-all border border-red-100"
-                                title="Remove Image"
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                            <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 flex flex-col gap-3 items-center justify-center transition-all backdrop-blur-[2px] z-20 pointer-events-none">
+                              <div className="bg-white/90 px-3.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-800 shadow-xl">Recalibrate Media</div>
+                              <div className="flex items-center gap-2 pointer-events-auto">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setZoomModal({
+                                      isOpen: true,
+                                      imageUrl: form.images[img.id],
+                                      title: `${img.label} Inspection`,
+                                      images: [form.images.front, form.images.side, form.images.model, form.images.zoom, ...(form.images.gallery || [])].filter(Boolean)
+                                    });
+                                  }}
+                                  className="bg-white text-emerald-600 hover:bg-emerald-50 hover:scale-110 p-2.5 rounded-full shadow-xl transition-all border border-emerald-100"
+                                  title="Zoom / Inspect Image"
+                                >
+                                  <ZoomIn size={16} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setForm(prev => ({ ...prev, images: { ...prev.images, [img.id]: '' } }));
+                                    setPendingImages(prev => {
+                                      const next = { ...prev };
+                                      delete next[`images.${img.id}`];
+                                      return next;
+                                    });
+                                  }}
+                                  className="bg-white text-red-500 hover:bg-red-50 hover:text-red-600 hover:scale-110 p-2.5 rounded-full shadow-xl transition-all border border-red-100"
+                                  title="Remove Image"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -1016,13 +1124,30 @@ const AdminProducts = () => {
                       {form.images?.gallery?.map((url, idx) => (
                         <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 group bg-white shadow-sm p-1">
                           <img src={url} className="w-full h-full object-contain" />
-                          <button
-                            type="button"
-                            onClick={() => setForm(prev => ({ ...prev, images: { ...prev.images, gallery: prev.images.gallery.filter((_, i) => i !== idx) } }))}
-                            className="absolute top-1.5 right-1.5 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:scale-110"
-                          >
-                            <X size={12} />
-                          </button>
+                          <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-1">
+                            <button
+                              type="button"
+                              onClick={() => setZoomModal({
+                                isOpen: true,
+                                imageUrl: url,
+                                title: `Gallery Photo #${idx + 1}`,
+                                images: form.images.gallery,
+                                initialIndex: idx
+                              })}
+                              className="bg-white text-slate-800 hover:bg-slate-100 rounded-full p-1.5 shadow-lg hover:scale-110 transition-transform"
+                              title="Zoom Image"
+                            >
+                              <ZoomIn size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setForm(prev => ({ ...prev, images: { ...prev.images, gallery: prev.images.gallery.filter((_, i) => i !== idx) } }))}
+                              className="bg-red-500 text-white hover:bg-red-600 rounded-full p-1.5 shadow-lg hover:scale-110 transition-transform"
+                              title="Remove"
+                            >
+                              <X size={13} />
+                            </button>
+                          </div>
                         </div>
                       ))}
                       {(!form.images?.gallery || form.images.gallery.length === 0) && (
@@ -1103,9 +1228,29 @@ const AdminProducts = () => {
                    {/* Front View */}
                    <div className="flex flex-col items-center gap-1.5">
                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Front</span>
-                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner">
+                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner group/cfront">
                         {colorForm.image ? (
-                           <img src={colorForm.image} alt="" className="w-full h-full object-contain p-1" />
+                           <>
+                             <img src={colorForm.image} alt="" className="w-full h-full object-contain p-1" />
+                             <button
+                               type="button"
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 e.stopPropagation();
+                                 setZoomModal({
+                                   isOpen: true,
+                                   imageUrl: colorForm.image,
+                                   title: `${colorForm.name || 'Color'} Front View`,
+                                   images: [colorForm.image, colorForm.image_side, colorForm.image_model].filter(Boolean),
+                                   initialIndex: 0
+                                 });
+                               }}
+                               className="absolute bottom-1 right-1 z-20 bg-slate-900/80 hover:bg-emerald-600 text-white p-1 rounded-lg opacity-0 group-hover/cfront:opacity-100 transition-opacity shadow"
+                               title="Zoom / Inspect Image"
+                             >
+                               <ZoomIn size={13} />
+                             </button>
+                           </>
                         ) : (
                            <div className="flex flex-col items-center text-slate-300">
                               <Upload size={16} />
@@ -1136,9 +1281,29 @@ const AdminProducts = () => {
                    {/* Side View */}
                    <div className="flex flex-col items-center gap-1.5">
                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Side</span>
-                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner">
+                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner group/cside">
                         {colorForm.image_side ? (
-                           <img src={colorForm.image_side} alt="" className="w-full h-full object-contain p-1" />
+                           <>
+                             <img src={colorForm.image_side} alt="" className="w-full h-full object-contain p-1" />
+                             <button
+                               type="button"
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 e.stopPropagation();
+                                 setZoomModal({
+                                   isOpen: true,
+                                   imageUrl: colorForm.image_side,
+                                   title: `${colorForm.name || 'Color'} Side View`,
+                                   images: [colorForm.image, colorForm.image_side, colorForm.image_model].filter(Boolean),
+                                   initialIndex: colorForm.image ? 1 : 0
+                                 });
+                               }}
+                               className="absolute bottom-1 right-1 z-20 bg-slate-900/80 hover:bg-emerald-600 text-white p-1 rounded-lg opacity-0 group-hover/cside:opacity-100 transition-opacity shadow"
+                               title="Zoom / Inspect Image"
+                             >
+                               <ZoomIn size={13} />
+                             </button>
+                           </>
                         ) : (
                            <div className="flex flex-col items-center text-slate-300">
                               <Upload size={16} />
@@ -1169,9 +1334,30 @@ const AdminProducts = () => {
                    {/* Model View */}
                    <div className="flex flex-col items-center gap-1.5">
                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Model</span>
-                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner">
+                     <div className="relative w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-all cursor-pointer shadow-inner group/cmodel">
                         {colorForm.image_model ? (
-                           <img src={colorForm.image_model} alt="" className="w-full h-full object-contain p-1" />
+                           <>
+                             <img src={colorForm.image_model} alt="" className="w-full h-full object-contain p-1" />
+                             <button
+                               type="button"
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 e.stopPropagation();
+                                 const cImgs = [colorForm.image, colorForm.image_side, colorForm.image_model].filter(Boolean);
+                                 setZoomModal({
+                                   isOpen: true,
+                                   imageUrl: colorForm.image_model,
+                                   title: `${colorForm.name || 'Color'} Model View`,
+                                   images: cImgs,
+                                   initialIndex: cImgs.length - 1
+                                 });
+                               }}
+                               className="absolute bottom-1 right-1 z-20 bg-slate-900/80 hover:bg-emerald-600 text-white p-1 rounded-lg opacity-0 group-hover/cmodel:opacity-100 transition-opacity shadow"
+                               title="Zoom / Inspect Image"
+                             >
+                               <ZoomIn size={13} />
+                             </button>
+                           </>
                         ) : (
                            <div className="flex flex-col items-center text-slate-300">
                               <Upload size={16} />
@@ -1209,6 +1395,16 @@ const AdminProducts = () => {
           </div>
         </div>
       )}
+
+      {/* Product Image Zoom / Lightbox Inspector */}
+      <ImageZoomModal
+        isOpen={zoomModal.isOpen}
+        onClose={() => setZoomModal(prev => ({ ...prev, isOpen: false }))}
+        imageUrl={zoomModal.imageUrl}
+        images={zoomModal.images}
+        initialIndex={zoomModal.initialIndex}
+        title={zoomModal.title}
+      />
     </div>
   );
 };
