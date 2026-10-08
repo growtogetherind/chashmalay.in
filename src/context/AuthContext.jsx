@@ -108,18 +108,39 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     getRedirectResult(auth)
       .then(async (result) => {
-        if (result) {
+        if (result && result.user) {
           const userEmail = (result.user.email || '').toLowerCase();
           const shouldBeAdmin = checkIsAdminEmail(userEmail);
-          if (shouldBeAdmin) {
-            await updateFirebaseProfile(result.user.uid, { is_admin: true, role: 'super_admin' });
+          let profileData = null;
+          try {
+            const { data } = await fetchFirebaseProfile(result.user.uid);
+            profileData = data;
+            if (!data) {
+              profileData = {
+                email: result.user.email,
+                full_name: result.user.displayName || (shouldBeAdmin ? 'Admin' : 'Customer'),
+                is_admin: shouldBeAdmin,
+                role: shouldBeAdmin ? 'super_admin' : 'customer',
+                created_at: new Date()
+              };
+              await updateFirebaseProfile(result.user.uid, profileData);
+            } else if (shouldBeAdmin && (!data.is_admin || !['super_admin', 'admin'].includes(data.role))) {
+              profileData = { ...data, is_admin: true, role: 'super_admin' };
+              await updateFirebaseProfile(result.user.uid, { is_admin: true, role: 'super_admin' });
+            }
+          } catch (e) {
+            console.warn("Redirect profile sync error:", e);
           }
+          setProfile(profileData);
+          setUser(result.user);
           toast.success(shouldBeAdmin ? 'Welcome Admin!' : 'Logged in with Google!');
         }
       })
       .catch((error) => {
         console.error("Redirect login error:", error);
-        toast.error(error.message || 'Redirect login failed.');
+        if (error.code && error.code !== 'auth/null-user') {
+          toast.error(error.message || 'Redirect login failed.');
+        }
       });
   }, []);
 
@@ -158,19 +179,25 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = async (email, password, fullName) => {
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const cleanEmail = (email || '').trim().toLowerCase();
+      const result = await createUserWithEmailAndPassword(auth, cleanEmail, password);
       await updateAuthProfile(result.user, { displayName: fullName });
       
       const profileData = {
-        email,
+        email: cleanEmail,
         full_name: fullName,
         is_admin: false,
         role: 'customer',
         created_at: new Date()
       };
       
-      await updateFirebaseProfile(result.user.uid, profileData);
+      try {
+        await updateFirebaseProfile(result.user.uid, profileData);
+      } catch (profErr) {
+        console.warn("Could not save profile immediately:", profErr);
+      }
       setProfile(profileData);
+      setUser(result.user);
       
       toast.success('Account created successfully!');
       return { user: result.user, profile: profileData };
@@ -182,21 +209,29 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = async (email, password) => {
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      const profileResult = await fetchFirebaseProfile(result.user.uid);
-      if (!profileResult.error) {
-        setProfile(profileResult.data);
-        const resolvedRole = profileResult.data?.role || (profileResult.data?.is_admin ? 'admin' : 'customer');
-        if (['super_admin', 'admin', 'manager', 'staff'].includes(resolvedRole)) {
-          await writeAdminLog('admin_login', result.user.uid, { email: result.user.email });
+      const cleanEmail = (email || '').trim().toLowerCase();
+      const result = await signInWithEmailAndPassword(auth, cleanEmail, password);
+      let profileData = null;
+      try {
+        const profileResult = await fetchFirebaseProfile(result.user.uid);
+        if (!profileResult.error) {
+          profileData = profileResult.data;
+          setProfile(profileData);
+          const resolvedRole = profileData?.role || (profileData?.is_admin ? 'admin' : 'customer');
+          if (['super_admin', 'admin', 'manager', 'staff'].includes(resolvedRole)) {
+            await writeAdminLog('admin_login', result.user.uid, { email: result.user.email });
+          }
         }
+      } catch (profErr) {
+        console.warn("Profile fetch non-fatal error during sign-in:", profErr);
       }
+      setUser(result.user);
       toast.success(`Welcome back!`);
-      return { user: result.user, profile: profileResult.data };
+      return { user: result.user, profile: profileData };
     } catch (error) {
-      await writeAdminLog('failed_login_attempt', null, { email, error: error.message });
+      await writeAdminLog('failed_login_attempt', null, { email, error: error.message }).catch(() => {});
       const errorMessage = (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password')
-        ? 'Invalid user or password'
+        ? 'Invalid email or password'
         : error.message;
       toast.error(errorMessage);
       throw error;
@@ -205,19 +240,7 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    
-    // Check if the user is on a mobile device where popups are historically buggy/unreliable.
-    // If mobile, directly use redirect login to avoid popup blocks entirely.
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) {
-      try {
-        await signInWithRedirect(auth, provider);
-        return;
-      } catch (error) {
-        toast.error(error.message);
-        throw error;
-      }
-    }
+    provider.setCustomParameters({ prompt: 'select_account' });
 
     try {
       const result = await signInWithPopup(auth, provider);
@@ -225,51 +248,58 @@ export const AuthProvider = ({ children }) => {
       const userEmail = (result.user.email || '').toLowerCase();
       const shouldBeAdmin = checkIsAdminEmail(userEmail);
 
-      const { data } = await fetchFirebaseProfile(result.user.uid);
-      let profileData = data;
+      let profileData = null;
+      try {
+        const { data } = await fetchFirebaseProfile(result.user.uid);
+        profileData = data;
 
-      if (!data) {
-        profileData = {
-          email: result.user.email,
-          full_name: result.user.displayName || (shouldBeAdmin ? 'Admin' : 'Customer'),
-          is_admin: shouldBeAdmin,
-          role: shouldBeAdmin ? 'super_admin' : 'customer',
-          created_at: new Date()
-        };
-        await updateFirebaseProfile(result.user.uid, profileData);
-      } else if (shouldBeAdmin && (!data.is_admin || !['super_admin', 'admin'].includes(data.role))) {
-        profileData = {
-          ...data,
-          is_admin: true,
-          role: 'super_admin'
-        };
-        await updateFirebaseProfile(result.user.uid, { is_admin: true, role: 'super_admin' });
+        if (!data) {
+          profileData = {
+            email: result.user.email,
+            full_name: result.user.displayName || (shouldBeAdmin ? 'Admin' : 'Customer'),
+            is_admin: shouldBeAdmin,
+            role: shouldBeAdmin ? 'super_admin' : 'customer',
+            created_at: new Date()
+          };
+          await updateFirebaseProfile(result.user.uid, profileData);
+        } else if (shouldBeAdmin && (!data.is_admin || !['super_admin', 'admin'].includes(data.role))) {
+          profileData = {
+            ...data,
+            is_admin: true,
+            role: 'super_admin'
+          };
+          await updateFirebaseProfile(result.user.uid, { is_admin: true, role: 'super_admin' });
+        }
+      } catch (profErr) {
+        console.warn("Profile fetch non-fatal error during Google sign-in:", profErr);
       }
       
       setProfile(profileData);
+      setUser(result.user);
       const resolvedRole = profileData?.role || (profileData?.is_admin ? 'admin' : 'customer');
       if (['super_admin', 'admin', 'manager', 'staff'].includes(resolvedRole)) {
-        await writeAdminLog('admin_login', result.user.uid, { email: result.user.email, provider: 'google' });
+        await writeAdminLog('admin_login', result.user.uid, { email: result.user.email, provider: 'google' }).catch(() => {});
       }
       toast.success(shouldBeAdmin ? 'Welcome Admin!' : 'Logged in with Google!');
       return { user: result.user, profile: profileData };
     } catch (error) {
+      console.warn("Google signInWithPopup:", error);
       if (error.code === 'auth/popup-blocked') {
-        toast.loading('Popup blocked by browser. Redirecting to Google login...');
+        toast.loading('Opening Google sign-in window...');
         try {
           await signInWithRedirect(auth, provider);
           return;
         } catch (redirectError) {
-          toast.error(redirectError.message);
+          toast.error(redirectError.message || 'Google sign-in failed');
           throw redirectError;
         }
       }
-      // If user closed the popup voluntarily, we do NOT trigger a redirect fallback.
+      // If user closed the popup voluntarily, don't show a scary error
       if (error.code === 'auth/popup-closed-by-user') {
-        toast.error('Sign-in cancelled.');
-        throw error;
+        toast('Google sign-in cancelled', { icon: 'ℹ️' });
+        return;
       }
-      toast.error(error.message);
+      toast.error(error.message || 'Google sign-in failed');
       throw error;
     }
   };

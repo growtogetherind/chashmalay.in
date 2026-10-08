@@ -37,6 +37,7 @@ const NotFound     = lazy(() => import('./pages/NotFound.jsx'));
 
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard.jsx'));
 const AdminProducts  = lazy(() => import('./pages/Admin/Products.jsx'));
+const AdminQuickAdd   = lazy(() => import('./pages/Admin/QuickAddProduct.jsx'));
 const AdminInventory = lazy(() => import('./pages/Admin/Inventory.jsx'));
 const AdminOrders    = lazy(() => import('./pages/Admin/Orders.jsx'));
 const AdminCustomers = lazy(() => import('./pages/Admin/Customers.jsx'));
@@ -170,6 +171,12 @@ function App() {
                 {/* ── Admin routes — no Navbar/Footer ── */}
                 <Route path="/admin" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense></AdminRoute>} />
                 <Route path="/admin/products" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminProducts /></Suspense></AdminRoute>} />
+                {(Boolean(import.meta.env.DEV) || (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname))) && (
+                  <>
+                    <Route path="/admin/quick-add" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminQuickAdd /></Suspense></AdminRoute>} />
+                    <Route path="/quick-add" element={<Suspense fallback={<PageLoader />}><AdminQuickAdd /></Suspense>} />
+                  </>
+                )}
                 <Route path="/admin/inventory" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminInventory /></Suspense></AdminRoute>} />
                 <Route path="/admin/orders" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminOrders /></Suspense></AdminRoute>} />
                 <Route path="/admin/customers" element={<AdminRoute><Suspense fallback={<PageLoader />}><AdminCustomers /></Suspense></AdminRoute>} />

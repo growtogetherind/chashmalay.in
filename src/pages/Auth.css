@@ -236,3 +236,45 @@
 
 .loading-dots { animation: blink 1s infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Mobile screen optimization */
+@media (max-width: 640px) {
+  .auth-form-panel {
+    padding: 1.5rem 1rem;
+    align-items: flex-start;
+    padding-top: 2.5rem;
+  }
+
+  .auth-card {
+    padding: 1.75rem 1.25rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .auth-tabs {
+    margin-bottom: 1.5rem;
+  }
+
+  .auth-tab {
+    padding: 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .input-wrap {
+    min-height: 48px;
+  }
+
+  .input-wrap input {
+    font-size: 16px; /* Prevents auto-zoom on iOS Safari when tapping inputs */
+  }
+
+  .auth-submit-btn {
+    min-height: 48px;
+    padding: 0.875rem;
+  }
+
+  .google-btn {
+    min-height: 48px;
+  }
+}
+

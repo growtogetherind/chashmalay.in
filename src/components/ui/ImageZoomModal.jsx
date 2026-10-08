@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   ZoomIn, 
   ZoomOut, 
-  RotateCw, 
   Maximize2, 
   ChevronLeft, 
   ChevronRight, 
   Move,
   RefreshCcw
 } from 'lucide-react';
+import { transformCloudinaryUrl } from '../../lib/cloudinary';
 
 export default function ImageZoomModal({ 
   isOpen, 
@@ -22,7 +23,6 @@ export default function ImageZoomModal({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
@@ -37,7 +37,6 @@ export default function ImageZoomModal({
       }
       setScale(1);
       setPosition({ x: 0, y: 0 });
-      setRotation(0);
     }
   }, [isOpen, imageUrl, images, initialIndex]);
 
@@ -61,11 +60,6 @@ export default function ImageZoomModal({
   const handleReset = useCallback(() => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
-    setRotation(0);
-  }, []);
-
-  const handleRotate = useCallback(() => {
-    setRotation(prev => (prev + 90) % 360);
   }, []);
 
   // Carousel navigation
@@ -122,6 +116,68 @@ export default function ImageZoomModal({
     setIsDragging(false);
   };
 
+  // Touch handlers for mobile pan & pinch-to-zoom
+  const touchStartRef = useRef(null);
+  const pinchDistRef = useRef(null);
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      touchStartRef.current = {
+        x: touch.clientX - position.x,
+        y: touch.clientY - position.y,
+        startX: touch.clientX,
+        startY: touch.clientY
+      };
+      if (scale > 1) {
+        setIsDragging(true);
+      }
+    } else if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      pinchDistRef.current = { dist, initialScale: scale };
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 1 && touchStartRef.current) {
+      if (scale > 1) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        setPosition({
+          x: touch.clientX - touchStartRef.current.x,
+          y: touch.clientY - touchStartRef.current.y
+        });
+      }
+    } else if (e.touches.length === 2 && pinchDistRef.current) {
+      e.preventDefault();
+      const newDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const ratio = newDist / pinchDistRef.current.dist;
+      const targetScale = Math.min(Math.max(pinchDistRef.current.initialScale * ratio, 1), 4);
+      setScale(targetScale);
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (e.touches.length === 0) {
+      if (scale <= 1 && touchStartRef.current && hasMultiple) {
+        const deltaX = (e.changedTouches?.[0]?.clientX || 0) - touchStartRef.current.startX;
+        if (deltaX > 60) handlePrev();
+        else if (deltaX < -60) handleNext();
+      }
+      setIsDragging(false);
+      touchStartRef.current = null;
+      pinchDistRef.current = null;
+    } else if (e.touches.length === 1) {
+      pinchDistRef.current = null;
+    }
+  };
+
   // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
@@ -143,22 +199,22 @@ export default function ImageZoomModal({
 
   const hasMultiple = images && images.length > 1;
 
-  return (
+  const modalContent = (
     <div 
-      className="fixed inset-0 z-[9999] flex flex-col bg-slate-950/90 backdrop-blur-md animate-in fade-in select-none"
+      className="fixed inset-0 z-[99999] flex flex-col bg-slate-900/60 backdrop-blur-xs animate-in fade-in select-none"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900/60 backdrop-blur-md text-white z-20">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white/95 backdrop-blur-md text-slate-800 z-20 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-white/10 text-emerald-400">
+          <div className="p-2 rounded-xl bg-slate-100 text-slate-700">
             <ZoomIn size={18} />
           </div>
           <div>
-            <h3 className="text-sm font-bold tracking-tight text-white">{title}</h3>
+            <h3 className="text-sm font-bold tracking-tight text-slate-900">{title}</h3>
             {hasMultiple && (
-              <p className="text-[11px] text-slate-400 font-medium">
+              <p className="text-[11px] text-slate-500 font-medium">
                 Photo {currentIndex + 1} of {images.length}
               </p>
             )}
@@ -166,18 +222,18 @@ export default function ImageZoomModal({
         </div>
 
         {/* Floating Zoom & Inspector Controls in Top Bar */}
-        <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md p-1.5 rounded-2xl border border-white/10">
+        <div className="flex items-center gap-1.5 bg-slate-100/90 border border-slate-200 p-1.5 rounded-2xl shadow-xs">
           <button
             type="button"
             onClick={handleZoomOut}
             disabled={scale <= 1}
-            className="p-2 rounded-xl hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent text-white transition-colors"
+            className="p-2 rounded-xl hover:bg-white hover:shadow-xs disabled:opacity-30 disabled:hover:bg-transparent text-slate-700 transition-all"
             title="Zoom Out (-)"
           >
             <ZoomOut size={16} />
           </button>
 
-          <span className="px-2.5 text-xs font-mono font-bold text-white min-w-[50px] text-center">
+          <span className="px-2.5 text-xs font-mono font-bold text-slate-800 min-w-[50px] text-center">
             {Math.round(scale * 100)}%
           </span>
 
@@ -185,27 +241,18 @@ export default function ImageZoomModal({
             type="button"
             onClick={handleZoomIn}
             disabled={scale >= 4}
-            className="p-2 rounded-xl hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent text-white transition-colors"
+            className="p-2 rounded-xl hover:bg-white hover:shadow-xs disabled:opacity-30 disabled:hover:bg-transparent text-slate-700 transition-all"
             title="Zoom In (+)"
           >
             <ZoomIn size={16} />
           </button>
 
-          <div className="w-[1px] h-5 bg-white/10 mx-1" />
-
-          <button
-            type="button"
-            onClick={handleRotate}
-            className="p-2 rounded-xl hover:bg-white/10 text-white transition-colors"
-            title="Rotate 90°"
-          >
-            <RotateCw size={16} />
-          </button>
+          <div className="w-[1px] h-5 bg-slate-200 mx-1" />
 
           <button
             type="button"
             onClick={handleReset}
-            className="p-2 rounded-xl hover:bg-white/10 text-white transition-colors"
+            className="p-2 rounded-xl hover:bg-white hover:shadow-xs text-slate-700 transition-all"
             title="Reset Zoom & Pan (R)"
           >
             <RefreshCcw size={16} />
@@ -216,7 +263,7 @@ export default function ImageZoomModal({
         <button
           type="button"
           onClick={onClose}
-          className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-105"
+          className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:scale-105 border border-slate-200"
           title="Close (Esc)"
         >
           <X size={18} />
@@ -229,22 +276,25 @@ export default function ImageZoomModal({
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onDoubleClick={handleDoubleClick}
-        className={`flex-1 relative overflow-hidden flex items-center justify-center p-6 ${
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={`flex-1 relative overflow-hidden flex items-center justify-center p-6 touch-none bg-slate-50/70 ${
           scale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
         }`}
       >
         <div 
           className="relative max-w-full max-h-full transition-transform duration-75 ease-out"
           style={{
-            transform: `translate(${position.x}px, ${position.y}px) scale(${scale}) rotate(${rotation}deg)`,
+            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
             transformOrigin: 'center center'
           }}
         >
           <img
-            src={activeImage}
+            src={transformCloudinaryUrl(activeImage, { width: 1800 })}
             alt="Product Zoom"
             draggable={false}
-            className="max-h-[80vh] max-w-[85vw] object-contain drop-shadow-2xl rounded-xl pointer-events-none select-none"
+            className="max-h-[80vh] max-w-[85vw] object-contain drop-shadow-md rounded-xl pointer-events-none select-none"
           />
         </div>
 
@@ -254,7 +304,7 @@ export default function ImageZoomModal({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-              className="absolute left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white border border-white/10 backdrop-blur-md shadow-xl transition-all hover:scale-110 z-10"
+              className="absolute left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 shadow-md transition-all hover:scale-110 z-10"
               title="Previous Photo (Left Arrow)"
             >
               <ChevronLeft size={22} />
@@ -262,7 +312,7 @@ export default function ImageZoomModal({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleNext(); }}
-              className="absolute right-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white border border-white/10 backdrop-blur-md shadow-xl transition-all hover:scale-110 z-10"
+              className="absolute right-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 shadow-md transition-all hover:scale-110 z-10"
               title="Next Photo (Right Arrow)"
             >
               <ChevronRight size={22} />
@@ -271,18 +321,18 @@ export default function ImageZoomModal({
         )}
 
         {/* Helper Instructions Pill */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/80 backdrop-blur-md border border-white/10 text-slate-300 text-[11px] font-medium px-4 py-2 rounded-full shadow-lg pointer-events-none flex items-center gap-3">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md border border-slate-200 text-slate-600 text-[11px] font-medium px-4 py-2 rounded-full shadow-md pointer-events-none flex items-center gap-3">
           <span>Scroll wheel / +/- to zoom</span>
-          <span className="w-1 h-1 bg-white/30 rounded-full" />
+          <span className="w-1 h-1 bg-slate-300 rounded-full" />
           <span>Double-click to expand</span>
-          <span className="w-1 h-1 bg-white/30 rounded-full" />
+          <span className="w-1 h-1 bg-slate-300 rounded-full" />
           <span>Click & drag to pan</span>
         </div>
       </div>
 
       {/* Bottom Thumbnail Strip (if multiple photos) */}
       {hasMultiple && (
-        <div className="px-6 py-3 bg-slate-900/80 border-t border-white/10 backdrop-blur-md flex items-center justify-center gap-3 overflow-x-auto z-20">
+        <div className="px-6 py-3 bg-white/95 border-t border-slate-200 backdrop-blur-md flex items-center justify-center gap-3 overflow-x-auto z-20">
           {images.map((img, idx) => (
             <button
               key={idx}
@@ -291,10 +341,10 @@ export default function ImageZoomModal({
                 setCurrentIndex(idx);
                 handleReset();
               }}
-              className={`w-14 h-14 rounded-xl overflow-hidden p-1 bg-white/5 border transition-all shrink-0 ${
+              className={`w-14 h-14 rounded-xl overflow-hidden p-1 bg-white border transition-all shrink-0 ${
                 idx === currentIndex 
-                  ? 'border-emerald-500 ring-2 ring-emerald-500/40 scale-105' 
-                  : 'border-white/10 hover:border-white/30 opacity-60 hover:opacity-100'
+                  ? 'border-slate-900 ring-2 ring-slate-900/20 scale-105 shadow-sm' 
+                  : 'border-slate-200 hover:border-slate-400 opacity-70 hover:opacity-100'
               }`}
             >
               <img src={img} alt="" className="w-full h-full object-contain" />
@@ -304,4 +354,8 @@ export default function ImageZoomModal({
       )}
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 }

@@ -1,26 +1,62 @@
 import admin from 'firebase-admin';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 if (!admin.apps.length) {
   try {
     let serviceAccount;
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      try {
+        serviceAccount = typeof process.env.FIREBASE_SERVICE_ACCOUNT === 'string'
+          ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+          : process.env.FIREBASE_SERVICE_ACCOUNT;
+        admin.initializeApp({
+          credential: admin.credential.cert(serviceAccount)
+        });
+      } catch (e) {
+        console.warn("Invalid FIREBASE_SERVICE_ACCOUNT format. Initializing with projectId fallback:", e.message);
+        admin.initializeApp({
+          projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'chashmalay'
+        });
+      }
     } else {
       const serviceAccountPath = join(process.cwd(), 'serviceAccountKey.json');
-      serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+      if (existsSync(serviceAccountPath)) {
+        try {
+          serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+          });
+        } catch (e) {
+          console.warn("Error parsing serviceAccountKey.json:", e.message);
+          admin.initializeApp({
+            projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'chashmalay'
+          });
+        }
+      } else {
+        // Fallback for local dev when running without a physical service account file
+        const projectId = process.env.VITE_FIREBASE_PROJECT_ID || 'chashmalay';
+        admin.initializeApp({
+          projectId
+        });
+      }
     }
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
   } catch (error) {
-    console.error("Firebase Admin initialization failed:", error);
+    console.error("Firebase Admin initialization error:", error);
+    if (!admin.apps.length) {
+      try {
+        admin.initializeApp({
+          projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'chashmalay'
+        });
+      } catch (fallbackErr) {
+        console.error("Critical fallback init failed:", fallbackErr);
+      }
+    }
   }
 }
 
-export const db = admin.firestore();
-export const auth = admin.auth();
+export const db = admin.apps.length ? admin.firestore() : null;
+export const auth = admin.apps.length ? admin.auth() : null;
 export { admin };
 
 export async function verifyAuth(req) {
@@ -47,13 +83,26 @@ export async function verifyAdmin(req) {
   const decodedToken = await verifyAuth(req);
   
   try {
-    const userDoc = await db.collection('profiles').doc(decodedToken.uid).get();
-    if (!userDoc.exists || userDoc.data().is_admin !== true) {
-      const err = new Error('Forbidden: Admin access required');
-      err.statusCode = 403;
-      throw err;
+    // 1. Direct admin check by trusted admin email configuration
+    const adminEmails = (process.env.VITE_ADMIN_EMAILS || 'chashmalayshorts@gmail.com,admin@gmail.com')
+      .split(',')
+      .map(e => e.trim().toLowerCase());
+
+    if (decodedToken.email && adminEmails.includes(decodedToken.email.toLowerCase())) {
+      return decodedToken;
     }
-    return decodedToken;
+
+    // 2. Database profile check if Firestore is accessible
+    if (db) {
+      const userDoc = await db.collection('profiles').doc(decodedToken.uid).get();
+      if (userDoc.exists && userDoc.data().is_admin === true) {
+        return decodedToken;
+      }
+    }
+
+    const err = new Error('Forbidden: Admin access required');
+    err.statusCode = 403;
+    throw err;
   } catch (error) {
     if (error.statusCode) throw error;
     console.error("Admin verification check failed:", error);
@@ -62,3 +111,4 @@ export async function verifyAdmin(req) {
     throw err;
   }
 }
+

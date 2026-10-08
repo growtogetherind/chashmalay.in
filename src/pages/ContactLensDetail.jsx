@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Zap, Droplets, Heart, Share2, Star, Plus, Minus, Info, ArrowRight, CheckCircle2, HelpCircle, PenLine, ShieldAlert, UploadCloud, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getProductById, subscribeProducts, addReview, subscribeProductReviews } from '../lib/firebase';
+import { getRecommendedProducts } from '../lib/recommendations';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { compressToWebP } from '../lib/cloudinary';
 import ProductCard from '../components/ui/ProductCard';
+import ProductImageZoom from '../components/ui/ProductImageZoom';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
 import toast from 'react-hot-toast';
 import './ProductDetail.css';
@@ -63,10 +65,11 @@ const ContactLensDetail = () => {
       setProduct(data);
       setLoading(false);
 
-      // Fetch related products
+      // Fetch related products using product-aware recommendations
       unsubRelated = subscribeProducts({ category: data.category }, (items) => {
-        if (isActive) {
-          setRelatedProducts(items.filter(p => p.id !== id).slice(0, 4));
+        if (isActive && Array.isArray(items)) {
+          const recommendations = getRecommendedProducts(data, items, { limit: 8, maxSameBrand: 4 });
+          setRelatedProducts(recommendations);
         }
       });
     };
@@ -162,44 +165,64 @@ const ContactLensDetail = () => {
   };
 
   return (
-    <div className="product-detail-page pt-28">
+    <div className="product-detail-page">
       <div className="container mx-auto px-4 md:px-8">
         <div className="product-detail-layout">
           {/* Left: Gallery */}
           <div className="gallery-section">
             <div className="gallery-container">
-              <div className="vertical-thumbnails">
-                {images.map((img, idx) => (
-                  <button 
-                    key={idx} 
-                    className={`thumb-btn ${activeImage === idx ? 'active' : ''}`}
-                    onClick={() => setActiveImage(idx)}
-                  >
-                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
               <div className="main-image-viewport">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImage}
-                    src={images[activeImage]}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.05 }}
-                    transition={TRANSITIONS.cinema}
-                    className="w-full h-full object-contain p-12"
-                  />
-                </AnimatePresence>
-                <div className="absolute top-6 right-6 flex flex-col gap-3">
-                  <button onClick={() => setIsWishlisted(!isWishlisted)} className={`w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-all ${isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-slate-400 hover:text-red-500'}`}>
-                    <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} />
-                  </button>
-                  <button className="w-12 h-12 rounded-full bg-white text-slate-400 flex items-center justify-center shadow-xl hover:text-emerald-500 transition-all">
-                    <Share2 size={20} />
-                  </button>
-                </div>
+                <ProductImageZoom
+                  images={images}
+                  activeImage={activeImage}
+                  onActiveImageChange={setActiveImage}
+                  product={product}
+                  productName={product.name}
+                  extraTopRight={
+                    <div className="flex items-center gap-2">
+                      <button 
+                        type="button"
+                        onClick={() => setIsWishlisted(!isWishlisted)} 
+                        className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all ${isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-slate-400 hover:text-red-500'}`}
+                        title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                      >
+                        <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          if (navigator.share) {
+                            navigator.share({ title: product.name, url: window.location.href });
+                          } else {
+                            navigator.clipboard.writeText(window.location.href);
+                            toast.success("Link copied to clipboard!");
+                          }
+                        }}
+                        className="w-10 h-10 rounded-full bg-white text-slate-400 flex items-center justify-center shadow-md hover:text-emerald-500 transition-all"
+                        title="Share product"
+                      >
+                        <Share2 size={18} />
+                      </button>
+                    </div>
+                  }
+                />
               </div>
+
+              {images.length > 1 && (
+                <div className="thumbnails-strip">
+                  {images.map((img, idx) => (
+                    <button 
+                      key={idx} 
+                      className={`thumb-btn ${activeImage === idx ? 'active' : ''}`}
+                      onClick={() => setActiveImage(idx)}
+                      title={`View angle ${idx + 1}`}
+                      aria-label={`View angle ${idx + 1}`}
+                    >
+                      <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

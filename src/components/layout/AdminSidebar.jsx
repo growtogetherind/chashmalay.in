@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutGrid, Box, Layers, Tag, Package, Receipt, Users, FileText, Ticket, Star, Settings, LogOut, Menu, X, Glasses, Sparkles } from 'lucide-react';
+import { LayoutGrid, Box, Layers, Tag, Package, Receipt, Users, FileText, Ticket, Star, Settings, LogOut, Menu, X, Glasses, Sparkles, Zap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../ui/Logo';
 
@@ -8,11 +8,13 @@ const AdminSidebar = () => {
   const { signOut, isAdmin } = useAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const isLocalhost = Boolean(import.meta.env.DEV) || (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname));
 
   const navItems = [
     { path: '/admin', label: 'Dashboard', icon: <LayoutGrid size={20} /> },
     { path: '/admin/orders', label: 'Orders', icon: <Receipt size={20} /> },
     { path: '/admin/products', label: 'Products', icon: <Box size={20} /> },
+    ...(isLocalhost ? [{ path: '/admin/quick-add', label: '⚡ Quick Add', icon: <Zap size={20} /> }] : []),
     ...(isAdmin ? [{ path: '/admin/customers', label: 'Customers', icon: <Users size={20} /> }] : []),
     { path: '/admin/categories', label: 'Categories', icon: <Layers size={20} /> },
     { path: '/admin/brands', label: 'Brands', icon: <Tag size={20} /> },

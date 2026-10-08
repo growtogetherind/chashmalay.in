@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { Star, Heart, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Layers, ChevronRight, ChevronLeft, X, CheckCircle } from 'lucide-react';
 import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
+import { getRecommendedProducts } from '../lib/recommendations';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ui/ProductCard';
+import ProductImageZoom from '../components/ui/ProductImageZoom';
 import { FadeIn, TRANSITIONS } from '../components/ui/Motion';
 import { getCloudinarySrcSet, transformCloudinaryUrl } from '../lib/cloudinary';
 import toast from 'react-hot-toast';
@@ -60,6 +62,13 @@ const ProductDetail = () => {
   const [submittingReview, setSubmittingReview] = useState(false);
 
   const sliderRef = useRef(null);
+
+  const scrollSlider = (direction) => {
+    if (sliderRef.current) {
+      const scrollAmount = direction === 'left' ? -320 : 320;
+      sliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const colors = useMemo(() => {
     if (!product) return [];
@@ -206,18 +215,52 @@ const ProductDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!product?.category) return;
+    if (!product) return;
     let cancelled = false;
 
     const loadRelated = async () => {
-      const { data: allProds } = await getProducts({ category: product.category });
-      if (!cancelled && allProds) {
-        setRelatedProducts(allProds.filter(p => p.id !== product.id).slice(0, 10));
+      try {
+        // 1. Fetch products in the same category
+        const { data: categoryProds } = await getProducts({ category: product.category });
+        let candidatePool = Array.isArray(categoryProds) ? [...categoryProds] : [];
+
+        // 2. If the product has a specific brand, also fetch any other products from that brand
+        if (product.brand && product.brand.trim() && product.brand.toLowerCase() !== 'chashmalay luxury') {
+          const { data: brandProds } = await getProducts({ brand: product.brand }).catch(() => ({ data: [] }));
+          if (Array.isArray(brandProds) && brandProds.length > 0) {
+            const map = new Map();
+            candidatePool.forEach(p => map.set(p.id, p));
+            brandProds.forEach(p => map.set(p.id, p));
+            candidatePool = Array.from(map.values());
+          }
+        }
+
+        // 3. Fallback: If candidate pool is too small, fetch active catalog so we always have strong recommendations
+        if (candidatePool.length < 10) {
+          const { data: generalProds } = await getProducts().catch(() => ({ data: [] }));
+          if (Array.isArray(generalProds) && generalProds.length > 0) {
+            const map = new Map();
+            candidatePool.forEach(p => map.set(p.id, p));
+            generalProds.forEach(p => map.set(p.id, p));
+            candidatePool = Array.from(map.values());
+          }
+        }
+
+        if (!cancelled && candidatePool.length > 0) {
+          // Dynamic, product-aware scoring: same-brand first, then similar shape/style/color from other brands
+          const recommendations = getRecommendedProducts(product, candidatePool, { 
+            limit: 10,
+            maxSameBrand: 5
+          });
+          setRelatedProducts(recommendations);
+        }
+      } catch (err) {
+        console.error("Failed to load recommendations:", err);
       }
     };
 
     if ('requestIdleCallback' in window) {
-      const idleId = window.requestIdleCallback(loadRelated, { timeout: 1200 });
+      const idleId = window.requestIdleCallback(loadRelated, { timeout: 800 });
       return () => {
         cancelled = true;
         window.cancelIdleCallback(idleId);
@@ -332,52 +375,49 @@ const ProductDetail = () => {
   const prevImage = () => setActiveImage((prev) => (prev - 1 + (gallery.length || 1)) % (gallery.length || 1));
 
   return (
-    <div className="product-detail-page pt-28">
-      <div className="container">
+    <div className="product-detail-page">
+      <div className="container mx-auto px-4 md:px-8">
         <div className="product-detail-layout">
 
-          <div className="space-y-12">
+          <div className="gallery-section">
             <div className="gallery-container">
-              <div className="vertical-thumbnails">
-                {gallery.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveImage(idx)}
-                    className={`thumb-btn ${activeImage === idx ? 'active' : ''}`}
-                  >
-	                    <img src={transformCloudinaryUrl(img, { width: 160 })} alt="" width="160" height="120" className="w-full h-full object-contain" loading="lazy" decoding="async" />
-                  </button>
-                ))}
+              <div className="main-image-viewport">
+                <ProductImageZoom
+                  images={gallery}
+                  activeImage={activeImage}
+                  onActiveImageChange={setActiveImage}
+                  product={product}
+                  selectedColor={selectedFrameColor}
+                  selectedSize={activeSize}
+                  productName={product.name}
+                  imageLoading={imageLoading}
+                  setImageLoading={setImageLoading}
+                />
               </div>
 
-              <div className="main-image-viewport group">
-                <button className="image-nav-btn prev" onClick={prevImage}><ChevronLeft size={20} /></button>
-                <button className="image-nav-btn next" onClick={nextImage}><ChevronRight size={20} /></button>
-
-                <AnimatePresence mode="wait">
-                  <div className="relative w-full h-full flex items-center justify-center min-h-[400px]">
-                    {imageLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center z-10">
-                        <div className="w-12 h-12 border-4 border-slate-100 border-t-slate-900 rounded-full animate-spin" />
-                      </div>
-                    )}
-                    <motion.img
-                      key={activeImage}
-	                      src={transformCloudinaryUrl(activeImageUrl, { width: 1200 })}
-                        srcSet={activeImageUrl.includes('res.cloudinary.com') ? getCloudinarySrcSet(activeImageUrl, [640, 960, 1200, 1600]) : undefined}
-                        sizes="(max-width: 1024px) 100vw, 58vw"
-	                      alt={product.name}
-                      onLoad={() => setImageLoading(false)}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: imageLoading ? 0 : 1, scale: imageLoading ? 0.9 : 1 }}
-                      transition={{ duration: 0.5, ease: TRANSITIONS.ease }}
-                      className="w-full max-w-[90%] h-auto object-contain"
-                      fetchpriority={activeImage === 0 ? 'high' : 'auto'}
-                      decoding="async"
-                    />
-                  </div>
-                </AnimatePresence>
-              </div>
+              {gallery.length > 1 && (
+                <div className="thumbnails-strip">
+                  {gallery.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImage(idx)}
+                      className={`thumb-btn ${activeImage === idx ? 'active' : ''}`}
+                      title={`View image angle ${idx + 1}`}
+                      aria-label={`View image angle ${idx + 1}`}
+                    >
+                      <img
+                        src={transformCloudinaryUrl(img, { width: 180 })}
+                        alt=""
+                        width="180"
+                        height="130"
+                        className="w-full h-full object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -641,9 +681,34 @@ const ProductDetail = () => {
         </div>
 
         {relatedProducts.length > 0 && (
-          <section className="mt-32 pt-16 border-t border-divider">
-             <div className="flex justify-between items-end mb-12">
-                <h2 className="text-2xl font-bold text-primary">Similar Products</h2>
+          <section className="mt-20 pt-10 border-t border-slate-200">
+             <div className="flex justify-between items-end mb-8">
+                <div>
+                  <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-accent">Recommended For You</span>
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+                    {product.brand && product.brand !== 'Chashmalay Luxury' 
+                      ? `More from ${product.brand} & Similar Styles` 
+                      : 'Similar Designs & Styles'}
+                  </h2>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => scrollSlider('left')}
+                    className="w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition shadow-xs"
+                    title="Previous recommendations"
+                    aria-label="Previous recommendations"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button
+                    onClick={() => scrollSlider('right')}
+                    className="w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition shadow-xs"
+                    title="Next recommendations"
+                    aria-label="Next recommendations"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
              </div>
              <div className="similar-grid-container" ref={sliderRef}>
                 {relatedProducts.map(p => <div key={p.id} className="w-full"><ProductCard product={p} /></div>)}

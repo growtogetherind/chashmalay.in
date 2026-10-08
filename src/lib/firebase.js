@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter } from "firebase/firestore";
+import { initializeFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBv9Lm2xw_0jvBNWvOdFUx8PQxkg7soSec",
@@ -16,7 +16,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+  ignoreUndefinedProperties: true
+});
 
 let clientIp = null;
 const fetchClientIp = async () => {
@@ -193,10 +196,11 @@ const checkRateLimit = (action, limitMs = 5000) => {
 };
 
 // --- Products ---
-export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false, limitVal = null, startAfterDoc = null } = {}) => {
+export const getProducts = async ({ category, brand, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false, limitVal = null, startAfterDoc = null } = {}) => {
   try {
     let q = adminFilter ? query(collection(db, "products")) : query(collection(db, "products"), where("is_active", "==", true));
     if (category) q = query(q, where("category", "==", category));
+    if (brand) q = query(q, where("brand", "==", brand));
     if (shape) q = query(q, where("shape", "==", shape));
     if (isFeatured !== undefined) q = query(q, where("is_featured", "==", isFeatured));
     if (isNew !== undefined) q = query(q, where("is_new", "==", isNew));
@@ -225,9 +229,10 @@ export const getProducts = async ({ category, shape, priceMin, priceMax, isFeatu
   }
 };
 
-export const subscribeProducts = ({ category, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false } = {}, onData, onError) => {
+export const subscribeProducts = ({ category, brand, shape, priceMin, priceMax, isFeatured, isNew, sortBy = 'created_at', adminFilter = false } = {}, onData, onError) => {
   let q = adminFilter ? query(collection(db, "products")) : query(collection(db, "products"), where("is_active", "==", true));
   if (category) q = query(q, where("category", "==", category));
+  if (brand) q = query(q, where("brand", "==", brand));
   if (shape) q = query(q, where("shape", "==", shape));
   if (isFeatured !== undefined) q = query(q, where("is_featured", "==", isFeatured));
   if (isNew !== undefined) q = query(q, where("is_new", "==", isNew));

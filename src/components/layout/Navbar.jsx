@@ -121,6 +121,25 @@ const Navbar = () => {
                 )}
               </button>
 
+              {/* Mobile Account / Login button */}
+              {user ? (
+                <Link
+                  to={isAdmin ? '/admin' : '/account'}
+                  className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-sm ml-1"
+                  aria-label="Account"
+                >
+                  <span className="text-[10px] font-black tracking-tight">{getInitials()}</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="md:hidden p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all ml-1"
+                  aria-label="Sign In"
+                >
+                  <User size={18} strokeWidth={1.5} />
+                </Link>
+              )}
+
               {/* ── Profile Avatar / Popup (desktop) ── */}
               <div className="hidden md:block relative" ref={profileRef}>
                 <button
@@ -313,7 +332,7 @@ const Navbar = () => {
               </div>
 
               {/* User info (mobile) */}
-              {user && (
+              {user ? (
                 <div className="mx-4 mt-4 p-3 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl flex items-center gap-3 border border-indigo-100/60">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-black shadow flex-shrink-0">
                     {getInitials()}
@@ -324,6 +343,25 @@ const Navbar = () => {
                     </p>
                     <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
                   </div>
+                </div>
+              ) : (
+                <div className="mx-4 mt-4 p-3.5 bg-gray-50/90 rounded-2xl flex items-center justify-between border border-gray-100 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
+                      <User size={17} strokeWidth={1.5} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-gray-900 leading-tight">Welcome Guest</p>
+                      <p className="text-[11px] text-gray-500">Sign in for orders & rewards</p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/auth"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-3.5 py-1.5 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all shadow-sm"
+                  >
+                    Sign In
+                  </Link>
                 </div>
               )}
 

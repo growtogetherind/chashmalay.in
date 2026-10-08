@@ -7,6 +7,7 @@ import fs from 'fs'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Local Vercel Serverless Function and Assets Dev Proxy Plugin
 const vercelDevPlugin = () => ({
   name: 'vercel-dev-plugin',
   configureServer(server) {
@@ -38,12 +39,36 @@ const vercelDevPlugin = () => ({
           // Read request body if needed
           let body = '';
           if (req.method !== 'GET' && req.method !== 'HEAD') {
-            body = await new Promise((resolve, reject) => {
-              let data = '';
-              req.on('data', chunk => { data += chunk; });
-              req.on('end', () => resolve(data));
-              req.on('error', err => reject(err));
-            });
+            if (req.readableEnded) {
+              body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
+            } else {
+              body = await new Promise((resolve, reject) => {
+                let data = '';
+                const onData = chunk => { data += chunk; };
+                const onEnd = () => { cleanup(); resolve(data); };
+                const onError = err => { cleanup(); reject(err); };
+                const timer = setTimeout(() => {
+                  cleanup();
+                  resolve(data);
+                }, 15000);
+
+                function cleanup() {
+                  clearTimeout(timer);
+                  req.removeListener('data', onData);
+                  req.removeListener('end', onEnd);
+                  req.removeListener('error', onError);
+                }
+
+                req.on('data', onData);
+                req.on('end', onEnd);
+                req.on('error', onError);
+
+                if (req.readableEnded) {
+                  cleanup();
+                  resolve(data);
+                }
+              });
+            }
           }
 
           let parsedBody = {};
@@ -64,6 +89,10 @@ const vercelDevPlugin = () => ({
           const resWrapper = Object.create(res);
           resWrapper.status = function(statusCode) {
             res.statusCode = statusCode;
+            return this;
+          };
+          resWrapper.setHeader = function(name, val) {
+            res.setHeader(name, val);
             return this;
           };
           resWrapper.json = function(data) {

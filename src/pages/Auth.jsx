@@ -19,14 +19,14 @@ const Auth = () => {
   const from = location.state?.from || '/';
 
   useEffect(() => {
-    if (user && profile) {
-      const isUserAdmin = profile.is_admin || 
-        ['super_admin', 'admin', 'manager', 'staff'].includes(profile.role) ||
+    if (user) {
+      const isUserAdmin = profile?.is_admin || 
+        ['super_admin', 'admin', 'manager', 'staff'].includes(profile?.role) ||
         checkIsAdminEmail(user.email);
       if (isUserAdmin) {
-        navigate('/admin');
+        navigate('/admin', { replace: true });
       } else {
-        navigate(from);
+        navigate(from, { replace: true });
       }
     }
   }, [user, profile, navigate, from]);
@@ -35,22 +35,35 @@ const Auth = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const cleanEmail = (form.email || '').trim().toLowerCase();
+    const cleanPassword = form.password;
+
+    if (!cleanEmail) {
+      toast.error('Please enter your email address.');
+      return;
+    }
+
     setLoading(true);
     try {
       if (mode === 'login') {
-        const { profile: loggedInProfile } = await signIn(form.email, form.password);
+        const { profile: loggedInProfile } = await signIn(cleanEmail, cleanPassword);
         const isUserAdmin = loggedInProfile?.is_admin || 
           ['super_admin', 'admin', 'manager', 'staff'].includes(loggedInProfile?.role) ||
-          checkIsAdminEmail(form.email);
+          checkIsAdminEmail(cleanEmail);
         if (isUserAdmin) {
-          navigate('/admin');
+          navigate('/admin', { replace: true });
         } else {
-          navigate(from);
+          navigate(from, { replace: true });
         }
       } else {
-        if (!form.fullName.trim()) { toast.error('Please enter your full name.'); setLoading(false); return; }
-        await signUp(form.email, form.password, form.fullName);
-        navigate(from);
+        const cleanName = (form.fullName || '').trim();
+        if (!cleanName) { 
+          toast.error('Please enter your full name.'); 
+          setLoading(false); 
+          return; 
+        }
+        await signUp(cleanEmail, cleanPassword, cleanName);
+        navigate(from, { replace: true });
       }
     } catch (err) {
       toast.error(err.message || 'Something went wrong.');
@@ -60,30 +73,36 @@ const Auth = () => {
   };
 
   const handleGoogle = async () => {
+    setLoading(true);
     try { 
       const res = await signInWithGoogle(); 
-      const isUserAdmin = res?.profile?.is_admin || 
-        ['super_admin', 'admin', 'manager', 'staff'].includes(res?.profile?.role) ||
-        checkIsAdminEmail(res?.user?.email);
-      if (isUserAdmin) {
-        navigate('/admin');
-      } else if (res?.user) {
-        navigate(from);
+      if (res?.user) {
+        const isUserAdmin = res?.profile?.is_admin || 
+          ['super_admin', 'admin', 'manager', 'staff'].includes(res?.profile?.role) ||
+          checkIsAdminEmail(res?.user?.email);
+        if (isUserAdmin) {
+          navigate('/admin', { replace: true });
+        } else {
+          navigate(from, { replace: true });
+        }
       }
     } catch {
       // Handled in AuthContext
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleForgotPassword = async (e) => {
     if (e) e.preventDefault();
-    if (!form.email.trim()) {
+    const cleanEmail = (form.email || '').trim().toLowerCase();
+    if (!cleanEmail) {
       toast.error('Please enter your email address first.');
       return;
     }
     setResetLoading(true);
     try {
-      await resetPassword(form.email.trim());
+      await resetPassword(cleanEmail);
       setMode('login'); // Go back to login after sending
     } catch {
       // Error is handled in AuthContext toast
@@ -144,6 +163,11 @@ const Auth = () => {
                         placeholder="you@example.com" 
                         value={form.email} 
                         onChange={handleChange} 
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        spellCheck="false"
+                        autoComplete="email"
+                        inputMode="email"
                         required 
                       />
                     </div>
@@ -167,7 +191,16 @@ const Auth = () => {
                   <label>Full Name</label>
                   <div className="input-wrap">
                     <User size={16} className="input-icon" />
-                    <input type="text" name="fullName" placeholder="Rahul Kumar" value={form.fullName} onChange={handleChange} required />
+                    <input 
+                      type="text" 
+                      name="fullName" 
+                      placeholder="Rahul Kumar" 
+                      value={form.fullName} 
+                      onChange={handleChange} 
+                      autoCapitalize="words"
+                      autoComplete="name"
+                      required 
+                    />
                   </div>
                 </div>
               )}
@@ -176,7 +209,19 @@ const Auth = () => {
                 <label>Email Address</label>
                 <div className="input-wrap">
                   <span className="input-icon text-sm">@</span>
-                  <input type="email" name="email" placeholder="you@example.com" value={form.email} onChange={handleChange} required />
+                  <input 
+                    type="email" 
+                    name="email" 
+                    placeholder="you@example.com" 
+                    value={form.email} 
+                    onChange={handleChange} 
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck="false"
+                    autoComplete="email"
+                    inputMode="email"
+                    required 
+                  />
                 </div>
               </div>
 
@@ -186,7 +231,19 @@ const Auth = () => {
                   <button type="button" className="input-icon input-toggle" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
-                  <input type={showPassword ? 'text' : 'password'} name="password" placeholder="••••••••" value={form.password} onChange={handleChange} required minLength={6} />
+                  <input 
+                    type={showPassword ? 'text' : 'password'} 
+                    name="password" 
+                    placeholder="••••••••" 
+                    value={form.password} 
+                    onChange={handleChange} 
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck="false"
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    required 
+                    minLength={6} 
+                  />
                 </div>
               </div>
 
@@ -218,9 +275,9 @@ const Auth = () => {
               <>
                 <div className="auth-divider"><span>or continue with</span></div>
 
-                <button onClick={handleGoogle} className="google-btn">
+                <button onClick={handleGoogle} className="google-btn" type="button" disabled={loading}>
                   <Globe size={18} />
-                  <span>Continue with Google</span>
+                  <span>{loading ? 'Signing in...' : 'Continue with Google'}</span>
                 </button>
 
                 <p className="auth-switch">
