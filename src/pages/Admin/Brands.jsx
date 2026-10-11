@@ -9,6 +9,11 @@ import '../Admin.css';
 
 const DEFAULT_BRANDS = [
   { name: 'Ray-Ban', description: 'Iconic sunglasses and eyeglasses since 1937', logo: '' },
+  { name: 'Oakley', description: 'High-performance sport and lifestyle optics', logo: '' },
+  { name: 'Tommy Hilfiger', description: 'Classic American cool style and premium frames', logo: '' },
+  { name: 'Armani Exchange', description: 'Contemporary urban style and modern designer frames', logo: '' },
+  { name: 'Fling', description: 'Trendy, vibrant, and chic fashion eyewear', logo: '' },
+  { name: 'Calvin Klein', description: 'Minimalist luxury and sophisticated modern eyewear', logo: '' },
   { name: 'Scott', description: 'Sporty and modern premium eyewear', logo: '' },
   { name: 'IDEE', description: 'Trendy, youth-centric, and chic eyewear', logo: '' },
   { name: 'IRUS', description: 'Stylish and affordable fashion eyewear', logo: '' },

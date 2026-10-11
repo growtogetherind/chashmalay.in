@@ -640,10 +640,15 @@ const AdminProducts = () => {
                       <select name="brand" value={form.brand} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
                         <option value="">Select Brand</option>
                         {Array.from(new Set([
+                          'Ray-Ban',
+                          'Oakley',
+                          'Tommy Hilfiger',
+                          'Armani Exchange',
+                          'Fling',
+                          'Calvin Klein',
                           'Hyat Hunter Classic',
                           'Chashmalay',
                           'Scott',
-                          'Ray-Ban',
                           'IDEE',
                           'IRUS',
                           'David Parker',
