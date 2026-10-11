@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn } from 'lucide-react';
-import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories } from '../../lib/firebase';
+import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
 import ImageZoomModal from '../../components/ui/ImageZoomModal';
@@ -90,8 +90,49 @@ const AdminProducts = () => {
   const [activeTab, setActiveTab] = useState('basic');
   const [pendingImages, setPendingImages] = useState({});
   const [pendingGallery, setPendingGallery] = useState([]);
+  const [showNewBrandInput, setShowNewBrandInput] = useState(false);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [addingBrand, setAddingBrand] = useState(false);
   const [zoomModal, setZoomModal] = useState({ isOpen: false, imageUrl: '', images: [], initialIndex: 0, title: '' });
   const { confirm } = useConfirm();
+
+  const handleQuickAddBrand = async () => {
+    const trimmed = newBrandName.trim();
+    if (!trimmed) {
+      toast.error('Please enter a brand name');
+      return;
+    }
+
+    setAddingBrand(true);
+    try {
+      const existing = brands.find(b => b.name?.toLowerCase().trim() === trimmed.toLowerCase());
+      if (existing) {
+        setForm(prev => ({ ...prev, brand: existing.name }));
+        setShowNewBrandInput(false);
+        setNewBrandName('');
+        toast.success(`Selected existing brand: ${existing.name}`);
+        setAddingBrand(false);
+        return;
+      }
+
+      const { error } = await saveBrand({ name: trimmed, description: '', logo: '' });
+      if (error) {
+        console.error('Error saving brand:', error);
+        toast.error('Could not save to database, but selected for this product');
+      } else {
+        toast.success(`Brand "${trimmed}" added!`);
+      }
+
+      setForm(prev => ({ ...prev, brand: trimmed }));
+      setShowNewBrandInput(false);
+      setNewBrandName('');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to add brand');
+    } finally {
+      setAddingBrand(false);
+    }
+  };
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -354,6 +395,8 @@ const AdminProducts = () => {
     setEditing(null);
     setPendingImages({});
     setPendingGallery([]);
+    setShowNewBrandInput(false);
+    setNewBrandName('');
 
     const draft = localStorage.getItem('product_draft');
     if (draft) {
@@ -522,6 +565,8 @@ const AdminProducts = () => {
                                  setEditing(p.id);
                                  setPendingImages({});
                                  setPendingGallery([]);
+                                 setShowNewBrandInput(false);
+                                 setNewBrandName('');
                                  setShowForm(true);
                                }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-all text-xs font-bold uppercase tracking-widest">
                                  <Edit3 size={16} /> <span>Modify Asset</span>
@@ -530,6 +575,8 @@ const AdminProducts = () => {
                                  const duplicate = { ...p, id: undefined, name: `${p.name} (Copy)`, sku: `${p.sku}-COPY` };
                                  setForm(duplicate);
                                  setEditing(null);
+                                 setShowNewBrandInput(false);
+                                 setNewBrandName('');
                                  setShowForm(true);
                                }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-all text-xs font-bold uppercase tracking-widest">
                                  <Copy size={16} /> <span>Duplicate Profile</span>
@@ -636,39 +683,106 @@ const AdminProducts = () => {
                       </select>
                     </div>
                     <div className="form-group">
-                      <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Brand *</label>
-                      <select name="brand" value={form.brand} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
-                        <option value="">Select Brand</option>
-                        {Array.from(new Set([
-                          'Ray-Ban',
-                          'Oakley',
-                          'Tommy Hilfiger',
-                          'Armani Exchange',
-                          'Fling',
-                          'Calvin Klein',
-                          'Danial Hunter',
-                          'David Jones',
-                          'Farenheit',
-                          'Hyat Hunter Classic',
-                          'Chashmalay',
-                          'Scott',
-                          'IDEE',
-                          'IRUS',
-                          'David Parker',
-                          'Vogue',
-                          '13 Century',
-                          'Essilor',
-                          'Zeiss',
-                          'Nova',
-                          'Yash',
-                          'Nikon',
-                          'Bonzer',
-                          ...brands.map(b => b.name),
-                          form.brand
-                        ].filter(Boolean))).map(brandName => (
-                          <option key={brandName} value={brandName}>{brandName}</option>
-                        ))}
-                      </select>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block">Brand *</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowNewBrandInput(prev => !prev);
+                            setNewBrandName('');
+                          }}
+                          className="text-[10px] font-bold uppercase text-emerald-600 hover:text-emerald-700 tracking-wider flex items-center gap-1 transition-colors hover:underline cursor-pointer"
+                        >
+                          <Plus size={12} /> {showNewBrandInput ? 'Select Existing' : '+ Add Brand'}
+                        </button>
+                      </div>
+
+                      {showNewBrandInput ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={newBrandName}
+                            onChange={(e) => setNewBrandName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleQuickAddBrand();
+                              }
+                            }}
+                            placeholder="Enter new brand name..."
+                            autoFocus
+                            className="flex-1 bg-white border-2 border-emerald-500 p-3.5 rounded-xl text-slate-900 text-sm font-bold focus:outline-none transition-all shadow-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleQuickAddBrand}
+                            disabled={addingBrand || !newBrandName.trim()}
+                            className="px-4 py-3.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-sm shadow-emerald-500/20"
+                          >
+                            {addingBrand ? 'Adding...' : 'Add'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowNewBrandInput(false);
+                              setNewBrandName('');
+                            }}
+                            className="p-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0"
+                            title="Cancel"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <select
+                          name="brand"
+                          value={form.brand}
+                          onChange={(e) => {
+                            if (e.target.value === '__ADD_NEW__') {
+                              setShowNewBrandInput(true);
+                              setNewBrandName('');
+                            } else {
+                              handleChange(e);
+                            }
+                          }}
+                          required
+                          className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer"
+                        >
+                          <option value="">Select Brand</option>
+                          <option value="__ADD_NEW__" className="text-emerald-600 font-bold bg-emerald-50">
+                            + Add New Brand directly...
+                          </option>
+                          {Array.from(new Set([
+                            'Ray-Ban',
+                            'Oakley',
+                            'Tommy Hilfiger',
+                            'Armani Exchange',
+                            'Fling',
+                            'Calvin Klein',
+                            'Danial Hunter',
+                            'David Jones',
+                            'Farenheit',
+                            'Hyat Hunter Classic',
+                            'Chashmalay',
+                            'Scott',
+                            'IDEE',
+                            'IRUS',
+                            'David Parker',
+                            'Vogue',
+                            '13 Century',
+                            'Essilor',
+                            'Zeiss',
+                            'Nova',
+                            'Yash',
+                            'Nikon',
+                            'Bonzer',
+                            ...brands.map(b => b.name),
+                            form.brand
+                          ].filter(Boolean))).map(brandName => (
+                            <option key={brandName} value={brandName}>{brandName}</option>
+                          ))}
+                        </select>
+                      )}
                     </div>
                     <div className="form-group">
                       <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Default Color</label>
