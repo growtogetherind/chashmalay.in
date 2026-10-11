@@ -16,6 +16,7 @@ const DEFAULT_BRANDS = [
   { name: 'Calvin Klein', description: 'Minimalist luxury and sophisticated modern eyewear', logo: '' },
   { name: 'Danial Hunter', description: 'Distinctive crafted frames and refined eyewear', logo: '' },
   { name: 'David Jones', description: 'Timeless classic and elegant designer eyewear', logo: '' },
+  { name: 'Farenheit', description: 'Contemporary high-fashion frames and sunglasses', logo: '' },
   { name: 'Scott', description: 'Sporty and modern premium eyewear', logo: '' },
   { name: 'IDEE', description: 'Trendy, youth-centric, and chic eyewear', logo: '' },
   { name: 'IRUS', description: 'Stylish and affordable fashion eyewear', logo: '' },

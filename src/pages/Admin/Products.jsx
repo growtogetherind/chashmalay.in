@@ -648,6 +648,7 @@ const AdminProducts = () => {
                           'Calvin Klein',
                           'Danial Hunter',
                           'David Jones',
+                          'Farenheit',
                           'Hyat Hunter Classic',
                           'Chashmalay',
                           'Scott',
