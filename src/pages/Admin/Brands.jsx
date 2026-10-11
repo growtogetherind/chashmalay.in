@@ -14,6 +14,8 @@ const DEFAULT_BRANDS = [
   { name: 'Armani Exchange', description: 'Contemporary urban style and modern designer frames', logo: '' },
   { name: 'Fling', description: 'Trendy, vibrant, and chic fashion eyewear', logo: '' },
   { name: 'Calvin Klein', description: 'Minimalist luxury and sophisticated modern eyewear', logo: '' },
+  { name: 'Danial Hunter', description: 'Distinctive crafted frames and refined eyewear', logo: '' },
+  { name: 'David Jones', description: 'Timeless classic and elegant designer eyewear', logo: '' },
   { name: 'Scott', description: 'Sporty and modern premium eyewear', logo: '' },
   { name: 'IDEE', description: 'Trendy, youth-centric, and chic eyewear', logo: '' },
   { name: 'IRUS', description: 'Stylish and affordable fashion eyewear', logo: '' },

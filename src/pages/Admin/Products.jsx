@@ -646,6 +646,8 @@ const AdminProducts = () => {
                           'Armani Exchange',
                           'Fling',
                           'Calvin Klein',
+                          'Danial Hunter',
+                          'David Jones',
                           'Hyat Hunter Classic',
                           'Chashmalay',
                           'Scott',
