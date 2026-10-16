@@ -56,6 +56,10 @@ const Checkout = () => {
   };
 
   useEffect(() => {
+    loadRazorpay();
+  }, []);
+
+  useEffect(() => {
     const fetchPincodeData = async () => {
       if (address.pincode.length === 6) {
         try {
@@ -186,11 +190,15 @@ const Checkout = () => {
     let razorpayOrderAmount = amountInPaise;
     let razorpayOrderCurrency = 'INR';
 
-    // STEP 1: Attempt to create order on server (for strict signature verification)
+    // STEP 1: Fast server order initiation (strictly capped at 2s to prevent UI delays)
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+
       const token = await user?.getIdToken?.();
       const orderRes = await fetch('/api/create-order', {
         method: 'POST',
+        signal: controller.signal,
         headers: { 
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -202,6 +210,7 @@ const Checkout = () => {
           amount: amountInPaise,
         }),
       });
+      clearTimeout(timeoutId);
 
       if (orderRes.ok) {
         const orderData = await orderRes.json();
@@ -215,7 +224,7 @@ const Checkout = () => {
         console.warn('Backend order initiation notice:', errJson.error || orderRes.statusText);
       }
     } catch (orderInitErr) {
-      console.warn('Backend order API unreachable, continuing with direct secure checkout:', orderInitErr.message);
+      console.warn('Backend order API skipped/timed out, opening direct checkout immediately:', orderInitErr.message);
     }
 
     // STEP 2: Configure Razorpay modal (works seamlessly with or without order_id)

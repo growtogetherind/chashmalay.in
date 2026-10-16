@@ -2,6 +2,8 @@ import admin from 'firebase-admin';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
+let hasServiceAccount = false;
+
 if (!admin.apps.length) {
   try {
     let serviceAccount;
@@ -13,6 +15,7 @@ if (!admin.apps.length) {
         admin.initializeApp({
           credential: admin.credential.cert(serviceAccount)
         });
+        hasServiceAccount = true;
       } catch (e) {
         console.warn("Invalid FIREBASE_SERVICE_ACCOUNT format. Initializing with projectId fallback:", e.message);
         admin.initializeApp({
@@ -27,6 +30,7 @@ if (!admin.apps.length) {
           admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
           });
+          hasServiceAccount = true;
         } catch (e) {
           console.warn("Error parsing serviceAccountKey.json:", e.message);
           admin.initializeApp({
@@ -55,9 +59,9 @@ if (!admin.apps.length) {
   }
 }
 
-export const db = admin.apps.length ? admin.firestore() : null;
+export const db = (admin.apps.length && hasServiceAccount) ? admin.firestore() : null;
 export const auth = admin.apps.length ? admin.auth() : null;
-export { admin };
+export { admin, hasServiceAccount };
 
 export async function verifyAuth(req) {
   const authHeader = req.headers.authorization;
