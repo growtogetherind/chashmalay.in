@@ -117,10 +117,74 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
 
   const categories = getFilteredCategories();
 
-  // Get available lenses for current selection category
+  // Get available lenses for current selection category, applying any per-product custom lens values
   const getAvailableLenses = () => {
     if (!selections.visionType) return [];
-    return dbLenses.filter(l => l.category_id === selections.visionType.id && l.is_active !== false);
+    const baseLenses = dbLenses.filter(l => l.category_id === selections.visionType.id && l.is_active !== false);
+
+    const customList = Array.isArray(product?.custom_lenses) ? product.custom_lenses : [];
+
+    if (customList.length === 0) {
+      return baseLenses;
+    }
+
+    // Filter overrides relevant to this vision category (by id, category_name, or global)
+    const categoryCustoms = customList.filter(cl =>
+      cl.is_active !== false &&
+      ((cl.category_id && cl.category_id === selections.visionType.id) ||
+       (cl.category_name && cl.category_name.toLowerCase() === selections.visionType.name?.toLowerCase()) ||
+       (!cl.category_id && !cl.category_name))
+    );
+
+    if (categoryCustoms.length === 0) {
+      return product.only_specific_lenses ? [] : baseLenses;
+    }
+
+    // Merge base lenses with custom overrides
+    let result = baseLenses.map(bl => {
+      const override = categoryCustoms.find(co => co.lens_id === bl.id || co.name?.toLowerCase().trim() === bl.name?.toLowerCase().trim());
+      if (override) {
+        return {
+          ...bl,
+          price: override.price !== undefined && override.price !== '' ? Number(override.price) : bl.price,
+          original_price: override.original_price !== undefined && override.original_price !== '' ? Number(override.original_price) : bl.price,
+          badge: override.badge !== undefined && override.badge !== '' ? override.badge : bl.badge,
+          description: override.description || bl.description,
+          features: override.features ? (Array.isArray(override.features) ? override.features : override.features.split(',').map(s => s.trim())) : bl.features,
+          is_custom_override: true
+        };
+      }
+      return bl;
+    });
+
+    // Also include any standalone custom lenses defined on the product that aren't in baseLenses
+    categoryCustoms.forEach(co => {
+      const alreadyIncluded = result.some(r => r.id === co.lens_id || r.name?.toLowerCase().trim() === co.name?.toLowerCase().trim());
+      if (!alreadyIncluded && co.name) {
+        result.push({
+          id: co.lens_id || `custom-${co.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+          name: co.name,
+          category_id: selections.visionType.id,
+          category_name: selections.visionType.name,
+          price: Number(co.price || 0),
+          original_price: co.original_price ? Number(co.original_price) : null,
+          badge: co.badge || '',
+          description: co.description || 'Custom lens package for this frame',
+          features: co.features ? (Array.isArray(co.features) ? co.features : co.features.split(',').map(s => s.trim())) : ['High Clarity', 'UV Protection', 'Scratch Resistant'],
+          image_url: co.image_url || '/assets/im/select_lens/essential.webp',
+          is_custom_override: true
+        });
+      }
+    });
+
+    // If "only_specific_lenses" is turned on, only show the configured specific lenses
+    if (product.only_specific_lenses) {
+      result = result.filter(r =>
+        categoryCustoms.some(co => co.lens_id === r.id || co.name?.toLowerCase().trim() === r.name?.toLowerCase().trim())
+      );
+    }
+
+    return result;
   };
 
   // Get applicable add-ons for the current selection category
@@ -298,7 +362,20 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                         <div className="package-info">
                           <div className="package-header">
                             <h4>{lens.name}</h4>
-                            <div className="package-price">+ ₹{lens.price}</div>
+                            <div className="package-price">
+                              {Number(lens.price) === 0 ? (
+                                <span className="text-emerald-600 font-extrabold uppercase tracking-wider text-xs bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                  FREE OFFER
+                                </span>
+                              ) : (
+                                <>
+                                  {lens.original_price && Number(lens.original_price) > Number(lens.price) && (
+                                    <span className="line-through text-slate-400 text-xs mr-1 font-normal">₹{lens.original_price}</span>
+                                  )}
+                                  + ₹{lens.price}
+                                </>
+                              )}
+                            </div>
                           </div>
                           <p className="package-desc">{lens.description}</p>
                           <ul className="package-features">
@@ -306,7 +383,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                               <li key={f}><Check size={12} /> {f}</li>
                             ))}
                           </ul>
-                          <button className="select-pkg-btn">Select This Lens</button>
+                          <button className="select-pkg-btn">{Number(lens.price) === 0 ? 'Select Free Lens' : 'Select This Lens'}</button>
                         </div>
                       </div>
                     ))}
@@ -527,7 +604,9 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     {selections.selectedLens && (
                       <div className="summary-row">
                         <span>Lens ({selections.selectedLens.name})</span>
-                        <span>+ ₹{selections.selectedLens.price}</span>
+                        <span className={Number(selections.selectedLens.price) === 0 ? "text-emerald-600 font-bold" : ""}>
+                          {Number(selections.selectedLens.price) === 0 ? 'FREE (₹0)' : `+ ₹${selections.selectedLens.price}`}
+                        </span>
                       </div>
                     )}
                     {selections.addons && selections.addons.map(addon => (

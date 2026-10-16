@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn } from 'lucide-react';
-import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories } from '../../lib/firebase';
+import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn, Tag } from 'lucide-react';
+import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories, saveLensCategory, subscribeLenses } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
 import ImageZoomModal from '../../components/ui/ImageZoomModal';
@@ -43,6 +43,8 @@ const EMPTY_PRODUCT = {
   available_lenses: [], // New: Multiple compatible lenses
   available_sizes: ['M'], // New: S, M, L
   available_colors: ['Standard'], // New: Colors
+  custom_lenses: [], // Array of specific lens packages with custom values
+  only_specific_lenses: false, // Restrict lens selector to only custom lenses
   tags: '',
   is_active: true,
   is_new: false,
@@ -78,6 +80,7 @@ const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [lensCategories, setLensCategories] = useState([]);
+  const [lenses, setLenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
@@ -93,8 +96,149 @@ const AdminProducts = () => {
   const [showNewBrandInput, setShowNewBrandInput] = useState(false);
   const [newBrandName, setNewBrandName] = useState('');
   const [addingBrand, setAddingBrand] = useState(false);
+  const [showNewLensCategoryInput, setShowNewLensCategoryInput] = useState(false);
+  const [newLensCategoryName, setNewLensCategoryName] = useState('');
+  const [addingLensCategory, setAddingLensCategory] = useState(false);
   const [zoomModal, setZoomModal] = useState({ isOpen: false, imageUrl: '', images: [], initialIndex: 0, title: '' });
   const { confirm } = useConfirm();
+
+  const slugify = (v = '') => v.trim().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  const handleQuickAddLensCategory = async () => {
+    const trimmed = newLensCategoryName.trim();
+    if (!trimmed) {
+      toast.error('Please enter a lens category name');
+      return;
+    }
+
+    setAddingLensCategory(true);
+    try {
+      const existing = lensCategories.find(c => c.name?.toLowerCase().trim() === trimmed.toLowerCase());
+      const catName = existing ? existing.name : trimmed;
+
+      if (!existing) {
+        const { error } = await saveLensCategory({
+          name: trimmed,
+          slug: slugify(trimmed),
+          description: `Custom lens options for ${trimmed}`,
+          sort_order: (lensCategories.length || 0) + 1,
+          is_active: true
+        });
+
+        if (error) {
+          console.error('Error saving lens category:', error);
+          toast.error('Could not save to database, but added for this product');
+        } else {
+          toast.success(`Lens category "${trimmed}" added!`);
+        }
+      } else {
+        toast.success(`Selected existing category: ${existing.name}`);
+      }
+
+      setForm(prev => {
+        const currentList = prev.available_lenses || [];
+        if (!currentList.some(al => al.toLowerCase() === catName.toLowerCase())) {
+          return { ...prev, available_lenses: [...currentList, catName] };
+        }
+        return prev;
+      });
+
+      setShowNewLensCategoryInput(false);
+      setNewLensCategoryName('');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to add lens category');
+    } finally {
+      setAddingLensCategory(false);
+    }
+  };
+
+  // Specific Lens Override Management
+  const handleAddLensOverride = (lensId = '') => {
+    const selected = lenses.find(l => l.id === lensId);
+    const newOverride = {
+      id: `ovr-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      lens_id: selected?.id || '',
+      name: selected?.name || '',
+      category_id: selected?.category_id || '',
+      category_name: selected?.category_name || (lensCategories[0]?.name || 'Single Vision'),
+      original_price: selected?.price ?? 490,
+      price: 0,
+      badge: 'FREE OFFER',
+      description: selected?.description || 'Offer lens for this frame',
+      is_active: true
+    };
+
+    setForm(prev => ({
+      ...prev,
+      custom_lenses: [...(prev.custom_lenses || []), newOverride]
+    }));
+  };
+
+  const handleUpdateLensOverride = (index, field, value) => {
+    setForm(prev => {
+      const updated = [...(prev.custom_lenses || [])];
+      if (!updated[index]) return prev;
+
+      if (field === 'lens_id') {
+        const found = lenses.find(l => l.id === value);
+        if (found) {
+          updated[index] = {
+            ...updated[index],
+            lens_id: found.id,
+            name: found.name,
+            category_id: found.category_id,
+            category_name: found.category_name || updated[index].category_name,
+            original_price: found.price,
+            price: updated[index].price !== undefined ? updated[index].price : 0,
+            badge: updated[index].badge || 'FREE OFFER',
+            description: found.description || updated[index].description
+          };
+          return { ...prev, custom_lenses: updated };
+        }
+      }
+
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, custom_lenses: updated };
+    });
+  };
+
+  const handleRemoveLensOverride = (index) => {
+    setForm(prev => ({
+      ...prev,
+      custom_lenses: (prev.custom_lenses || []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleQuickAddFreeSingleVision = () => {
+    const svLens = lenses.find(l => l.category_name?.toLowerCase().includes('single') || l.name?.toLowerCase().includes('anti glare')) || lenses[0];
+    const newOverride = {
+      id: `ovr-${Date.now()}`,
+      lens_id: svLens?.id || '',
+      name: svLens?.name || 'Anti Glare Single Vision (Free Offer)',
+      category_name: svLens?.category_name || 'Single Vision',
+      category_id: svLens?.category_id || '',
+      original_price: svLens?.price || 490,
+      price: 0,
+      badge: 'FREE WITH FRAME',
+      description: 'Zero cost single vision lenses bundled with this frame.',
+      is_active: true
+    };
+
+    setForm(prev => {
+      const current = prev.custom_lenses || [];
+      const exists = current.some(c => c.lens_id && c.lens_id === svLens?.id);
+      if (exists) {
+        toast('This lens is already added in the overrides below', { icon: 'ℹ️' });
+        return prev;
+      }
+      toast.success('Free Single Vision lens offer added!');
+      return {
+        ...prev,
+        custom_lenses: [...current, newOverride]
+      };
+    });
+  };
 
   const handleQuickAddBrand = async () => {
     const trimmed = newBrandName.trim();
@@ -193,11 +337,15 @@ const AdminProducts = () => {
     const unLensCategories = subscribeLensCategories((data) => {
       setLensCategories(data || []);
     });
+    const unLenses = subscribeLenses((data) => {
+      setLenses(data || []);
+    });
     return () => {
       unProducts?.();
       unCategories?.();
       unBrands?.();
       unLensCategories?.();
+      unLenses?.();
     };
   }, []);
 
@@ -397,6 +545,8 @@ const AdminProducts = () => {
     setPendingGallery([]);
     setShowNewBrandInput(false);
     setNewBrandName('');
+    setShowNewLensCategoryInput(false);
+    setNewLensCategoryName('');
 
     const draft = localStorage.getItem('product_draft');
     if (draft) {
@@ -567,6 +717,8 @@ const AdminProducts = () => {
                                  setPendingGallery([]);
                                  setShowNewBrandInput(false);
                                  setNewBrandName('');
+                                 setShowNewLensCategoryInput(false);
+                                 setNewLensCategoryName('');
                                  setShowForm(true);
                                }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-all text-xs font-bold uppercase tracking-widest">
                                  <Edit3 size={16} /> <span>Modify Asset</span>
@@ -577,6 +729,8 @@ const AdminProducts = () => {
                                  setEditing(null);
                                  setShowNewBrandInput(false);
                                  setNewBrandName('');
+                                 setShowNewLensCategoryInput(false);
+                                 setNewLensCategoryName('');
                                  setShowForm(true);
                                }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-all text-xs font-bold uppercase tracking-widest">
                                  <Copy size={16} /> <span>Duplicate Profile</span>
@@ -866,36 +1020,322 @@ const AdminProducts = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-4 block">Compatible Lens Categories</label>
-                    <div className="flex flex-wrap gap-6 p-5 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
-                      {(lensCategories.length > 0 ? lensCategories : [
-                        { id: 'l1', name: 'Single Vision' },
-                        { id: 'l2', name: 'Bifocal' },
-                        { id: 'l3', name: 'Progressive' }
-                      ]).map(cat => (
-                        <label key={cat.id || cat.name} className="flex items-center gap-3 cursor-pointer group">
-                          <div className="relative flex items-center">
-                            <input
-                              type="checkbox"
-                              className="peer opacity-0 absolute h-6 w-6 cursor-pointer z-10"
-                              checked={form.available_lenses?.some(al => al.toLowerCase() === cat.name.toLowerCase()) || false}
-                              onChange={(e) => {
-                                const list = form.available_lenses || [];
-                                const newList = e.target.checked
-                                  ? [...list, cat.name]
-                                  : list.filter(item => item.toLowerCase() !== cat.name.toLowerCase());
-                                setForm(prev => ({ ...prev, available_lenses: newList }));
-                              }}
-                            />
-                            <div className="h-6 w-6 border-2 border-slate-200 rounded-lg bg-white peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all flex items-center justify-center shadow-inner">
-                              <Plus size={14} className="text-white scale-0 peer-checked:scale-100 transition-transform" />
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block">Compatible Lens Categories</label>
+                        <p className="text-[9px] text-slate-400 mt-0.5 font-medium italic">Select which lens options to offer for this particular product (e.g. Single Vision only, or Bifocal & Progressive). If none are checked, all categories will be shown.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowNewLensCategoryInput(prev => !prev);
+                          setNewLensCategoryName('');
+                        }}
+                        className="text-[10px] font-bold uppercase text-emerald-600 hover:text-emerald-700 tracking-wider flex items-center gap-1 transition-colors hover:underline cursor-pointer shrink-0"
+                      >
+                        <Plus size={12} /> {showNewLensCategoryInput ? 'Cancel' : '+ Add Lens Category'}
+                      </button>
+                    </div>
+
+                    {showNewLensCategoryInput && (
+                      <div className="flex items-center gap-2 mb-4 p-3 bg-emerald-50/70 rounded-xl border border-emerald-100 animate-fade-in">
+                        <input
+                          type="text"
+                          value={newLensCategoryName}
+                          onChange={(e) => setNewLensCategoryName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleQuickAddLensCategory();
+                            }
+                          }}
+                          placeholder="e.g. Computer Glasses, Zero Power, Reading..."
+                          autoFocus
+                          className="flex-1 bg-white border-2 border-emerald-500 p-2.5 rounded-xl text-slate-900 text-xs font-bold focus:outline-none transition-all shadow-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleQuickAddLensCategory}
+                          disabled={addingLensCategory || !newLensCategoryName.trim()}
+                          className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-sm shadow-emerald-500/20"
+                        >
+                          {addingLensCategory ? 'Adding...' : 'Add'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowNewLensCategoryInput(false);
+                            setNewLensCategoryName('');
+                          }}
+                          className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0"
+                          title="Cancel"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
+                      {Array.from(new Set([
+                        'Single Vision',
+                        'Bifocal',
+                        'Progressive',
+                        ...lensCategories.map(c => c.name),
+                        ...(form.available_lenses || [])
+                      ].filter(Boolean))).map(name => {
+                        const isChecked = form.available_lenses?.some(al => al.toLowerCase() === name.toLowerCase()) || false;
+                        return (
+                          <label key={name} className={`flex items-center gap-3 p-2.5 px-4 rounded-xl border transition-all cursor-pointer group ${isChecked ? 'bg-emerald-50/80 border-emerald-300 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'}`}>
+                            <div className="relative flex items-center">
+                              <input
+                                type="checkbox"
+                                className="peer opacity-0 absolute h-5 w-5 cursor-pointer z-10"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  const list = form.available_lenses || [];
+                                  const newList = e.target.checked
+                                    ? [...list, name]
+                                    : list.filter(item => item.toLowerCase() !== name.toLowerCase());
+                                  setForm(prev => ({ ...prev, available_lenses: newList }));
+                                }}
+                              />
+                              <div className="h-5 w-5 border-2 border-slate-300 rounded-md bg-white peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all flex items-center justify-center shadow-inner">
+                                <Plus size={13} className="text-white scale-0 peer-checked:scale-100 transition-transform" />
+                              </div>
+                            </div>
+                            <span className={`text-xs font-black uppercase transition-colors ${isChecked ? 'text-emerald-900' : 'text-slate-600 group-hover:text-slate-900'}`}>{name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {form.available_lenses && form.available_lenses.length > 0 && (
+                      <div className="flex items-center justify-between mt-2 px-1">
+                        <span className="text-[10px] font-bold text-emerald-600">
+                          {form.available_lenses.length} lens {form.available_lenses.length === 1 ? 'category' : 'categories'} offered for this frame
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setForm(prev => ({ ...prev, available_lenses: [] }))}
+                          className="text-[10px] font-bold text-slate-400 hover:text-red-500 underline cursor-pointer"
+                        >
+                          Clear Selection (Offer All)
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── Specific Lenses & Custom Pricing Overrides ── */}
+                  <div className="p-6 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-5">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Tag size={16} className="text-emerald-600" />
+                          <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                            Specific Lens Overrides & Offers
+                          </h4>
+                          <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                            Custom Values
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-1 font-medium">
+                          Add specific lenses to edit their prices (e.g. Free ₹0, special discount) or change their promotional badge for this product.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={handleQuickAddFreeSingleVision}
+                          className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                          title="Quickly bundle a Free ₹0 Single Vision Lens with this frame"
+                        >
+                          <Zap size={12} className="text-emerald-600 fill-emerald-600" />
+                          <span>+ Free Single Vision Offer (₹0)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAddLensOverride('')}
+                          className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                        >
+                          <Plus size={12} />
+                          <span>Add Specific Lens</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Only Show Specific Lenses Toggle */}
+                    <div className="flex items-center justify-between p-3.5 bg-white rounded-xl border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={form.only_specific_lenses || false}
+                            onChange={(e) => setForm(prev => ({ ...prev, only_specific_lenses: e.target.checked }))}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                        <div>
+                          <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wide block">
+                            Restrict Storefront to ONLY These Specific Lenses
+                          </span>
+                          <span className="text-[9px] text-slate-400">
+                            {form.only_specific_lenses
+                              ? 'Enabled: Customers will only see the custom lenses listed below when configuring this frame.'
+                              : 'Disabled: All catalog lenses remain available, with your custom prices applied to matching ones.'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Lens List */}
+                    {(!form.custom_lenses || form.custom_lenses.length === 0) ? (
+                      <div className="py-6 text-center border-2 border-dashed border-slate-200 rounded-xl bg-white/60">
+                        <p className="text-xs font-bold text-slate-400">No specific lens overrides added yet.</p>
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          Standard catalog prices and badges will be used for this frame. Click <strong>"+ Free Single Vision Offer"</strong> or <strong>"+ Add Specific Lens"</strong> above to customize.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {form.custom_lenses.map((ovr, idx) => (
+                          <div key={ovr.id || idx} className="p-4 bg-white rounded-xl border border-slate-200/90 shadow-sm space-y-3 hover:border-emerald-300 transition-all">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                              <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider flex items-center gap-1.5">
+                                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px]">
+                                  {idx + 1}
+                                </span>
+                                Specific Lens #{idx + 1}
+                              </span>
+                              <div className="flex items-center gap-3">
+                                <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={ovr.is_active !== false}
+                                    onChange={(e) => handleUpdateLensOverride(idx, 'is_active', e.target.checked)}
+                                    className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 h-3.5 w-3.5"
+                                  />
+                                  <span>Enabled</span>
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveLensOverride(idx)}
+                                  className="text-slate-400 hover:text-red-500 p-1 transition-colors cursor-pointer"
+                                  title="Remove this lens override"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                              {/* Lens Selection or Custom Name */}
+                              <div className="md:col-span-5">
+                                <label className="text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-1 block">
+                                  Select Catalog Lens or Type Name
+                                </label>
+                                <div className="space-y-1.5">
+                                  <select
+                                    value={ovr.lens_id || ''}
+                                    onChange={(e) => handleUpdateLensOverride(idx, 'lens_id', e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-lg text-slate-800 text-xs font-bold focus:border-emerald-500 focus:bg-white outline-none"
+                                  >
+                                    <option value="">-- Choose from Catalog (or Custom) --</option>
+                                    {lenses.map(l => (
+                                      <option key={l.id} value={l.id}>
+                                        {l.name} ({l.category_name || 'Lens'}) — Standard: ₹{l.price}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <input
+                                    type="text"
+                                    value={ovr.name || ''}
+                                    onChange={(e) => handleUpdateLensOverride(idx, 'name', e.target.value)}
+                                    placeholder="Lens Display Name"
+                                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-slate-800 text-xs font-medium focus:border-emerald-500 outline-none"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Category */}
+                              <div className="md:col-span-2">
+                                <label className="text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-1 block">
+                                  Vision Category
+                                </label>
+                                <select
+                                  value={ovr.category_name || 'Single Vision'}
+                                  onChange={(e) => handleUpdateLensOverride(idx, 'category_name', e.target.value)}
+                                  className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-lg text-slate-800 text-xs font-bold focus:border-emerald-500 focus:bg-white outline-none"
+                                >
+                                  {Array.from(new Set([
+                                    'Single Vision',
+                                    'Bifocal',
+                                    'Progressive',
+                                    ...lensCategories.map(c => c.name)
+                                  ])).map(catName => (
+                                    <option key={catName} value={catName}>{catName}</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Custom Offer Price */}
+                              <div className="md:col-span-2">
+                                <div className="flex items-center justify-between mb-1">
+                                  <label className="text-[9px] font-bold uppercase text-slate-400 tracking-wider block">
+                                    Offer Price (₹)
+                                  </label>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateLensOverride(idx, 'price', 0)}
+                                    className="text-[9px] font-black text-emerald-600 hover:underline uppercase"
+                                    title="Set price to 0 (Free)"
+                                  >
+                                    Free ₹0
+                                  </button>
+                                </div>
+                                <div className="relative">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={ovr.price ?? 0}
+                                    onChange={(e) => handleUpdateLensOverride(idx, 'price', e.target.value === '' ? '' : Number(e.target.value))}
+                                    className={`w-full border p-2.5 rounded-lg text-xs font-black outline-none transition-all ${
+                                      Number(ovr.price) === 0
+                                        ? 'bg-emerald-50/70 border-emerald-400 text-emerald-800'
+                                        : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500'
+                                    }`}
+                                  />
+                                  {Number(ovr.price) === 0 && (
+                                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-emerald-600 uppercase tracking-widest pointer-events-none">
+                                      FREE
+                                    </span>
+                                  )}
+                                </div>
+                                {ovr.original_price && Number(ovr.original_price) > Number(ovr.price || 0) && (
+                                  <span className="text-[9px] text-slate-400 line-through mt-0.5 block">
+                                    Was ₹{ovr.original_price}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Badge / Tag */}
+                              <div className="md:col-span-3">
+                                <label className="text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-1 block">
+                                  Offer Badge / Tag
+                                </label>
+                                <input
+                                  type="text"
+                                  value={ovr.badge || ''}
+                                  onChange={(e) => handleUpdateLensOverride(idx, 'badge', e.target.value)}
+                                  placeholder="e.g. FREE WITH FRAME, 50% OFF"
+                                  className="w-full bg-white border border-slate-200 p-2.5 rounded-lg text-slate-800 text-xs font-bold focus:border-emerald-500 outline-none"
+                                />
+                              </div>
                             </div>
                           </div>
-                          <span className="text-xs font-black text-slate-500 group-hover:text-slate-900 transition-colors uppercase">{cat.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                    <p className="text-[9px] text-slate-400 mt-2 font-medium italic">Select which lens categories are compatible with this frame. If none are selected, all categories will be shown.</p>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* ── Accessories Specialized Fields ── */}

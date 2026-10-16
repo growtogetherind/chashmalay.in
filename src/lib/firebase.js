@@ -149,6 +149,8 @@ export const normalizeProduct = (product = {}) => {
     is_active: product.is_active !== false,
     available_sizes: Array.isArray(product.available_sizes) && product.available_sizes.length ? product.available_sizes : ['M'],
     available_lenses: Array.isArray(product.available_lenses) ? product.available_lenses : [],
+    custom_lenses: Array.isArray(product.custom_lenses) ? product.custom_lenses : [],
+    only_specific_lenses: Boolean(product.only_specific_lenses),
     colors: Array.isArray(product.colors) ? product.colors : [],
     images: {
       ...(product.images || {}),
