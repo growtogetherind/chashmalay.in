@@ -4,6 +4,7 @@ import { Search, ShoppingBag, User, Heart, Menu, X, Phone, MapPin, LogOut, Packa
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { subscribeCategories } from '../../lib/firebase';
 import SearchModal from './SearchModal';
 import Logo from '../ui/Logo';
 
@@ -35,16 +36,34 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const navLinks = [
-    { name: 'EYEGLASSES',        path: '/category/eyeglasses' },
-    { name: 'SUNGLASSES',        path: '/category/sunglasses' },
-    { name: 'CLIP-ON GLASSES',   path: '/category/clip-on-glasses' },
-    { name: 'CONTACT LENSES',    path: '/contact-lenses' },
-    { name: 'READING GLASSES',   path: '/category/reading-glasses' },
-    { name: 'ACCESSORIES',       path: '/category/accessories' },
-    { name: 'TRACK ORDER',       path: '/account' },
-    { name: 'STORE LOCATOR',     path: '/find-store' },
-  ];
+  const [liveCategories, setLiveCategories] = useState([]);
+
+  useEffect(() => {
+    const unsub = subscribeCategories((data) => setLiveCategories(data || []));
+    return unsub;
+  }, []);
+
+  const activeLiveNav = liveCategories.filter((c) => c.is_active !== false);
+
+  const navLinks = activeLiveNav.length > 0
+    ? [
+        ...activeLiveNav.map((c) => ({
+          name: c.name.toUpperCase(),
+          path: c.slug === 'contacts' || c.slug === 'contact-lenses' ? '/contact-lenses' : `/category/${c.slug}`
+        })),
+        { name: 'TRACK ORDER', path: '/account' },
+        { name: 'STORE LOCATOR', path: '/find-store' },
+      ]
+    : [
+        { name: 'EYEGLASSES',        path: '/category/eyeglasses' },
+        { name: 'SUNGLASSES',        path: '/category/sunglasses' },
+        { name: 'CLIP-ON GLASSES',   path: '/category/clip-on-glasses' },
+        { name: 'CONTACT LENSES',    path: '/contact-lenses' },
+        { name: 'READING GLASSES',   path: '/category/reading-glasses' },
+        { name: 'ACCESSORIES',       path: '/category/accessories' },
+        { name: 'TRACK ORDER',       path: '/account' },
+        { name: 'STORE LOCATOR',     path: '/find-store' },
+      ];
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
   const getInitials = () => {

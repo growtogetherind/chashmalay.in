@@ -49,6 +49,8 @@ const MOCKUP_CATEGORIES = [
   },
 ];
 
+const FALLBACK_COLORS = ['#F6F4EE', '#FFE5D0', '#EED9F7', '#D2F3E1', '#D7ECFB', '#EFE8D3', '#F3E8FF', '#FCE7F3'];
+
 const CategoryBentoGrid = () => {
   const [liveCategories, setLiveCategories] = React.useState([]);
 
@@ -57,18 +59,34 @@ const CategoryBentoGrid = () => {
     return unsubscribe;
   }, []);
 
-  const categories = MOCKUP_CATEGORIES.map((mock) => {
-    const live = liveCategories.find(
-      (cat) => (cat.slug === 'contacts' && mock.link === '/contact-lenses') ||
-               (cat.slug === mock.link.split('/').pop()) ||
-               (cat.name?.toLowerCase() === mock.name.toLowerCase())
-    );
+  const activeLive = liveCategories.filter((cat) => cat.is_active !== false);
+
+  // Use live categories from admin when present; fallback to mockup if empty
+  const sourceList = activeLive.length > 0 ? activeLive : MOCKUP_CATEGORIES;
+
+  const categories = sourceList.map((cat, idx) => {
+    let link = cat.link;
+    if (!link) {
+      const slug = cat.slug || cat.name?.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-');
+      if (slug === 'contacts' || slug === 'contact-lenses') {
+        link = '/contact-lenses';
+      } else {
+        link = `/category/${slug}`;
+      }
+    }
+
+    const color = (cat.color && cat.color !== '#f8fafc' && cat.color !== '#ffffff')
+      ? cat.color
+      : FALLBACK_COLORS[idx % FALLBACK_COLORS.length];
+
+    const image = cat.image_url || cat.image || cat.base_photo || cat.basePhoto || cat.photo || 'https://i.ibb.co/dsJrhRr1/eyewear-optimized.webp';
+
     return {
-      id: live?.id || mock.id,
-      name: live?.name || mock.name,
-      image: live?.image_url || live?.image || mock.image,
-      link: mock.link,
-      color: live?.color || mock.color,
+      id: cat.id || `cat-${idx}`,
+      name: cat.name,
+      image,
+      link,
+      color,
     };
   });
 
@@ -87,8 +105,15 @@ const CategoryBentoGrid = () => {
         </Link>
       </div>
 
-      {/* Category Cards — horizontal scroll on mobile, 6 in a row on desktop */}
-      <div className="flex overflow-x-auto pb-4 md:pb-0 gap-4 md:grid md:grid-cols-6 md:gap-6 scrollbar-hide snap-x snap-mandatory scroll-smooth">
+      {/* Category Cards — horizontal scroll on mobile, responsive grid on desktop */}
+      <div 
+        className="flex overflow-x-auto pb-4 md:pb-0 gap-4 md:grid md:gap-6 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+        style={{
+          gridTemplateColumns: categories.length <= 6
+            ? `repeat(${categories.length}, minmax(0, 1fr))`
+            : 'repeat(auto-fit, minmax(150px, 1fr))'
+        }}
+      >
         {categories.map((cat, idx) => (
           <motion.div
             key={cat.id}
