@@ -7,48 +7,17 @@ import { subscribeCarouselItems, subscribeSettings } from '../../lib/firebase';
 const FALLBACK_SLIDES = [
   {
     id: 'f1',
-    title: 'Classic Square',
-    titleLine2: 'Sunglasses',
-    titleLine3: 'Female',
-    subtitle: 'Vintage Brand Design',
-    badge: 'New Collection',
-    cta: 'Shop Now',
-    ctaLink: '/category/sunglasses',
-    image: '/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp',
-    bg: 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)',
+    title: 'Ferrari Collection',
+    link: '/category/eyeglasses',
+    image: '/assets/im/all_img/26march-website-banner.jpg.webp',
   },
   {
     id: 'f2',
-    title: 'Titan Elite',
-    titleLine2: 'Collection',
-    titleLine3: '',
-    subtitle: 'Engineered for Precision',
-    badge: 'Flat 20% OFF',
-    cta: 'Explore Now',
-    ctaLink: '/category/eyeglasses',
-    image: '/assets/im/all_img/26march-website-banner.jpg.webp',
-    bg: '#0f172a',
+    title: 'End of Season Sale',
+    link: '/category/sunglasses',
+    image: '/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp',
   },
 ];
-
-const getSlideBackground = (bg) => {
-  if (!bg) return 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)';
-  const lower = String(bg).toLowerCase().trim();
-  if (
-    lower.includes('orange') ||
-    lower.startsWith('#f97') ||
-    lower.startsWith('#ea5') ||
-    lower.startsWith('#fb9') ||
-    lower.startsWith('#c24') ||
-    lower.startsWith('#f59e0b') ||
-    lower.startsWith('#d97706') ||
-    lower === '#f97416ff' ||
-    lower === '#f97316'
-  ) {
-    return 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)';
-  }
-  return bg;
-};
 
 const HeroSlider = () => {
   const [slides, setSlides] = React.useState([]);
@@ -105,105 +74,48 @@ const HeroSlider = () => {
     <div className="w-full bg-white px-3 sm:px-5 md:px-8 py-4 space-y-3 sm:space-y-4">
 
       {/* ═══════════════════════════════════════
-          HERO BANNER — red rounded card
+          HERO BANNER — Clean Edge-to-Edge Visual Banner
       ═══════════════════════════════════════ */}
       <div
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl"
-        style={{ background: getSlideBackground(slide.bg), minHeight: 'clamp(200px, 35vw, 380px)' }}
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl w-full bg-slate-900"
+        style={{ minHeight: 'clamp(180px, 32vw, 420px)' }}
       >
         <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={slide.id}
-            className="relative flex items-center h-full"
-            style={{ minHeight: 'clamp(200px, 35vw, 380px)' }}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
+            className="relative w-full h-full"
+            style={{ minHeight: 'clamp(180px, 32vw, 420px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
           >
-            {/* ── Left: Text Content ── */}
-            <div className="relative z-10 flex-1 px-6 py-8 sm:px-10 sm:py-10 md:px-14 md:py-12 max-w-[58%] sm:max-w-[55%]">
-              {slide.badge && (
-                <span className="inline-block text-[10px] sm:text-xs font-bold text-white/70 uppercase tracking-[0.2em] mb-3 sm:mb-4 bg-white/15 px-2.5 py-1 rounded-full">
-                  {slide.badge}
-                </span>
-              )}
-
-              <h1
-                className="text-white font-black leading-[0.95] mb-1"
-                style={{ fontSize: 'clamp(1.5rem, 4.5vw, 3.75rem)' }}
-              >
-                {slide.title || 'Classic Square'}
-              </h1>
-
-              {slide.titleLine2 && (
-                <h1
-                  className="text-white font-black leading-[0.95] mb-1"
-                  style={{ fontSize: 'clamp(1.5rem, 4.5vw, 3.75rem)' }}
-                >
-                  {slide.titleLine2}
-                </h1>
-              )}
-
-              {slide.titleLine3 ? (
-                <div className="flex items-end gap-2 sm:gap-4 flex-wrap mt-1">
-                  <h1
-                    className="text-white font-black leading-[0.95]"
-                    style={{ fontSize: 'clamp(1.5rem, 4.5vw, 3.75rem)' }}
-                  >
-                    {slide.titleLine3}
-                  </h1>
-                  {slide.subtitle && (
-                    <span className="text-white/75 text-[11px] sm:text-sm font-medium leading-snug mb-1">
-                      {slide.subtitle.split(' ').slice(0, 1).join(' ')}<br />
-                      {slide.subtitle.split(' ').slice(1).join(' ')}
-                    </span>
-                  )}
-                </div>
-              ) : slide.subtitle ? (
-                <p className="text-white/75 text-xs sm:text-sm font-medium mt-2">{slide.subtitle}</p>
-              ) : null}
-
-              {slide.cta && (
-                <Link
-                  to={slide.ctaLink || '/category/all'}
-                  className="mt-5 sm:mt-7 inline-flex items-center gap-2 bg-white text-slate-900 hover:text-blue-600 font-bold text-xs sm:text-sm px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-lg hover:bg-slate-100 transition-colors shadow-lg"
-                >
-                  {slide.cta}
-                </Link>
-              )}
-            </div>
-
-            {/* ── Right: Model photo with fade mask ── */}
-            <div className="absolute right-0 top-0 h-full w-[55%] sm:w-1/2 pointer-events-none">
+            <Link to={slide.link || slide.ctaLink || '/category/all'} className="block w-full h-full">
               <img
                 src={slide.image}
-                alt={slide.title || 'Hero'}
-                className="h-full w-full object-cover object-top"
+                alt={slide.title || 'Hero Banner'}
+                className="w-full h-full object-cover object-center"
                 loading="eager"
                 decoding="async"
                 fetchPriority="high"
-                style={{
-                  maskImage: 'linear-gradient(to left, black 55%, transparent 95%)',
-                  WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 95%)',
-                }}
+                style={{ minHeight: 'clamp(180px, 32vw, 420px)' }}
               />
-            </div>
+            </Link>
 
             {/* Arrows */}
             <button
-              onClick={prev}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white z-20 transition-colors backdrop-blur-sm"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); prev(); }}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 flex items-center justify-center text-white z-20 transition-all backdrop-blur-sm shadow-lg hover:scale-105"
               aria-label="Previous"
             >
-              <ChevronLeft size={15} />
+              <ChevronLeft size={18} />
             </button>
             <button
-              onClick={next}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white z-20 transition-colors backdrop-blur-sm"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); next(); }}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 flex items-center justify-center text-white z-20 transition-all backdrop-blur-sm shadow-lg hover:scale-105"
               aria-label="Next"
             >
-              <ChevronRight size={15} />
+              <ChevronRight size={18} />
             </button>
           </motion.div>
         </AnimatePresence>
@@ -214,7 +126,7 @@ const HeroSlider = () => {
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${current === i ? 'bg-white w-5' : 'bg-white/40 w-1.5'}`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${current === i ? 'bg-white w-6 shadow-md' : 'bg-white/50 w-1.5'}`}
               aria-label={`Slide ${i + 1}`}
             />
           ))}
@@ -224,8 +136,6 @@ const HeroSlider = () => {
       {/* ═══════════════════════════════════════
           BENTO GRID — below the hero banner
       ═══════════════════════════════════════ */}
-
-      {/* Mobile: stacked, Tablet+: 2-column bento */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_2fr] gap-3 sm:gap-4">
 
         {/* ─ Cell A: Tall photo (spans rows on lg) ─ */}
@@ -237,46 +147,29 @@ const HeroSlider = () => {
             loading="lazy"
             decoding="async"
           />
-          {/* Bottom subtle gradient accent */}
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent" />
         </div>
 
-        {/* ─ Cell B: Luxury promo card ─ */}
+        {/* ─ Cell B: Promo banner card without color overlays ─ */}
         <Link
           to="/category/sunglasses"
-          className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center h-36 sm:h-44 md:h-48 border border-white/10 shadow-md"
+          className="group relative overflow-hidden rounded-xl sm:rounded-2xl flex items-center h-36 sm:h-44 md:h-48 border border-slate-200/50 shadow-md"
         >
-          {/* Text */}
-          <div className="flex-1 px-5 sm:px-7 py-5 z-10 min-w-0">
-            <h3 className="text-white font-black text-xl sm:text-2xl md:text-3xl leading-tight mb-1">
-              SUNGLASSES
-            </h3>
-            <p className="text-white/80 text-sm leading-snug">That Define Your</p>
-            <p className="text-white italic font-semibold text-sm leading-snug">Unique Style</p>
-          </div>
-          {/* Model image — right half */}
-          <div className="relative h-full w-2/5 flex-shrink-0 overflow-hidden">
-            <img
-              src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp"
-              alt="Sunglasses Model"
-              className="h-full w-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-              loading="lazy"
-              decoding="async"
-              style={{
-                maskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
-              }}
-            />
-          </div>
+          <img
+            src="/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp"
+            alt="Sunglasses Promo"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            decoding="async"
+          />
         </Link>
 
-        {/* ─ Cells C & D: Two dark photo cards ─ */}
+        {/* ─ Cells C & D: Two clean photo cards ─ */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-900 h-32 sm:h-40 md:h-44">
             <img
               src="/assets/im/all_img/26march-website-banner.jpg.webp"
               alt="Collection Style"
-              className="absolute inset-0 w-full h-full object-cover brightness-75 hover:brightness-95 hover:scale-105 transition-all duration-400"
+              className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-all duration-400"
               loading="lazy"
               decoding="async"
             />
@@ -285,7 +178,7 @@ const HeroSlider = () => {
             <img
               src="/assets/im/poster1.webp"
               alt="Eyewear Style"
-              className="absolute inset-0 w-full h-full object-cover brightness-75 hover:brightness-95 hover:scale-105 transition-all duration-400"
+              className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-all duration-400"
               loading="lazy"
               decoding="async"
               onError={(e) => { e.target.src = '/assets/im/eyeglasses.webp'; }}
