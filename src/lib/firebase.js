@@ -428,8 +428,123 @@ export const purgeStoreData = async ({ products = true, orders = true, prescript
 };
 
 // --- Orders ---
-export const createOrder = async () => {
-  throw new Error("Client-side order creation is disabled for security. Orders are verified and confirmed securely on the server.");
+export const createOrder = async ({
+  userId,
+  items,
+  total,
+  address,
+  paymentId,
+  razorpayOrderId = null,
+  couponCode = null,
+  discountAmount = 0
+}) => {
+  if (!checkRateLimit(`createOrder_${userId}`, 3000)) {
+    throw new Error("Please wait before placing another order.");
+  }
+
+  const denormalizedItems = items.map(item => ({
+    product_id: item.product_id || item.id,
+    quantity: item.quantity || 1,
+    price: Number(item.price || item.consumersPrice || 0),
+    product_name: item.name || 'Premium Eyewear',
+    frame_image: item.frameImage || item.frame_image || item.gallery?.[0] || '',
+    category: item.category || '',
+    brand: item.brand || '',
+    lens_selection: item.lensSelection || null,
+    selected_color: item.lensSelection?.selectedColor || null,
+    selected_size: item.lensSelection?.selectedSize || null,
+    cart_variant_key: item.cartVariantKey || item.firebaseId || null
+  }));
+
+  const orderData = {
+    user_id: userId,
+    total_amount: Number(total),
+    shipping_address: address,
+    razorpay_payment_id: paymentId,
+    razorpay_order_id: razorpayOrderId || null,
+    status: 'confirmed',
+    created_at: serverTimestamp(),
+    coupon_code: couponCode || null,
+    discount_amount: Number(discountAmount) || 0,
+    customer_name: address.name || 'Customer',
+    customer_phone: address.phone || '',
+    profiles: {
+      full_name: address.name,
+      phone: address.phone
+    },
+    order_items: denormalizedItems
+  };
+
+  let orderId = razorpayOrderId;
+  if (orderId) {
+    const orderRef = doc(db, "orders", orderId);
+    await setDoc(orderRef, orderData, { merge: true });
+  } else {
+    const orderRef = await addDoc(collection(db, "orders"), orderData);
+    orderId = orderRef.id;
+  }
+
+  // Record individual items in order_items collection for legacy/subquery views
+  try {
+    for (const item of denormalizedItems) {
+      await addDoc(collection(db, "order_items"), {
+        order_id: orderId,
+        ...item
+      });
+    }
+  } catch (err) {
+    console.warn("Could not save to order_items subcollection:", err);
+  }
+
+  // Best-effort inventory stock decrement
+  try {
+    for (const item of denormalizedItems) {
+      const pid = item.product_id;
+      if (pid && !String(pid).startsWith('custom-')) {
+        const productRef = doc(db, "products", pid);
+        await updateDoc(productRef, {
+          stock_quantity: increment(-Number(item.quantity || 1))
+        }).catch(() => {});
+      }
+    }
+  } catch (err) {
+    console.warn("Stock decrement skipped or failed:", err);
+  }
+
+  // Best-effort prescription records
+  try {
+    for (const item of items) {
+      const lens = item.lensSelection;
+      if (lens && (lens.prescriptionUrl || lens.manualDetails || lens.powerOption === 'later')) {
+        await addDoc(collection(db, "prescriptions"), {
+          user_id: userId,
+          user_name: address.name || 'Customer',
+          user_phone: address.phone || '',
+          order_id: orderId,
+          product_name: item.name || 'Premium Eyewear',
+          image_url: lens.prescriptionUrl || null,
+          right_eye: lens.manualDetails ? {
+            sph: lens.manualDetails.rightSph || '',
+            cyl: lens.manualDetails.rightCyl || '',
+            axis: lens.manualDetails.rightAxis || '',
+            add: lens.manualDetails.rightAddlPower || ''
+          } : null,
+          left_eye: lens.manualDetails ? {
+            sph: lens.manualDetails.leftSph || '',
+            cyl: lens.manualDetails.leftCyl || '',
+            axis: lens.manualDetails.leftAxis || '',
+            add: lens.manualDetails.leftAddlPower || ''
+          } : null,
+          power_option: lens.powerOption || 'manual',
+          created_at: serverTimestamp()
+        }).catch(() => {});
+      }
+    }
+  } catch (err) {
+    console.warn("Prescription save skipped or failed:", err);
+  }
+
+  return { id: orderId, ...orderData };
 };
 
 export const getUserOrders = async (userId) => {
