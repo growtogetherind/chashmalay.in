@@ -230,60 +230,60 @@
 .package-card {
   position: relative;
   padding: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #e2e8f0;
   border-radius: 20px;
   display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 16px;
+  flex-direction: column;
+  gap: 14px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
   text-align: left;
 }
 
 .package-card:hover {
   border-color: var(--oa-accent, #1E3A8A);
-  box-shadow: 0 8px 24px rgba(30, 58, 138, 0.08);
+  box-shadow: 0 10px 28px rgba(30, 58, 138, 0.1);
 }
 
 .package-tag {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  background-color: #f59e0b;
+  top: 14px;
+  left: 14px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 99px;
   z-index: 10;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
 }
 
 .package-image-wrapper {
-  width: 130px;
-  min-width: 130px;
-  aspect-ratio: 9 / 16;
-  background-color: #f8fafc;
+  width: 100%;
+  height: 155px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 14px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  padding: 10px;
 }
 
 .package-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
 }
 
 .package-card:hover .package-image {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .package-info {
@@ -291,77 +291,118 @@
   flex-direction: column;
   flex-grow: 1;
   min-width: 0;
+  gap: 6px;
 }
 
 .package-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 12px;
+  margin-bottom: 2px;
 }
 
 .package-header h4 {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.3;
+  line-height: 1.35;
   margin-bottom: 0;
+  flex: 1;
 }
 
 .package-price {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--oa-accent, #1E3A8A);
+  text-align: right;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.package-desc {
+.price-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.price-original {
   font-size: 0.75rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.price-final {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--oa-accent, #1E3A8A);
+  letter-spacing: -0.01em;
+}
+
+.free-offer-badge {
+  display: inline-block;
+  color: #059669;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  background-color: #ecfdf5;
+  padding: 3px 8px;
+  border-radius: 99px;
+  border: 1px solid #a7f3d0;
+}
+
+.package-desc {
+  font-size: 0.8rem;
   color: #64748b;
   margin-bottom: 10px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .package-features {
   list-style: none;
   padding: 0;
-  margin-bottom: 12px;
-  flex-grow: 1;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .package-features li {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   color: #334155;
-  margin-bottom: 5px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 600;
+  line-height: 1.35;
 }
 
 .package-features li svg {
   color: #16a34a;
   flex-shrink: 0;
+  width: 14px;
+  height: 14px;
 }
 
 .select-pkg-btn {
   width: 100%;
-  padding: 8px 16px;
-  border: 1px solid var(--oa-accent, #1E3A8A);
+  padding: 11px 18px;
+  border: 1.5px solid var(--oa-accent, #1E3A8A);
   border-radius: 12px;
   color: var(--oa-accent, #1E3A8A);
+  background-color: white;
   font-weight: 700;
-  font-size: 0.75rem;
-  transition: all 0.2s;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
   text-align: center;
   margin-top: auto;
+  cursor: pointer;
 }
 
 .package-card:hover .select-pkg-btn {
   background-color: var(--oa-accent, #1E3A8A);
   color: white;
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.25);
 }
 
 /* Final Step */
@@ -542,4 +583,145 @@
 
 .animate-slide-right {
   animation: slideRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Mobile Responsiveness for Phones (< 640px) */
+@media (max-width: 640px) {
+  .lens-modal-container {
+    max-width: 100vw;
+    width: 100vw;
+  }
+
+  .lens-modal-header {
+    padding: 12px 16px;
+  }
+
+  .header-info h2 {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .header-info p {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+
+  .lens-modal-steps {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .step-circle {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+
+  .step-item::after {
+    left: calc(50% + 14px);
+    width: calc(100% - 28px);
+  }
+
+  .lens-modal-content {
+    padding: 16px 14px 32px 14px;
+  }
+
+  .step-title {
+    font-size: 1.15rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .back-btn {
+    margin-bottom: 14px;
+    font-size: 10px;
+  }
+
+  /* Package Cards */
+  .package-card {
+    padding: 14px;
+    border-radius: 18px;
+    gap: 12px;
+  }
+
+  .package-image-wrapper {
+    height: 145px;
+    border-radius: 12px;
+    padding: 8px;
+  }
+
+  .package-tag {
+    top: 10px;
+    left: 10px;
+    font-size: 0.6rem;
+    padding: 3px 8px;
+  }
+
+  .package-header {
+    gap: 8px;
+  }
+
+  .package-header h4 {
+    font-size: 0.95rem;
+  }
+
+  .price-final {
+    font-size: 1.05rem;
+  }
+
+  .price-original {
+    font-size: 0.7rem;
+  }
+
+  .package-desc {
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+  }
+
+  .package-features {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .package-features li {
+    font-size: 0.75rem;
+    gap: 7px;
+  }
+
+  .select-pkg-btn {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+  }
+
+  /* Vision Type Cards */
+  .vision-card {
+    padding: 14px;
+    border-radius: 16px;
+    margin-bottom: 0;
+  }
+
+  .vision-image-wrapper {
+    width: 48px;
+    height: 48px;
+    margin-right: 14px;
+    border-radius: 12px;
+  }
+
+  .vision-info h4 {
+    font-size: 13px;
+  }
+
+  .vision-info p {
+    font-size: 11px;
+  }
+
+  /* Power option cards */
+  .power-option-card {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .power-icon-wrapper {
+    width: 48px;
+    height: 48px;
+  }
 }

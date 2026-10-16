@@ -394,16 +394,16 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                             <h4>{lens.name}</h4>
                             <div className="package-price">
                               {Number(lens.price) === 0 ? (
-                                <span className="text-emerald-600 font-extrabold uppercase tracking-wider text-xs bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                <span className="free-offer-badge">
                                   FREE OFFER
                                 </span>
                               ) : (
-                                <>
+                                <div className="price-stack">
                                   {lens.original_price && Number(lens.original_price) > Number(lens.price) && (
-                                    <span className="line-through text-slate-400 text-xs mr-1 font-normal">₹{lens.original_price}</span>
+                                    <span className="price-original">₹{lens.original_price}</span>
                                   )}
-                                  + ₹{lens.price}
-                                </>
+                                  <span className="price-final">+ ₹{lens.price}</span>
+                                </div>
                               )}
                             </div>
                           </div>
