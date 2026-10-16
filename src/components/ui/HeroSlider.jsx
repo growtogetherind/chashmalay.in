@@ -15,7 +15,7 @@ const FALLBACK_SLIDES = [
     cta: 'Shop Now',
     ctaLink: '/category/sunglasses',
     image: '/assets/im/all_img/WEBSITE_BANNER_1.jpg.webp',
-    bg: '#f97416ff',
+    bg: 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)',
   },
   {
     id: 'f2',
@@ -27,9 +27,28 @@ const FALLBACK_SLIDES = [
     cta: 'Explore Now',
     ctaLink: '/category/eyeglasses',
     image: '/assets/im/all_img/26march-website-banner.jpg.webp',
-    bg: '#111111',
+    bg: '#0f172a',
   },
 ];
+
+const getSlideBackground = (bg) => {
+  if (!bg) return 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)';
+  const lower = String(bg).toLowerCase().trim();
+  if (
+    lower.includes('orange') ||
+    lower.startsWith('#f97') ||
+    lower.startsWith('#ea5') ||
+    lower.startsWith('#fb9') ||
+    lower.startsWith('#c24') ||
+    lower.startsWith('#f59e0b') ||
+    lower.startsWith('#d97706') ||
+    lower === '#f97416ff' ||
+    lower === '#f97316'
+  ) {
+    return 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)';
+  }
+  return bg;
+};
 
 const HeroSlider = () => {
   const [slides, setSlides] = React.useState([]);
@@ -89,8 +108,8 @@ const HeroSlider = () => {
           HERO BANNER — red rounded card
       ═══════════════════════════════════════ */}
       <div
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl"
-        style={{ background: slide.bg || '#f97316', minHeight: 'clamp(200px, 35vw, 380px)' }}
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl"
+        style={{ background: getSlideBackground(slide.bg), minHeight: 'clamp(200px, 35vw, 380px)' }}
       >
         <AnimatePresence initial={false} mode="wait">
           <motion.div
@@ -148,7 +167,7 @@ const HeroSlider = () => {
               {slide.cta && (
                 <Link
                   to={slide.ctaLink || '/category/all'}
-                  className="mt-5 sm:mt-7 inline-flex items-center gap-2 bg-white text-orange-600 font-bold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-md"
+                  className="mt-5 sm:mt-7 inline-flex items-center gap-2 bg-white text-slate-900 hover:text-blue-600 font-bold text-xs sm:text-sm px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-lg hover:bg-slate-100 transition-colors shadow-lg"
                 >
                   {slide.cta}
                 </Link>
@@ -218,14 +237,14 @@ const HeroSlider = () => {
             loading="lazy"
             decoding="async"
           />
-          {/* Bottom red gradient accent */}
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-orange-800/70 via-orange-700/20 to-transparent" />
+          {/* Bottom subtle gradient accent */}
+          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent" />
         </div>
 
-        {/* ─ Cell B: Red promo card ─ */}
+        {/* ─ Cell B: Luxury promo card ─ */}
         <Link
           to="/category/sunglasses"
-          className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-orange-600 flex items-center h-36 sm:h-44 md:h-48"
+          className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center h-36 sm:h-44 md:h-48 border border-white/10 shadow-md"
         >
           {/* Text */}
           <div className="flex-1 px-5 sm:px-7 py-5 z-10 min-w-0">

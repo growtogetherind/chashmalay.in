@@ -3,6 +3,13 @@
 
 import { verifyAuth, db, admin } from './utils/auth.js';
 
+const parsePrice = (raw) => {
+  if (raw === null || raw === undefined) return 0;
+  const str = raw.toString().replace(/,/g, '').trim();
+  const parsed = parseFloat(str);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
     return response.status(405).json({ error: 'Method Not Allowed' });
@@ -36,7 +43,8 @@ export default async function handler(request, response) {
       let cartTotal = 0;
 
       for (const item of items) {
-        let basePrice = Number(item.price ?? item.consumersPrice ?? 0);
+        // Prioritize consumersPrice (customer retail price) over price
+        let basePrice = parsePrice(item.consumersPrice ?? item.price ?? item.products?.price ?? 0);
         let lensPrice = 0;
 
         // Try to query product from database if db is available
@@ -46,7 +54,7 @@ export default async function handler(request, response) {
             const productDoc = await db.collection('products').doc(productId).get();
             if (productDoc.exists) {
               const productData = productDoc.data();
-              basePrice = Number(productData.price ?? productData.consumersPrice ?? basePrice);
+              basePrice = parsePrice(productData.consumersPrice ?? productData.price ?? basePrice);
             }
           } catch (dbErr) {
             // Firestore credentials not available on Vercel — use item's provided price
@@ -57,23 +65,22 @@ export default async function handler(request, response) {
         if (item.lensSelection) {
           const ls = item.lensSelection;
           if (ls.selectedLens?.price) {
-            lensPrice += Number(ls.selectedLens.price || 0);
+            lensPrice += parsePrice(ls.selectedLens.price);
+          } else if (ls.lensPackage?.price) {
+            lensPrice += parsePrice(ls.lensPackage.price);
           }
           if (ls.addons && Array.isArray(ls.addons)) {
             for (const addon of ls.addons) {
-              if (addon.price) lensPrice += Number(addon.price || 0);
+              if (addon.price) lensPrice += parsePrice(addon.price);
             }
           }
           if (ls.visionType?.price) {
-            lensPrice += Number(ls.visionType.price || 0);
-          }
-          if (ls.lensPackage?.price) {
-            lensPrice += Number(ls.lensPackage.price || 0);
+            lensPrice += parsePrice(ls.visionType.price);
           }
         }
 
         const finalItemPrice = basePrice + lensPrice;
-        const quantity = item.quantity || 1;
+        const quantity = Number(item.quantity) || 1;
         cartTotal += finalItemPrice * quantity;
 
         itemsWithPrices.push({
@@ -126,13 +133,23 @@ export default async function handler(request, response) {
       }
 
       calculatedTotal = Math.max(1, cartTotal - discountAmount);
-    } else if (amount) {
-      calculatedTotal = Number(amount) / 100;
-    } else {
-      return response.status(400).json({ error: 'Missing items or amount in order request.' });
     }
 
-    const amountInPaise = Math.round(calculatedTotal * 100);
+    // Authoritative amount in paise:
+    // If the checkout client explicitly submitted `amount` (Math.round(finalTotal * 100)),
+    // prioritize it so Razorpay gateway matches the exact amount shown on the checkout screen.
+    const clientPaise = (amount && !isNaN(Number(amount)) && Number(amount) > 0)
+      ? Math.round(Number(amount))
+      : null;
+    const serverPaise = calculatedTotal > 0 ? Math.round(calculatedTotal * 100) : null;
+    const amountInPaise = clientPaise || serverPaise;
+
+    if (!amountInPaise || amountInPaise < 100) {
+      return response.status(400).json({ error: 'Missing items or invalid order amount.' });
+    }
+
+    // Keep calculatedTotal synchronized with amountInPaise
+    calculatedTotal = amountInPaise / 100;
 
     // Call Razorpay Order API
     const orderPayload = {
