@@ -23,7 +23,7 @@ import {
   ZoomIn
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { saveProduct, subscribeProducts } from '../../lib/firebase';
+import { saveProduct, subscribeProducts, subscribeCategories } from '../../lib/firebase';
 import { uploadImage, compressToWebP, base64ToBlob, fileToBase64 } from '../../lib/cloudinary';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import ImageZoomModal from '../../components/ui/ImageZoomModal';
@@ -110,13 +110,41 @@ export default function QuickAddProduct() {
   // Recent products feed
   const [recentProducts, setRecentProducts] = useState([]);
   const [zoomModal, setZoomModal] = useState({ isOpen: false, imageUrl: '', images: [], initialIndex: 0, title: '' });
+  const [liveCategories, setLiveCategories] = useState([]);
 
   useEffect(() => {
     const unsub = subscribeProducts({ adminFilter: true }, (items) => {
       setRecentProducts(items.slice(0, 6));
     });
-    return () => unsub && unsub();
+    const unsubCat = subscribeCategories((data) => {
+      setLiveCategories(data || []);
+    });
+    return () => {
+      unsub && unsub();
+      unsubCat && unsubCat();
+    };
   }, []);
+
+  const categoryOptions = React.useMemo(() => {
+    if (!liveCategories || liveCategories.length === 0) return CATEGORY_OPTIONS;
+    const mapped = liveCategories
+      .filter(c => c && c.is_active !== false && (c.name || c.title || c.slug))
+      .map(c => {
+        const slug = String(c.slug || c.name || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-');
+        const icon = slug.includes('sun') ? '🕶️' : slug.includes('clip') ? '🧲' : slug.includes('contact') ? '👁️' : slug.includes('read') ? '📖' : '👓';
+        return {
+          id: slug,
+          label: c.name || c.title || c.slug,
+          icon
+        };
+      });
+
+    // Ensure clip-on-glasses is available if not in list
+    if (!mapped.some(c => c.id === 'clip-on-glasses')) {
+      mapped.splice(1, 0, { id: 'clip-on-glasses', label: 'Clip-On Glasses', icon: '🧲' });
+    }
+    return mapped;
+  }, [liveCategories]);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -982,8 +1010,8 @@ export default function QuickAddProduct() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">
                   Category
                 </label>
-                <div className="grid grid-cols-1 gap-1.5">
-                  {CATEGORY_OPTIONS.map(c => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto pr-1">
+                  {categoryOptions.map(c => (
                     <button
                       key={c.id}
                       type="button"
@@ -996,11 +1024,11 @@ export default function QuickAddProduct() {
                           : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-100'
                       }`}
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-2 truncate">
                         <span>{c.icon}</span>
-                        <span>{c.label}</span>
+                        <span className="truncate">{c.label}</span>
                       </span>
-                      {category === c.id && <CheckCircle2 size={16} />}
+                      {category === c.id && <CheckCircle2 size={16} className="shrink-0" />}
                     </button>
                   ))}
                 </div>

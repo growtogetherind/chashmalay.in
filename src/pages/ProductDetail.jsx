@@ -1,6 +1,6 @@
 import { Suspense, lazy, useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Star, Heart, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Layers, ChevronRight, ChevronLeft, X, CheckCircle } from 'lucide-react';
 import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { getRecommendedProducts } from '../lib/recommendations';
@@ -378,6 +378,17 @@ const ProductDetail = () => {
   return (
     <div className="product-detail-page">
       <div className="container mx-auto px-4 md:px-8">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center gap-2 text-xs text-slate-500 mb-6 flex-wrap pt-2">
+          <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+          <span>/</span>
+          <Link to={`/category/${product.category ? String(product.category).toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-') : 'all'}`} className="hover:text-primary transition-colors capitalize font-medium text-slate-600">
+            {product.category || 'Eyewear'}
+          </Link>
+          <span>/</span>
+          <span className="text-slate-900 font-semibold truncate max-w-[240px]">{product.name}</span>
+        </div>
+
         <div className="product-detail-layout">
 
           <div className="gallery-section">
@@ -426,7 +437,18 @@ const ProductDetail = () => {
             <div className="flex flex-col gap-5">
               <div className="brand-header">
                 <FadeIn delay={0.1}>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                    {product.category && (
+                      <>
+                        <Link 
+                          to={`/category/${String(product.category).toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-')}`}
+                          className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-2.5 py-1 rounded-md transition-colors"
+                        >
+                          {product.category}
+                        </Link>
+                        <div className="w-1 h-1 rounded-full bg-slate-300" />
+                      </>
+                    )}
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
                       {product.brand || 'Chashmalay Luxury'}
                     </span>
@@ -622,6 +644,7 @@ const ProductDetail = () => {
                       </>
                     ) : (
                       <>
+                        <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Category</span><p className="text-[12px] font-black text-slate-900 capitalize">{product.category || 'Eyewear'}</p></div>
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Material</span><p className="text-[12px] font-black text-slate-900">{product.frame_material || 'TR90 Ultra'}</p></div>
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Style</span><p className="text-[12px] font-black text-slate-900">{product.frame_type || 'Full Rim'}</p></div>
                         <div className="spec-item"><span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Shape</span><p className="text-[12px] font-black text-slate-900">{product.frame_shape || 'Rectangle'}</p></div>

@@ -190,14 +190,14 @@ const categoryMatches = (productCategory, routeName) => {
 
   return category === target ||
     category.replace(/\s+/g, '-') === routeName ||
-    category.replace(/\s+/g, '') === target.replace(/\s+/g, '');
+    category.replace(/\s+/g, '') === target.replace(/\s+/g, '') ||
+    category.replace(/[^a-z0-9]+/g, '-') === routeName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 };
 
 const productMatchesRoute = (product, routeName) => {
   if (!routeName || routeName === 'all') return true;
 
   const target = normalizeText(routeName);
-  const category = normalizeText(product.category);
   const gender = normalizeText(product.gender);
 
   // Check if route matches a gender
@@ -211,8 +211,8 @@ const productMatchesRoute = (product, routeName) => {
     return gender === 'kids';
   }
 
-  // Otherwise fallback to category matching
-  return categoryMatches(product.category, routeName);
+  // Fallback to category or product_type matching
+  return categoryMatches(product.category, routeName) || categoryMatches(product.product_type, routeName);
 };
 
 const normalizeCategoryProduct = (product = {}) => {

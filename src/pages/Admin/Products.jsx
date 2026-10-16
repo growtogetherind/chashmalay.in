@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn, Tag } from 'lucide-react';
-import { getProducts, saveProduct, deleteProduct, getCategories, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories, saveLensCategory, subscribeLenses } from '../../lib/firebase';
+import { getProducts, saveProduct, deleteProduct, getCategories, saveCategory, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories, saveLensCategory, subscribeLenses } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
 import ImageZoomModal from '../../components/ui/ImageZoomModal';
@@ -94,6 +94,9 @@ const AdminProducts = () => {
   const [activeTab, setActiveTab] = useState('basic');
   const [pendingImages, setPendingImages] = useState({});
   const [pendingGallery, setPendingGallery] = useState([]);
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [addingCategory, setAddingCategory] = useState(false);
   const [showNewBrandInput, setShowNewBrandInput] = useState(false);
   const [newBrandName, setNewBrandName] = useState('');
   const [addingBrand, setAddingBrand] = useState(false);
@@ -239,6 +242,44 @@ const AdminProducts = () => {
         custom_lenses: [...current, newOverride]
       };
     });
+  };
+
+  const handleQuickAddCategory = async () => {
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      toast.error('Please enter a category name');
+      return;
+    }
+
+    setAddingCategory(true);
+    try {
+      const existing = categories.find(c => (c.name || c.title || c.slug)?.toLowerCase().trim() === trimmed.toLowerCase());
+      if (existing) {
+        setForm(prev => ({ ...prev, category: existing.name || existing.slug }));
+        setShowNewCategoryInput(false);
+        setNewCategoryName('');
+        toast.success(`Selected existing category: ${existing.name || existing.slug}`);
+        setAddingCategory(false);
+        return;
+      }
+
+      const { error } = await saveCategory({ name: trimmed, slug: slugify(trimmed), is_active: true });
+      if (error) {
+        console.error('Error saving category:', error);
+        toast.error('Could not save to database, but selected for this product');
+      } else {
+        toast.success(`Category "${trimmed}" added!`);
+      }
+
+      setForm(prev => ({ ...prev, category: trimmed }));
+      setShowNewCategoryInput(false);
+      setNewCategoryName('');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to add category');
+    } finally {
+      setAddingCategory(false);
+    }
   };
 
   const handleQuickAddBrand = async () => {
@@ -831,11 +872,58 @@ const AdminProducts = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="form-group">
-                      <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-3 block">Category *</label>
-                      <select name="category" value={form.category} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
-                        <option value="">{categories.length === 0 ? 'No Categories Found - Add One First' : 'Select Category'}</option>
-                        {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                      </select>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block">Category *</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowNewCategoryInput(prev => !prev);
+                            setNewCategoryName('');
+                          }}
+                          className="text-[10px] font-bold uppercase text-emerald-600 hover:text-emerald-700 tracking-wider flex items-center gap-1 transition-colors hover:underline cursor-pointer"
+                        >
+                          <Plus size={12} /> {showNewCategoryInput ? 'Select Existing' : '+ Add Category'}
+                        </button>
+                      </div>
+
+                      {showNewCategoryInput ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleQuickAddCategory();
+                              }
+                            }}
+                            placeholder="Enter new category name..."
+                            autoFocus
+                            className="flex-1 bg-white border-2 border-emerald-500 p-3.5 rounded-xl text-slate-900 text-sm font-bold focus:outline-none transition-all shadow-sm"
+                          />
+                          <button
+                            type="button"
+                            disabled={addingCategory}
+                            onClick={handleQuickAddCategory}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3.5 rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer disabled:opacity-50"
+                          >
+                            {addingCategory ? 'Adding...' : 'Add'}
+                          </button>
+                        </div>
+                      ) : (
+                        <select name="category" value={form.category} onChange={handleChange} required className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-900 text-sm font-bold focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer">
+                          <option value="">{categories.length === 0 ? 'No Categories Found - Click + Add Category' : 'Select Category'}</option>
+                          {categories.map(c => {
+                            const val = c.name || c.title || c.slug;
+                            return <option key={c.id || val} value={val}>{val}</option>;
+                          })}
+                          {/* Ensure current form.category is always selected even if not in standard list */}
+                          {form.category && !categories.some(c => (c.name || c.title || c.slug) === form.category) && (
+                            <option value={form.category}>{form.category}</option>
+                          )}
+                        </select>
+                      )}
                     </div>
                     <div className="form-group">
                       <div className="flex items-center justify-between mb-3">
