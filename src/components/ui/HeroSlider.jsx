@@ -77,14 +77,12 @@ const HeroSlider = () => {
           HERO BANNER — Clean Edge-to-Edge Visual Banner
       ═══════════════════════════════════════ */}
       <div
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl w-full bg-slate-900"
-        style={{ minHeight: 'clamp(180px, 32vw, 420px)' }}
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-md w-full bg-slate-900 h-44 sm:h-56 md:h-64 lg:h-72 xl:h-[300px]"
       >
         <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={slide.id}
             className="relative w-full h-full"
-            style={{ minHeight: 'clamp(180px, 32vw, 420px)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -98,7 +96,6 @@ const HeroSlider = () => {
                 loading="eager"
                 decoding="async"
                 fetchPriority="high"
-                style={{ minHeight: 'clamp(180px, 32vw, 420px)' }}
               />
             </Link>
 
