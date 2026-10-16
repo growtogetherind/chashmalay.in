@@ -33,12 +33,12 @@ class ErrorBoundary extends React.Component {
           <p style={{ color: '#64748b', maxWidth: '400px' }}>
             We encountered an unexpected error. Our team has been notified.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.75rem', marginTop: '1rem' }}>
             <button
-              onClick={() => this.setState({ hasError: false, error: null })}
+              onClick={() => window.location.reload()}
               style={{ padding: '0.75rem 1.5rem', background: '#1e3f8a', color: 'white', borderRadius: '999px', border: 'none', fontWeight: 700, cursor: 'pointer' }}
             >
-              Try Again
+              Refresh Page
             </button>
             <a
               href="/"
@@ -47,10 +47,13 @@ class ErrorBoundary extends React.Component {
               Go Home
             </a>
           </div>
-          {import.meta.env.DEV && this.state.error && (
-            <pre style={{ marginTop: '2rem', padding: '1rem', background: '#fee2e2', borderRadius: '0.5rem', fontSize: '0.75rem', color: '#991b1b', textAlign: 'left', maxWidth: '600px', overflow: 'auto' }}>
-              {this.state.error.toString()}
-            </pre>
+          {this.state.error && (
+            <details style={{ marginTop: '1.5rem', maxWidth: '500px', textAlign: 'left', fontSize: '0.8rem', color: '#64748b' }}>
+              <summary style={{ cursor: 'pointer', textAlign: 'center', textDecoration: 'underline' }}>Error Details</summary>
+              <pre style={{ marginTop: '0.5rem', padding: '0.75rem', background: '#fee2e2', borderRadius: '0.5rem', color: '#991b1b', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                {this.state.error.toString()}
+              </pre>
+            </details>
           )}
         </div>
       );

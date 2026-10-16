@@ -59,19 +59,25 @@ const CategoryBentoGrid = () => {
     return unsubscribe;
   }, []);
 
-  const activeLive = liveCategories.filter((cat) => cat.is_active !== false);
+  const activeLive = (Array.isArray(liveCategories) ? liveCategories : []).filter(
+    (cat) => cat && typeof cat === 'object' && cat.is_active !== false && (cat.name || cat.title || cat.slug)
+  );
 
   // Use live categories from admin when present; fallback to mockup if empty
   const sourceList = activeLive.length > 0 ? activeLive : MOCKUP_CATEGORIES;
 
   const categories = sourceList.map((cat, idx) => {
+    const rawName = String(cat?.name || cat?.title || cat?.slug || 'Eyewear').trim();
     let link = cat.link;
     if (!link) {
-      const slug = cat.slug || cat.name?.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-');
+      const slug = String(
+        cat?.slug || rawName.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')
+      ).trim();
+
       if (slug === 'contacts' || slug === 'contact-lenses') {
         link = '/contact-lenses';
       } else {
-        link = `/category/${slug}`;
+        link = slug ? `/category/${slug}` : '/category/all';
       }
     }
 
@@ -83,7 +89,7 @@ const CategoryBentoGrid = () => {
 
     return {
       id: cat.id || `cat-${idx}`,
-      name: cat.name,
+      name: rawName,
       image,
       link,
       color,

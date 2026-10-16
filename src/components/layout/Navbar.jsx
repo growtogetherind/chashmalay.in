@@ -43,14 +43,22 @@ const Navbar = () => {
     return unsub;
   }, []);
 
-  const activeLiveNav = liveCategories.filter((c) => c.is_active !== false);
+  const activeLiveNav = (Array.isArray(liveCategories) ? liveCategories : []).filter(
+    (c) => c && typeof c === 'object' && c.is_active !== false && (c.name || c.title || c.slug)
+  );
 
   const navLinks = activeLiveNav.length > 0
     ? [
-        ...activeLiveNav.map((c) => ({
-          name: c.name.toUpperCase(),
-          path: c.slug === 'contacts' || c.slug === 'contact-lenses' ? '/contact-lenses' : `/category/${c.slug}`
-        })),
+        ...activeLiveNav.map((c) => {
+          const rawName = String(c?.name || c?.title || c?.slug || 'Category').trim();
+          const rawSlug = String(
+            c?.slug || rawName.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')
+          ).trim();
+          return {
+            name: rawName.toUpperCase(),
+            path: rawSlug === 'contacts' || rawSlug === 'contact-lenses' ? '/contact-lenses' : `/category/${rawSlug}`
+          };
+        }),
         { name: 'TRACK ORDER', path: '/account' },
         { name: 'STORE LOCATOR', path: '/find-store' },
       ]

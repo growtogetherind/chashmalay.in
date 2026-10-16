@@ -159,7 +159,8 @@ const ProductDetail = () => {
   useEffect(() => {
     if (!product || colors.length === 0) return;
     if (product.default_color) {
-      const idx = colors.findIndex(c => c.name?.toLowerCase() === product.default_color.toLowerCase());
+      const targetColor = String(product.default_color).trim().toLowerCase();
+      const idx = colors.findIndex(c => String(c?.name || '').trim().toLowerCase() === targetColor);
       if (idx !== -1) {
         setActiveColor(idx);
       } else {
