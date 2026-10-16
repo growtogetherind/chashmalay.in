@@ -139,7 +139,12 @@ export const AuthProvider = ({ children }) => {
       .catch((error) => {
         console.error("Redirect login error:", error);
         if (error.code && error.code !== 'auth/null-user') {
-          toast.error(error.message || 'Redirect login failed.');
+          if (error.code === 'auth/unauthorized-domain') {
+            const domain = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
+            toast.error(`Domain "${domain}" is not authorized in Firebase. Add it in Firebase Console -> Authentication -> Settings -> Authorized Domains.`, { duration: 8000 });
+          } else {
+            toast.error(error.message || 'Redirect login failed.');
+          }
         }
       });
   }, []);
@@ -298,6 +303,11 @@ export const AuthProvider = ({ children }) => {
       if (error.code === 'auth/popup-closed-by-user') {
         toast('Google sign-in cancelled', { icon: 'ℹ️' });
         return;
+      }
+      if (error.code === 'auth/unauthorized-domain') {
+        const domain = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
+        toast.error(`Domain "${domain}" is not authorized in Firebase. Add it in Firebase Console -> Authentication -> Settings -> Authorized Domains.`, { duration: 8000 });
+        throw error;
       }
       toast.error(error.message || 'Google sign-in failed');
       throw error;
