@@ -151,6 +151,7 @@ export const normalizeProduct = (product = {}) => {
     available_lenses: Array.isArray(product.available_lenses) ? product.available_lenses : [],
     custom_lenses: Array.isArray(product.custom_lenses) ? product.custom_lenses : [],
     only_specific_lenses: Boolean(product.only_specific_lenses),
+    show_lens_treatment: product.show_lens_treatment !== false,
     colors: Array.isArray(product.colors) ? product.colors : [],
     images: {
       ...(product.images || {}),

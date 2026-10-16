@@ -70,6 +70,7 @@ const EMPTY_PRODUCT = {
   base_curve: '8.6',
   diameter: '14.2',
   show_lens_selection: true,
+  show_lens_treatment: true,
   show_color_selection: true,
   show_size_selection: true
 };
@@ -1188,6 +1189,31 @@ const AdminProducts = () => {
                       </div>
                     </div>
 
+                    {/* Lens Treatment (Customize your lenses) Step Toggle */}
+                    <div className="flex items-center justify-between p-3.5 bg-white rounded-xl border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={form.show_lens_treatment !== false}
+                            onChange={(e) => setForm(prev => ({ ...prev, show_lens_treatment: e.target.checked }))}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                        <div>
+                          <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wide block">
+                            Lens Treatment Step (Customize your lenses)
+                          </span>
+                          <span className="text-[9px] text-slate-400">
+                            {form.show_lens_treatment !== false
+                              ? 'Enabled: Customer sees "Step 3: Lens Treatment" with standard free option or optional add-ons.'
+                              : 'Disabled: Customer skips Lens Treatment directly to Prescription step.'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Lens List */}
                     {(!form.custom_lenses || form.custom_lenses.length === 0) ? (
                       <div className="py-6 text-center border-2 border-dashed border-slate-200 rounded-xl bg-white/60">
@@ -1480,6 +1506,11 @@ const AdminProducts = () => {
                         <input type="checkbox" name="show_lens_selection" checked={form.show_lens_selection !== false} onChange={handleChange} className="peer hidden" />
                         <div className="w-5 h-5 rounded-lg border-2 border-slate-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all shadow-inner" />
                         <span className="text-[10px] font-bold uppercase text-slate-400 group-hover:text-slate-900 transition-colors">Enable Lenses Selector</span>
+                      </label>
+                      <label className="flex items-center gap-4 cursor-pointer group">
+                        <input type="checkbox" name="show_lens_treatment" checked={form.show_lens_treatment !== false} onChange={handleChange} className="peer hidden" />
+                        <div className="w-5 h-5 rounded-lg border-2 border-slate-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-600 transition-all shadow-inner" />
+                        <span className="text-[10px] font-bold uppercase text-slate-400 group-hover:text-slate-900 transition-colors">Show Lens Treatment</span>
                       </label>
                       <label className="flex items-center gap-4 cursor-pointer group">
                         <input type="checkbox" name="show_color_selection" checked={form.show_color_selection !== false} onChange={handleChange} className="peer hidden" />

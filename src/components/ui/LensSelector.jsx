@@ -200,6 +200,10 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
 
   // Setup default add-ons when a category/lens is chosen
   const initializeDefaultAddons = (catSlug) => {
+    if (product?.show_lens_treatment === false) {
+      setSelections(prev => ({ ...prev, addons: [] }));
+      return;
+    }
     const applicableAddons = dbAddons.filter(a =>
       a.is_active !== false &&
       a.is_default &&
@@ -223,14 +227,19 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
   const handleLensSelect = (lens) => {
     setSelections(prev => ({ ...prev, selectedLens: lens }));
     setCurrentAddonGroupIndex(0);
-    setStep(3);
+    if (product?.show_lens_treatment === false || getApplicableGroups().length === 0) {
+      setStep(4);
+    } else {
+      setStep(3);
+    }
   };
 
   const ADDON_GROUPS = [
-    { name: 'Lens Treatment', label: 'Lens Treatment', required: true, noneLabel: null }
+    { name: 'Lens Treatment', label: 'Lens Treatment', required: false, noneLabel: 'Standard (No Extra Treatment)' }
   ];
 
   const getApplicableGroups = () => {
+    if (product?.show_lens_treatment === false) return [];
     if (!selections.visionType) return [];
     return ADDON_GROUPS.filter(group => {
       const options = dbAddons.filter(a =>
@@ -295,10 +304,10 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
         </header>
 
         <div className="lens-modal-steps">
-          {[1, 2, 3, 4, 5].map((s) => (
+          {(product?.show_lens_treatment === false ? [1, 2, 4, 5] : [1, 2, 3, 4, 5]).map((s, idx) => (
             <div key={s} className={`step-item ${step === s ? 'active' : step > s ? 'completed' : ''}`}>
               <div className="step-circle">
-                {step > s ? <Check size={12} strokeWidth={3} /> : s}
+                {step > s ? <Check size={12} strokeWidth={3} /> : idx + 1}
               </div>
             </div>
           ))}
@@ -500,8 +509,12 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                 <div className="step-content animate-fade-in text-left">
                   <button className="back-btn" onClick={() => {
                     const applicableGroups = getApplicableGroups();
-                    setCurrentAddonGroupIndex(applicableGroups.length - 1);
-                    setStep(3);
+                    if (applicableGroups.length === 0 || product?.show_lens_treatment === false) {
+                      setStep(2);
+                    } else {
+                      setCurrentAddonGroupIndex(applicableGroups.length - 1);
+                      setStep(3);
+                    }
                   }}>
                     ← Back
                   </button>
