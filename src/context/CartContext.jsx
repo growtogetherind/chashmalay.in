@@ -408,6 +408,7 @@ export const CartProvider = ({ children }) => {
       cartTotal,
       tax,
       discount,
+      coupon: discount?.code ? { code: discount.code, amount: discount.amount } : null,
       finalTotal,
       applyCoupon,
       removeCoupon,

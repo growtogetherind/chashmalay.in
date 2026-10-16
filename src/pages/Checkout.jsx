@@ -30,7 +30,7 @@ const InputField = ({ label, error, ...props }) => (
 );
 
 const Checkout = () => {
-  const { cart, cartTotal, finalTotal, discount, emptyCart, updateLensSelection } = useCart();
+  const { cart, cartTotal, finalTotal, discount, coupon, emptyCart, updateLensSelection } = useCart();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -189,7 +189,7 @@ const Checkout = () => {
         body: JSON.stringify({
           items: cart,
           address,
-          couponCode: coupon?.code || null
+          couponCode: discount?.code || null
         }),
       });
 
