@@ -20,6 +20,7 @@ const AdminSettings = () => {
     maintenance_mode: false,
     store_logo: '',
     carousel_interval: 5,
+    enable_lens_treatment: true,
     telegram_bot_token: '',
     telegram_chat_id: ''
   });
@@ -282,6 +283,27 @@ const AdminSettings = () => {
                           className="sr-only peer"
                         />
                         <div className="w-14 h-7 bg-slate-200 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500 shadow-inner relative"></div>
+                     </div>
+                  </label>
+
+                  <label className="flex items-center justify-between p-8 bg-emerald-50/70 rounded-[32px] border border-emerald-100 group/toggle shadow-sm cursor-pointer">
+                     <div className="flex-1">
+                        <p className="text-[11px] font-black text-emerald-800 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Storewide Lens Treatment Step
+                        </p>
+                        <p className="text-[10px] text-slate-500 font-bold leading-relaxed max-w-[280px]">
+                          {form.enable_lens_treatment !== false ? 'Enabled: Step 3 "Lens Treatment" (Customize your lenses) is active in the storefront.' : 'Disabled: Step 3 is skipped completely in the customer lens selector, going directly to Prescription.'}
+                        </p>
+                     </div>
+                     <div className="relative inline-flex items-center">
+                        <input
+                          id="lens-treatment-toggle"
+                          type="checkbox"
+                          checked={form.enable_lens_treatment !== false}
+                          onChange={e => setForm({...form, enable_lens_treatment: e.target.checked})}
+                          className="sr-only peer"
+                        />
+                        <div className="w-14 h-7 bg-slate-200 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 shadow-inner relative"></div>
                      </div>
                   </label>
                   <div className="form-group pt-4">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Edit3, Trash2, X, Eye, EyeOff } from 'lucide-react';
-import { subscribeLensAddons, subscribeLensCategories, saveLensAddon, deleteLensAddon } from '../../lib/firebase';
+import { Plus, Edit3, Trash2, X, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { subscribeLensAddons, subscribeLensCategories, saveLensAddon, deleteLensAddon, subscribeSettings, saveSettings } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import { useConfirm } from '../../context/ConfirmContext';
 import toast from 'react-hot-toast';
@@ -15,6 +15,8 @@ const EMPTY_FORM = {
 const AdminLensAddons = () => {
   const [addons, setAddons] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [settings, setSettings] = useState({});
+  const [togglingSettings, setTogglingSettings] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -25,8 +27,19 @@ const AdminLensAddons = () => {
   useEffect(() => {
     const unsubAddons = subscribeLensAddons(data => { setAddons(data || []); setLoading(false); }, () => setLoading(false));
     const unsubCats = subscribeLensCategories(data => setCategories(data || []), () => {});
-    return () => { unsubAddons(); unsubCats(); };
+    const unsubSettings = subscribeSettings(data => setSettings(data || {}));
+    return () => { unsubAddons(); unsubCats(); unsubSettings(); };
   }, []);
+
+  const handleToggleStorewideTreatment = async () => {
+    const currentVal = settings.enable_lens_treatment !== false;
+    const newVal = !currentVal;
+    setTogglingSettings(true);
+    const { error } = await saveSettings({ ...settings, enable_lens_treatment: newVal });
+    if (error) toast.error('Failed to update setting');
+    else toast.success(newVal ? 'Lens Treatment step enabled in storefront' : 'Lens Treatment step disabled in storefront');
+    setTogglingSettings(false);
+  };
 
   const openAdd = () => { setForm({ ...EMPTY_FORM }); setEditing(null); setShowForm(true); };
   const openEdit = (a) => { setForm({ ...EMPTY_FORM, ...a }); setEditing(a.id); setShowForm(true); };
@@ -83,6 +96,45 @@ const AdminLensAddons = () => {
           <button onClick={openAdd} className="admin-primary-btn px-6 shadow-lg shadow-emerald-500/20">
             <Plus size={18} /> <span className="ml-1">Add Add-on</span>
           </button>
+        </div>
+
+        {/* Storewide Lens Treatment Step Toggle Card */}
+        <div className="mb-6 p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${settings.enable_lens_treatment !== false ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'}`}>
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                  Storewide Lens Treatment Step (Customize your lenses)
+                </h3>
+                <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${settings.enable_lens_treatment !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                  {settings.enable_lens_treatment !== false ? 'Active in Store' : 'Disabled'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                {settings.enable_lens_treatment !== false
+                  ? 'Step 3 "Lens Treatment" is enabled in the customer lens selector (customers select from your configured treatments).'
+                  : 'Step 3 is skipped completely in the customer lens selector, navigating directly to Prescription.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={handleToggleStorewideTreatment}
+              disabled={togglingSettings}
+              className={`admin-toggle ${settings.enable_lens_treatment !== false ? 'bg-emerald-500 border-emerald-600' : 'bg-slate-200 border-slate-300'}`}
+              title="Toggle Lens Treatment Step"
+            >
+              <span className={`admin-toggle-dot ${settings.enable_lens_treatment !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
+            <span className="text-xs font-bold text-slate-700">
+              {settings.enable_lens_treatment !== false ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
         </div>
 
         {loading ? (

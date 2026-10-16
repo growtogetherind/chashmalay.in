@@ -3,7 +3,7 @@ import { X, Check, ChevronRight, Camera } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { uploadImage, compressToWebP } from '../../lib/cloudinary';
 import { useNavigate } from 'react-router-dom';
-import { getLensCategories, getLenses, getLensAddons } from '../../lib/firebase';
+import { getLensCategories, getLenses, getLensAddons, subscribeSettings } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import './LensSelector.css';
 
@@ -14,11 +14,23 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
   const [isPowerModalOpen, setIsPowerModalOpen] = useState(false);
   const [currentAddonGroupIndex, setCurrentAddonGroupIndex] = useState(0);
 
-  // DB Data
+  // DB Data & Settings
   const [dbCategories, setDbCategories] = useState([]);
   const [dbLenses, setDbLenses] = useState([]);
   const [dbAddons, setDbAddons] = useState([]);
+  const [storeSettings, setStoreSettings] = useState({});
   const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    const unsub = subscribeSettings(setStoreSettings);
+    return () => unsub();
+  }, []);
+
+  const isLensTreatmentEnabled = () => {
+    if (storeSettings.enable_lens_treatment === false) return false;
+    if (product?.show_lens_treatment === false) return false;
+    return true;
+  };
 
   const [selections, setSelections] = useState({
     visionType: null, // Selected Category (e.g. Single Vision)
@@ -200,7 +212,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
 
   // Setup default add-ons when a category/lens is chosen
   const initializeDefaultAddons = (catSlug) => {
-    if (product?.show_lens_treatment === false) {
+    if (!isLensTreatmentEnabled()) {
       setSelections(prev => ({ ...prev, addons: [] }));
       return;
     }
@@ -209,7 +221,16 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
       a.is_default &&
       (!a.applicable_categories || a.applicable_categories.length === 0 || a.applicable_categories.includes(catSlug))
     );
-    setSelections(prev => ({ ...prev, addons: applicableAddons }));
+    if (applicableAddons.length > 0) {
+      setSelections(prev => ({ ...prev, addons: applicableAddons }));
+    } else {
+      const firstApplicable = dbAddons.find(a =>
+        a.is_active !== false &&
+        a.group === 'Lens Treatment' &&
+        (!a.applicable_categories || a.applicable_categories.length === 0 || a.applicable_categories.includes(catSlug))
+      );
+      setSelections(prev => ({ ...prev, addons: firstApplicable ? [firstApplicable] : [] }));
+    }
   };
 
   const handleCategorySelect = (cat) => {
@@ -227,7 +248,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
   const handleLensSelect = (lens) => {
     setSelections(prev => ({ ...prev, selectedLens: lens }));
     setCurrentAddonGroupIndex(0);
-    if (product?.show_lens_treatment === false || getApplicableGroups().length === 0) {
+    if (!isLensTreatmentEnabled() || getApplicableGroups().length === 0) {
       setStep(4);
     } else {
       setStep(3);
@@ -235,11 +256,11 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
   };
 
   const ADDON_GROUPS = [
-    { name: 'Lens Treatment', label: 'Lens Treatment', required: false, noneLabel: 'Standard (No Extra Treatment)' }
+    { name: 'Lens Treatment', label: 'Lens Treatment', required: true, noneLabel: null }
   ];
 
   const getApplicableGroups = () => {
-    if (product?.show_lens_treatment === false) return [];
+    if (!isLensTreatmentEnabled()) return [];
     if (!selections.visionType) return [];
     return ADDON_GROUPS.filter(group => {
       const options = dbAddons.filter(a =>
@@ -304,7 +325,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
         </header>
 
         <div className="lens-modal-steps">
-          {(product?.show_lens_treatment === false ? [1, 2, 4, 5] : [1, 2, 3, 4, 5]).map((s, idx) => (
+          {(!isLensTreatmentEnabled() ? [1, 2, 4, 5] : [1, 2, 3, 4, 5]).map((s, idx) => (
             <div key={s} className={`step-item ${step === s ? 'active' : step > s ? 'completed' : ''}`}>
               <div className="step-circle">
                 {step > s ? <Check size={12} strokeWidth={3} /> : idx + 1}
@@ -438,25 +459,6 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     </p>
 
                     <div className="space-y-4 mb-8">
-                      {/* Render optional None option */}
-                      {!currentGroup.required && currentGroup.noneLabel && (
-                        <div
-                          onClick={() => handleSelectGroupOption(currentGroup.name, null)}
-                          className={`p-5 rounded-2xl border cursor-pointer transition-all flex items-center justify-between ${!currentSelection ? 'border-emerald-500 bg-emerald-50/40 shadow-sm' : 'border-slate-200 bg-slate-50 hover:bg-slate-100/50'}`}
-                        >
-                          <div className="flex-1 pr-4">
-                            <h4 className="font-bold text-sm text-slate-900">{currentGroup.noneLabel}</h4>
-                            <p className="text-xs text-slate-500 mt-1 font-medium">No upgrade, keep standard options</p>
-                          </div>
-                          <div className="text-right flex items-center gap-4">
-                            <span className="font-black text-sm text-slate-900">Free</span>
-                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${!currentSelection ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 bg-white'}`}>
-                              {!currentSelection && <Check size={12} strokeWidth={4} />}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
                       {/* Render actual DB options */}
                       {options.map(addon => {
                         const isSelected = currentSelection?.id === addon.id;
@@ -491,6 +493,9 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                     <button
                       className="btn-cta w-full"
                       onClick={() => {
+                        if (!currentSelection && options.length > 0) {
+                          handleSelectGroupOption(currentGroup.name, options[0]);
+                        }
                         if (currentAddonGroupIndex < applicableGroups.length - 1) {
                           setCurrentAddonGroupIndex(prev => prev + 1);
                         } else {
@@ -509,7 +514,7 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
                 <div className="step-content animate-fade-in text-left">
                   <button className="back-btn" onClick={() => {
                     const applicableGroups = getApplicableGroups();
-                    if (applicableGroups.length === 0 || product?.show_lens_treatment === false) {
+                    if (applicableGroups.length === 0 || !isLensTreatmentEnabled()) {
                       setStep(2);
                     } else {
                       setCurrentAddonGroupIndex(applicableGroups.length - 1);
