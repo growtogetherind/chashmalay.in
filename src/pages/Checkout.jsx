@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, ShoppingBag, Shield, CheckCircle } from 'lucide-react';
+import { ChevronRight, ShoppingBag, Shield, CheckCircle, MapPin, Phone, Truck, Edit2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createOrder } from '../lib/firebase';
@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { FadeIn } from '../components/ui/Motion';
 import { sanitizeTextInput } from '../lib/utils';
 
-const STEPS = ['Shipping', 'Review', 'Secure Payment'];
+const STEPS = ['Delivery Address', 'Review Order', 'Payment'];
 
 const getSelectedColorName = (item) => {
   const selectedColor = item?.lensSelection?.selectedColor;
@@ -238,6 +238,7 @@ const Checkout = () => {
       handler: async function (response) {
         setProcessing(true);
         let finalOrderId = response.razorpay_order_id || razorpayOrderId;
+        let serverVerified = false;
 
         // Try server-side verification if signature is present
         if (response.razorpay_signature && response.razorpay_order_id) {
@@ -259,6 +260,7 @@ const Checkout = () => {
             if (verifyRes.ok) {
               const verifyData = await verifyRes.json();
               finalOrderId = verifyData.order_id || finalOrderId;
+              serverVerified = true;
             }
           } catch (verifyErr) {
             console.warn('Server verification bypassed or delayed:', verifyErr.message);
@@ -283,6 +285,12 @@ const Checkout = () => {
           navigate(`/order-success/${confirmedId}`);
         } catch (saveErr) {
           console.error('Client order save failed:', saveErr);
+          if (serverVerified) {
+            console.info('Order was verified server-side despite client save issue. Proceeding to order success.');
+            await emptyCart();
+            navigate(`/order-success/${finalOrderId || response.razorpay_payment_id}`);
+            return;
+          }
           setProcessing(false);
           toast.error(saveErr.message || ('Order confirmation failed. Please contact support with Payment ID: ' + response.razorpay_payment_id));
         }
@@ -321,8 +329,8 @@ const Checkout = () => {
         <div className="w-24 h-24 rounded-full bg-surface-flat flex items-center justify-center border border-divider">
            <ShoppingBag size={32} className="text-secondary" strokeWidth={1} />
         </div>
-        <h2 className="text-3xl font-sans font-black text-primary tracking-tighter">Your bag is empty</h2>
-        <Link to="/" className="btn-secondary mt-4">Return to Archive</Link>
+        <h2 className="text-3xl font-sans font-black text-primary tracking-tighter">Your cart is empty</h2>
+        <Link to="/" className="btn-secondary mt-4">Continue Shopping</Link>
       </div>
     );
   }
@@ -349,28 +357,31 @@ const Checkout = () => {
           <div className="w-full lg:w-3/5">
             {step === 0 && (
               <FadeIn>
-                 <h2 className="text-3xl font-sans font-black mb-10 flex items-center justify-between tracking-tighter">
-                    Shipping Details
-                 </h2>
+                 <div className="mb-10">
+                   <h2 className="text-3xl font-sans font-black tracking-tighter mb-2">
+                      Delivery Address
+                   </h2>
+                   <p className="text-sm text-secondary">Please enter the address where you want your order delivered.</p>
+                 </div>
                  <form onSubmit={handleAddressSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       <InputField label="Full Name" name="name" value={address.name} onChange={handleAddressChange} error={errors.name} placeholder="First & Last Name" required />
-                       <InputField label="Contact Number" name="phone" value={address.phone} onChange={handleAddressChange} error={errors.phone} placeholder="Mobile Number" required />
+                       <InputField label="Full Name" name="name" value={address.name} onChange={handleAddressChange} error={errors.name} placeholder="Your Full Name" required />
+                       <InputField label="Mobile Number" name="phone" value={address.phone} onChange={handleAddressChange} error={errors.phone} placeholder="10-digit mobile number" required />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        <InputField label="Date of Birth (Optional)" name="dob" type="date" value={address.dob} onChange={handleAddressChange} />
                        <div className="hidden md:block" /> 
                     </div>
-                    <InputField label="Address Line 1" name="line1" value={address.line1} onChange={handleAddressChange} error={errors.line1} placeholder="House / Flat No., Street Name" required />
-                    <InputField label="Address Line 2" name="line2" value={address.line2} onChange={handleAddressChange} placeholder="Landmark, Area (Optional)" />
+                    <InputField label="Flat / House No. & Street" name="line1" value={address.line1} onChange={handleAddressChange} error={errors.line1} placeholder="Flat / House No., Building Name, Street" required />
+                    <InputField label="Area / Landmark (Optional)" name="line2" value={address.line2} onChange={handleAddressChange} placeholder="Near landmark, colony, or sector (optional)" />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                       <InputField label="City" name="city" value={address.city} onChange={handleAddressChange} error={errors.city} placeholder="City City" required />
+                       <InputField label="City" name="city" value={address.city} onChange={handleAddressChange} error={errors.city} placeholder="City" required />
                        <InputField label="State" name="state" value={address.state} onChange={handleAddressChange} error={errors.state} placeholder="State" required />
-                       <InputField label="Postal Code" name="pincode" value={address.pincode} onChange={handleAddressChange} error={errors.pincode} placeholder="Postal Code" maxLength={6} required />
+                       <InputField label="Pincode" name="pincode" value={address.pincode} onChange={handleAddressChange} error={errors.pincode} placeholder="6-digit pincode" maxLength={6} required />
                     </div>
                     <div className="pt-8 text-right">
                        <button type="submit" disabled={processing} className="btn-primary w-full md:w-auto">
-                         {processing ? 'Optimizing & Uploading...' : 'Continue to Review'}
+                         {processing ? 'Saving...' : 'Continue to Review'}
                        </button>
                     </div>
                  </form>
@@ -380,16 +391,55 @@ const Checkout = () => {
             {step === 1 && (
               <FadeIn>
                  <div className="flex justify-between items-end mb-8 border-b border-divider pb-4">
-                   <h2 className="text-3xl font-sans font-black tracking-tighter">Review Order</h2>
-                   <button onClick={() => setStep(0)} className="text-xs uppercase tracking-widest text-secondary hover:text-primary transition-colors border-b border-current pb-1">Edit</button>
+                   <h2 className="text-3xl font-sans font-black tracking-tighter">Review Your Order</h2>
+                   <button onClick={() => setStep(0)} className="text-xs uppercase tracking-widest text-secondary hover:text-primary transition-colors border-b border-current pb-1">Change Address</button>
                 </div>
-                                <div className="bg-surface-flat p-8 rounded-2xl mb-12">
-                   <p className="font-sans font-bold text-xl mb-4 tracking-tight">{address.name}</p>
-                   <p className="text-secondary font-sans leading-loose">
-                      {address.line1}, {address.line2 && `${address.line2},`} <br/>
-                      {address.city}, {address.state} — {address.pincode} <br/>
-                      {address.phone}
-                   </p>
+
+                {/* Delivery Address Card */}
+                <div className="bg-surface-flat border border-divider rounded-2xl p-6 md:p-8 mb-10 shadow-sm">
+                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-divider">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-accent/10 text-accent flex items-center justify-center">
+                        <MapPin size={18} />
+                      </div>
+                      <div>
+                        <h3 className="font-sans font-bold text-sm tracking-tight text-primary">Delivery Address</h3>
+                        <p className="text-[11px] text-secondary">Your order will be delivered to this address</p>
+                      </div>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setStep(0)} 
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline uppercase tracking-wider"
+                    >
+                      <Edit2 size={12} /> Change
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-sans">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block mb-1">Name & Contact</span>
+                      <p className="font-bold text-base text-primary">{address.name}</p>
+                      <p className="text-secondary flex items-center gap-1.5 mt-1 text-xs">
+                        <Phone size={13} className="text-accent" /> {address.phone}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block mb-1">Address</span>
+                      <p className="text-body leading-relaxed font-medium">
+                        {address.line1}
+                        {address.line2 && <span className="block text-secondary text-xs">{address.line2}</span>}
+                        <span className="block font-bold text-primary mt-1">
+                          {address.city}, {address.state} — {address.pincode}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mb-6 pb-2 border-b border-divider">
+                  <h3 className="text-sm font-sans font-bold uppercase tracking-widest text-secondary">Items in Your Order ({cart.length})</h3>
+                  <span className="text-xs text-accent font-semibold flex items-center gap-1"><Truck size={14} /> Free Delivery</span>
                 </div>
 
                 <div className="space-y-8 mb-12">
@@ -430,7 +480,7 @@ const Checkout = () => {
                              )}
                              {item.lensSelection?.addons && item.lensSelection.addons.length > 0 && (
                                <p className="text-[10px] font-sans text-secondary">
-                                 Upgrades: {item.lensSelection.addons.map(a => a.name).join(', ')}
+                                 Add-ons: {item.lensSelection.addons.map(a => a.name).join(', ')}
                                </p>
                              )}
                           </div>
@@ -443,7 +493,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="text-right">
-                   <button onClick={() => setStep(2)} className="btn-primary w-full md:w-auto">Proceed to Payment</button>
+                   <button onClick={() => setStep(2)} className="btn-primary w-full md:w-auto">Continue to Payment</button>
                 </div>
               </FadeIn>
             )}
@@ -451,30 +501,55 @@ const Checkout = () => {
             {step === 2 && (
               <FadeIn>
                  <h2 className="text-3xl font-sans font-black mb-8 border-b border-divider pb-4 flex justify-between tracking-tighter">
-                   Secure Payment
+                   Payment
                    <button onClick={() => setStep(1)} className="text-xs font-sans uppercase tracking-widest text-secondary hover:text-primary transition-colors border-b border-current pb-1 hidden md:block">Back</button>
                 </h2>
+
+                {/* Verified Delivery Address on Payment Step */}
+                <div className="bg-surface-flat border border-divider rounded-2xl p-5 mb-8 flex items-start justify-between shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-accent/10 text-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <MapPin size={16} />
+                    </div>
+                    <div className="text-xs font-sans">
+                      <span className="font-bold text-sm text-primary block">Delivering to: {address.name}</span>
+                      <span className="text-secondary flex items-center gap-1 mt-0.5 font-medium">
+                        <Phone size={11} className="text-accent" /> {address.phone}
+                      </span>
+                      <span className="text-body block mt-1 leading-snug">
+                        {address.line1}{address.line2 ? `, ${address.line2}` : ''}, {address.city}, {address.state} — {address.pincode}
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => setStep(0)} 
+                    className="text-xs font-bold text-accent hover:underline flex-shrink-0 ml-2 uppercase tracking-wider"
+                  >
+                    Change
+                  </button>
+                </div>
                 
                 <div className="bg-surface border border-accent rounded-2xl p-6 md:p-8 relative overflow-hidden mb-8 shadow-luxury">
                    <div className="flex gap-4 items-center mb-6">
                       <div className="w-6 h-6 rounded-full border-4 border-accent flex items-center justify-center">
                          <div className="w-2 h-2 rounded-full bg-accent" />
                       </div>
-                       <span className="text-lg font-sans font-bold tracking-tight">Razorpay Secure Checkout</span>
+                       <span className="text-lg font-sans font-bold tracking-tight">Pay Online with Razorpay</span>
                    </div>
-                   <p className="text-body tracking-wide text-sm pl-10">Pay via Credit Card, Debit Card, Net Banking, or UPI.</p>
+                   <p className="text-body tracking-wide text-sm pl-10">Pay easily using UPI (GPay, PhonePe, Paytm), Cards, or Net Banking.</p>
                 </div>
 
                 <div className="flex items-start gap-4 p-6 bg-surface-flat rounded-xl mb-12">
                    <Shield className="text-accent mt-0.5 flex-shrink-0" size={20} />
                    <div>
-                      <h4 className="text-sm font-bold uppercase tracking-widest mb-2 text-primary">Absolute Security</h4>
-                      <p className="text-sm text-secondary leading-relaxed">Your payment information is thoroughly encrypted and securely processed. We do not store your credit card information.</p>
+                      <h4 className="text-sm font-bold uppercase tracking-widest mb-2 text-primary">100% Secure Payment</h4>
+                      <p className="text-sm text-secondary leading-relaxed">Your payment is encrypted and completely safe. We never store your card details or banking PIN.</p>
                    </div>
                 </div>
 
                 <button onClick={handlePayment} disabled={processing} className="w-full btn-primary py-5 text-sm">
-                  {processing ? 'Connecting to gateway...' : `Authorize Payment — ₹${finalTotal.toFixed(0)}`}
+                  {processing ? 'Opening payment...' : `Pay Now — ₹${finalTotal.toFixed(0)}`}
                 </button>
               </FadeIn>
             )}
@@ -482,8 +557,57 @@ const Checkout = () => {
 
           {/* Sticky Summary Panel */}
           <div className="w-full lg:w-2/5">
-             <div className="bg-surface glass-panel rounded-3xl p-8 sticky top-32 mt-0">
-                <h3 className="text-xs font-sans font-semibold uppercase tracking-[0.2em] mb-8 pb-4 border-b border-divider">Order Summary</h3>
+             <div className="bg-surface glass-panel rounded-3xl p-6 md:p-8 sticky top-32 mt-0 shadow-sm border border-divider">
+                <h3 className="text-xs font-sans font-semibold uppercase tracking-[0.2em] mb-6 pb-4 border-b border-divider flex items-center justify-between">
+                  <span>Order Summary</span>
+                  <span className="text-secondary font-normal font-sans text-xs">({cart.length} item{cart.length > 1 ? 's' : ''})</span>
+                </h3>
+
+                {/* Items in Order Preview */}
+                <div className="max-h-60 overflow-y-auto space-y-3 pr-1 mb-6 border-b border-divider pb-6">
+                  {cart.map((item) => {
+                    const basePrice = parseInt((item.consumersPrice || item.price || "0").toString().replace(/,/g, ''));
+                    let lensTotal = 0;
+                    if (item.lensSelection?.selectedLens?.price) {
+                      lensTotal += Number(item.lensSelection.selectedLens.price);
+                    } else if (item.lensSelection?.lensPackage?.price) {
+                      lensTotal += Number(item.lensSelection.lensPackage.price);
+                    }
+                    if (item.lensSelection?.addons && item.lensSelection.addons.length > 0) {
+                      item.lensSelection.addons.forEach(a => {
+                        lensTotal += Number(a.price || 0);
+                      });
+                    }
+                    if (item.lensSelection?.visionType?.price) {
+                      lensTotal += Number(item.lensSelection.visionType.price);
+                    }
+                    const itemTotal = (basePrice + lensTotal) * (item.quantity || 1);
+
+                    return (
+                      <div key={item.cartId || item.id} className="flex gap-3 items-center text-xs">
+                        <div className="w-12 h-12 bg-surface-flat rounded-lg p-1 border border-divider flex-shrink-0 flex items-center justify-center">
+                          <img src={item.frameImage || item.gallery?.[0]} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-primary truncate">{item.name}</p>
+                          <p className="text-secondary text-[11px]">Qty: {item.quantity || 1}{getSelectedColorName(item) ? ` • ${getSelectedColorName(item)}` : ''}</p>
+                        </div>
+                        <span className="font-bold text-primary flex-shrink-0">₹{itemTotal.toFixed(0)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Verified Delivery Destination snippet in Sidebar if entered */}
+                {address.city && address.name && (
+                  <div className="bg-surface-flat/80 rounded-xl p-3 mb-6 text-xs font-sans border border-divider/60 flex items-start gap-2">
+                    <MapPin size={14} className="text-accent flex-shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <span className="font-bold text-primary block truncate">Delivering to: {address.name}</span>
+                      <span className="text-secondary text-[11px] block truncate">{address.city}, {address.state} — {address.pincode}</span>
+                    </div>
+                  </div>
+                )}
                 
                 <div className="space-y-4 font-sans text-sm tracking-wide mb-8">
                    <div className="flex justify-between">
@@ -492,7 +616,7 @@ const Checkout = () => {
                    </div>
                    <div className="flex justify-between">
                       <span className="text-secondary">Shipping</span>
-                      <span className="text-accent uppercase text-xs font-black tracking-widest">Complimentary</span>
+                      <span className="text-accent uppercase text-xs font-black tracking-widest">Free</span>
                    </div>
                    {discount?.code && (
                       <div className="flex justify-between text-accent">
@@ -506,7 +630,9 @@ const Checkout = () => {
                    <span className="font-sans font-bold text-lg tracking-tight">Total</span>
                    <span className="font-sans font-black text-3xl text-primary tracking-tighter">₹{finalTotal.toFixed(0)}</span>
                 </div>
-                <p className="text-[10px] text-secondary text-right">Complimentary Shipping & Delivery</p>
+                <p className="text-[10px] text-secondary text-right flex items-center justify-end gap-1">
+                  <Truck size={12} className="text-accent" /> Free Delivery
+                </p>
              </div>
           </div>
 

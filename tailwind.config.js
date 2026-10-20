@@ -12,6 +12,8 @@ export default {
         surface: '#F8FAFC', 
         'surface-flat': '#F1F5F9', 
         primary: '#1E3A8A',
+        'primary-blue': '#1D4ED8',
+        'secondary-blue': '#2FA4B7',
         secondary: '#475569',
         accent: {
           light: '#7DD3FC',

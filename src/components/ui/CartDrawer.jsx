@@ -167,7 +167,14 @@ const CartDrawer = () => {
                           <div className="item-details">
                             <div className="flex justify-between items-start">
                               <h3 className="item-name">{getItemName(item)}</h3>
-                              <button onClick={() => removeFromCart(itemId)} className="remove-item-btn"><X size={14} /></button>
+                              <button 
+                                onClick={() => removeFromCart(itemId)} 
+                                className="remove-item-btn" 
+                                title="Remove item" 
+                                aria-label="Remove item"
+                              >
+                                <X size={14} strokeWidth={2.5} />
+                              </button>
                             </div>
                             <p className="item-meta">
                               {item.products?.brand || item.brand || 'Premium Edition'} • {getSelectedColorName(item) ? `Color: ${getSelectedColorName(item)}` : (item.products?.frame_shape || item.frame_shape || 'Medium')}{item.lensSelection?.selectedSize ? ` / Size: ${item.lensSelection.selectedSize}` : ''}

@@ -114,8 +114,13 @@ const Cart = () => {
 
               return (
                 <div key={itemId} className="cart-item-card">
-                  <button className="btn-remove-top" onClick={() => removeFromCart(itemId)}>
-                    <X size={14} />
+                  <button 
+                    className="btn-remove-top" 
+                    onClick={() => removeFromCart(itemId)}
+                    title="Remove item"
+                    aria-label="Remove item"
+                  >
+                    <X size={14} strokeWidth={2.5} />
                   </button>
                   
                   <div className="item-layout">

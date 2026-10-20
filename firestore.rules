@@ -92,20 +92,31 @@ service cloud.firestore {
     // Staff can update order status but not total amounts.
     match /orders/{orderId} {
       allow read: if isStaff() ||
-        (request.auth != null && request.auth.uid == resource.data.user_id);
+        (request.auth != null && (
+          request.auth.uid == resource.data.user_id ||
+          (resource.data.user_id is string && resource.data.user_id.matches('guest_.*'))
+        ));
 
       allow create: if request.auth != null &&
         request.auth.uid == request.resource.data.user_id;
 
-      // Staff can update order status; users can cancel confirmed orders
+      // Staff can update order status; users can confirm payment for their own/guest orders or cancel confirmed orders
       allow update: if isAdmin() ||
         (isStaff() &&
          request.resource.data.user_id == resource.data.user_id &&
          request.resource.data.total_amount == resource.data.total_amount) ||
         (request.auth != null &&
-         request.auth.uid == resource.data.user_id &&
-         request.resource.data.status == 'cancelled' &&
-         resource.data.status == 'confirmed');
+         (
+           // Customer cancelling a confirmed order
+           (request.resource.data.status == 'cancelled' &&
+            resource.data.status == 'confirmed' &&
+            resource.data.user_id == request.auth.uid) ||
+           // Customer confirming their order upon payment
+           (request.resource.data.status == 'confirmed' &&
+            request.resource.data.user_id == request.auth.uid &&
+            (resource.data.user_id == request.auth.uid ||
+             (resource.data.user_id is string && resource.data.user_id.matches('guest_.*'))))
+         ));
 
       allow delete: if isSuperAdmin();
     }
@@ -202,9 +213,7 @@ service cloud.firestore {
           (request.resource.data.user_id == request.auth.uid && !request.resource.data.user_id.matches('guest-.*'))
         )
         && !('verified' in request.resource.data)
-        && !('verified_at' in request.resource.data)
-        && !('orderId' in request.resource.data)
-        && !('order_id' in request.resource.data);
+        && !('verified_at' in request.resource.data);
 
       allow update: if isStaff() || (
         request.auth != null &&

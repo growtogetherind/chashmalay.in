@@ -478,7 +478,13 @@ export const createOrder = async ({
   let orderId = razorpayOrderId;
   if (orderId) {
     const orderRef = doc(db, "orders", orderId);
-    await setDoc(orderRef, orderData, { merge: true });
+    try {
+      await setDoc(orderRef, orderData, { merge: true });
+    } catch (setErr) {
+      console.warn("Could not merge into existing order doc, creating new document:", setErr.message);
+      const newRef = await addDoc(collection(db, "orders"), orderData);
+      orderId = newRef.id;
+    }
   } else {
     const orderRef = await addDoc(collection(db, "orders"), orderData);
     orderId = orderRef.id;

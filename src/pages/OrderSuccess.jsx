@@ -113,8 +113,8 @@ const OrderSuccess = () => {
         {order && (
           <div className="bg-gray-50 rounded-2xl p-5 mb-6 text-left">
             <div className="flex items-center gap-2 mb-3">
-              <Package size={16} className="text-primary-blue" />
-              <span className="text-xs font-black uppercase tracking-widest text-primary-blue">Order Details</span>
+              <Package size={16} className="text-blue-700" />
+              <span className="text-xs font-black uppercase tracking-widest text-blue-700">Order Details</span>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -138,7 +138,7 @@ const OrderSuccess = () => {
         )}
 
         <div className="flex flex-col gap-3">
-          <Link to="/account/orders" className="px-6 py-3 bg-primary-blue text-white rounded-full font-black text-sm flex items-center justify-center gap-2 hover:bg-blue-800 transition-colors">
+          <Link to="/account/orders" className="px-6 py-3.5 bg-blue-700 text-white rounded-full font-black text-sm flex items-center justify-center gap-2 hover:bg-blue-800 shadow-md transition-all active:scale-98">
             <Package size={16} /> Track My Order
           </Link>
           <Link to="/" className="px-6 py-3 bg-gray-100 text-gray-800 rounded-full font-black text-sm flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">

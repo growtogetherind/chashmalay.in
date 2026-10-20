@@ -159,13 +159,24 @@
 }
 
 .remove-item-btn {
-  color: #cbd5e1;
-  padding: 4px;
-  transition: color 0.3s ease;
+  color: #475569;
+  background-color: #f1f5f9;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .remove-item-btn:hover {
   color: #ef4444;
+  background-color: #fee2e2;
+  transform: scale(1.08);
 }
 
 .item-meta {
