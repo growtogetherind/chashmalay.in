@@ -100,9 +100,32 @@ const ContactLens = () => {
       setLoading(false);
     }, () => setLoading(false));
 
-    window.scrollTo(0, 0);
+    if (!sessionStorage.getItem('last_viewed_frame_id')) {
+      window.scrollTo(0, 0);
+    }
     return unsubscribe;
   }, []);
+
+  // Restore scroll position and highlight the specific frame when navigating back
+  useEffect(() => {
+    if (!loading && products.length > 0) {
+      const lastFrameId = sessionStorage.getItem('last_viewed_frame_id');
+      if (lastFrameId) {
+        const timer = setTimeout(() => {
+          const el = document.getElementById(`product-${lastFrameId}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('ring-4', 'ring-primary', 'ring-offset-4', 'shadow-2xl', 'scale-[1.02]');
+            setTimeout(() => {
+              el.classList.remove('ring-4', 'ring-primary', 'ring-offset-4', 'shadow-2xl', 'scale-[1.02]');
+            }, 2500);
+          }
+          sessionStorage.removeItem('last_viewed_frame_id');
+        }, 180);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [loading, products]);
 
   const filteredProducts = React.useMemo(() => (
     sortProducts(products.filter((product) => matchesLensFilters(product, selectedFilters)), sortBy)

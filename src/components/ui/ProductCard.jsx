@@ -98,24 +98,33 @@ const ProductCard = ({ product }) => {
   const isContactLens = product.category?.toLowerCase().includes('contact');
   const productPath = isContactLens ? `/contact-lens/${product.id}` : `/product/${product.id}`;
 
+  const recordLastViewed = () => {
+    sessionStorage.setItem('last_viewed_frame_id', product.id);
+  };
+
   return (
     <div
-      className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-gray-200/50 transition-all duration-300 transform hover:-translate-y-1.5"
+      id={`product-${product.id}`}
+      className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl hover:border-gray-200/80 transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col h-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Area */}
-      <Link to={productPath} className="block relative overflow-hidden aspect-[4/3] bg-gray-50">
-        {/* Discount Badge */}
+      {/* Image Area - enlarged frame image with minimal padding */}
+      <Link
+        to={productPath}
+        onClick={recordLastViewed}
+        className="block relative overflow-hidden aspect-[16/11] bg-slate-50/60 flex items-center justify-center"
+      >
+        {/* Discount Badge (Clean positive percentage e.g. 33% instead of -33%) */}
         {discountPercent > 0 && (
-          <span className="absolute top-3 left-3 z-10 bg-primary text-white text-[11px] md:text-xs font-extrabold px-2.5 py-1 rounded-md shadow-sm">
-            -{discountPercent}%
+          <span className="absolute top-3.5 left-3.5 z-10 bg-primary text-white text-[11px] md:text-xs font-black px-2.5 py-1 rounded-md shadow-sm">
+            {discountPercent}%
           </span>
         )}
 
         {/* Wishlist */}
         <button
-          className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:border-red-100 hover:bg-white transition-all duration-300 shadow-md hover:scale-110"
+          className="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/80 flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:border-red-100 hover:bg-white transition-all duration-300 shadow-md hover:scale-110"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           onClick={(e) => {
             e.preventDefault();
@@ -130,64 +139,65 @@ const ProductCard = ({ product }) => {
           />
         </button>
 
-        {/* Product Image */}
+        {/* Product Image - Large frame showcase */}
         <img
-          src={transformCloudinaryUrl(activeImage, { width: 640 })}
-          srcSet={activeImage.includes('res.cloudinary.com') ? getCloudinarySrcSet(activeImage, [320, 480, 640, 800]) : undefined}
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px"
+          src={transformCloudinaryUrl(activeImage, { width: 800 })}
+          srcSet={activeImage.includes('res.cloudinary.com') ? getCloudinarySrcSet(activeImage, [360, 540, 720, 960]) : undefined}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
           alt={product.name}
-          width="640"
-          height="480"
-          className="w-full h-full object-contain mix-blend-multiply p-4 md:p-5 transition-transform duration-500 group-hover:scale-110"
+          width="800"
+          height="550"
+          className="w-full h-full object-contain mix-blend-multiply p-2 sm:p-3 md:p-4 transition-transform duration-500 group-hover:scale-108"
           loading="lazy"
           decoding="async"
           onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x300/f5f5f5/999?text=No+Image'; }}
         />
-
       </Link>
 
       {/* Info Area */}
-      <div className="p-3 md:p-6">
-        <p className="text-[9px] md:text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1 md:mb-2">
-          {product.brand || 'Chashmalay'}
-        </p>
-        <Link to={productPath} className="block">
-          <h4 className="text-xs md:text-lg font-normal text-slate-900 line-clamp-2 hover:text-primary transition-colors mb-1 md:mb-2">
-            {product.name}
-          </h4>
-        </Link>
-        <p className="text-[10px] md:text-sm text-slate-500 font-normal mb-2 md:mb-4 capitalize">
-          {product.category?.toLowerCase().includes('contact')
-            ? `${product.disposable_type || 'Monthly'} • ${product.pack_size || '6 Lenses'}`
-            : (product.frame_shape || product.frameShape || product.category || 'Eyeglasses')}
-        </p>
+      <div className="p-4 md:p-6 flex flex-col flex-1 justify-between">
+        <div>
+          <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+            {product.brand || 'Chashmalay'}
+          </p>
+          <Link to={productPath} onClick={recordLastViewed} className="block">
+            <h4 className="text-sm md:text-lg font-medium text-slate-900 line-clamp-2 hover:text-primary transition-colors mb-1.5">
+              {product.name}
+            </h4>
+          </Link>
+          <p className="text-xs md:text-sm text-slate-500 font-normal mb-3 capitalize">
+            {product.category?.toLowerCase().includes('contact')
+              ? `${product.disposable_type || 'Monthly'} • ${product.pack_size || '6 Lenses'}`
+              : (product.frame_shape || product.frameShape || product.category || 'Eyeglasses')}
+          </p>
 
-        {/* Colors */}
-        {colors.length > 0 && (
-          <div className="flex gap-2.5 mb-4">
-            {colors.slice(0, 4).map((c, i) => (
-              <span
-                key={i}
-                className="w-6 h-6 rounded-full border border-gray-200 inline-block transition-transform hover:scale-115 shadow-sm"
-                style={{ background: typeof c === 'object' && c.is_dual_tone && c.hex2 ? `linear-gradient(135deg, ${c.hex} 50%, ${c.hex2} 50%)` : getColorValue(c) }}
-                title={getColorLabel(c)}
-              />
-            ))}
-          </div>
-        )}
+          {/* Colors */}
+          {colors.length > 0 && (
+            <div className="flex gap-2 mb-3">
+              {colors.slice(0, 5).map((c, i) => (
+                <span
+                  key={i}
+                  className="w-5 h-5 md:w-6 md:h-6 rounded-full border border-gray-200 inline-block transition-transform hover:scale-115 shadow-sm"
+                  style={{ background: typeof c === 'object' && c.is_dual_tone && c.hex2 ? `linear-gradient(135deg, ${c.hex} 50%, ${c.hex2} 50%)` : getColorValue(c) }}
+                  title={getColorLabel(c)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Price Row */}
-        <div className="flex items-center justify-between mt-2 md:mt-2.5 pt-2 border-t border-gray-50">
-          <div className="flex items-baseline gap-1.5 md:gap-2.5">
-            <span className="text-sm md:text-xl font-medium text-slate-900">₹{price.toLocaleString()}</span>
+        <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-100">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base md:text-xl font-bold text-slate-900">₹{price.toLocaleString()}</span>
             {originalPrice > price && (
-              <span className="text-[9px] md:text-xs text-slate-400 line-through font-normal">₹{originalPrice.toLocaleString()}</span>
+              <span className="text-xs md:text-sm text-slate-400 line-through font-normal">MRP ₹{originalPrice.toLocaleString()}</span>
             )}
           </div>
-          {/* Stock indicator dots (like the reference) */}
+          {/* Stock indicator */}
           <div className="flex gap-1.5 items-center">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block animate-pulse" title="In Stock" />
-            <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block" title="Limited" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse" title="In Stock" />
+            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">In Stock</span>
           </div>
         </div>
       </div>

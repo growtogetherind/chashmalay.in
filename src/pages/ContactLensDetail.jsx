@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Zap, Droplets, Heart, Share2, Star, Plus, Minus, Info, ArrowRight, CheckCircle2, HelpCircle, PenLine, ShieldAlert, UploadCloud, X } from 'lucide-react';
+import { ShieldCheck, Zap, Droplets, Heart, Share2, Star, Plus, Minus, Info, ArrowRight, CheckCircle2, HelpCircle, PenLine, ShieldAlert, UploadCloud, X, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getProductById, subscribeProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { getRecommendedProducts } from '../lib/recommendations';
@@ -167,6 +167,19 @@ const ContactLensDetail = () => {
   return (
     <div className="product-detail-page">
       <div className="container mx-auto px-4 md:px-8">
+        <div className="flex items-center gap-2 mb-4 pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              sessionStorage.setItem('last_viewed_frame_id', product.id);
+              navigate(-1);
+            }}
+            className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-primary transition-colors py-1 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200"
+          >
+            <ChevronLeft size={15} />
+            <span>Back to Contact Lenses</span>
+          </button>
+        </div>
         <div className="product-detail-layout">
           {/* Left: Gallery */}
           <div className="gallery-section">

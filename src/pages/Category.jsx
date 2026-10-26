@@ -442,9 +442,34 @@ const Category = () => {
       setProducts(processedProducts);
       setLoading(false);
     }, () => setLoading(false));
-    window.scrollTo(0, 0);
+
+    if (!sessionStorage.getItem('last_viewed_frame_id')) {
+      window.scrollTo(0, 0);
+    }
+
     return unsubscribe;
   }, [name]);
+
+  // Restore scroll position and highlight the specific frame when navigating back to catalog
+  useEffect(() => {
+    if (!loading && products.length > 0) {
+      const lastFrameId = sessionStorage.getItem('last_viewed_frame_id');
+      if (lastFrameId) {
+        const timer = setTimeout(() => {
+          const el = document.getElementById(`product-${lastFrameId}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('ring-4', 'ring-primary', 'ring-offset-4', 'shadow-2xl', 'scale-[1.02]');
+            setTimeout(() => {
+              el.classList.remove('ring-4', 'ring-primary', 'ring-offset-4', 'shadow-2xl', 'scale-[1.02]');
+            }, 2500);
+          }
+          sessionStorage.removeItem('last_viewed_frame_id');
+        }, 180);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [loading, products]);
 
   useEffect(() => {
     setSelectedShapes([]);
@@ -750,384 +775,79 @@ const Category = () => {
       </header>
 
       <div className="w-full max-w-[1920px] mx-auto py-6 md:py-12 px-4 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        
            {/* Minimal Sidebar */}
             {/* Advanced Filters Sidebar */}
-            <aside className="hidden lg:block lg:col-span-3">
-               <FadeIn delay={0.4} className="sticky top-28 bg-white border border-slate-100 rounded-2xl p-6 h-[calc(100vh-140px)] max-h-[calc(100vh-140px)] overflow-y-auto custom-scrollbar shadow-sm" data-lenis-prevent>
-                  {/* Sort By Section */}
-                  <div className="flex justify-between items-center pb-4 mb-4 border-b border-gray-100">
-                     <div className="flex items-center gap-2 text-slate-900 hover:text-primary transition-colors cursor-pointer">
-                        <ArrowUpDown size={14} className="text-slate-700" />
-                        <span className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Sort By</span>
-                     </div>
-                     <select
-                       value={sortBy}
-                       onChange={(e) => handleSortChange(e.target.value)}
-                       className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 font-semibold text-slate-700 outline-none hover:border-slate-300 transition-all cursor-pointer min-w-[120px]"
-                     >
-                       <option value="recommended">Recommended</option>
-                       <option value="price-low">Price Low</option>
-                       <option value="price-high">Price High</option>
-                       <option value="newest">Newest</option>
-                     </select>
-                  </div>
+            {/* Floating Top Control Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 bg-white border border-slate-100 p-4 sm:p-5 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              onClick={() => setIsMobileFilterOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            >
+              <SlidersHorizontal size={15} />
+              <span>Filters</span>
+              {(selectedShapes.length + selectedTypes.length + selectedColors.length + selectedThemes.length + (minPrice > 0 || maxPrice < 20000 ? 1 : 0)) > 0 && (
+                <span className="w-5 h-5 rounded-full bg-accent text-white text-[10px] flex items-center justify-center font-bold">
+                  {selectedShapes.length + selectedTypes.length + selectedColors.length + selectedThemes.length + (minPrice > 0 || maxPrice < 20000 ? 1 : 0)}
+                </span>
+              )}
+            </button>
 
-                  {/* Filters Header */}
-                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
-                     <div className="flex items-center gap-2">
-                        <Filter className="text-slate-900" size={16} strokeWidth={2.5} />
-                        <span className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Filters</span>
-                     </div>
-                     {(selectedShapes.length > 0 || selectedTypes.length > 0 || selectedColors.length > 0 || selectedThemes.length > 0) && (
-                       <button
-                         onClick={handleClearAll}
-                         className="text-[10px] font-black text-accent uppercase tracking-wider hover:underline"
-                       >
-                         Clear All
-                       </button>
-                     )}
-                  </div>
+            {/* Active filter tags */}
+            {selectedShapes.map(s => (
+              <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-800 text-xs font-semibold rounded-lg">
+                {s}
+                <button onClick={() => handleShapeChange(s)} className="hover:text-red-500 cursor-pointer"><X size={12} /></button>
+              </span>
+            ))}
+            {selectedTypes.map(t => (
+              <span key={t} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-800 text-xs font-semibold rounded-lg">
+                {t}
+                <button onClick={() => handleTypeChange(t)} className="hover:text-red-500 cursor-pointer"><X size={12} /></button>
+              </span>
+            ))}
+            {selectedColors.map(c => (
+              <span key={c} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-800 text-xs font-semibold rounded-lg">
+                {c}
+                <button onClick={() => handleColorChange(c)} className="hover:text-red-500 cursor-pointer"><X size={12} /></button>
+              </span>
+            ))}
 
-                  <div className="space-y-2">
-                      {/* Frame Type Accordion */}
-                      <div className="border-b border-gray-100 pb-2">
-                         <button
-                           onClick={() => toggleFilter('type')}
-                           className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
-                         >
-                           <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Frame Type</span>
-                           <ChevronDown
-                             size={16}
-                             className={`text-slate-400 transition-transform duration-300 ${expandedFilters.type ? 'transform rotate-180 text-accent' : ''}`}
-                           />
-                         </button>
-                         <AnimatePresence initial={false}>
-                           {expandedFilters.type && (
-                             <motion.div
-                               initial={{ height: 0, opacity: 0 }}
-                               animate={{ height: 'auto', opacity: 1 }}
-                               exit={{ height: 0, opacity: 0 }}
-                               transition={{ duration: 0.2, ease: 'easeInOut' }}
-                               className="overflow-hidden"
-                             >
-                               <div className="pt-1 pb-4">
-                                 <div className="grid grid-cols-2 gap-3">
-                                     {['Full Rim', 'Rimless', 'Half Rim', 'Low Bridge Fit'].map(type => {
-                                         const Icon = FrameIcons[type] || FrameIcons.Rectangle;
-                                         const isSelected = pendingTypes.includes(type);
-                                         const availabilityCount = getAvailabilityCount('type', type, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
+            {(selectedShapes.length > 0 || selectedTypes.length > 0 || selectedColors.length > 0 || selectedThemes.length > 0) && (
+              <button
+                onClick={handleClearAll}
+                className="text-xs font-bold text-red-500 hover:text-red-700 uppercase tracking-wider ml-1 cursor-pointer"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
 
-                                         return (
-                                             <div key={type} className="flex flex-col items-center">
-                                                 <button
-                                                     onClick={() => handleTypeChange(type)}
-                                                     disabled={availabilityCount === 0 && !isSelected}
-                                                     className={`w-full p-3 flex items-center justify-center border rounded-xl transition-all ${
-                                                         isSelected ? 'border-slate-950 bg-slate-950 text-white scale-[1.02] shadow-sm' : 'border-slate-200 bg-white hover:border-slate-350'
-                                                     } ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
-                                                 >
-                                                     <div className={`transition-colors ${isSelected ? 'text-white' : 'text-slate-800'}`}>
-                                                         <Icon />
-                                                     </div>
-                                                 </button>
-                                                 <span className="text-[10px] font-semibold text-slate-700 mt-1.5 text-center truncate w-full">{type}</span>
-                                                 <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
-                                             </div>
-                                         );
-                                     })}
-                                 </div>
-                               </div>
-                             </motion.div>
-                           )}
-                         </AnimatePresence>
-                      </div>
+          {/* Right: Sort By & Item Count */}
+          <div className="flex items-center gap-4 ml-auto">
+            <span className="text-xs font-semibold text-slate-400 hidden sm:inline">
+              Showing {filteredProducts.length} frames
+            </span>
+            <div className="flex items-center gap-2">
+              <ArrowUpDown size={14} className="text-slate-500" />
+              <select
+                value={sortBy}
+                onChange={(e) => handleSortChange(e.target.value)}
+                className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-bold text-slate-800 outline-none hover:border-slate-300 transition-all cursor-pointer"
+              >
+                <option value="recommended">Sort: Recommended</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-                     {/* Frame Shape Accordion */}
-                     <div className="border-b border-gray-100 pb-2">
-                        <button
-                          onClick={() => toggleFilter('shape')}
-                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
-                        >
-                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Frame Shape</span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.shape ? 'transform rotate-180 text-accent' : ''}`}
-                          />
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {expandedFilters.shape && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pt-1 pb-4">
-                                <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-                                    {['Round', 'Square', 'Cat Eye', 'Aviator', 'Rectangle'].map(shape => {
-                                        const Icon = FrameIcons[shape] || FrameIcons.Rectangle;
-                                        const isSelected = pendingShapes.includes(shape);
-                                        const availabilityCount = getAvailabilityCount('shape', shape, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
-                                        const label = shape === 'Cat Eye' ? 'Cat-Eye' : shape;
-
-                                        return (
-                                            <div key={shape} className="flex flex-col items-center">
-                                                <button
-                                                    onClick={() => handleShapeChange(shape)}
-                                                    disabled={availabilityCount === 0 && !isSelected}
-                                                    className={`w-full aspect-[4/3] flex items-center justify-center border rounded-xl transition-all ${
-                                                        isSelected ? 'border-slate-950 bg-slate-950 text-white scale-[1.02] shadow-sm' : 'border-slate-200 bg-white hover:border-slate-350'
-                                                    } ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
-                                                >
-                                                    <div className={`transition-colors ${isSelected ? 'text-white' : 'text-slate-800'}`}>
-                                                        <Icon />
-                                                    </div>
-                                                </button>
-                                                <span className="text-[10px] font-semibold text-slate-700 mt-1.5 text-center truncate w-full">{label}</span>
-                                                <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                     </div>
-
-                     {/* Frame Color Accordion */}
-                     <div className="border-b border-gray-100 pb-2">
-                        <button
-                          onClick={() => toggleFilter('color')}
-                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
-                        >
-                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Color</span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.color ? 'transform rotate-180 text-accent' : ''}`}
-                          />
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {expandedFilters.color && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pt-1 pb-4">
-                                <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-                                    {colorOptions.map(color => {
-                                        const isSelected = pendingColors.includes(color);
-                                        const availabilityCount = getAvailabilityCount('color', color, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
-
-                                        return (
-                                            <div key={color} className="flex flex-col items-center">
-                                                <button
-                                                    onClick={() => handleColorChange(color)}
-                                                    disabled={availabilityCount === 0 && !isSelected}
-                                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                                                        isSelected ? 'ring-2 ring-slate-950 ring-offset-2 scale-105' : 'hover:scale-105'
-                                                    } ${availabilityCount === 0 && !isSelected ? 'opacity-20 cursor-not-allowed' : ''}`}
-                                                >
-                                                    <ColorSwatch color={color} isSelected={false} size="w-full h-full" products={products} />
-                                                </button>
-                                                <span className="text-[10px] font-semibold text-slate-700 mt-1.5 text-center truncate w-full">{color}</span>
-                                                <span className="text-[8px] font-mono font-bold text-slate-400">({availabilityCount})</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                     </div>
-
-                     {/* Material Accordion */}
-                     <div className="border-b border-gray-100 pb-2">
-                        <button
-                          onClick={() => toggleFilter('material')}
-                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
-                        >
-                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Material</span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.material ? 'transform rotate-180 text-accent' : ''}`}
-                          />
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {expandedFilters.material && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pt-1 pb-4 space-y-2.5">
-                                 {['Acetate', 'Metal', 'Titanium', 'Plastic', 'TR90'].map(mat => {
-                                     const isChecked = pendingMaterials.includes(mat);
-                                     const handleToggle = () => {
-                                         setPendingMaterials(prev =>
-                                             prev.includes(mat) ? prev.filter(m => m !== mat) : [...prev, mat]
-                                         );
-                                     };
-                                     const availabilityCount = getAvailabilityCount('material', mat, { shapes: pendingShapes, types: pendingTypes, colors: pendingColors, themes: pendingThemes, categories: pendingCategories, materials: pendingMaterials, priceRange: [pendingMinPrice, pendingMaxPrice] });
-
-                                     return (
-                                         <label key={mat} className="flex items-center gap-3 cursor-pointer group py-1">
-                                             <input
-                                                 type="checkbox"
-                                                 checked={isChecked}
-                                                 onChange={handleToggle}
-                                                 className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
-                                             />
-                                             <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
-                                                 {mat} <span className="text-[10px] text-slate-400 font-normal">({availabilityCount})</span>
-                                             </span>
-                                         </label>
-                                     );
-                                 })}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                     </div>
-
-                  {/* Accessory Type Accordion - shown only on accessories route */}
-                  {isAccessoriesRoute && (
-                     <div className="border-b border-gray-100 pb-2">
-                        <button
-                          onClick={() => toggleFilter('accessoryType')}
-                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
-                        >
-                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Accessory Type</span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.accessoryType ? 'transform rotate-180 text-accent' : ''}`}
-                          />
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {expandedFilters.accessoryType && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pt-1 pb-4 space-y-2.5">
-                                 {ACCESSORY_TYPE_OPTIONS.map(at => {
-                                     const isChecked = pendingAccessoryTypes.includes(at);
-                                     const handleToggle = () => {
-                                         setPendingAccessoryTypes(prev =>
-                                             prev.includes(at) ? prev.filter(a => a !== at) : [...prev, at]
-                                         );
-                                     };
-                                     const count = products.filter(p => (p.accessory_type || '').toLowerCase() === at.toLowerCase()).length;
-                                     return (
-                                         <label key={at} className="flex items-center gap-3 cursor-pointer group py-1">
-                                             <input
-                                                 type="checkbox"
-                                                 checked={isChecked}
-                                                 onChange={handleToggle}
-                                                 className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
-                                             />
-                                             <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
-                                                 {at} <span className="text-[10px] text-slate-400 font-normal">({count})</span>
-                                             </span>
-                                         </label>
-                                     );
-                                 })}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                     </div>
-                  )}
-
-                  {/* Price Range Accordion */}
-                     <div className="border-b border-gray-100 pb-2">
-                        <button
-                          onClick={() => toggleFilter('price')}
-                          className="w-full flex justify-between items-center py-4 text-left focus:outline-none group"
-                        >
-                          <span className="text-xs font-extrabold text-slate-900 group-hover:text-accent uppercase tracking-wider transition-colors">Price Range</span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform duration-300 ${expandedFilters.price ? 'transform rotate-180 text-accent' : ''}`}
-                          />
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {expandedFilters.price && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pt-2 pb-4 space-y-4">
-                                 <div className="relative h-1 w-[90%] mx-auto bg-slate-100 rounded-full my-4">
-                                     <div
-                                         className="absolute h-full bg-[#B78A5B] rounded-full"
-                                         style={{
-                                             left: `${(pendingMinPrice / 20000) * 100}%`,
-                                             right: `${100 - (pendingMaxPrice / 20000) * 100}%`
-                                         }}
-                                     />
-                                     <input
-                                         type="range"
-                                         min="0"
-                                         max="20000"
-                                         step="500"
-                                         value={pendingMinPrice}
-                                         onChange={handleMinChange}
-                                         className="absolute w-full h-1 pointer-events-none appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#B78A5B] [&::-webkit-slider-thumb]:appearance-none"
-                                     />
-                                     <input
-                                         type="range"
-                                         min="0"
-                                         max="20000"
-                                         step="500"
-                                         value={pendingMaxPrice}
-                                         onChange={handleMaxChange}
-                                         className="absolute w-full h-1 pointer-events-none appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#B78A5B] [&::-webkit-slider-thumb]:appearance-none"
-                                     />
-                                 </div>
-                                 <div className="flex items-center gap-3">
-                                     <div className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 text-center">
-                                         ₹{pendingMinPrice.toLocaleString()}
-                                     </div>
-                                     <span className="text-slate-400 font-bold">-</span>
-                                     <div className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 text-center">
-                                         ₹{pendingMaxPrice.toLocaleString()}
-                                     </div>
-                                 </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                     </div>
-                  </div>
-
-                  {/* Sleek Slate-900 Apply Button */}
-                  <button
-                    onClick={handleApplyFilters}
-                    className="w-full mt-6 py-3.5 bg-slate-900 hover:bg-black text-white font-extrabold rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] text-xs uppercase tracking-widest"
-                  >
-                    Apply Filters
-                  </button>
-               </FadeIn>
-            </aside>
-
-            <main className="lg:col-span-9">
+            <main className="w-full">
               {loading ? (
-                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-8">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {[...Array(6)].map((_, i) => (
                        <div key={i} className="aspect-[3/4] bg-surface-flat rounded-2xl animate-pulse" />
                     ))}
@@ -1148,7 +868,7 @@ const Category = () => {
                   ) : (
                     <div
                       key={`${selectedShapes.join('|')}-${selectedTypes.join('|')}-${selectedColors.join('|')}-${selectedThemes.join('|')}-${sortBy}`}
-                      className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-8"
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
                     >
                       {filteredProducts.map((product) => (
                         <div key={product.id}>
@@ -1159,7 +879,6 @@ const Category = () => {
                   )
                )}
             </main>
-        </div>
       </div>
 
       <AnimatePresence>
@@ -1371,7 +1090,7 @@ const Category = () => {
       </AnimatePresence>
 
       {/* Mobile Sticky Filter Bar */}
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] lg:hidden mb-4">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] mb-2 pointer-events-auto">
          <div className="flex items-center gap-6 glass-panel rounded-full px-8 py-4">
              <button className="flex items-center gap-2 text-sm font-sans font-medium text-primary" onClick={() => setIsMobileFilterOpen(true)}>
                 <SlidersHorizontal size={16} strokeWidth={1.5} />

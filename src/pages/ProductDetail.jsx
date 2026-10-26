@@ -1,6 +1,6 @@
 import { Suspense, lazy, useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Star, Heart, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Layers, ChevronRight, ChevronLeft, X, CheckCircle } from 'lucide-react';
 import { getProductById, getProducts, addReview, subscribeProductReviews } from '../lib/firebase';
 import { getRecommendedProducts } from '../lib/recommendations';
@@ -42,6 +42,7 @@ const Accordion = ({ title, children }) => {
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
@@ -378,11 +379,28 @@ const ProductDetail = () => {
   return (
     <div className="product-detail-page">
       <div className="container mx-auto px-4 md:px-8">
-        {/* Breadcrumb Navigation */}
+        {/* Breadcrumb Navigation & Back Button */}
         <div className="flex items-center gap-2 text-xs text-slate-500 mb-6 flex-wrap pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              sessionStorage.setItem('last_viewed_frame_id', product.id);
+              navigate(-1);
+            }}
+            className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-primary transition-colors py-1 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 mr-1"
+          >
+            <ChevronLeft size={15} />
+            <span>Back</span>
+          </button>
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
           <span>/</span>
-          <Link to={`/category/${product.category ? String(product.category).toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-') : 'all'}`} className="hover:text-primary transition-colors capitalize font-medium text-slate-600">
+          <Link
+            to={`/category/${product.category ? String(product.category).toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-') : 'all'}`}
+            onClick={() => {
+              sessionStorage.setItem('last_viewed_frame_id', product.id);
+            }}
+            className="hover:text-primary transition-colors capitalize font-medium text-slate-600"
+          >
             {product.category || 'Eyewear'}
           </Link>
           <span>/</span>
