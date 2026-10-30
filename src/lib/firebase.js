@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { initializeFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter } from "firebase/firestore";
+import { initializeFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter, getCountFromServer } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBv9Lm2xw_0jvBNWvOdFUx8PQxkg7soSec",
@@ -744,38 +744,132 @@ export const getDashboardStats = async () => {
 };
 
 export const subscribeDashboardStats = (onData, onError) => {
-  let latestOrders = [];
+  let allOrders = [];
   let latestProducts = [];
-  let statsData = { orderCount: 0, profileCount: 0, productCount: 0, lowStockProducts: 0, pendingOrders: 0, revenue: 0 };
+  let userProfilesCount = 0;
+  let serverStats = null;
 
-  const fetchStats = async () => {
-    const { data } = await getDashboardStats();
-    if (data) {
-      statsData = data;
-      emit();
-    }
-  };
+  const calculateAndEmit = () => {
+    // 1. Calculate orders metrics
+    const orderCount = serverStats?.orderCount && serverStats.orderCount > allOrders.length 
+      ? serverStats.orderCount 
+      : allOrders.length;
 
-  const emit = () => {
+    let computedRevenue = 0;
+    let pendingCount = 0;
+    const uniqueCustomers = new Set();
+
+    allOrders.forEach(order => {
+      // Exclude cancelled orders from revenue
+      if (order.status !== 'cancelled') {
+        const amt = Number(order.total_amount ?? order.total ?? order.amount ?? 0);
+        if (!isNaN(amt)) computedRevenue += amt;
+      }
+      if (order.status === 'pending' || order.status === 'confirmed' || !order.status) {
+        pendingCount++;
+      }
+      if (order.user_id && !order.user_id.startsWith('guest_')) {
+        uniqueCustomers.add(order.user_id);
+      } else if (order.shipping_address?.phone) {
+        uniqueCustomers.add(order.shipping_address.phone);
+      } else if (order.shipping_address?.email) {
+        uniqueCustomers.add(order.shipping_address.email);
+      }
+    });
+
+    const revenue = (serverStats?.revenue && serverStats.revenue > 0)
+      ? serverStats.revenue
+      : computedRevenue;
+
+    const pendingOrders = (serverStats?.pendingOrders !== undefined && serverStats.pendingOrders > 0)
+      ? serverStats.pendingOrders
+      : pendingCount;
+
+    // 2. Calculate product metrics
+    const productCount = (serverStats?.productCount && serverStats.productCount > latestProducts.length)
+      ? serverStats.productCount
+      : latestProducts.length;
+
+    const computedLowStock = latestProducts.filter(p => {
+      const q = Number(p.stock_quantity ?? p.stock ?? 0);
+      return !isNaN(q) && q <= 10;
+    }).length;
+
+    const lowStockProducts = (serverStats?.lowStockProducts !== undefined && serverStats.lowStockProducts > 0)
+      ? serverStats.lowStockProducts
+      : computedLowStock;
+
+    // 3. Customer profiles metric
+    const profileCount = Math.max(
+      serverStats?.profileCount || 0,
+      userProfilesCount,
+      uniqueCustomers.size
+    );
+
     onData({
-      orders: latestOrders,
-      orderCount: statsData.orderCount || latestOrders.length,
-      productCount: statsData.productCount || latestProducts.length,
-      profileCount: statsData.profileCount,
-      revenue: statsData.revenue,
-      pendingOrders: statsData.pendingOrders,
-      lowStockProducts: statsData.lowStockProducts,
+      orders: allOrders,
+      orderCount,
+      productCount,
+      profileCount,
+      revenue,
+      pendingOrders,
+      lowStockProducts
     });
   };
 
-  // Initial fetch of statistics
+  // Direct fetch of counts from Firestore
+  const fetchCounts = async () => {
+    try {
+      const [orderSnap, prodSnap, profSnap] = await Promise.allSettled([
+        getCountFromServer(collection(db, "orders")),
+        getCountFromServer(collection(db, "products")),
+        getCountFromServer(collection(db, "profiles"))
+      ]);
+
+      let statsObj = {};
+      if (orderSnap.status === 'fulfilled') {
+        statsObj.orderCount = orderSnap.value.data().count;
+      }
+      if (prodSnap.status === 'fulfilled') {
+        statsObj.productCount = prodSnap.value.data().count;
+      }
+      if (profSnap.status === 'fulfilled') {
+        userProfilesCount = profSnap.value.data().count;
+      }
+      if (Object.keys(statsObj).length > 0) {
+        serverStats = { ...(serverStats || {}), ...statsObj };
+        calculateAndEmit();
+      }
+    } catch (err) {
+      console.warn("Direct Firestore count notice:", err.message);
+    }
+  };
+  fetchCounts();
+
+  // Auxiliary serverless API check (if backend service account is enabled)
+  const fetchStats = async () => {
+    try {
+      const { data } = await getDashboardStats();
+      if (data && !data.devFallback && (data.revenue > 0 || data.orderCount > 0)) {
+        serverStats = { ...(serverStats || {}), ...data };
+        calculateAndEmit();
+      }
+    } catch (e) {
+      // silent fallback
+    }
+  };
   fetchStats();
-  // Poll stats every 30 seconds to keep counts and revenue updated
-  const intervalId = setInterval(fetchStats, 30000);
+  const intervalId = setInterval(fetchStats, 60000);
 
   const unsubs = [
-    subscribeRecentOrders((orders) => { latestOrders = orders; emit(); }, onError),
-    subscribeProducts({ adminFilter: true }, (products) => { latestProducts = products; emit(); }, onError),
+    subscribeAllOrders((orders) => {
+      allOrders = orders;
+      calculateAndEmit();
+    }, onError),
+    subscribeProducts({ adminFilter: true }, (products) => {
+      latestProducts = products;
+      calculateAndEmit();
+    }, onError),
   ];
 
   return () => {

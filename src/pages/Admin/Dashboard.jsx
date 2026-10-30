@@ -300,26 +300,45 @@ const AdminDashboard = () => {
               </div>
            </div>
 
-           {/* Right side - Revenue Chart Card */}
-           <div className="admin-card">
-              <div className="admin-card-header">
-                 <h2 className="admin-card-title">Order Activity</h2>
-                 <button className="text-gray-400 hover:text-gray-600">
-                    <MoreVertical size={20} />
-                 </button>
+           {/* Right side - Order Activity Chart Card */}
+           <div className="admin-card flex flex-col justify-between">
+              <div className="admin-card-header !mb-3">
+                 <div>
+                    <h2 className="admin-card-title">Order Activity</h2>
+                    <p className="text-gray-400 text-xs font-semibold mt-0.5">Real-time store metrics</p>
+                 </div>
+                 <div className="px-2.5 py-1 rounded-xl bg-purple-50 text-purple-600 font-extrabold text-[11px] uppercase tracking-wider border border-purple-100">
+                    Live
+                 </div>
               </div>
               <div className="bar-chart-container">
                   {(() => {
-                     const dataset = [stats.orders, stats.pendingOrders, stats.lowStockProducts, stats.products];
-                     const maxVal = Math.max(...dataset, 1);
-                     return dataset.map((value, i) => {
-                        const h = Math.max(12, Math.round((value / maxVal) * 90));
+                     const chartItems = [
+                       { label: 'Orders', fullLabel: 'Total Orders', value: stats.orders, color: 'from-purple-600 to-indigo-600' },
+                       { label: 'Open', fullLabel: 'Needs Attention', value: stats.pendingOrders, color: 'from-amber-500 to-orange-500' },
+                       { label: 'Low Stock', fullLabel: 'Low Stock (<=10)', value: stats.lowStockProducts, color: 'from-rose-500 to-red-500' },
+                       { label: 'SKUs', fullLabel: 'Catalog SKUs', value: stats.products, color: 'from-emerald-500 to-teal-500' }
+                     ];
+                     const maxVal = Math.max(...chartItems.map(item => item.value), 1);
+                     return chartItems.map((item, i) => {
+                        const percent = item.value === 0 ? 8 : Math.max(16, Math.min(100, Math.round((item.value / maxVal) * 92)));
                         return (
                            <div key={i} className="bar-wrapper">
-                              <div className="bar group" style={{ height: `${h}%` }}>
-                                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{value}</div>
+                              <div className="bar-track">
+                                 <div 
+                                    className="bar-value-pill font-mono font-bold"
+                                    style={{ bottom: `calc(${percent}% + 6px)` }}
+                                 >
+                                    {item.value}
+                                 </div>
+                                 <div 
+                                    className={`bar-fill bg-gradient-to-t ${item.color}`} 
+                                    style={{ height: `${percent}%` }}
+                                    title={`${item.fullLabel}: ${item.value}`}
+                                 />
                               </div>
-                              <span className="bar-label">{['Orders', 'Open', 'Low', 'SKUs'][i]}</span>
+                              <span className="bar-label mt-2.5 text-center">{item.label}</span>
+                              <span className="text-[10px] font-bold text-gray-400">{item.value} units</span>
                            </div>
                         );
                      });
