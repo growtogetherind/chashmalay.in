@@ -685,6 +685,33 @@ export const updateOrderStatus = async (orderId, status) => {
   }
 };
 
+export const deleteOrder = async (orderId) => {
+  try {
+    if (!orderId) throw new Error("Order ID is required");
+
+    // 1. Delete associated order_items
+    const itemsQ = query(collection(db, "order_items"), where("order_id", "==", orderId));
+    const itemsSnap = await getDocs(itemsQ);
+    const deleteItemPromises = itemsSnap.docs.map(itemDoc => deleteDoc(doc(db, "order_items", itemDoc.id)));
+    await Promise.all(deleteItemPromises);
+
+    // 2. Delete the order document
+    await deleteDoc(doc(db, "orders", orderId));
+
+    // 3. Write admin log
+    try {
+      await writeAdminLog('delete_order', orderId, { orderId }, null, null);
+    } catch (logErr) {
+      console.warn("Could not write admin log for delete_order:", logErr);
+    }
+
+    return { success: true, error: null };
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    return { success: false, error: error.message || error };
+  }
+};
+
 export const subscribeRecentOrders = (onData, onError) => subscribeToQuery(
   query(collection(db, "orders"), orderBy("created_at", "desc"), limit(6)),
   async (orders) => {
@@ -1335,6 +1362,8 @@ export const sendTelegramNotification = async (message, options = {}) => {
   if (!message) return;
   try {
     const payload = { message };
+    if (options.photo_url) payload.photo_url = options.photo_url;
+    if (options.photos) payload.photos = options.photos;
     if (options.reply_markup) payload.reply_markup = options.reply_markup;
 
     if (!auth.currentUser) {

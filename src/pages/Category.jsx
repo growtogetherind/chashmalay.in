@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, ChevronDown, X, Filter, ArrowUpDown } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown, X, Filter, ArrowUpDown, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ui/ProductCard';
 import { FadeIn, RevealText, TRANSITIONS } from '../components/ui/Motion';
@@ -401,6 +401,7 @@ const Category = () => {
 
   const [sortBy, setSortBy] = useState('recommended');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isSortModalOpen, setIsSortModalOpen] = useState(false);
 
   const isAccessoriesRoute = (name || '').toLowerCase().includes('accessor');
 
@@ -837,8 +838,10 @@ const Category = () => {
                 className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-bold text-slate-800 outline-none hover:border-slate-300 transition-all cursor-pointer"
               >
                 <option value="recommended">Sort: Recommended</option>
-                <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="brand-asc">Brand: A to Z</option>
+                <option value="brand-desc">Brand: Z to A</option>
                 <option value="newest">Newest First</option>
               </select>
             </div>

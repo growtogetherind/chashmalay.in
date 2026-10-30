@@ -39,7 +39,7 @@ const AdminCarousel = () => {
     if (!file) return;
 
     const toastId = toast.loading(`Uploading ${field}...`);
-    const { url, error } = await uploadImage(file, 'carousel');
+    const { url, error } = await uploadImage(file, 'carousel', { maxWidth: 2560, maxHeight: 1600, quality: 0.94 });
 
     if (error) {
       toast.error(`Upload failed: ${error}`, { id: toastId });
@@ -202,9 +202,9 @@ const AdminCarousel = () => {
                   <div className="space-y-10">
                      <div className="space-y-4">
                         <label className="text-[11px] font-black text-slate-900 uppercase tracking-[3px] flex items-center gap-3">
-                           <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Desktop Artifact (1920x800)
+                           <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Desktop Banner (1800x900 Standard 2:1 Ratio)
                         </label>
-                        <div className="relative aspect-[16/7] bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-100 flex items-center justify-center overflow-hidden group/upload transition-all hover:border-emerald-200 shadow-inner">
+                        <div className="relative aspect-[2/1] bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-100 flex items-center justify-center overflow-hidden group/upload transition-all hover:border-emerald-200 shadow-inner">
                            {form.image ? <img src={form.image} className="w-full h-full object-cover transition-transform group-hover/upload:scale-105" /> : <ImageIcon className="text-slate-200" size={48} strokeWidth={1} />}
                            <input type="file" onChange={e => handleFileUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" />
                            <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover/upload:opacity-100 transition-opacity pointer-events-none flex items-center justify-center">

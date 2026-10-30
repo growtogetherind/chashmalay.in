@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Package, ShoppingBag, DollarSign, Users, TrendingUp, ArrowRight, Search, Bell, MoreVertical, Filter } from 'lucide-react';
 import { subscribeDashboardStats } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
+import { startContinuousOrderAlert, stopContinuousOrderAlert, playSingleChime } from '../../lib/adminAlertManager';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 
@@ -29,6 +30,15 @@ const playNotificationSound = () => {
 };
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const [topSearch, setTopSearch] = useState('');
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (topSearch.trim()) {
+      navigate(`/admin/products?search=${encodeURIComponent(topSearch.trim())}`);
+    }
+  };
   const [stats, setStats] = useState({ orders: 0, products: 0, revenue: 0, users: 0, pendingOrders: 0, lowStockProducts: 0 });
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +69,7 @@ const AdminDashboard = () => {
         const latestOrder = currentOrders[0];
         if (lastOrderId && latestOrder.id !== lastOrderId) {
           // Play notification chime
-          playNotificationSound();
+          startContinuousOrderAlert(latestOrder);
 
           // Show elegant in-app custom toast
           toast.custom((t) => (
@@ -84,7 +94,7 @@ const AdminDashboard = () => {
               </div>
               <div className="flex border-l border-gray-100">
                 <button
-                  onClick={() => toast.dismiss(t.id)}
+                  onClick={() => { stopContinuousOrderAlert(); toast.dismiss(t.id); }}
                   className="w-full border border-transparent rounded-none rounded-r-3xl p-4 flex items-center justify-center text-xs font-black uppercase tracking-widest text-purple-600 hover:text-purple-700 hover:bg-purple-50 focus:outline-none"
                 >
                   Dismiss
@@ -139,10 +149,15 @@ const AdminDashboard = () => {
       <main className="admin-main">
         {/* Top Bar */}
         <div className="admin-topbar">
-          <div className="admin-search-wrapper">
+          <form onSubmit={handleSearchSubmit} className="admin-search-wrapper">
             <Search size={18} className="text-gray-400" />
-            <input type="text" placeholder="Search orders, products..." />
-          </div>
+            <input
+              type="text"
+              placeholder="Search products by name, SKU..."
+              value={topSearch}
+              onChange={e => setTopSearch(e.target.value)}
+            />
+          </form>
           <div className="admin-user-nav">
              <div className="hidden md:flex flex-col items-end mr-4">
                 <span className="text-purple-600 font-extrabold text-xs uppercase tracking-wider">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' })}</span>

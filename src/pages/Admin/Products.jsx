@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn, Tag } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn, Tag, Search, Filter } from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct, getCategories, saveCategory, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories, saveLensCategory, subscribeLenses } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -320,15 +320,52 @@ const AdminProducts = () => {
     }
   };
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const q = searchParams.get('search');
+    if (q !== null && q !== searchQuery) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterCategory, filterStatus]);
+
+  const filteredProducts = products.filter(p => {
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchName = (p.name || '').toLowerCase().includes(q);
+      const matchSku = (p.sku || '').toLowerCase().includes(q);
+      const matchBrand = (p.brand || '').toLowerCase().includes(q);
+      const matchCat = (p.category || '').toLowerCase().includes(q);
+      const matchShape = (p.frame_shape || '').toLowerCase().includes(q);
+      const matchGender = (p.gender || '').toLowerCase().includes(q);
+      const matchTags = (p.tags || '').toLowerCase().includes(q);
+      if (!matchName && !matchSku && !matchBrand && !matchCat && !matchShape && !matchGender && !matchTags) {
+        return false;
+      }
+    }
+    if (filterCategory && (p.category || '').toLowerCase() !== filterCategory.toLowerCase()) {
+      return false;
+    }
+    if (filterStatus === 'active' && !p.is_active) return false;
+    if (filterStatus === 'inactive' && p.is_active) return false;
+    return true;
+  });
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const totalPagesCount = Math.ceil(products.length / itemsPerPage);
+    const totalPagesCount = Math.ceil(filteredProducts.length / itemsPerPage);
     if (currentPage > totalPagesCount && totalPagesCount > 0) {
       setCurrentPage(totalPagesCount);
     }
-  }, [products]);
+  }, [filteredProducts]);
 
   // Auto-save draft to localStorage
   useEffect(() => {
@@ -623,8 +660,8 @@ const AdminProducts = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const isLocalhost = Boolean(import.meta.env.DEV) || (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname));
 
   return (
@@ -659,6 +696,79 @@ const AdminProducts = () => {
             </div>
           ) : (
             <>
+              {/* Product Search & Filter Toolbar */}
+              <div className="p-4 md:p-5 border-b border-slate-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-slate-50/50">
+                <div className="relative flex-1 max-w-lg">
+                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, SKU, brand, category, shape, gender..."
+                    value={searchQuery}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setSearchQuery(val);
+                      if (val) {
+                        setSearchParams({ search: val }, { replace: true });
+                      } else {
+                        setSearchParams({}, { replace: true });
+                      }
+                    }}
+                    className="w-full pl-11 pr-10 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs md:text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchParams({}, { replace: true });
+                      }}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+                      title="Clear search"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={filterCategory}
+                    onChange={e => setFilterCategory(e.target.value)}
+                    className="px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map(c => (
+                      <option key={c.id || c.name} value={c.name}>{c.name}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filterStatus}
+                    onChange={e => setFilterStatus(e.target.value)}
+                    className="px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Hidden Only</option>
+                  </select>
+
+                  {(searchQuery || filterCategory || filterStatus !== 'all') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setFilterCategory('');
+                        setFilterStatus('all');
+                        setSearchParams({}, { replace: true });
+                      }}
+                      className="px-3 py-2 text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-xl transition-all"
+                    >
+                      Reset Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div className="overflow-x-auto">
               <table className="admin-table">
                 <thead>
@@ -673,7 +783,36 @@ const AdminProducts = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map(p => (
+                  {currentItems.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="text-center py-16">
+                        <div className="flex flex-col items-center justify-center space-y-3">
+                          <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+                            <Search size={22} />
+                          </div>
+                          <p className="text-sm font-bold text-slate-700">No products found</p>
+                          <p className="text-xs text-slate-400 max-w-sm">
+                            {searchQuery ? `No products match your search "${searchQuery}".` : 'No products available under selected filters.'}
+                          </p>
+                          {(searchQuery || filterCategory || filterStatus !== 'all') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSearchQuery('');
+                                setFilterCategory('');
+                                setFilterStatus('all');
+                                setSearchParams({}, { replace: true });
+                              }}
+                              className="mt-2 px-4 py-2 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all"
+                            >
+                              Clear search & filters
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    currentItems.map(p => (
                     <tr key={p.id} className="group">
                       <td>
                         <div className="flex items-center gap-5">
@@ -789,14 +928,15 @@ const AdminProducts = () => {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  )))
+                  }
                 </tbody>
               </table>
             </div>
 
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
                <span className="text-xs text-slate-400 font-bold">
-                  Showing {products.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, products.length)} of {products.length} products
+                  Showing {filteredProducts.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredProducts.length)} of {filteredProducts.length} products{filteredProducts.length !== products.length ? ` (filtered from ${products.length} total)` : ''}
                </span>
                {totalPages > 1 && (
                   <div className="flex items-center gap-2">
@@ -837,9 +977,9 @@ const AdminProducts = () => {
 
       {/* Product Form Modal */}
       {showForm && (
-        <div className="admin-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[1000] flex items-center justify-center p-4 md:p-8" onClick={() => setShowForm(false)}>
-            <div className="admin-modal max-w-5xl w-full h-[90vh] bg-white rounded-[32px] flex flex-col overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-8 border-b border-slate-100 shrink-0 bg-white z-20">
+        <div className="admin-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[1000] flex items-center justify-center p-2 sm:p-4 md:p-8" onClick={() => setShowForm(false)}>
+            <div className="admin-modal max-w-5xl w-full h-[96vh] md:h-[90vh] bg-white rounded-2xl md:rounded-[32px] flex flex-col overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-4 md:p-8 border-b border-slate-100 shrink-0 bg-white z-20">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900">{editing ? 'Edit Product' : 'Add New Product'}</h2>
                   <div className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] mt-2 flex items-center gap-2">
@@ -850,13 +990,13 @@ const AdminProducts = () => {
               </div>
 
               {/* Form Tabs */}
-              <div className="flex gap-10 px-8 pt-6 border-b border-slate-100 shrink-0 bg-white z-10">
+              <div className="flex gap-4 md:gap-10 px-4 md:px-8 pt-4 md:pt-6 border-b border-slate-100 shrink-0 bg-white z-10 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <button type="button" onClick={() => setActiveTab('basic')} className={`pb-4 text-[10px] font-bold uppercase tracking-[2px] border-b-2 transition-all ${activeTab === 'basic' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>01. Basic Information</button>
                 <button type="button" onClick={() => setActiveTab('details')} className={`pb-4 text-[10px] font-bold uppercase tracking-[2px] border-b-2 transition-all ${activeTab === 'details' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>02. Frame & Lens Details</button>
                 <button type="button" onClick={() => setActiveTab('media')} className={`pb-4 text-[10px] font-bold uppercase tracking-[2px] border-b-2 transition-all ${activeTab === 'media' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>03. Product Images</button>
               </div>
 
-            <form id="product-form" onSubmit={handleSave} className="admin-form overflow-y-auto p-8 flex-1 custom-scrollbar bg-slate-50/30">
+            <form id="product-form" onSubmit={handleSave} className="admin-form overflow-y-auto p-4 md:p-8 flex-1 custom-scrollbar bg-slate-50/30">
               {activeTab === 'basic' && (
                 <div className="space-y-10 pb-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -1845,11 +1985,11 @@ const AdminProducts = () => {
             </form>
 
             {/* Sticky Footer */}
-            <div className="flex gap-6 p-8 border-t border-slate-100 shrink-0 bg-white z-20">
-              <button form="product-form" type="submit" disabled={saving} className="flex-1 py-5 bg-emerald-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-[3px] hover:bg-emerald-600 shadow-2xl shadow-emerald-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
+            <div className="flex gap-3 md:gap-6 p-4 md:p-8 border-t border-slate-100 shrink-0 bg-white z-20">
+              <button form="product-form" type="submit" disabled={saving} className="flex-1 py-3.5 md:py-5 bg-emerald-500 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[2px] md:tracking-[3px] hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 md:gap-3">
                 {saving ? 'Saving changes...' : (editing ? 'Save Changes' : 'Save Product')}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-10 py-5 bg-slate-50 text-slate-400 rounded-2xl font-bold text-[10px] uppercase tracking-[3px] hover:bg-slate-100 hover:text-slate-900 transition-all border border-slate-100 shadow-sm">Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)} className="px-5 md:px-10 py-3.5 md:py-5 bg-slate-50 text-slate-400 rounded-xl md:rounded-2xl font-bold text-[10px] uppercase tracking-[2px] md:tracking-[3px] hover:bg-slate-100 hover:text-slate-900 transition-all border border-slate-100 shadow-sm">Cancel</button>
             </div>
           </div>
         </div>

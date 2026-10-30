@@ -4,6 +4,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { subscribeCarouselItems, subscribeSettings } from '../../lib/firebase';
 
+const getOptimizedBannerUrl = (url, width = 2400) => {
+  if (!url || typeof url !== 'string') return url || '';
+  if (!url.includes('cloudinary.com')) return url;
+  // Upgrade any w_800 or downscaled Cloudinary transform to ultra-crisp w_2400 with q_auto:best
+  return url.replace(/\/upload\/(?:[^/]+\/)?(?=v\d|\/)/, `/upload/f_auto,q_auto:best,w_${width}/`);
+};
+
 const FALLBACK_SLIDES = [
   {
     id: 'f1',
@@ -71,13 +78,14 @@ const HeroSlider = () => {
   const slide = slides[current] || FALLBACK_SLIDES[0];
 
   return (
-    <div className="w-full bg-white px-3 sm:px-5 md:px-8 py-4 space-y-3 sm:space-y-4">
+    <div className="w-full bg-white px-3 sm:px-5 md:px-8 py-4 space-y-3 sm:space-y-4 max-w-[1440px] mx-auto">
 
       {/* ═══════════════════════════════════════
-          HERO BANNER — Clean Edge-to-Edge Visual Banner
+          HERO BANNER — Sleek Balanced Proportion (1920x800 / 2.4:1 Ratio)
       ═══════════════════════════════════════ */}
       <div
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-md w-full bg-slate-900 h-44 sm:h-56 md:h-64 lg:h-72 xl:h-[300px]"
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-md w-full bg-slate-900 aspect-[2.4/1] max-h-[440px] sm:max-h-[480px] md:max-h-[500px] mx-auto"
+        style={{ aspectRatio: '1920 / 800' }}
       >
         <AnimatePresence initial={false} mode="wait">
           <motion.div
@@ -89,14 +97,19 @@ const HeroSlider = () => {
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
           >
             <Link to={slide.link || slide.ctaLink || '/category/all'} className="block w-full h-full">
-              <img
-                src={slide.image}
-                alt={slide.title || 'Hero Banner'}
-                className="w-full h-full object-cover object-center"
-                loading="eager"
-                decoding="async"
-                fetchPriority="high"
-              />
+              <picture className="block w-full h-full">
+                {slide.mobile_image && (
+                  <source media="(max-width: 640px)" srcSet={getOptimizedBannerUrl(slide.mobile_image, 1200)} />
+                )}
+                <img
+                  src={getOptimizedBannerUrl(slide.image, 2400)}
+                  alt={slide.title || 'Hero Banner'}
+                  className="w-full h-full object-cover object-[center_20%] sm:object-center"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                />
+              </picture>
             </Link>
 
             {/* Arrows */}

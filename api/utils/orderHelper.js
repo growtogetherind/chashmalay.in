@@ -104,7 +104,7 @@ export async function confirmOrder(orderId, paymentId) {
         });
 
         if (lens.prescriptionUrl) {
-          await sendTelegram(`📑 *New Prescription Uploaded!*\n\n*Customer:* ${address.name}\n*Phone:* ${address.phone}\n*Order ID:* #${orderId.slice(0, 8).toUpperCase()}\n*Item:* ${item.product_name || 'Eyewear'}\n\n🖼️ [View Uploaded Prescription](${lens.prescriptionUrl})`);
+          await sendTelegram(`📑 *New Prescription Uploaded!*\n\n*Customer:* ${address.name}\n*Phone:* ${address.phone}\n*Order ID:* #${orderId.slice(0, 8).toUpperCase()}\n*Item:* ${item.product_name || 'Eyewear'}`, lens.prescriptionUrl);
         }
       } catch (e) {
         console.error("Error saving prescription to database:", e);
@@ -167,7 +167,19 @@ ${address.city}, ${address.state} - ${address.pincode}
 
 _Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}_`;
 
-  await sendTelegram(fullOrderDescription);
+  // Collect all photos from order items (primary product images)
+  const itemPhotos = items.map(i => i.image || i.images?.front || (i.images?.gallery && i.images.gallery[0])).filter(Boolean);
+  const primaryPhoto = itemPhotos[0] || null;
+
+  // Send main order notification with photo to admin mobile
+  await sendTelegram(fullOrderDescription, primaryPhoto);
+
+  // Send additional item photos continuously to mobile if multiple items
+  for (let idx = 1; idx < itemPhotos.length; idx++) {
+    const extraPhoto = itemPhotos[idx];
+    const itemObj = items[idx] || {};
+    await sendTelegram(`📸 *Item Photo (${idx + 1}/${itemPhotos.length}):* ${itemObj.product_name || 'Product'} (Order #${orderId.slice(0, 8).toUpperCase()})`, extraPhoto);
+  }
 
   // 4. Send Fast2SMS SMS
   await sendSMS(address.phone, address.name, orderId.slice(0, 8).toUpperCase(), orderData.total_amount);
@@ -175,14 +187,46 @@ _Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}_`;
   return { success: true };
 }
 
-async function sendTelegram(message) {
+async function sendTelegram(message, photoUrl = null) {
   const token = process.env.TELEGRAM_BOT_TOKEN || process.env.VITE_TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID;
   if (!token || !chatId) {
     console.warn("Telegram bot token or chat ID is missing. Message skipped.");
     return;
   }
+
   try {
+    if (photoUrl && typeof photoUrl === 'string' && photoUrl.startsWith('http')) {
+      const caption = message.length > 1024 ? message.slice(0, 1020) + '...' : message;
+      const photoRes = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          photo: photoUrl,
+          caption: caption,
+          parse_mode: 'Markdown'
+        })
+      });
+
+      const photoData = await photoRes.json().catch(() => ({}));
+      if (photoRes.ok && photoData.ok) {
+        if (message.length > 1024) {
+          await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: message.slice(1020),
+              parse_mode: 'Markdown'
+            })
+          });
+        }
+        return;
+      }
+      console.warn("Telegram sendPhoto failed, falling back to sendMessage:", photoData?.description);
+    }
+
     const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

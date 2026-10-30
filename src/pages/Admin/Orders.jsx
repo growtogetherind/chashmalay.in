@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { X, Download, Search, Filter, MoreVertical, DownloadCloud, Settings, Bell } from 'lucide-react';
-import { subscribeAllOrders, updateOrderStatus as firebaseUpdateOrderStatus } from '../../lib/firebase';
+import { X, Download, Search, Filter, MoreVertical, DownloadCloud, Settings, Bell, Trash2, Eye } from 'lucide-react';
+import { subscribeAllOrders, updateOrderStatus as firebaseUpdateOrderStatus, deleteOrder } from '../../lib/firebase';
+import { useConfirm } from '../../context/ConfirmContext';
 import { generateInvoice } from '../../lib/invoiceGenerator';
 import AdminSidebar from '../../components/layout/AdminSidebar';
+import { startContinuousOrderAlert, stopContinuousOrderAlert } from '../../lib/adminAlertManager';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import '../Admin.css';
@@ -40,6 +42,7 @@ const getSelectedColorName = (item) => {
 const getSelectedSize = (item) => item?.selected_size || item?.lens_selection?.selectedSize;
 
 const AdminOrders = () => {
+  const { confirm } = useConfirm();
   const [orders, setOrders] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +58,29 @@ const AdminOrders = () => {
   const [filter, setFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
+
+  const handleDeleteOrder = async (orderId, e) => {
+    if (e) e.stopPropagation();
+    const confirmed = await confirm({
+      title: 'Delete Order',
+      message: `Are you sure you want to permanently delete order #${orderId.slice(0, 8).toUpperCase()}? This action will permanently remove the order and its line items.`,
+      confirmText: 'Delete Permanently',
+      cancelText: 'Cancel',
+      type: 'danger'
+    });
+    if (!confirmed) return;
+
+    const toastId = toast.loading('Deleting order...');
+    const { success, error } = await deleteOrder(orderId);
+    if (success) {
+      toast.success('Order deleted successfully', { id: toastId });
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder(null);
+      }
+    } else {
+      toast.error(typeof error === 'string' ? error : 'Failed to delete order', { id: toastId });
+    }
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -76,7 +102,7 @@ const AdminOrders = () => {
         const latestOrder = currentOrders[0];
         if (lastOrderId && latestOrder.id !== lastOrderId) {
           // Play notification chime
-          playNotificationSound();
+          startContinuousOrderAlert(latestOrder);
 
           // Elegant visual custom toast
           toast.custom((t) => (
@@ -101,7 +127,7 @@ const AdminOrders = () => {
               </div>
               <div className="flex border-l border-gray-100">
                 <button
-                  onClick={() => toast.dismiss(t.id)}
+                  onClick={() => { stopContinuousOrderAlert(); toast.dismiss(t.id); }}
                   className="w-full border border-transparent rounded-none rounded-r-3xl p-4 flex items-center justify-center text-xs font-black uppercase tracking-widest text-purple-600 hover:text-purple-700 hover:bg-purple-50 focus:outline-none"
                 >
                   Dismiss
@@ -267,7 +293,7 @@ const AdminOrders = () => {
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
            <div className="flex items-center gap-4 w-full md:w-auto">
-              <div className="admin-search-wrapper !mb-0 min-w-[300px]">
+              <div className="admin-search-wrapper !mb-0 w-full sm:w-auto min-w-0 sm:min-w-[280px]">
                  <Search size={18} className="text-gray-400" />
                  <input type="text" placeholder="Search orders..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
               </div>
@@ -336,7 +362,14 @@ const AdminOrders = () => {
                               </span>
                            </td>
                            <td className="text-right">
-                              <button onClick={() => setSelectedOrder(order)} className="p-2 text-gray-400 hover:text-gray-900 transition-colors"><MoreVertical size={18} /></button>
+                              <div className="flex items-center justify-end gap-1">
+                                 <button onClick={() => setSelectedOrder(order)} className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" title="View Order Details">
+                                    <Eye size={17} />
+                                 </button>
+                                 <button onClick={(e) => handleDeleteOrder(order.id, e)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Order">
+                                    <Trash2 size={17} />
+                                 </button>
+                              </div>
                            </td>
                         </tr>
                      ))}
@@ -596,9 +629,14 @@ const AdminOrders = () => {
                      <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Total Amount</span>
                      <span className="text-2xl font-black text-gray-900">₹{Number(selectedOrder.total_amount).toLocaleString()}</span>
                   </div>
-                  <button onClick={() => generateInvoice(selectedOrder)} className="w-full py-4 bg-purple-600 text-white rounded-2xl font-extrabold text-xs uppercase tracking-[3px] shadow-lg shadow-purple-200 flex items-center justify-center gap-3 hover:bg-purple-700 transition-all active:scale-[0.98]">
-                     <Download size={18} /> Download Invoice
-                  </button>
+                  <div className="flex items-center gap-3">
+                     <button onClick={() => generateInvoice(selectedOrder)} className="flex-1 py-4 bg-purple-600 text-white rounded-2xl font-extrabold text-xs uppercase tracking-[2px] shadow-lg shadow-purple-200 flex items-center justify-center gap-2 hover:bg-purple-700 transition-all active:scale-[0.98]">
+                        <Download size={18} /> Invoice
+                     </button>
+                     <button onClick={() => handleDeleteOrder(selectedOrder.id)} className="px-5 py-4 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-100 rounded-2xl font-extrabold text-xs uppercase tracking-[2px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]" title="Delete Order">
+                        <Trash2 size={18} /> Delete
+                     </button>
+                  </div>
                </div>
             </motion.div>
           </>

@@ -28,26 +28,77 @@ export default async function handler(request, response) {
     return response.status(200).json({ success: false, skipped: true, reason: 'not_configured' });
   }
 
-  const { message, reply_markup } = request.body || {};
+  const { message, photo_url, photos, reply_markup } = request.body || {};
 
   if (!message || typeof message !== 'string') {
     return response.status(400).json({ error: 'A non-empty "message" string is required.' });
   }
 
-  // Cap message length defensively (Telegram limit is 4096 chars).
   const text = message.slice(0, 4096);
-
-  const payload = {
-    chat_id: CHAT_ID,
-    text,
-    parse_mode: 'Markdown',
-    disable_web_page_preview: false,
-  };
-  if (reply_markup && typeof reply_markup === 'object') {
-    payload.reply_markup = reply_markup;
-  }
+  const photoList = Array.isArray(photos) ? photos.filter(Boolean) : (photo_url ? [photo_url] : []);
 
   try {
+    // If photos are provided, send photo(s) continuously to admin mobile via sendPhoto
+    if (photoList.length > 0) {
+      for (let i = 0; i < photoList.length; i++) {
+        const photo = photoList[i];
+        const isFirst = (i === 0);
+        // Telegram caption is max 1024 chars
+        const caption = isFirst ? text.slice(0, 1024) : '';
+        const photoPayload = {
+          chat_id: CHAT_ID,
+          photo,
+          parse_mode: 'Markdown'
+        };
+        if (caption) photoPayload.caption = caption;
+        if (isFirst && reply_markup && typeof reply_markup === 'object') {
+          photoPayload.reply_markup = reply_markup;
+        }
+
+        try {
+          const photoRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(photoPayload),
+          });
+          const photoData = await photoRes.json().catch(() => ({}));
+          if (!photoRes.ok || !photoData.ok) {
+            console.warn('Telegram sendPhoto returned error, fallback to sendMessage:', photoData?.description);
+            // If first photo fails, break and fall back to sendMessage
+            if (isFirst) throw new Error(photoData?.description || 'sendPhoto failed');
+          }
+        } catch (photoErr) {
+          if (isFirst) throw photoErr;
+        }
+      }
+
+      // If text was longer than 1024 chars, send the rest as message
+      if (text.length > 1024) {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: text.slice(1024, 4096),
+            parse_mode: 'Markdown'
+          }),
+        });
+      }
+
+      return response.status(200).json({ success: true, with_photos: photoList.length });
+    }
+
+    // Default: text message
+    const payload = {
+      chat_id: CHAT_ID,
+      text,
+      parse_mode: 'Markdown',
+      disable_web_page_preview: false,
+    };
+    if (reply_markup && typeof reply_markup === 'object') {
+      payload.reply_markup = reply_markup;
+    }
+
     const tgRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

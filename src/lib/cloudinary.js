@@ -259,13 +259,18 @@ const uploadWithServerProxy = async ({ base64Data, folder, tags, publicId, timeo
  * Automatically retries and falls back to server proxy if client is blocked by ad-blocker or CORS.
  */
 export const uploadImage = async (file, folder = 'products', options = {}) => {
+  const isBanner = folder === 'carousel' || (typeof folder === 'string' && folder.includes('banner')) || Boolean(options.isBanner);
   const { 
     onProgress, 
     retries = 1, 
     maxBytes = MAX_IMAGE_UPLOAD_BYTES, 
     timeout = 60000, 
     tags = [],
-    base64: precomputedBase64 = null 
+    base64: precomputedBase64 = null,
+    skipCompression = false,
+    quality = isBanner ? 0.94 : 0.85,
+    maxWidth = isBanner ? 2560 : 1600,
+    maxHeight = isBanner ? 1600 : 1600
   } = options;
 
   const validationError = validateImageFile(file, maxBytes);
@@ -283,8 +288,11 @@ export const uploadImage = async (file, folder = 'products', options = {}) => {
     let base64DataForProxy = precomputedBase64;
 
     try {
-      if (!base64DataForProxy && file && (file instanceof Blob || (file.type && file.type.startsWith('image/')))) {
-        const compressedBase64 = await compressToWebP(file, 1200, 1200, 0.75);
+      if (!skipCompression && !base64DataForProxy && file && (file instanceof Blob || (file.type && file.type.startsWith('image/')))) {
+        const targetMaxWidth = options.maxWidth || maxWidth;
+        const targetMaxHeight = options.maxHeight || maxHeight;
+        const targetQuality = options.quality || quality;
+        const compressedBase64 = await compressToWebP(file, targetMaxWidth, targetMaxHeight, targetQuality);
         base64DataForProxy = compressedBase64;
         const mimeType = 'image/webp';
         const blob = base64ToBlob(compressedBase64, mimeType);
@@ -387,8 +395,12 @@ export const uploadImage = async (file, folder = 'products', options = {}) => {
 
     if (!data?.secure_url) throw new Error("Cloudinary did not return a secure URL.");
 
+    const finalUrl = isBanner
+      ? data.secure_url.replace(/\/upload\/(?:[^/]+\/)?(?=v\d|\/)/, '/upload/f_auto,q_auto:best,w_2400/')
+      : transformCloudinaryUrl(data.secure_url);
+
     return {
-      url: transformCloudinaryUrl(data.secure_url),
+      url: finalUrl,
       secureUrl: data.secure_url,
       publicId: data.public_id,
       resourceType: data.resource_type,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Zap, 
@@ -8,18 +8,13 @@ import {
   CheckCircle2, 
   ExternalLink, 
   Copy, 
-  Image as ImageIcon, 
   Palette, 
-  ArrowRight, 
   Sparkles, 
   RefreshCw, 
   Lock, 
   Eye, 
   Star, 
   Layers, 
-  Glasses,
-  Sun,
-  X,
   ZoomIn
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -125,7 +120,7 @@ export default function QuickAddProduct() {
     };
   }, []);
 
-  const categoryOptions = React.useMemo(() => {
+  const categoryOptions = useMemo(() => {
     if (!liveCategories || liveCategories.length === 0) return CATEGORY_OPTIONS;
     const mapped = liveCategories
       .filter(c => c && c.is_active !== false && (c.name || c.title || c.slug))
@@ -234,7 +229,9 @@ export default function QuickAddProduct() {
     toast.success(`Added ${files.length} photo(s)`);
     try {
       e.target.value = '';
-    } catch {}
+    } catch {
+      // Ignored: resetting input value if already detached
+    }
 
     // In parallel / background, immediately read each file into RAM (Blob + base64).
     // This locks the image data in memory so it CANNOT be detached, locked, or invalidated
@@ -253,6 +250,16 @@ export default function QuickAddProduct() {
           base64 = await fileToBase64(file);
         }
 
+        let uploadFile = compressedBlob;
+        if (compressedBlob && !(compressedBlob instanceof File)) {
+          const webpName = file.name ? file.name.replace(/\.[^/.]+$/, "") + ".webp" : 'photo.webp';
+          try {
+            uploadFile = new File([compressedBlob], webpName, { type: compressedBlob.type || 'image/webp' });
+          } catch {
+            uploadFile = compressedBlob;
+          }
+        }
+
         setVariants(prev => prev.map(v => {
           if (v.id !== variantId) return v;
           return {
@@ -261,7 +268,7 @@ export default function QuickAddProduct() {
               ...p,
               base64,
               compressedBlob,
-              file: compressedBlob,
+              file: uploadFile,
               preview: base64 || p.preview
             } : p)
           };
@@ -295,6 +302,11 @@ export default function QuickAddProduct() {
   };
 
   const handlePublish = async () => {
+    if (!canWrite) {
+      toast.error('Admin authentication required. Please sign in with admin credentials first.');
+      return;
+    }
+
     // 1. Validation: check that at least one photo is provided
     const totalPhotos = variants.reduce((acc, v) => acc + (v.photos?.length || 0), 0);
     if (totalPhotos === 0) {
@@ -365,13 +377,13 @@ export default function QuickAddProduct() {
       // 3. Fallbacks and auto-generated fields
       setPublishStep('Syncing catalog item to live Firestore...');
 
-      const primary = uploadedVariants[0];
+      const primary = uploadedVariants.find(v => v.image) || uploadedVariants[0] || {};
       const isClip = isClipOn || category === 'clip-on-glasses';
       const finalCategory = isClip ? 'clip-on-glasses' : category;
 
       const autoTitle = customName.trim()
         ? customName.trim()
-        : `Chashmalay ${primary.is_dual_tone ? `${primary.name} Dual-Tone` : primary.name} ${frameShape} ${isClip ? 'Magnetic Clip-On' : ''} Frame`;
+        : `Chashmalay ${primary?.is_dual_tone ? `${primary?.name} Dual-Tone` : (primary?.name || '')} ${frameShape} ${isClip ? 'Magnetic Clip-On' : ''} Frame`.replace(/\s+/g, ' ').trim();
 
       const generatedSku = `CH-Q-${Date.now().toString().slice(-6)}`;
       const numPrice = Number(price) || 999;
@@ -380,14 +392,15 @@ export default function QuickAddProduct() {
       const allGalleryUrls = Array.from(new Set(
         uploadedVariants.flatMap(v => v.gallery).filter(Boolean)
       ));
+      const primaryImg = primary?.image || allGalleryUrls[0] || '';
 
       const description = isClip
         ? `${autoTitle} by Chashmalay. 2-in-1 magnetic clip-on optical eyewear featuring ${clipOnSet}. Converts instantly from indoor clear prescription frame to outdoor polarized sunglasses.`
-        : `${autoTitle} by Chashmalay. Premium handcrafted frame engineered for superior durability and all-day comfort. Finished in ${primary.name}.`;
+        : `${autoTitle} by Chashmalay. Premium handcrafted frame engineered for superior durability and all-day comfort. Finished in ${primary?.name || 'Standard'}.`;
 
       const tags = isClip
-        ? `clip-on, clip-on glasses, magnetic clip-on, 2-in-1, polarized, sunglasses clip, optical frame, ${primary.name.toLowerCase()}`
-        : `eyeglasses, ${category}, ${primary.name.toLowerCase()}, ${frameShape.toLowerCase()}`;
+        ? `clip-on, clip-on glasses, magnetic clip-on, 2-in-1, polarized, sunglasses clip, optical frame, ${(primary?.name || '').toLowerCase()}`
+        : `eyeglasses, ${category}, ${(primary?.name || '').toLowerCase()}, ${frameShape.toLowerCase()}`;
 
       const payload = {
         name: autoTitle,
@@ -407,13 +420,13 @@ export default function QuickAddProduct() {
         lens_type: 'Single Vision Prescription / Blue Cut Compatible',
         available_sizes: ['M', 'L'],
         available_colors: uploadedVariants.map(v => v.name),
-        default_color: primary.name,
-        color: primary.name,
-        color_hex: primary.hex,
-        is_dual_tone: Boolean(primary.is_dual_tone),
-        hex2: primary.is_dual_tone ? primary.hex2 : null,
-        dual_color_hex: primary.is_dual_tone ? primary.hex2 : null,
-        frame_color: primary.name,
+        default_color: primary?.name || 'Standard',
+        color: primary?.name || 'Standard',
+        color_hex: primary?.hex || '#111111',
+        is_dual_tone: Boolean(primary?.is_dual_tone),
+        hex2: primary?.is_dual_tone ? primary?.hex2 : null,
+        dual_color_hex: primary?.is_dual_tone ? primary?.hex2 : null,
+        frame_color: primary?.name || 'Standard',
         // Clip-on flags
         is_clip_on: Boolean(isClip),
         has_clip_on: Boolean(isClip),
@@ -423,14 +436,14 @@ export default function QuickAddProduct() {
         is_new: true,
         is_featured: false,
         images: {
-          front: primary.image || '',
-          side: primary.image_side || '',
-          model: primary.image_model || '',
+          front: primaryImg,
+          side: primary?.image_side || allGalleryUrls[1] || '',
+          model: primary?.image_model || allGalleryUrls[2] || '',
           gallery: allGalleryUrls
         },
         gallery: allGalleryUrls,
-        frame_image: primary.image || '',
-        image: primary.image || '',
+        frame_image: primaryImg,
+        image: primaryImg,
         colors: uploadedVariants
       };
 

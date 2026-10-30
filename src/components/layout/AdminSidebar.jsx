@@ -1,20 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutGrid, Box, Layers, Tag, Package, Receipt, Users, FileText, Ticket, Star, Settings, LogOut, Menu, X, Glasses, Sparkles, Zap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../ui/Logo';
+import AdminOrderAlertBanner from './AdminOrderAlertBanner';
+import { registerAdminServiceWorker } from '../../lib/adminAlertManager';
 
 const AdminSidebar = () => {
   const { signOut, isAdmin } = useAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    registerAdminServiceWorker();
+  }, []);
   const isLocalhost = Boolean(import.meta.env.DEV) || (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname));
 
   const navItems = [
     { path: '/admin', label: 'Dashboard', icon: <LayoutGrid size={20} /> },
     { path: '/admin/orders', label: 'Orders', icon: <Receipt size={20} /> },
     { path: '/admin/products', label: 'Products', icon: <Box size={20} /> },
-    ...(isLocalhost ? [{ path: '/admin/quick-add', label: '⚡ Quick Add', icon: <Zap size={20} /> }] : []),
+    { path: '/admin/quick-add', label: '⚡ Quick Add', icon: <Zap size={20} /> },
     ...(isAdmin ? [{ path: '/admin/customers', label: 'Customers', icon: <Users size={20} /> }] : []),
     { path: '/admin/categories', label: 'Categories', icon: <Layers size={20} /> },
     { path: '/admin/brands', label: 'Brands', icon: <Tag size={20} /> },
@@ -36,8 +42,10 @@ const AdminSidebar = () => {
 
   return (
     <>
+      <AdminOrderAlertBanner />
       <aside className={`admin-sidebar ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} transition-transform duration-300 fixed lg:sticky top-0 left-0 bg-white border-r border-gray-100 z-[1001]`}>
-        <div className="admin-brand flex items-center gap-3 py-6 px-4 mb-4">
+        <div className="admin-brand flex items-center justify-between py-6 px-4 mb-4">
+          <div className="flex items-center gap-3">
            <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center text-white shadow-sm">
               <Logo className="w-6 h-6 invert brightness-0" />
            </div>
@@ -45,6 +53,10 @@ const AdminSidebar = () => {
               <span className="text-gray-900 font-extrabold text-sm tracking-tight leading-none uppercase">Chashmalay</span>
               <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mt-1">Admin Panel</span>
            </div>
+          </div>
+          <button onClick={() => setIsOpen(false)} className="lg:hidden p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl" aria-label="Close menu">
+            <X size={20} />
+          </button>
         </div>
 
         <nav className="flex flex-col gap-1.5 px-3 flex-1 overflow-y-auto scrollbar-hide">
