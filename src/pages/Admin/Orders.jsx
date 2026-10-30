@@ -58,6 +58,49 @@ const AdminOrders = () => {
   const [filter, setFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [showCleanupModal, setShowCleanupModal] = useState(false);
+  const [cleanupCutoff, setCleanupCutoff] = useState('2026-10-22');
+  const [isDeletingBatch, setIsDeletingBatch] = useState(false);
+
+  // Filter orders created before cleanupCutoff (default 22/10/2026)
+  const ordersBeforeCutoff = orders.filter(o => {
+    const rawDate = o.created_at?.seconds ? o.created_at.seconds * 1000 : o.created_at;
+    const orderDate = new Date(rawDate);
+    const targetDate = new Date(`${cleanupCutoff}T00:00:00`);
+    return !isNaN(orderDate.getTime()) && orderDate < targetDate;
+  });
+
+  const handleDeleteBatch = async () => {
+    if (ordersBeforeCutoff.length === 0) return;
+    const count = ordersBeforeCutoff.length;
+    const confirmed = await confirm({
+      title: `Delete ${count} Orders?`,
+      message: `Are you sure you want to permanently delete all ${count} orders created before ${new Date(cleanupCutoff).toLocaleDateString('en-GB')}? This action cannot be undone.`,
+      confirmText: `Delete ${count} Orders`,
+      cancelText: 'Cancel',
+      type: 'danger'
+    });
+    if (!confirmed) return;
+
+    setIsDeletingBatch(true);
+    const toastId = toast.loading(`Deleting ${count} orders...`);
+    let deleted = 0;
+    let failed = 0;
+
+    for (const order of ordersBeforeCutoff) {
+      const { success } = await deleteOrder(order.id);
+      if (success) deleted++;
+      else failed++;
+    }
+
+    setIsDeletingBatch(false);
+    setShowCleanupModal(false);
+    if (failed === 0) {
+      toast.success(`Successfully deleted all ${deleted} orders!`, { id: toastId });
+    } else {
+      toast.error(`Deleted ${deleted} orders (${failed} failed)`, { id: toastId });
+    }
+  };
 
   const handleDeleteOrder = async (orderId, e) => {
     if (e) e.stopPropagation();
@@ -640,6 +683,120 @@ const AdminOrders = () => {
                </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Cleanup Orders Before Date Modal */}
+      <AnimatePresence>
+        {showCleanupModal && (
+          <div className="fixed inset-0 z-[2500] flex items-center justify-center p-4">
+             <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => !isDeletingBatch && setShowCleanupModal(false)}
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+             />
+             <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="relative bg-white rounded-3xl shadow-2xl border border-red-100 w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden z-10"
+             >
+                {/* Header */}
+                <div className="p-6 border-b border-gray-100 bg-red-50/50 flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center">
+                         <Trash2 size={20} />
+                      </div>
+                      <div>
+                         <h3 className="text-lg font-black text-gray-900 tracking-tight">Cleanup Orders Before Date</h3>
+                         <p className="text-xs text-gray-500 font-medium">Review all orders placed before the selected date before deletion</p>
+                      </div>
+                   </div>
+                   <button
+                      onClick={() => !isDeletingBatch && setShowCleanupModal(false)}
+                      className="p-2 text-gray-400 hover:text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
+                   >
+                      <X size={20} />
+                   </button>
+                </div>
+
+                {/* Date Selector & Summary Bar */}
+                <div className="p-5 border-b border-gray-100 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                   <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-gray-700">Orders placed before:</span>
+                      <input
+                         type="date"
+                         value={cleanupCutoff}
+                         onChange={(e) => setCleanupCutoff(e.target.value)}
+                         className="px-3 py-1.5 border border-gray-200 rounded-xl text-xs font-bold text-gray-800 outline-none focus:border-red-400"
+                      />
+                   </div>
+                   <span className="px-3 py-1 bg-red-50 text-red-700 text-xs font-black rounded-lg border border-red-100">
+                      {ordersBeforeCutoff.length} orders found
+                   </span>
+                </div>
+
+                {/* Orders List / Table */}
+                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                   {ordersBeforeCutoff.length === 0 ? (
+                      <div className="text-center py-12">
+                         <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3 font-bold text-lg">✓</div>
+                         <p className="text-sm font-bold text-gray-800">No orders found before {new Date(cleanupCutoff).toLocaleDateString('en-GB')}</p>
+                         <p className="text-xs text-gray-400 mt-1">All your orders in the digital ledger are newer than this date.</p>
+                      </div>
+                   ) : (
+                      <div className="space-y-2.5">
+                         <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">Orders to be deleted ({ordersBeforeCutoff.length}):</p>
+                         {ordersBeforeCutoff.map((ord) => {
+                            const dateStr = new Date(ord.created_at?.seconds ? ord.created_at.seconds * 1000 : ord.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                            return (
+                               <div key={ord.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-gray-50 hover:bg-gray-100/70 rounded-2xl border border-gray-100 transition-colors gap-2">
+                                  <div className="flex items-center gap-3">
+                                     <span className="font-mono text-xs font-black text-gray-700 bg-white px-2 py-1 rounded-lg border border-gray-200">
+                                        #{ord.id.slice(0, 8).toUpperCase()}
+                                     </span>
+                                     <div>
+                                        <p className="text-xs font-bold text-gray-900">{ord.profiles?.full_name || ord.shipping_address?.name || 'Guest'}</p>
+                                        <p className="text-[10px] text-gray-400">{ord.shipping_address?.phone || 'No phone'} • {dateStr}</p>
+                                     </div>
+                                  </div>
+                                  <div className="flex items-center gap-3 self-end sm:self-auto">
+                                     <span className="text-xs font-black text-gray-900">₹{Number(ord.total_amount).toLocaleString()}</span>
+                                     <span className="text-[9px] uppercase font-black px-2 py-0.5 rounded bg-white text-gray-600 border border-gray-200">
+                                        {ord.status}
+                                     </span>
+                                  </div>
+                               </div>
+                            );
+                         })}
+                      </div>
+                   )}
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="p-6 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3">
+                   <button
+                      type="button"
+                      disabled={isDeletingBatch}
+                      onClick={() => setShowCleanupModal(false)}
+                      className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-100 transition-colors disabled:opacity-50"
+                   >
+                      Cancel
+                   </button>
+                   <button
+                      type="button"
+                      disabled={isDeletingBatch || ordersBeforeCutoff.length === 0}
+                      onClick={handleDeleteBatch}
+                      className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-red-200 flex items-center gap-2"
+                   >
+                      <Trash2 size={16} />
+                      {isDeletingBatch ? 'Deleting...' : `Confirm & Delete ${ordersBeforeCutoff.length} Orders`}
+                   </button>
+                </div>
+             </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
