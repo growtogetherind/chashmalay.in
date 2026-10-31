@@ -86,3 +86,4 @@ export const subscribeToWebPush = async () => {
   localStorage.setItem('admin_push_subscribed', 'true');
   return sub;
 };
+
