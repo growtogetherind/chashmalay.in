@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import './DiwaliTheme.css';
 
@@ -66,8 +67,10 @@ export const DiwaliDiyaIcon = ({ className = 'w-4 h-4', isAlt = false }) => (
   </svg>
 );
 
-// ── Festive Top Announcement Bar (Sleek, Small Font, Text-Only) ────────────────
+// ── Festive Top Announcement Bar (Home Page Only, Sleek & Text-Only) ───────────
 export const DiwaliAnnouncementBar = ({ settings = {} }) => {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
@@ -78,7 +81,7 @@ export const DiwaliAnnouncementBar = ({ settings = {} }) => {
   }, []);
 
   const isEnabled = settings.diwali_theme_enabled !== false;
-  if (!isEnabled || isDismissed) return null;
+  if (!isHome || !isEnabled || isDismissed) return null;
 
   const message = settings.diwali_banner_text || '🪔 Shubh Deepavali! Flat 20% OFF on all Eyewear • Use Code: DIWALI20 ✨';
 
@@ -125,19 +128,20 @@ export const DiwaliAnnouncementBar = ({ settings = {} }) => {
   );
 };
 
-// ── Native Overlay Component Based on diwali-overlay-v3 ────────────────────────
+// ── Native Overlay Component Based on diwali-overlay-v3 (Home Page Only) ───────
 export const DiwaliDecorOverlay = ({ settings = {} }) => {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
   const containerRef = useRef(null);
 
   useEffect(() => {
     const isEnabled = settings.diwali_theme_enabled !== false;
     const showDiyas = isEnabled && settings.diwali_show_diyas !== false;
-    if (!showDiyas || !containerRef.current) return;
+    if (!isHome || !showDiyas || !containerRef.current) return;
 
     const root = containerRef.current;
     const S = root.querySelector('#z-s');
     const D = root.querySelector('#z-d');
-    const F = root.querySelector('#z-f');
     const K = root.querySelector('#z-c');
 
     const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -196,21 +200,20 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
       const small = W < 700;
       let html = '';
       let h2 = '';
-      let h3 = '';
 
-      // 1. Silk Drapes in top corners
-      const sw = small ? 90 : 170;
+      // 1. Silk Drapes in top corners (Scaled smaller on mobile: 55px vs 160px desktop)
+      const sw = small ? 55 : 160;
       const sh = (sw * 172) / 200;
       html += silk(sw, sh, false) + silk(sw, sh, true);
 
-      // 2. Gold Lotus in bottom-left corner
-      html += '<div class="a" style="left:' + (small ? 4 : 14) + 'px;bottom:' + (small ? 4 : 10) + 'px">' + lotus(small ? 64 : 96) + '</div>';
+      // 2. Gold Lotus in bottom-left corner (Scaled smaller on mobile: 40px vs 90px desktop)
+      html += '<div class="a" style="left:' + (small ? 4 : 14) + 'px;bottom:' + (small ? 4 : 10) + 'px">' + lotus(small ? 40 : 90) + '</div>';
       if (S) S.innerHTML = html;
 
-      // 3. Hanging Staggered Diyas on Golden Chains
-      const dw = small ? 40 : 54;
+      // 3. Hanging Staggered Diyas on Golden Chains (Scaled small & clean on mobile: 28px width, 2 edge strands)
+      const dw = small ? 28 : 52;
       const spec = small
-        ? [[8, 55], [22, 95], [78, 80], [92, 115]]
+        ? [[5, 45], [95, 45]] // On mobile: only 2 delicate edge strands, 0 obstruction
         : [[4, 75], [12, 140], [24, 50], [74, 65], [86, 145], [96, 90]];
 
       spec.forEach((p, n) => {
@@ -219,14 +222,6 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
           '<div class="z-chain" style="height:' + p[1] + 'px"></div><div style="margin-top:-2px">' + diya(dw) + '</div></div>';
       });
       if (D) D.innerHTML = h2;
-
-      // 4. Soft Golden Bokeh Sparkles
-      for (let i = 0; i < (small ? 8 : 16); i++) {
-        const s = rnd(5, 14);
-        h3 +=
-          '<div class="a z-tw" style="width:' + s + 'px;height:' + s + 'px;left:' + rnd(0, 98) + '%;top:' + rnd(2, 92) + '%;animation-delay:-' + rnd(0, 4) + 's;animation-duration:' + rnd(2.6, 5) + 's"></div>';
-      }
-      if (F) F.innerHTML = h3;
     }
 
     build();
@@ -245,7 +240,7 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
       emberInterval = setInterval(() => {
         if (document.hidden || !K || K.childNodes.length > 5) return;
         const e = document.createElement('div');
-        const s = rnd(3, 6);
+        const s = rnd(3, 5);
         e.className = 'a';
         e.style.cssText += 'bottom:-20px;left:' + rnd(3, 97) + '%;width:' + s + 'px;height:' + s + 'px;border-radius:50%;background:radial-gradient(#fff3c4,#ffb347 55%,transparent 72%);box-shadow:0 0 ' + (s * 2) + 'px #ffb347';
         K.appendChild(e);
@@ -254,19 +249,19 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
             { transform: 'translate(0,0)', opacity: 0 },
             { opacity: 0.9, offset: 0.15 },
             { opacity: 0.8, offset: 0.7 },
-            { transform: 'translate(' + rnd(-40, 40) + 'px,' + (-rnd(window.innerHeight * 0.35, window.innerHeight * 0.7)) + 'px)', opacity: 0 }
+            { transform: 'translate(' + rnd(-30, 30) + 'px,' + (-rnd(window.innerHeight * 0.35, window.innerHeight * 0.6)) + 'px)', opacity: 0 }
           ],
           { duration: rnd(9000, 14000), easing: 'ease-out' }
         ).onfinish = () => e.remove();
-      }, 2000);
+      }, 2500);
     }
 
     // Click or tap to light a diya with golden burst
     const handleClick = (ev) => {
       if (ev.target.closest && ev.target.closest('a,button,input,select,textarea,label,summary,[role=button]')) return;
-      if (!K || K.childNodes.length > 20) return;
+      if (!K || K.childNodes.length > 15) return;
 
-      const w = 58;
+      const w = window.innerWidth < 700 ? 42 : 56;
       const d = document.createElement('div');
       d.className = 'a';
       d.style.left = (ev.clientX - w / 2) + 'px';
@@ -279,25 +274,25 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
           { transform: 'scale(0)', opacity: 0 },
           { transform: 'scale(1.12)', opacity: 1, offset: 0.12 },
           { transform: 'scale(1)', opacity: 1, offset: 0.65 },
-          { transform: 'translateY(' + (reduce ? 0 : -80) + 'px) scale(.9)', opacity: 0 }
+          { transform: 'translateY(' + (reduce ? 0 : -60) + 'px) scale(.9)', opacity: 0 }
         ],
-        { duration: 4200 }
+        { duration: 4000 }
       ).onfinish = () => d.remove();
 
       if (reduce) return;
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 6; i++) {
         const p = document.createElement('div');
-        const a = (i / 7) * Math.PI * 2 + rnd(0, 0.5);
-        const r = rnd(30, 60);
+        const a = (i / 6) * Math.PI * 2 + rnd(0, 0.5);
+        const r = rnd(25, 50);
         p.className = 'a';
-        p.style.cssText += 'left:' + ev.clientX + 'px;top:' + ev.clientY + 'px;width:6px;height:6px;margin:-3px;border-radius:50%;background:#ffd76a;box-shadow:0 0 8px #ffb347';
+        p.style.cssText += 'left:' + ev.clientX + 'px;top:' + ev.clientY + 'px;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#ffd76a;box-shadow:0 0 6px #ffb347';
         K.appendChild(p);
         p.animate(
           [
             { transform: 'translate(0,0) scale(1)', opacity: 1 },
             { transform: 'translate(' + Math.cos(a) * r + 'px,' + Math.sin(a) * r + 'px) scale(.2)', opacity: 0 }
           ],
-          { duration: 800, easing: 'ease-out' }
+          { duration: 750, easing: 'ease-out' }
         ).onfinish = () => p.remove();
       }
     };
@@ -310,15 +305,14 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
       if (emberInterval) clearInterval(emberInterval);
       if (S) S.innerHTML = '';
       if (D) D.innerHTML = '';
-      if (F) F.innerHTML = '';
       if (K) K.innerHTML = '';
     };
-  }, [settings.diwali_theme_enabled, settings.diwali_show_diyas]);
+  }, [isHome, settings.diwali_theme_enabled, settings.diwali_show_diyas]);
 
   const isEnabled = settings.diwali_theme_enabled !== false;
   const showDiyas = isEnabled && settings.diwali_show_diyas !== false;
 
-  if (!showDiyas) return null;
+  if (!isHome || !showDiyas) return null;
 
   return (
     <div id="dz3" ref={containerRef} aria-hidden="true">
@@ -355,9 +349,7 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
       <div className="l" id="z-s"></div>
       {/* Layer 2: Hanging Diyas on Chains */}
       <div className="l" id="z-d"></div>
-      {/* Layer 3: Soft Gold Bokeh Sparkles */}
-      <div className="l" id="z-f"></div>
-      {/* Layer 4: Interactive Embers & Click Diyas */}
+      {/* Layer 3: Interactive Embers & Click Diyas */}
       <div className="l" id="z-c"></div>
     </div>
   );

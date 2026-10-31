@@ -75,7 +75,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   OVERLAY V3 STYLES: HANGING DIYAS, CHAINS, SILK, BOKEH, CLICK PARTICLES
+   OVERLAY V3 STYLES: HANGING DIYAS, CHAINS, SILK, CLICK PARTICLES (NO BUBBLES)
    ══════════════════════════════════════════════════════════════════════════════ */
 #dz3 {
   position: fixed;
@@ -138,19 +138,8 @@
   to { opacity: 1; }
 }
 
-.z-tw {
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff4c9, rgba(255, 200, 90, 0.75) 45%, rgba(255, 200, 90, 0) 70%);
-  animation: z-twk 3.5s ease-in-out infinite;
-}
-
-@keyframes z-twk {
-  0%, 100% { opacity: 0.15; transform: scale(0.7); }
-  50% { opacity: 0.95; transform: scale(1.1); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .z-strand, .z-flame, .z-glow, .z-tw {
+  .z-strand, .z-flame, .z-glow {
     animation: none;
   }
 }
