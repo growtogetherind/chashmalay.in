@@ -568,6 +568,22 @@ export const createOrder = async ({
     console.warn("Stock decrement skipped or failed:", err);
   }
 
+  // Best-effort coupon usage count increment (decreases remaining available coupons)
+  if (couponCode) {
+    try {
+      const couponQuery = query(collection(db, "coupons"), where("code", "==", couponCode.toUpperCase()));
+      const couponSnap = await getDocs(couponQuery);
+      if (!couponSnap.empty) {
+        const cDoc = couponSnap.docs[0];
+        await updateDoc(doc(db, "coupons", cDoc.id), {
+          used_count: increment(1)
+        }).catch(err => console.warn("Failed to increment coupon used_count:", err));
+      }
+    } catch (err) {
+      console.warn("Coupon usage increment skipped or failed:", err);
+    }
+  }
+
   // Best-effort prescription records
   try {
     for (const item of items) {
@@ -1377,6 +1393,8 @@ export const saveCoupon = async (couponData, id = null) => {
     const data = {
       ...couponData,
       code: couponData.code.toUpperCase(),
+      usage_limit: couponData.usage_limit !== undefined && couponData.usage_limit !== '' && couponData.usage_limit !== null ? Number(couponData.usage_limit) : null,
+      used_count: Number(couponData.used_count) || 0,
       updated_at: serverTimestamp()
     };
     if (id) {
@@ -1413,6 +1431,13 @@ export const validateCoupon = async (code) => {
         const expiry = new Date(`${coupon.expiry_date}T23:59:59`);
         if (expiry.getTime() < Date.now()) {
           return { data: null, error: "Coupon has expired" };
+        }
+      }
+      // Check maximum redemption / usage limit
+      if (coupon.usage_limit !== undefined && coupon.usage_limit !== null && Number(coupon.usage_limit) > 0) {
+        const used = Number(coupon.used_count || 0);
+        if (used >= Number(coupon.usage_limit)) {
+          return { data: null, error: "Coupon redemption limit reached. This coupon is fully redeemed." };
         }
       }
       return { data: coupon, error: null };

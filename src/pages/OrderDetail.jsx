@@ -235,8 +235,21 @@ const OrderDetail = () => {
              <div className="space-y-3 text-sm text-gray-600">
                <div className="flex justify-between">
                  <span>Subtotal</span>
-                 <span>₹{Number(order.total_amount).toLocaleString()}</span>
+                 <span>₹{(Number(order.total_amount) + Number(order.discount_amount || 0)).toLocaleString()}</span>
                </div>
+               {(order.coupon_code || order.discount_amount > 0) && (
+                 <div className="flex justify-between text-emerald-600 font-bold">
+                   <span className="flex items-center gap-1.5">
+                     <span>Coupon Discount</span>
+                     {order.coupon_code && (
+                       <span className="font-mono text-xs bg-emerald-100/80 px-2 py-0.5 rounded-md text-emerald-800">
+                         {order.coupon_code}
+                       </span>
+                     )}
+                   </span>
+                   <span>-₹{Number(order.discount_amount || 0).toLocaleString()}</span>
+                 </div>
+               )}
                <div className="flex justify-between">
                  <span>Shipping</span>
                  <span className="text-green-600 font-bold">Free</span>

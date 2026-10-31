@@ -179,27 +179,40 @@ export const generateInvoice = (order) => {
   }
 
   // 8. Calculations Summary Card
-  if (finalY > 230) {
+  if (finalY > 220) {
     doc.addPage();
     finalY = 20;
   } else {
     finalY += 8;
   }
 
-  const subtotal = Number(order.total_amount);
+  const finalTotal = Number(order.total_amount || 0);
+  const discountAmount = Number(order.discount_amount || 0);
+  const couponCode = order.coupon_code;
+  const subtotal = discountAmount > 0 ? (finalTotal + discountAmount) : finalTotal;
 
   doc.setFontSize(9.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(75, 85, 99);
 
-  doc.text('Subtotal:', 135, finalY);
+  doc.text('Subtotal:', 125, finalY);
   doc.text(`INR ${subtotal.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 196, finalY, { align: 'right' });
 
+  let summaryY = finalY;
+
+  if (couponCode || discountAmount > 0) {
+    summaryY += 6;
+    doc.setTextColor(5, 150, 105); // Emerald-600
+    doc.text(`Coupon Discount (${couponCode || 'APPLIED'}):`, 125, summaryY);
+    doc.text(`- INR ${discountAmount.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 196, summaryY, { align: 'right' });
+  }
+
+  summaryY += 8;
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 63, 138); // brand color
-  doc.text('TOTAL AMOUNT:', 135, finalY + 8);
-  doc.text(`INR ${Number(order.total_amount).toLocaleString()}`, 196, finalY + 8, { align: 'right' });
+  doc.text('TOTAL AMOUNT:', 125, summaryY);
+  doc.text(`INR ${finalTotal.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 196, summaryY, { align: 'right' });
 
   // 9. Standardized Professional Footer (Sticky at page bottom)
   const pageHeight = doc.internal.pageSize.getHeight();

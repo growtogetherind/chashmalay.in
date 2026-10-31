@@ -322,7 +322,16 @@ const AdminOrders = () => {
                                  {order.order_items?.[0]?.category || order.order_items?.[0]?.products?.category || 'Eyewear'}
                               </span>
                            </td>
-                           <td><span className="text-gray-900 font-extrabold">₹{Number(order.total_amount).toLocaleString()}</span></td>
+                           <td>
+                              <div className="flex flex-col">
+                                 <span className="text-gray-900 font-extrabold">₹{Number(order.total_amount).toLocaleString()}</span>
+                                 {order.coupon_code && (
+                                    <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded w-fit mt-0.5 tracking-wider">
+                                       🏷️ {order.coupon_code}
+                                    </span>
+                                 )}
+                              </div>
+                           </td>
                            <td><span className="text-gray-500 text-xs font-bold">{new Date(order.created_at?.seconds * 1000 || order.created_at).toLocaleDateString('en-GB')}</span></td>
                            <td><span className="text-gray-500 text-xs font-bold">{order.razorpay_payment_id ? 'Razorpay' : (order.payment_method || 'Pending')}</span></td>
                            <td>
@@ -593,6 +602,25 @@ const AdminOrders = () => {
 
                {/* Sidebar Footer */}
                <div className="p-6 border-t border-gray-100 bg-gray-50/50">
+                  {(selectedOrder.coupon_code || selectedOrder.discount_amount > 0) && (
+                    <div className="space-y-2 mb-4 pb-4 border-b border-gray-200/70 text-xs px-2">
+                       <div className="flex justify-between text-gray-500 font-medium">
+                          <span>Items Subtotal</span>
+                          <span>₹{(Number(selectedOrder.total_amount) + Number(selectedOrder.discount_amount || 0)).toLocaleString()}</span>
+                       </div>
+                       <div className="flex justify-between text-emerald-600 font-bold">
+                          <span className="flex items-center gap-1.5">
+                            <span>Coupon Discount</span>
+                            {selectedOrder.coupon_code && (
+                              <span className="font-mono text-[10px] bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-800">
+                                {selectedOrder.coupon_code}
+                              </span>
+                            )}
+                          </span>
+                          <span>-₹{Number(selectedOrder.discount_amount || 0).toLocaleString()}</span>
+                       </div>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-6 px-2">
                      <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Total Amount</span>
                      <span className="text-2xl font-black text-gray-900">₹{Number(selectedOrder.total_amount).toLocaleString()}</span>

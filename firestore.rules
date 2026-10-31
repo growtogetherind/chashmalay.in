@@ -135,7 +135,13 @@ service cloud.firestore {
     // ─── Coupons ──────────────────────────────────────────────────────────────
     match /coupons/{couponId} {
       allow read: if true;
-      allow write: if isManager();
+      allow create: if isManager();
+      allow update: if isManager() || (
+        request.auth != null &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used_count']) &&
+        request.resource.data.used_count is number &&
+        request.resource.data.used_count >= resource.data.used_count
+      );
       allow delete: if isAdmin();
     }
 

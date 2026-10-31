@@ -31,7 +31,8 @@ const CartDrawer = () => {
         const activeCoupons = coupons.filter(c => 
           c.is_active !== false && 
           !c.description?.toLowerCase().includes('demo') &&
-          !c.code?.toLowerCase().includes('demo')
+          !c.code?.toLowerCase().includes('demo') &&
+          (!c.usage_limit || (Number(c.used_count) || 0) < Number(c.usage_limit))
         );
         setAvailableCoupons(activeCoupons);
       });

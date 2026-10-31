@@ -125,6 +125,14 @@ const OrderSuccess = () => {
                 <span className="text-gray-500 font-medium">Amount Paid</span>
                 <span className="font-black text-green-600">₹{Number(order.total_amount).toFixed(0)}</span>
               </div>
+              {order.coupon_code && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500 font-medium">Coupon Applied</span>
+                  <span className="font-mono text-xs font-black text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">
+                    {order.coupon_code} {order.discount_amount > 0 ? `(-₹${Number(order.discount_amount).toFixed(0)})` : ''}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500 font-medium">Status</span>
                 <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-black rounded-full uppercase">{order.status}</span>
