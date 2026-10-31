@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { initializeFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter, getCountFromServer } from "firebase/firestore";
+import { initializeFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp, increment, runTransaction, onSnapshot, limit, startAfter, getCountFromServer, writeBatch } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBv9Lm2xw_0jvBNWvOdFUx8PQxkg7soSec",
@@ -289,6 +289,53 @@ export const saveProduct = async (product, id = null) => {
       return { id: docRef.id, error: null };
     }
   } catch (error) { return { id: null, error }; }
+};
+
+export const bulkUpdateProductPrices = async (updates, onProgress = null) => {
+  try {
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return { count: 0, error: new Error('No products specified for price update') };
+    }
+
+    const CHUNK_SIZE = 400; // Keep safely below Firestore's 500 operation limit per batch
+    let totalUpdated = 0;
+
+    for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
+      const chunk = updates.slice(i, i + CHUNK_SIZE);
+      const batch = writeBatch(db);
+
+      chunk.forEach(item => {
+        if (!item.id) return;
+        const ref = doc(db, 'products', item.id);
+        const patch = {
+          price: Number(item.price),
+          updated_at: serverTimestamp()
+        };
+        if (item.original_price !== undefined && item.original_price !== null) {
+          patch.original_price = Number(item.original_price);
+        }
+        if (item.discount_price !== undefined) {
+          patch.discount_price = item.discount_price ? Number(item.discount_price) : null;
+        }
+        batch.update(ref, patch);
+      });
+
+      await batch.commit();
+      totalUpdated += chunk.length;
+      if (onProgress) {
+        onProgress(totalUpdated, updates.length);
+      }
+    }
+
+    await writeAdminLog('bulk_price_adjustment', 'products', {
+      count: totalUpdated
+    });
+
+    return { count: totalUpdated, error: null };
+  } catch (error) {
+    console.error('bulkUpdateProductPrices Error:', error);
+    return { count: 0, error };
+  }
 };
 
 export const bulkImportCatalog = async (products, onProgress) => {

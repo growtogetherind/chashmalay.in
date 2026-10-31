@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn, Tag, Search, Filter } from 'lucide-react';
-import { getProducts, saveProduct, deleteProduct, getCategories, saveCategory, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories, saveLensCategory, subscribeLenses } from '../../lib/firebase';
+import { Plus, Edit3, Trash2, X, Copy, Image as ImageIcon, Layers, Upload, Palette, Package, MoreVertical, Eye, Zap, ZoomIn, Tag, Search, Filter, TrendingUp, Sparkles, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { getProducts, saveProduct, deleteProduct, bulkUpdateProductPrices, getCategories, saveCategory, getBrands, saveBrand, toggleProductActive, subscribeProducts, subscribeCategories, subscribeBrands, subscribeLensCategories, saveLensCategory, subscribeLenses } from '../../lib/firebase';
 import { uploadImage } from '../../lib/cloudinary';
 import { useConfirm } from '../../context/ConfirmContext';
 import ImageZoomModal from '../../components/ui/ImageZoomModal';
@@ -104,6 +104,117 @@ const AdminProducts = () => {
   const [newLensCategoryName, setNewLensCategoryName] = useState('');
   const [addingLensCategory, setAddingLensCategory] = useState(false);
   const [zoomModal, setZoomModal] = useState({ isOpen: false, imageUrl: '', images: [], initialIndex: 0, title: '' });
+  
+  // Mass Price Adjustment State
+  const [showBulkPriceModal, setShowBulkPriceModal] = useState(false);
+  const [bulkAdjType, setBulkAdjType] = useState('percent'); // 'percent' | 'fixed'
+  const [bulkDirection, setBulkDirection] = useState('increase'); // 'increase' | 'decrease'
+  const [bulkValue, setBulkValue] = useState(20);
+  const [bulkScope, setBulkScope] = useState('all'); // 'all' | 'filtered' | 'category'
+  const [bulkCategory, setBulkCategory] = useState('');
+  const [bulkUpdateMRP, setBulkUpdateMRP] = useState(true);
+  const [bulkRounding, setBulkRounding] = useState('nearest_9'); // 'none' | 'nearest_9' | 'nearest_10'
+  const [bulkApplying, setBulkApplying] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
+
+  const calculateAdjustedPrice = (origPrice, type, dir, val, rounding) => {
+    const p = Number(origPrice);
+    if (isNaN(p) || p <= 0) return p;
+
+    const numVal = Math.max(0, Number(val) || 0);
+    const sign = dir === 'increase' ? 1 : -1;
+    let newPrice = p;
+
+    if (type === 'percent') {
+      newPrice = p + sign * (p * (numVal / 100));
+    } else {
+      newPrice = p + sign * numVal;
+    }
+
+    if (newPrice < 0) newPrice = 0;
+
+    if (rounding === 'nearest_9') {
+      newPrice = Math.max(9, Math.round(newPrice / 10) * 10 - 1);
+    } else if (rounding === 'nearest_10') {
+      newPrice = Math.round(newPrice / 10) * 10;
+    } else {
+      newPrice = Math.round(newPrice);
+    }
+
+    return newPrice;
+  };
+
+  const getTargetProductsForBulk = () => {
+    if (bulkScope === 'filtered') {
+      return filteredProducts;
+    }
+    if (bulkScope === 'category' && bulkCategory) {
+      return products.filter(p => p.category?.toLowerCase() === bulkCategory.toLowerCase());
+    }
+    return products;
+  };
+
+  const handleApplyBulkPriceAdjustment = async () => {
+    const targets = getTargetProductsForBulk();
+    if (targets.length === 0) {
+      toast.error('No products found matching the selected scope.');
+      return;
+    }
+
+    const val = Number(bulkValue);
+    if (isNaN(val) || val <= 0) {
+      toast.error('Please enter a valid positive number for price adjustment.');
+      return;
+    }
+
+    const signText = bulkDirection === 'increase' ? `+${val}${bulkAdjType === 'percent' ? '%' : '₹'}` : `-${val}${bulkAdjType === 'percent' ? '%' : '₹'}`;
+
+    const confirmed = await confirm({
+      title: 'Confirm Mass Price Adjustment',
+      message: `Are you sure you want to apply ${signText} to all ${targets.length} product(s)? This will directly update prices in your live store.`
+    });
+
+    if (!confirmed) return;
+
+    setBulkApplying(true);
+    setBulkProgress({ current: 0, total: targets.length });
+
+    const updates = targets.map(p => {
+      const newPrice = calculateAdjustedPrice(p.price, bulkAdjType, bulkDirection, val, bulkRounding);
+      const updateObj = {
+        id: p.id,
+        price: newPrice
+      };
+      if (bulkUpdateMRP && p.original_price) {
+        updateObj.original_price = calculateAdjustedPrice(p.original_price, bulkAdjType, bulkDirection, val, bulkRounding);
+      }
+      return updateObj;
+    });
+
+    const { count, error } = await bulkUpdateProductPrices(updates, (curr, tot) => {
+      setBulkProgress({ current: curr, total: tot });
+    });
+
+    if (error) {
+      toast.error('Bulk update failed: ' + error.message);
+    } else {
+      toast.success(`Successfully updated prices for ${count} product(s) (${signText})!`);
+      const updateMap = new Map(updates.map(u => [u.id, u]));
+      setProducts(prev => prev.map(p => {
+        const u = updateMap.get(p.id);
+        if (u) {
+          return {
+            ...p,
+            price: u.price,
+            ...(u.original_price !== undefined ? { original_price: u.original_price } : {})
+          };
+        }
+        return p;
+      }));
+      setShowBulkPriceModal(false);
+    }
+    setBulkApplying(false);
+  };
   const { confirm } = useConfirm();
 
   const slugify = (v = '') => v.trim().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -682,6 +793,14 @@ const AdminProducts = () => {
                 <Zap size={16} className="fill-white" /> <span>Quick Add</span>
               </Link>
             )}
+            <button 
+              type="button"
+              onClick={() => setShowBulkPriceModal(true)} 
+              className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              title="Mass price adjustment across store"
+            >
+              <TrendingUp size={16} /> <span>Mass Price Adjust</span>
+            </button>
             <button onClick={handleNewProduct} className="admin-primary-btn px-6 shadow-lg shadow-emerald-500/20">
               <Plus size={18} /> <span className="ml-1">Add Product</span>
             </button>
@@ -2212,6 +2331,307 @@ const AdminProducts = () => {
             <div className="mt-8 flex gap-3">
               <button onClick={handleSaveColor} className="flex-1 py-4 bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all">Save Color</button>
               <button onClick={() => setShowColorModal(false)} className="px-6 py-4 bg-slate-50 text-slate-400 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mass Price Adjustment Modal */}
+      {showBulkPriceModal && (
+        <div className="admin-modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[2200] flex items-center justify-center p-3 sm:p-6" onClick={() => !bulkApplying && setShowBulkPriceModal(false)}>
+          <div className="admin-modal max-w-3xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-indigo-50/50 via-purple-50/30 to-white">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                  <TrendingUp size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Mass Price Adjustment</h2>
+                  <p className="text-xs text-slate-500 font-semibold mt-0.5">Increase or adjust prices across your catalog in one click</p>
+                </div>
+              </div>
+              <button 
+                disabled={bulkApplying}
+                onClick={() => setShowBulkPriceModal(false)} 
+                className="p-2.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors disabled:opacity-40"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Scrollable Body */}
+            <div className="p-6 overflow-y-auto space-y-6">
+              
+              {/* 1. Quick One-Click Percentage Presets */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                    <Sparkles size={14} className="text-indigo-600" /> One-Click Quick Presets
+                  </label>
+                  <span className="text-[10px] text-slate-400 font-bold">Click any preset to apply instantly</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: '+5%', dir: 'increase', val: 5 },
+                    { label: '+10%', dir: 'increase', val: 10 },
+                    { label: '+15%', dir: 'increase', val: 15 },
+                    { label: '+20% (Popular)', dir: 'increase', val: 20, popular: true },
+                    { label: '+25%', dir: 'increase', val: 25 },
+                    { label: '+30%', dir: 'increase', val: 30 },
+                    { label: '-10% (Sale)', dir: 'decrease', val: 10 },
+                    { label: '-20% (Sale)', dir: 'decrease', val: 20 }
+                  ].map((preset, idx) => {
+                    const isSelected = bulkAdjType === 'percent' && bulkDirection === preset.dir && Number(bulkValue) === preset.val;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setBulkAdjType('percent');
+                          setBulkDirection(preset.dir);
+                          setBulkValue(preset.val);
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-105 ring-2 ring-indigo-400'
+                            : preset.popular
+                              ? 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border border-indigo-200'
+                              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                        }`}
+                      >
+                        {preset.dir === 'increase' ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
+                        {preset.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. Custom Adjustment Input */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">Action</label>
+                  <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => setBulkDirection('increase')}
+                      className={`py-2 text-xs font-black rounded-lg transition-all ${bulkDirection === 'increase' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                    >
+                      + Increase
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBulkDirection('decrease')}
+                      className={`py-2 text-xs font-black rounded-lg transition-all ${bulkDirection === 'decrease' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                    >
+                      - Discount
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">Type</label>
+                  <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => setBulkAdjType('percent')}
+                      className={`py-2 text-xs font-black rounded-lg transition-all ${bulkAdjType === 'percent' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                    >
+                      Percent (%)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBulkAdjType('fixed')}
+                      className={`py-2 text-xs font-black rounded-lg transition-all ${bulkAdjType === 'fixed' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                    >
+                      Flat (₹)
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">
+                    Amount ({bulkAdjType === 'percent' ? '%' : '₹'})
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0.1"
+                      step="any"
+                      value={bulkValue}
+                      onChange={e => setBulkValue(e.target.value)}
+                      placeholder={bulkAdjType === 'percent' ? '20' : '100'}
+                      className="w-full bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-sm font-black text-slate-900 focus:bg-white focus:border-indigo-600 outline-none"
+                    />
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">
+                      {bulkAdjType === 'percent' ? '%' : '₹'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Scope & Filter */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">Target Products</label>
+                  <select
+                    value={bulkScope}
+                    onChange={e => setBulkScope(e.target.value)}
+                    className="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-indigo-600 shadow-sm cursor-pointer"
+                  >
+                    <option value="all">All Store Products ({products.length} products)</option>
+                    <option value="filtered">Currently Filtered List ({filteredProducts.length} products)</option>
+                    <option value="category">Specific Category Only...</option>
+                  </select>
+                </div>
+
+                {bulkScope === 'category' ? (
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">Select Category</label>
+                    <select
+                      value={bulkCategory}
+                      onChange={e => setBulkCategory(e.target.value)}
+                      className="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-indigo-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="">-- Choose Category --</option>
+                      {categories.map(c => (
+                        <option key={c.id || c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">Price Rounding</label>
+                    <select
+                      value={bulkRounding}
+                      onChange={e => setBulkRounding(e.target.value)}
+                      className="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-indigo-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="nearest_9">End in 9 (e.g. ₹999, ₹1,199) - Recommended</option>
+                      <option value="nearest_10">Round to nearest ₹10 (e.g. ₹1,000, ₹1,200)</option>
+                      <option value="none">Exact Rounded Rupee (e.g. ₹1,198)</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* 4. MRP Checkbox */}
+              <div className="flex items-center gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                <input
+                  type="checkbox"
+                  id="mrpCheck"
+                  checked={bulkUpdateMRP}
+                  onChange={e => setBulkUpdateMRP(e.target.checked)}
+                  className="w-4 h-4 rounded text-indigo-600 accent-indigo-600 cursor-pointer"
+                />
+                <label htmlFor="mrpCheck" className="text-xs font-bold text-slate-700 cursor-pointer select-none">
+                  Also proportionally adjust <span className="font-black text-slate-900">Original Price / MRP</span> (keeps discount tags visually consistent)
+                </label>
+              </div>
+
+              {/* 5. Live Preview Section */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">
+                    Live Preview ({getTargetProductsForBulk().length} products targeted)
+                  </span>
+                  <span className="text-[10px] text-indigo-600 font-extrabold uppercase tracking-wider">
+                    {bulkDirection === 'increase' ? `+${bulkValue}${bulkAdjType === 'percent' ? '%' : '₹'}` : `-${bulkValue}${bulkAdjType === 'percent' ? '%' : '₹'}`} adjustment
+                  </span>
+                </div>
+
+                <div className="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/40 divide-y divide-slate-100">
+                  {getTargetProductsForBulk().slice(0, 4).map(p => {
+                    const currentPrice = Number(p.price || 0);
+                    const newPrice = calculateAdjustedPrice(currentPrice, bulkAdjType, bulkDirection, bulkValue, bulkRounding);
+                    const diff = newPrice - currentPrice;
+                    const thumb = p.images?.front || p.frame_image || p.image || p.images?.gallery?.[0];
+
+                    return (
+                      <div key={p.id} className="p-3 flex items-center justify-between gap-4 bg-white hover:bg-slate-50/60 transition-colors">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                            {thumb ? <img src={thumb} alt="" className="w-full h-full object-contain" /> : <Package size={14} className="text-slate-400" />}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-slate-900 truncate">{p.name || 'Unnamed Product'}</p>
+                            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{p.category || 'Eyewear'}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 shrink-0 text-right">
+                          <div>
+                            <span className="text-xs font-semibold text-slate-400 line-through mr-2">₹{currentPrice.toLocaleString()}</span>
+                            <span className="text-sm font-black text-slate-900">₹{newPrice.toLocaleString()}</span>
+                          </div>
+                          <span className={`text-[11px] font-black px-2 py-0.5 rounded-lg ${diff >= 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
+                            {diff >= 0 ? `+₹${diff.toLocaleString()}` : `-₹${Math.abs(diff).toLocaleString()}`}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {getTargetProductsForBulk().length > 4 && (
+                    <div className="p-2 text-center text-[10px] font-bold text-slate-400 bg-slate-50">
+                      + {getTargetProductsForBulk().length - 4} more products will be updated with this formula
+                    </div>
+                  )}
+                  {getTargetProductsForBulk().length === 0 && (
+                    <div className="p-6 text-center text-xs font-bold text-slate-400">
+                      No products match your selected target scope.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress bar when applying */}
+              {bulkApplying && (
+                <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-2 animate-pulse">
+                  <div className="flex justify-between text-xs font-black text-indigo-900">
+                    <span>Updating Product Prices in Store...</span>
+                    <span>{bulkProgress.current} / {bulkProgress.total}</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-indigo-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-indigo-600 transition-all duration-300 rounded-full" 
+                      style={{ width: `${Math.round((bulkProgress.current / Math.max(1, bulkProgress.total)) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-4">
+              <button
+                type="button"
+                disabled={bulkApplying}
+                onClick={() => setShowBulkPriceModal(false)}
+                className="px-6 py-3.5 rounded-xl text-xs font-black text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all border border-slate-200 disabled:opacity-40"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                disabled={bulkApplying || getTargetProductsForBulk().length === 0}
+                onClick={handleApplyBulkPriceAdjustment}
+                className="flex-1 py-3.5 px-6 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-600/30 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2"
+              >
+                {bulkApplying ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Updating Prices...</span>
+                  </>
+                ) : (
+                  <>
+                    <TrendingUp size={16} />
+                    <span>Apply {bulkDirection === 'increase' ? `+${bulkValue}${bulkAdjType === 'percent' ? '%' : '₹'}` : `-${bulkValue}${bulkAdjType === 'percent' ? '%' : '₹'}`} to {getTargetProductsForBulk().length} Products</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
