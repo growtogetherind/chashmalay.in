@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════════
-   CHASHMALAY DIWALI FESTIVE THEME STYLES
+   CHASHMALAY DIWALI FESTIVE THEME STYLES (v3 OVERLAY & ANNOUNCEMENT BAR)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 /* Festive Announcement Bar Gradient & Shimmer */
@@ -27,7 +27,7 @@
   100% { background-position: -200% 0; }
 }
 
-/* Diya Flame Flicker */
+/* Diya Flame Flicker in Announcement Bar */
 .diwali-flame-flicker {
   transform-origin: 32px 30px;
   animation: diyaFlame 2.2s ease-in-out infinite alternate;
@@ -61,36 +61,6 @@
   }
 }
 
-/* Hanging Lantern / Diya Sway Animations */
-.diwali-lantern-left {
-  transform-origin: top center;
-  animation: diwaliLanternSwayLeft 4.5s ease-in-out infinite alternate;
-}
-
-.diwali-lantern-right {
-  transform-origin: top center;
-  animation: diwaliLanternSwayRight 4.8s ease-in-out 0.5s infinite alternate;
-}
-
-@keyframes diwaliLanternSwayLeft {
-  0% {
-    transform: rotate(-3.5deg);
-  }
-  100% {
-    transform: rotate(3deg);
-  }
-}
-
-@keyframes diwaliLanternSwayRight {
-  0% {
-    transform: rotate(3deg);
-  }
-  100% {
-    transform: rotate(-3.5deg);
-  }
-}
-
-/* Subtle Golden Glow Pulse */
 .diwali-glow-pulse {
   animation: diwaliGlow 3s ease-in-out infinite alternate;
 }
@@ -104,16 +74,83 @@
   }
 }
 
-/* Copy Coupon Pill Pulse */
-.diwali-coupon-btn {
-  background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%);
-  color: #713f12;
-  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/* ══════════════════════════════════════════════════════════════════════════════
+   OVERLAY V3 STYLES: HANGING DIYAS, CHAINS, SILK, BOKEH, CLICK PARTICLES
+   ══════════════════════════════════════════════════════════════════════════════ */
+#dz3 {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
 }
 
-.diwali-coupon-btn:hover {
-  background: linear-gradient(135deg, #fef9c3 0%, #fde047 50%, #facc15 100%);
-  transform: translateY(-1px) scale(1.03);
-  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+#dz3 .l {
+  position: absolute;
+  inset: 0;
+}
+
+#dz3 .a {
+  position: absolute;
+}
+
+#dz3 svg, #dz3 img {
+  display: block;
+  overflow: visible;
+}
+
+.z-strand {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 0;
+  animation: z-sway 5s ease-in-out infinite alternate;
+}
+
+.z-chain {
+  width: 2px;
+  background: repeating-linear-gradient(#b98a2e 0 3px, #f4dc95 3px 5px);
+}
+
+@keyframes z-sway {
+  from { transform: rotate(-1.6deg); }
+  to { transform: rotate(1.6deg); }
+}
+
+.z-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: z-flick 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes z-flick {
+  from { transform: scale(1, 1) rotate(-3deg); }
+  to { transform: scale(1.1, 1.2) rotate(3deg); }
+}
+
+.z-glow {
+  animation: z-pulse 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes z-pulse {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+.z-tw {
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff4c9, rgba(255, 200, 90, 0.75) 45%, rgba(255, 200, 90, 0) 70%);
+  animation: z-twk 3.5s ease-in-out infinite;
+}
+
+@keyframes z-twk {
+  0%, 100% { opacity: 0.15; transform: scale(0.7); }
+  50% { opacity: 0.95; transform: scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .z-strand, .z-flame, .z-glow, .z-tw {
+    animation: none;
+  }
 }
