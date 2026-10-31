@@ -184,7 +184,7 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
 
       if (small) {
         // MOBILE VIEW:
-        // On mobile, the sticky navbar takes ~84px (announcement bar + nav).
+        // On mobile, the sticky navbar takes ~84px.
         // Corner drapes and hanging diyas hang below the header at the extreme edges.
         const topOffset = 84;
         const sw = 45;
@@ -193,9 +193,9 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
 
         // On mobile, omit the bottom lotus so the BottomNav ('HOME', 'SHOP', 'CART', 'ACCOUNT') remains completely unobstructed and clean.
 
-        // Hanging Diyas: Scaled compact (24px) at outer edges
-        const dw = 24;
-        const spec = [[4, 34], [96, 34]];
+        // Hanging Diyas: Scaled compact (22px) at outer edges
+        const dw = 22;
+        const spec = [[3, 30], [97, 30]];
         spec.forEach((p, n) => {
           h2 +=
             '<div class="z-strand" style="left:' + p[0] + '%;top:' + topOffset + 'px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +
@@ -203,18 +203,23 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
         });
       } else {
         // DESKTOP & TABLET VIEW:
-        // On desktop, the header content is centered with wide outer margins.
-        // The silk drapes and hanging diyas frame the screen gracefully from top: 0!
-        const sw = 160;
+        // Silk drapes and hanging diyas are positioned EXCLUSIVELY in the outer corners (0-5% and 95-100%).
+        // They NEVER cross into the center where category links, search, logo, and the hero banner live!
+        const sw = 140;
         const sh = (sw * 172) / 200;
         html += silk(sw, sh, 0, false) + silk(sw, sh, 0, true);
 
-        // Lotus in bottom-left corner
-        html += '<div class="a" style="left:14px;bottom:12px">' + lotus(88) + '</div>';
+        // Elegant Gold Lotus in bottom-left corner
+        html += '<div class="a" style="left:16px;bottom:16px">' + lotus(76) + '</div>';
 
-        // Staggered hanging diyas in the wide outer margins
-        const dw = 52;
-        const spec = [[4, 75], [12, 140], [24, 50], [74, 65], [86, 145], [96, 90]];
+        // Staggered hanging diyas framed strictly in the top-left and top-right corners
+        const dw = 42;
+        const spec = [
+          [1.5, 75],   // Left outer corner diya
+          [3.8, 125],  // Left inner corner diya
+          [96.2, 125], // Right inner corner diya
+          [98.5, 75]   // Right outer corner diya
+        ];
         spec.forEach((p, n) => {
           h2 +=
             '<div class="z-strand" style="left:' + p[0] + '%;top:0px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +
