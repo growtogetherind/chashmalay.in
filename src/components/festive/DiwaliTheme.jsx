@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Copy, Check, Sparkles } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { X } from 'lucide-react';
 import './DiwaliTheme.css';
 
 // ── Reusable Glowing Diya SVG ──────────────────────────────────────────────────
-export const DiwaliDiyaIcon = ({ className = 'w-5 h-5', isAlt = false }) => (
+export const DiwaliDiyaIcon = ({ className = 'w-4 h-4', isAlt = false }) => (
   <svg
     viewBox="0 0 64 64"
     className={`shrink-0 ${className} diwali-glow-pulse`}
@@ -81,7 +80,7 @@ export const DiwaliHangingLantern = ({ side = 'left', className = '' }) => {
     >
       <svg
         viewBox="0 0 80 170"
-        className="w-10 sm:w-14 md:w-16 h-auto filter drop-shadow-[0_8px_20px_rgba(245,158,11,0.35)]"
+        className="w-9 sm:w-12 md:w-14 h-auto filter drop-shadow-[0_6px_16px_rgba(245,158,11,0.3)]"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -154,9 +153,8 @@ export const DiwaliHangingLantern = ({ side = 'left', className = '' }) => {
   );
 };
 
-// ── Festive Top Announcement Bar ───────────────────────────────────────────────
+// ── Festive Top Announcement Bar (Sleek, Small Font, Text-Only) ────────────────
 export const DiwaliAnnouncementBar = ({ settings = {} }) => {
-  const [copied, setCopied] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
@@ -169,29 +167,7 @@ export const DiwaliAnnouncementBar = ({ settings = {} }) => {
   const isEnabled = settings.diwali_theme_enabled !== false;
   if (!isEnabled || isDismissed) return null;
 
-  const message = settings.diwali_banner_text || '🪔 Shubh Deepavali! Extra 20% OFF on all Frames & Lenses • Use Code: DIWALI20 ✨';
-  const couponCode = settings.diwali_coupon_code || 'DIWALI20';
-
-  const handleCopy = (e) => {
-    e.stopPropagation();
-    if (!couponCode) return;
-    try {
-      navigator.clipboard.writeText(couponCode);
-      setCopied(true);
-      toast.success(`Diwali coupon "${couponCode}" copied! Apply at checkout ✨`, {
-        icon: '🪔',
-        style: {
-          background: '#450a0a',
-          color: '#fef08a',
-          fontWeight: 700,
-          border: '1px solid #ca8a04'
-        }
-      });
-      setTimeout(() => setCopied(false), 2500);
-    } catch (err) {
-      toast.error('Could not copy coupon code');
-    }
-  };
+  const message = settings.diwali_banner_text || '🪔 Shubh Deepavali! Flat 20% OFF on all Eyewear • Use Code: DIWALI20 ✨';
 
   const handleDismiss = (e) => {
     e.stopPropagation();
@@ -202,60 +178,36 @@ export const DiwaliAnnouncementBar = ({ settings = {} }) => {
   };
 
   return (
-    <div className="diwali-banner-bg text-amber-50 relative z-50 overflow-hidden py-2 px-3 sm:px-6">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 md:gap-4">
+    <div className="diwali-banner-bg text-amber-50 relative z-50 overflow-hidden py-1 sm:py-1.5 px-3 sm:px-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         
-        {/* Left Glowing Diya (visible on all screens) */}
-        <div className="hidden sm:flex items-center shrink-0">
-          <DiwaliDiyaIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+        {/* Left Glowing Diya */}
+        <div className="flex items-center shrink-0">
+          <DiwaliDiyaIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </div>
 
-        {/* Center Text & Coupon Pill */}
-        <div className="flex-1 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-center min-w-0">
-          <div className="flex items-center gap-1.5 shrink-0 sm:hidden">
-            <DiwaliDiyaIcon className="w-4 h-4" />
-          </div>
-          
-          <span className="text-[11px] sm:text-xs md:text-sm font-black tracking-wide text-amber-100 drop-shadow-sm truncate">
+        {/* Center Text (Small, Sleek, Clean Typography) */}
+        <div className="flex-1 flex items-center justify-center gap-2 text-center min-w-0 px-1">
+          <span className="text-[10px] sm:text-[11px] md:text-xs font-medium tracking-wider text-amber-50 drop-shadow-sm truncate">
             {message}
           </span>
-
-          {couponCode && (
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="diwali-coupon-btn inline-flex items-center gap-1 px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-wider shrink-0 cursor-pointer"
-              title="Click to copy coupon code"
-            >
-              {copied ? (
-                <>
-                  <Check size={12} className="stroke-[3] text-emerald-800" />
-                  <span>COPIED!</span>
-                </>
-              ) : (
-                <>
-                  <Copy size={11} className="stroke-[2.5]" />
-                  <span>{couponCode}</span>
-                </>
-              )}
-            </button>
-          )}
-
-          <div className="hidden md:flex items-center shrink-0">
-            <DiwaliDiyaIcon className="w-5 h-5 sm:w-6 sm:h-6" isAlt />
-          </div>
         </div>
 
-        {/* Right Dismiss Button */}
-        <button
-          type="button"
-          onClick={handleDismiss}
-          className="shrink-0 p-1 text-amber-200/80 hover:text-white hover:bg-amber-900/40 rounded-lg transition-colors cursor-pointer"
-          aria-label="Dismiss festive banner"
-          title="Dismiss"
-        >
-          <X size={15} />
-        </button>
+        {/* Right Glowing Diya & Dismiss Button */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="hidden sm:flex items-center">
+            <DiwaliDiyaIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" isAlt />
+          </div>
+          <button
+            type="button"
+            onClick={handleDismiss}
+            className="p-0.5 text-amber-200/70 hover:text-white hover:bg-amber-900/40 rounded transition-colors cursor-pointer"
+            aria-label="Dismiss festive banner"
+            title="Dismiss"
+          >
+            <X size={13} />
+          </button>
+        </div>
       </div>
     </div>
   );

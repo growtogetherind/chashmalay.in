@@ -376,22 +376,7 @@ const AdminSettings = () => {
                         />
                       </div>
 
-                      {/* Diwali Coupon Code */}
-                      <div className="form-group">
-                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                          Diwali Coupon Code (Quick Copy Button)
-                        </label>
-                        <input
-                          type="text"
-                          value={form.diwali_coupon_code || ''}
-                          onChange={e => setForm({ ...form, diwali_coupon_code: e.target.value.toUpperCase() })}
-                          placeholder="DIWALI20"
-                          className="w-full bg-white border border-slate-200 p-4 rounded-[18px] text-slate-900 text-sm font-bold focus:border-amber-500 outline-none transition-all shadow-inner uppercase tracking-wider"
-                        />
-                        <p className="text-[9px] text-slate-400 mt-2 font-medium">
-                          Shoppers can tap this code in the top banner to automatically copy it to clipboard.
-                        </p>
-                      </div>
+
 
                       {/* Hanging Diyas / Lanterns Toggle */}
                       <label className="flex items-center justify-between p-5 bg-white rounded-[20px] border border-slate-200 group/toggle shadow-sm cursor-pointer hover:border-amber-300 transition-colors">
@@ -420,16 +405,11 @@ const AdminSettings = () => {
                         <span className="text-[9px] font-black text-amber-800 uppercase tracking-widest">
                           Live Storefront Banner Preview:
                         </span>
-                        <div className="rounded-xl overflow-hidden shadow-md">
-                          <div className="bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900 text-white py-2 px-3 flex items-center justify-between text-xs font-bold gap-2">
+                        <div className="rounded-xl overflow-hidden shadow-sm border border-amber-300/40">
+                          <div className="bg-gradient-to-r from-amber-950 via-amber-700 to-amber-950 text-amber-50 py-1.5 px-3 flex items-center justify-center text-[11px] font-medium tracking-wider gap-2">
                             <span className="truncate">
-                              {form.diwali_banner_text || '🪔 Shubh Deepavali! Extra 20% OFF • Use Code: DIWALI20 ✨'}
+                              {form.diwali_banner_text || '🪔 Shubh Deepavali! Flat 20% OFF on all Eyewear • Use Code: DIWALI20 ✨'}
                             </span>
-                            {form.diwali_coupon_code && (
-                              <span className="bg-yellow-300 text-yellow-900 px-2 py-0.5 rounded-full text-[10px] font-black uppercase shrink-0 shadow-sm">
-                                {form.diwali_coupon_code}
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
