@@ -146,23 +146,6 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
       );
     }
 
-    // Lotus vector generator for bottom corner
-    function lotus(s) {
-      const P = 'M0 0C-11-12-10-32 0-46C10-32 11-12 0 0Z';
-      let g = '';
-      function row(angs, sc, fill) {
-        angs.forEach((a) => {
-          g += '<path d="' + P + '" transform="rotate(' + a + ') scale(' + sc + ')" fill="' + fill + '" stroke="#9a6a1c" stroke-width=".6"/>';
-        });
-      }
-      row([-80, 80], 0.9, 'url(#z-gold)');
-      row([-58, 58], 0.98, 'url(#z-gold2)');
-      row([-36, 36], 1, 'url(#z-gold)');
-      row([-14, 14], 1.02, 'url(#z-gold2)');
-      row([0], 0.8, 'url(#z-gold)');
-      return '<svg width="' + s + '" height="' + s + '" viewBox="-50 -50 100 100" style="filter:drop-shadow(0 3px 4px rgba(80,40,0,.35))"><g transform="translate(0,34)">' + g + '</g></svg>';
-    }
-
     // Silk corner drapes
     function silk(w, h, topOffset, mirror) {
       return (
@@ -208,9 +191,6 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
         const sw = 140;
         const sh = (sw * 172) / 200;
         html += silk(sw, sh, 0, false) + silk(sw, sh, 0, true);
-
-        // Elegant Gold Lotus in bottom-left corner
-        html += '<div class="a" style="left:16px;bottom:16px">' + lotus(76) + '</div>';
 
         // Staggered hanging diyas framed strictly in the top-left and top-right corners
         const dw = 42;
@@ -284,7 +264,7 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
           </linearGradient>
         </defs>
       </svg>
-      {/* Layer 1: Silk & Lotus */}
+      {/* Layer 1: Silk Drapes */}
       <div className="l" id="z-s"></div>
       {/* Layer 2: Hanging Diyas on Chains */}
       <div className="l" id="z-d"></div>
