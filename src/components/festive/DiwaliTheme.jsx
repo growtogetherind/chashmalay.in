@@ -73,81 +73,60 @@ export const DiwaliHangingLantern = ({ side = 'left', className = '' }) => {
   const isLeft = side === 'left';
   return (
     <div
-      className={`fixed top-0 z-40 pointer-events-none select-none transition-all duration-300 ${
-        isLeft ? 'left-1 sm:left-4 md:left-8 diwali-lantern-left' : 'right-1 sm:right-4 md:right-8 diwali-lantern-right'
+      className={`fixed top-0 z-[60] pointer-events-none select-none transition-all duration-300 ${
+        isLeft
+          ? 'left-0.5 sm:left-3 md:left-6 lg:left-10 diwali-lantern-left'
+          : 'right-0.5 sm:right-3 md:right-6 lg:right-10 diwali-lantern-right'
       } ${className}`}
       aria-hidden="true"
     >
       <svg
-        viewBox="0 0 80 170"
-        className="w-9 sm:w-12 md:w-14 h-auto filter drop-shadow-[0_6px_16px_rgba(245,158,11,0.3)]"
+        viewBox="0 0 100 230"
+        className="w-7 sm:w-11 md:w-13 lg:w-16 h-auto filter drop-shadow-[0_8px_20px_rgba(245,158,11,0.45)]"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
-          <linearGradient id={`goldChain-${side}`} x1="40" y1="0" x2="40" y2="45" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#FDE047" />
-            <stop offset="0.5" stopColor="#CA8A04" />
-            <stop offset="1" stopColor="#EAB308" />
-          </linearGradient>
-          <radialGradient id={`lanternGlow-${side}`} cx="50%" cy="50%" r="50%">
-            <stop stopColor="#FEF08A" stopOpacity="0.9" />
-            <stop offset="40%" stopColor="#F59E0B" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#9A3412" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id={`kandilBody-${side}`} x1="16" y1="45" x2="64" y2="105" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#E11D48" />
-            <stop offset="0.5" stopColor="#B91C1C" />
-            <stop offset="1" stopColor="#881337" />
-          </linearGradient>
-          <linearGradient id={`tasselGold-${side}`} x1="40" y1="105" x2="40" y2="165" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#FDE047" />
-            <stop offset="0.5" stopColor="#F59E0B" />
-            <stop offset="1" stopColor="#B45309" />
-          </linearGradient>
-        </defs>
+        {/* Brass Hanging Chain from Top Ceiling */}
+        <line x1="50" y1="0" x2="50" y2="52" stroke="#F59E0B" strokeWidth="2.5" strokeDasharray="3 3" />
+        <circle cx="50" cy="52" r="4.5" fill="#FDE047" stroke="#92400E" strokeWidth="1.5" />
 
-        {/* Top Brass Hanging Ring & Chain */}
-        <line x1="40" y1="0" x2="40" y2="40" stroke={`url(#goldChain-${side})`} strokeWidth="2.5" strokeDasharray="3 3" />
-        <circle cx="40" cy="40" r="3.5" fill="#FDE047" stroke="#854D0E" strokeWidth="1" />
+        {/* Traditional Brass Bell */}
+        <path d="M40 56 C40 52 60 52 60 56 L64 70 L36 70 Z" fill="#EAB308" stroke="#78350F" strokeWidth="1.2" />
+        <circle cx="50" cy="72" r="3" fill="#FDE047" stroke="#92400E" strokeWidth="1" />
+        <line x1="50" y1="73" x2="50" y2="84" stroke="#F59E0B" strokeWidth="2.5" />
 
-        {/* Lantern Top Cap / Canopy */}
-        <polygon points="40,36 58,45 22,45" fill="#EAB308" stroke="#713F12" strokeWidth="1" />
+        {/* Ambient Warm Golden Glow Halo */}
+        <circle cx="50" cy="120" r="38" fill="#F59E0B" opacity="0.4" className="diwali-glow-pulse" />
 
-        {/* Ambient Warm Candle Glow inside Lantern */}
-        <circle cx="40" cy="75" r="28" fill={`url(#lanternGlow-${side})`} />
+        {/* Lantern Top Canopy */}
+        <polygon points="50,78 76,92 24,92" fill="#D97706" stroke="#78350F" strokeWidth="1.2" />
 
-        {/* Central Geometric Kandil / Diamond Lantern Body */}
-        <polygon
-          points="40,45 66,75 40,105 14,75"
-          fill={`url(#kandilBody-${side})`}
-          stroke="#FDE047"
-          strokeWidth="2"
-        />
+        {/* Outer Diamond Kandil Body (Ruby Red with Gold Border) */}
+        <polygon points="50,92 84,130 50,168 16,130" fill="#DC2626" stroke="#FDE047" strokeWidth="2" />
 
-        {/* Inner Star Cutout with Golden Glow */}
-        <polygon
-          points="40,56 46,71 61,75 46,79 40,94 34,79 19,75 34,71"
-          fill="#FEF08A"
-          stroke="#CA8A04"
-          strokeWidth="1.2"
-        />
-        <circle cx="40" cy="75" r="6" fill="#FFFBEB" className="diwali-glow-pulse" />
+        {/* Inner Diamond Layers */}
+        <polygon points="50,104 72,130 50,156 28,130" fill="#B91C1C" stroke="#F59E0B" strokeWidth="1.2" />
+        <polygon points="50,116 62,130 50,144 38,130" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" />
 
-        {/* Bottom Cap */}
-        <polygon points="22,105 58,105 40,114" fill="#EAB308" stroke="#713F12" strokeWidth="1" />
+        {/* Glowing Candle Flame Heart */}
+        <circle cx="50" cy="130" r="5" fill="#FFFFFF" className="animate-pulse" />
 
-        {/* Hanging Golden Tassels (Akash Kandil Streamers) */}
-        <path d="M40 114 Q40 140 40 165" stroke={`url(#tasselGold-${side})`} strokeWidth="3" strokeLinecap="round" />
-        <path d="M33 111 Q30 135 28 158" stroke={`url(#tasselGold-${side})`} strokeWidth="2" strokeLinecap="round" />
-        <path d="M47 111 Q50 135 52 158" stroke={`url(#tasselGold-${side})`} strokeWidth="2" strokeLinecap="round" />
-        <path d="M26 108 Q21 130 18 150" stroke={`url(#tasselGold-${side})`} strokeWidth="1.6" strokeLinecap="round" />
-        <path d="M54 108 Q59 130 62 150" stroke={`url(#tasselGold-${side})`} strokeWidth="1.6" strokeLinecap="round" />
+        {/* Bottom Base Cap */}
+        <polygon points="24,168 76,168 50,178" fill="#D97706" stroke="#78350F" strokeWidth="1.2" />
 
-        {/* Sparkling End Beads */}
-        <circle cx="40" cy="165" r="2.5" fill="#FEF08A" />
-        <circle cx="28" cy="158" r="2" fill="#FEF08A" />
-        <circle cx="52" cy="158" r="2" fill="#FEF08A" />
+        {/* Flowing Golden Tassels (Streamers) */}
+        <path d="M50 178 Q50 200 50 224" stroke="#FDE047" strokeWidth="3" strokeLinecap="round" />
+        <path d="M40 174 Q36 198 32 216" stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M60 174 Q64 198 68 216" stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M28 171 Q23 192 18 206" stroke="#EAB308" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M72 171 Q77 192 82 206" stroke="#EAB308" strokeWidth="1.8" strokeLinecap="round" />
+
+        {/* Sparkling Golden Tassel End Beads */}
+        <circle cx="50" cy="225" r="3" fill="#FEF08A" stroke="#B45309" strokeWidth="1" />
+        <circle cx="32" cy="217" r="2.5" fill="#FEF08A" stroke="#B45309" strokeWidth="0.8" />
+        <circle cx="68" cy="217" r="2.5" fill="#FEF08A" stroke="#B45309" strokeWidth="0.8" />
+        <circle cx="18" cy="207" r="2" fill="#FEF08A" stroke="#B45309" strokeWidth="0.8" />
+        <circle cx="82" cy="207" r="2" fill="#FEF08A" stroke="#B45309" strokeWidth="0.8" />
       </svg>
     </div>
   );
