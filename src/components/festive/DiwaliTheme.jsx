@@ -185,19 +185,17 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
       if (small) {
         // MOBILE VIEW:
         // On mobile, the sticky navbar takes ~84px (announcement bar + nav).
-        // To prevent covering the Search icon and Hamburger menu:
-        // Top offset is 84px so diyas & drapes hang gracefully right under the header!
+        // Corner drapes and hanging diyas hang below the header at the extreme edges.
         const topOffset = 84;
         const sw = 45;
         const sh = (sw * 172) / 200;
         html += silk(sw, sh, topOffset, false) + silk(sw, sh, topOffset, true);
 
-        // Gold Lotus: Positioned ABOVE the mobile BottomNav (bottom: 74px) so it NEVER covers the "HOME" tab!
-        html += '<div class="a" style="left:8px;bottom:74px">' + lotus(38) + '</div>';
+        // On mobile, omit the bottom lotus so the BottomNav ('HOME', 'SHOP', 'CART', 'ACCOUNT') remains completely unobstructed and clean.
 
-        // Hanging Diyas: Scaled compact (26px), hanging under header into top of hero section
-        const dw = 26;
-        const spec = [[3, 38], [97, 38]];
+        // Hanging Diyas: Scaled compact (24px) at outer edges
+        const dw = 24;
+        const spec = [[4, 34], [96, 34]];
         spec.forEach((p, n) => {
           h2 +=
             '<div class="z-strand" style="left:' + p[0] + '%;top:' + topOffset + 'px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +

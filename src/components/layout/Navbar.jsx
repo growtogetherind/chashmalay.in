@@ -137,10 +137,10 @@ const Navbar = ({ settings = {} }) => {
                 <Heart size={18} strokeWidth={1.5} />
               </Link>
 
-              {/* Cart */}
+              {/* Cart (Desktop only; mobile uses BottomNav) */}
               <button
                 onClick={toggleCart}
-                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all duration-200 relative bg-transparent border-none cursor-pointer"
+                className="hidden md:flex p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all duration-200 relative bg-transparent border-none cursor-pointer"
                 aria-label="Cart"
               >
                 <ShoppingBag size={18} strokeWidth={1.5} />
