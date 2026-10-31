@@ -7,12 +7,17 @@ let alertIntervalId = null;
 let currentAlert = null;
 const listeners = new Set();
 
-export const registerAdminServiceWorker = () => {
+export const registerAdminServiceWorker = async () => {
   if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      return reg;
+    } catch (err) {
       console.warn('SW registration skipped:', err);
-    });
+      return null;
+    }
   }
+  return null;
 };
 
 const getAudioContext = () => {
@@ -93,7 +98,7 @@ export const showLockScreenNotification = async (order) => {
   const customer = order.profiles?.full_name || order.shipping_address?.name || 'Customer';
   const amount = Number(order.total_amount || 0).toLocaleString();
   const firstItem = order.order_items?.[0] || {};
-  const photo = firstItem.image || firstItem.images?.front || (firstItem.images?.gallery && firstItem.images.gallery[0]);
+  const photo = firstItem.frame_image || firstItem.image || firstItem.images?.front || (firstItem.images?.gallery && firstItem.images.gallery[0]);
 
   const title = `🚨 New Order #${orderIdShort} (₹${amount})`;
   const options = {
@@ -103,6 +108,12 @@ export const showLockScreenNotification = async (order) => {
     vibrate: [400, 200, 400, 200, 600],
     tag: `order-${order.id}`,
     requireInteraction: true,
+    renotify: true,
+    silent: false,
+    actions: [
+      { action: 'open_order', title: '👁️ Open Order' },
+      { action: 'dismiss', title: 'Dismiss' }
+    ],
     data: { url: '/admin/orders' }
   };
 
@@ -112,7 +123,10 @@ export const showLockScreenNotification = async (order) => {
 
   try {
     if ('serviceWorker' in navigator) {
-      const reg = await navigator.serviceWorker.getRegistration();
+      let reg = await navigator.serviceWorker.getRegistration();
+      if (!reg) {
+        reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      }
       if (reg && reg.showNotification) {
         await reg.showNotification(title, options);
         return;
@@ -121,6 +135,66 @@ export const showLockScreenNotification = async (order) => {
     new Notification(title, options);
   } catch (err) {
     console.warn('Lock screen notification trigger notice:', err);
+    try {
+      new Notification(title, options);
+    } catch {
+      // fallback
+    }
+  }
+};
+
+export const sendTestLockScreenNotification = async () => {
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    throw new Error('Notifications are not supported in this browser.');
+  }
+
+  let perm = Notification.permission;
+  if (perm === 'default') {
+    perm = await Notification.requestPermission();
+  }
+  if (perm !== 'granted') {
+    throw new Error('Notification permission was not granted.');
+  }
+
+  const title = '🚨 Test Lock Screen Notification';
+  const options = {
+    body: 'Lock Screen notification & vibration are fully active for orders!',
+    icon: '/assets/im/logo.webp',
+    badge: '/assets/im/logo.webp',
+    vibrate: [400, 200, 400, 200, 600],
+    tag: 'test-order-alert',
+    requireInteraction: true,
+    renotify: true,
+    silent: false,
+    actions: [
+      { action: 'open_order', title: '👁️ Open Orders' },
+      { action: 'dismiss', title: 'Dismiss' }
+    ],
+    data: { url: '/admin/orders' }
+  };
+
+  try {
+    if ('serviceWorker' in navigator) {
+      let reg = await navigator.serviceWorker.getRegistration();
+      if (!reg) {
+        reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      }
+      if (reg && reg.showNotification) {
+        await reg.showNotification(title, options);
+        playSingleChime();
+        triggerVibration();
+        return true;
+      }
+    }
+    new Notification(title, options);
+    playSingleChime();
+    triggerVibration();
+    return true;
+  } catch (err) {
+    console.warn('Test lock screen notification error:', err);
+    new Notification(title, options);
+    playSingleChime();
+    return true;
   }
 };
 

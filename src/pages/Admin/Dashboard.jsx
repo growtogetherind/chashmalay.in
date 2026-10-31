@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Package, ShoppingBag, DollarSign, Users, TrendingUp, ArrowRight, Search, Bell, MoreVertical, Filter } from 'lucide-react';
 import { subscribeDashboardStats } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
-import { startContinuousOrderAlert, stopContinuousOrderAlert, playSingleChime } from '../../lib/adminAlertManager';
+import { startContinuousOrderAlert, stopContinuousOrderAlert, playSingleChime, sendTestLockScreenNotification, registerAdminServiceWorker } from '../../lib/adminAlertManager';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 
@@ -44,6 +44,9 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Register Service Worker for OS Lock Screen Notifications
+    registerAdminServiceWorker();
+
     // Request notification permission on mount
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
@@ -163,20 +166,19 @@ const AdminDashboard = () => {
                 <span className="text-purple-600 font-extrabold text-xs uppercase tracking-wider">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
                 <span className="text-gray-400 text-[10px] font-bold">Live store data</span>
              </div>
-             {"Notification" in window && Notification.permission === "default" && (
+             {"Notification" in window && (
                 <button
                    onClick={async () => {
-                      const permission = await Notification.permission === "default" 
-                         ? await Notification.requestPermission()
-                         : Notification.permission;
-                      if (permission === "granted") {
-                         toast.success("Desktop alerts enabled!");
-                         playNotificationSound();
+                      try {
+                         await sendTestLockScreenNotification();
+                         toast.success("Lock Screen alert & vibration verified!");
+                      } catch (err) {
+                         toast.error(err.message || "Failed to trigger notification");
                       }
                    }}
                    className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors border border-purple-100 mr-2"
                 >
-                   <Bell size={12} className="animate-bounce" /> Enable Alerts
+                   <Bell size={12} className="animate-bounce" /> {Notification.permission === 'granted' ? 'Test Alert' : 'Enable Alerts'}
                 </button>
              )}
              <div className="relative">
@@ -195,6 +197,21 @@ const AdminDashboard = () => {
                     <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                       <span className="text-[10px] font-black uppercase tracking-widest text-gray-900">Notifications</span>
                       <span className="px-2 py-0.5 bg-purple-100 text-purple-600 rounded-full text-[9px] font-black uppercase tracking-widest">{stats.pendingOrders} Pending</span>
+                    </div>
+                    <div className="p-2 border-b border-gray-50 bg-purple-50/40">
+                      <button
+                        onClick={async () => {
+                          try {
+                            await sendTestLockScreenNotification();
+                            toast.success("Sent! Turn off/lock screen to test OS notification.");
+                          } catch (err) {
+                            toast.error(err.message || "Failed to trigger notification");
+                          }
+                        }}
+                        className="w-full py-2 px-3 text-center text-[10px] font-extrabold text-purple-700 bg-white hover:bg-purple-100/60 rounded-xl transition-all border border-purple-200/60 shadow-sm flex items-center justify-center gap-1.5"
+                      >
+                        ⚡ Test Lock Screen Alert
+                      </button>
                     </div>
                     <div className="max-h-80 overflow-y-auto custom-scrollbar">
                       {recentOrders.length > 0 ? recentOrders.map((order) => (
