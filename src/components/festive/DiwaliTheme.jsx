@@ -167,38 +167,33 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
 
       if (small) {
         // MOBILE VIEW:
-        // On mobile, the sticky navbar takes ~84px.
-        // Corner drapes and hanging diyas hang below the header at the extreme edges.
-        const topOffset = 84;
-        const sw = 45;
+        // Corner drapes and hanging diyas hang gracefully from top corners
+        const sw = 75;
         const sh = (sw * 172) / 200;
-        html += silk(sw, sh, topOffset, false) + silk(sw, sh, topOffset, true);
+        html += silk(sw, sh, 0, false) + silk(sw, sh, 0, true);
 
-        // On mobile, omit the bottom lotus so the BottomNav ('HOME', 'SHOP', 'CART', 'ACCOUNT') remains completely unobstructed and clean.
-
-        // Hanging Diyas: Scaled compact (22px) at outer edges
-        const dw = 22;
-        const spec = [[3, 30], [97, 30]];
+        // Compact hanging diyas on mobile corners
+        const dw = 30;
+        const spec = [[3, 50], [97, 50]];
         spec.forEach((p, n) => {
           h2 +=
-            '<div class="z-strand" style="left:' + p[0] + '%;top:' + topOffset + 'px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +
+            '<div class="z-strand" style="left:' + p[0] + '%;top:0px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +
             '<div class="z-chain" style="height:' + p[1] + 'px"></div><div style="margin-top:-2px">' + diya(dw) + '</div></div>';
         });
       } else {
         // DESKTOP & TABLET VIEW:
-        // Silk drapes and hanging diyas are positioned EXCLUSIVELY in the outer corners (0-5% and 95-100%).
-        // They NEVER cross into the center where category links, search, logo, and the hero banner live!
-        const sw = 140;
+        // Big, royal festive drapes and prominent glowing diyas framed ABOVE the navbar (z-70)
+        const sw = 210;
         const sh = (sw * 172) / 200;
         html += silk(sw, sh, 0, false) + silk(sw, sh, 0, true);
 
-        // Staggered hanging diyas framed strictly in the top-left and top-right corners
-        const dw = 42;
+        // Prominent glowing diyas hanging on golden chains in the outer corners
+        const dw = 58;
         const spec = [
-          [1.5, 75],   // Left outer corner diya
-          [3.8, 125],  // Left inner corner diya
-          [96.2, 125], // Right inner corner diya
-          [98.5, 75]   // Right outer corner diya
+          [2, 95],     // Left outer corner diya
+          [5.5, 160],  // Left inner corner diya
+          [94.5, 160], // Right inner corner diya
+          [98, 95]     // Right outer corner diya
         ];
         spec.forEach((p, n) => {
           h2 +=
