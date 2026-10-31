@@ -132,7 +132,17 @@ const LensSelector = ({ isOpen, onClose, product, selectedColor = null, selected
   // Get available lenses for current selection category, applying any per-product custom lens values
   const getAvailableLenses = () => {
     if (!selections.visionType) return [];
-    const baseLenses = dbLenses.filter(l => l.category_id === selections.visionType.id && l.is_active !== false);
+    const baseLenses = dbLenses.filter(l => {
+      if (l.category_id !== selections.visionType.id || l.is_active === false) return false;
+      // If lens is set for specific eyewear only, hide from all other frames
+      if (l.applies_to === 'specific') {
+        const allowedIds = Array.isArray(l.applicable_product_ids) ? l.applicable_product_ids : [];
+        if (!product?.id || !allowedIds.includes(product.id)) {
+          return false;
+        }
+      }
+      return true;
+    });
 
     const customList = Array.isArray(product?.custom_lenses) ? product.custom_lenses : [];
 
