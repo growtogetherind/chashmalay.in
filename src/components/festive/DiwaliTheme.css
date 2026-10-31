@@ -1,0 +1,119 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   CHASHMALAY DIWALI FESTIVE THEME STYLES
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Festive Announcement Bar Gradient & Shimmer */
+.diwali-banner-bg {
+  background: linear-gradient(
+    90deg,
+    #3b0716 0%,
+    #701a2b 15%,
+    #9a3412 30%,
+    #b45309 45%,
+    #d97706 50%,
+    #b45309 55%,
+    #9a3412 70%,
+    #701a2b 85%,
+    #3b0716 100%
+  );
+  background-size: 200% 100%;
+  animation: diwaliShimmer 8s linear infinite;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 4px 20px rgba(180, 83, 9, 0.25);
+}
+
+@keyframes diwaliShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Diya Flame Flicker */
+.diwali-flame-flicker {
+  transform-origin: 32px 30px;
+  animation: diyaFlame 2.2s ease-in-out infinite alternate;
+}
+
+.diwali-flame-flicker-alt {
+  transform-origin: 32px 30px;
+  animation: diyaFlame 2.6s ease-in-out 0.4s infinite alternate;
+}
+
+@keyframes diyaFlame {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 0.92;
+    filter: drop-shadow(0 0 5px #f59e0b);
+  }
+  35% {
+    transform: scale(1.08, 0.94) translateY(-1px) rotate(-1deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 9px #fbbf24);
+  }
+  70% {
+    transform: scale(0.96, 1.04) translateY(0.5px) rotate(1deg);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 7px #f59e0b);
+  }
+  100% {
+    transform: scale(1.05, 0.96) translateY(-0.5px);
+    opacity: 1;
+    filter: drop-shadow(0 0 11px #fde047);
+  }
+}
+
+/* Hanging Lantern / Diya Sway Animations */
+.diwali-lantern-left {
+  transform-origin: top center;
+  animation: diwaliLanternSwayLeft 4.5s ease-in-out infinite alternate;
+}
+
+.diwali-lantern-right {
+  transform-origin: top center;
+  animation: diwaliLanternSwayRight 4.8s ease-in-out 0.5s infinite alternate;
+}
+
+@keyframes diwaliLanternSwayLeft {
+  0% {
+    transform: rotate(-3.5deg);
+  }
+  100% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes diwaliLanternSwayRight {
+  0% {
+    transform: rotate(3deg);
+  }
+  100% {
+    transform: rotate(-3.5deg);
+  }
+}
+
+/* Subtle Golden Glow Pulse */
+.diwali-glow-pulse {
+  animation: diwaliGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes diwaliGlow {
+  0% {
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 14px rgba(251, 191, 36, 0.85));
+  }
+}
+
+/* Copy Coupon Pill Pulse */
+.diwali-coupon-btn {
+  background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%);
+  color: #713f12;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.diwali-coupon-btn:hover {
+  background: linear-gradient(135deg, #fef9c3 0%, #fde047 50%, #facc15 100%);
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}

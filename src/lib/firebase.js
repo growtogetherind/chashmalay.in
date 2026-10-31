@@ -107,7 +107,11 @@ const DEFAULT_SETTINGS = {
   free_shipping_min: 0,
   maintenance_mode: false,
   store_logo: '',
-  carousel_interval: 5
+  carousel_interval: 5,
+  diwali_theme_enabled: true,
+  diwali_banner_text: '🪔 Shubh Deepavali! Extra 20% OFF on all Frames & Lenses • Use Code: DIWALI20 ✨',
+  diwali_coupon_code: 'DIWALI20',
+  diwali_show_diyas: true
 };
 
 // The set of keys that are SECRET and must live in the admin-only

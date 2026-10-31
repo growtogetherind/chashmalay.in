@@ -7,6 +7,7 @@ import { CartProvider } from './context/CartContext';
 import { ProtectedRoute, AdminRoute } from './components/ui/ProtectedRoute';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar.jsx';
+import DiwaliTheme from './components/festive/DiwaliTheme.jsx';
 import BottomNav from './components/layout/BottomNav.jsx';
 import Footer from './components/layout/Footer.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
@@ -95,7 +96,8 @@ const PublicRoutes = ({ settings }) => {
 
   return (
     <>
-      <Navbar />
+      <DiwaliTheme settings={settings} />
+      <Navbar settings={settings} />
       <main className="main-content">
         <ErrorBoundary>
           <Suspense fallback={<PageLoader />}>

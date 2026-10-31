@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Mail, Wrench, Globe, Truck, Bell, Eye, EyeOff, Send, Trash2, AlertTriangle, UploadCloud, CheckCircle2 } from 'lucide-react';
+import { Save, Mail, Wrench, Globe, Truck, Bell, Eye, EyeOff, Send, Trash2, AlertTriangle, UploadCloud, CheckCircle2, Sparkles } from 'lucide-react';
 import { saveSettings, subscribeSettings, getPrivateSettings, purgeStoreData, bulkImportCatalog } from '../../lib/firebase';
 import { useConfirm } from '../../context/ConfirmContext';
 import AdminSidebar from '../../components/layout/AdminSidebar';
@@ -22,7 +22,11 @@ const AdminSettings = () => {
     carousel_interval: 5,
     enable_lens_treatment: true,
     telegram_bot_token: '',
-    telegram_chat_id: ''
+    telegram_chat_id: '',
+    diwali_theme_enabled: true,
+    diwali_banner_text: '🪔 Shubh Deepavali! Extra 20% OFF on all Frames & Lenses • Use Code: DIWALI20 ✨',
+    diwali_coupon_code: 'DIWALI20',
+    diwali_show_diyas: true
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -316,7 +320,125 @@ const AdminSettings = () => {
                 </div>
               </div>
 
-              <div className="admin-card !p-10 relative overflow-hidden group hover:shadow-2xl hover:shadow-slate-200/50 transition-all border-slate-100">
+              
+              {/* 🪔 Festive & Seasonal Theme (Diwali) */}
+              <div className="admin-card !p-10 relative overflow-hidden group hover:shadow-2xl hover:shadow-amber-500/10 transition-all border-amber-200 bg-gradient-to-b from-amber-50/40 to-transparent">
+                <div className="absolute top-0 right-0 p-10 opacity-[0.04] group-hover:opacity-[0.08] transition-opacity pointer-events-none text-amber-500">
+                  <Sparkles size={120} />
+                </div>
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-[11px] font-black uppercase tracking-[3px] text-amber-700 flex items-center gap-3">
+                    <span className="w-8 h-0.5 bg-amber-500/40"></span> 🪔 Festive & Seasonal Theme (Diwali)
+                  </h3>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${form.diwali_theme_enabled !== false ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>
+                    {form.diwali_theme_enabled !== false ? 'ACTIVE' : 'OFF'}
+                  </span>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Master Toggle */}
+                  <label className="flex items-center justify-between p-6 bg-white rounded-[24px] border border-amber-200/80 group/toggle shadow-sm cursor-pointer hover:border-amber-400 transition-colors">
+                    <div className="flex-1 pr-4">
+                      <p className="text-[11px] font-black text-amber-900 uppercase tracking-widest mb-1 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Enable Diwali Festive Theme
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
+                        {form.diwali_theme_enabled !== false
+                          ? 'Active: Golden announcement bar, Diwali coupon copy button, and festive corner lanterns are displayed.'
+                          : 'Inactive: Storefront uses standard clean theme without festive overlays.'}
+                      </p>
+                    </div>
+                    <div className="relative inline-flex items-center shrink-0">
+                      <input
+                        id="diwali-theme-toggle"
+                        type="checkbox"
+                        checked={form.diwali_theme_enabled !== false}
+                        onChange={e => setForm({ ...form, diwali_theme_enabled: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-14 h-7 bg-slate-200 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 shadow-inner relative"></div>
+                    </div>
+                  </label>
+
+                  {form.diwali_theme_enabled !== false && (
+                    <div className="space-y-6 pt-2">
+                      {/* Banner Announcement Text */}
+                      <div className="form-group">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                          Festive Announcement Message
+                        </label>
+                        <input
+                          type="text"
+                          value={form.diwali_banner_text || ''}
+                          onChange={e => setForm({ ...form, diwali_banner_text: e.target.value })}
+                          placeholder="🪔 Shubh Deepavali! Extra 20% OFF on all Frames & Lenses • Use Code: DIWALI20 ✨"
+                          className="w-full bg-white border border-slate-200 p-4 rounded-[18px] text-slate-900 text-sm font-bold focus:border-amber-500 outline-none transition-all shadow-inner"
+                        />
+                      </div>
+
+                      {/* Diwali Coupon Code */}
+                      <div className="form-group">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                          Diwali Coupon Code (Quick Copy Button)
+                        </label>
+                        <input
+                          type="text"
+                          value={form.diwali_coupon_code || ''}
+                          onChange={e => setForm({ ...form, diwali_coupon_code: e.target.value.toUpperCase() })}
+                          placeholder="DIWALI20"
+                          className="w-full bg-white border border-slate-200 p-4 rounded-[18px] text-slate-900 text-sm font-bold focus:border-amber-500 outline-none transition-all shadow-inner uppercase tracking-wider"
+                        />
+                        <p className="text-[9px] text-slate-400 mt-2 font-medium">
+                          Shoppers can tap this code in the top banner to automatically copy it to clipboard.
+                        </p>
+                      </div>
+
+                      {/* Hanging Diyas / Lanterns Toggle */}
+                      <label className="flex items-center justify-between p-5 bg-white rounded-[20px] border border-slate-200 group/toggle shadow-sm cursor-pointer hover:border-amber-300 transition-colors">
+                        <div className="flex-1 pr-4">
+                          <p className="text-[11px] font-black text-slate-800 uppercase tracking-widest mb-1 flex items-center gap-2">
+                            🏮 Hanging Corner Lanterns (Akash Kandils)
+                          </p>
+                          <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                            Display animated traditional hanging lamps gently swaying in the top corners of the screen.
+                          </p>
+                        </div>
+                        <div className="relative inline-flex items-center shrink-0">
+                          <input
+                            id="diwali-diyas-toggle"
+                            type="checkbox"
+                            checked={form.diwali_show_diyas !== false}
+                            onChange={e => setForm({ ...form, diwali_show_diyas: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-12 h-6 bg-slate-200 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-amber-500 shadow-inner relative"></div>
+                        </div>
+                      </label>
+
+                      {/* Live Preview Bar */}
+                      <div className="space-y-2 pt-2">
+                        <span className="text-[9px] font-black text-amber-800 uppercase tracking-widest">
+                          Live Storefront Banner Preview:
+                        </span>
+                        <div className="rounded-xl overflow-hidden shadow-md">
+                          <div className="bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900 text-white py-2 px-3 flex items-center justify-between text-xs font-bold gap-2">
+                            <span className="truncate">
+                              {form.diwali_banner_text || '🪔 Shubh Deepavali! Extra 20% OFF • Use Code: DIWALI20 ✨'}
+                            </span>
+                            {form.diwali_coupon_code && (
+                              <span className="bg-yellow-300 text-yellow-900 px-2 py-0.5 rounded-full text-[10px] font-black uppercase shrink-0 shadow-sm">
+                                {form.diwali_coupon_code}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+<div className="admin-card !p-10 relative overflow-hidden group hover:shadow-2xl hover:shadow-slate-200/50 transition-all border-slate-100">
                 <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity pointer-events-none"><Mail size={120} /></div>
                 <h3 className="text-[11px] font-black uppercase tracking-[3px] text-emerald-600 flex items-center gap-4 mb-10">
                   <span className="w-10 h-0.5 bg-emerald-500/20"></span> Communication Node

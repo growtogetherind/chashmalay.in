@@ -7,8 +7,9 @@ import { useAuth } from '../../context/AuthContext';
 import { subscribeCategories } from '../../lib/firebase';
 import SearchModal from './SearchModal';
 import Logo from '../ui/Logo';
+import { DiwaliAnnouncementBar } from '../festive/DiwaliTheme';
 
-const Navbar = () => {
+const Navbar = ({ settings = {} }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -101,6 +102,8 @@ const Navbar = () => {
             : 'border-b border-gray-100'
         }`}
       >
+        {/* 🪔 Festive Diwali Top Announcement Bar */}
+        <DiwaliAnnouncementBar settings={settings} />
         {/* ── Row 1: Search | Logo | Actions ── */}
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-14 md:h-16">
