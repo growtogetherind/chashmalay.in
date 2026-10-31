@@ -73,25 +73,10 @@ export const DiwaliAnnouncementBar = ({ settings = {} }) => {
   const isHome = location.pathname === '/';
   const [isDismissed, setIsDismissed] = useState(false);
 
-  useEffect(() => {
-    try {
-      const dismissed = sessionStorage.getItem('chashmalay_diwali_banner_dismissed') === 'true';
-      if (dismissed) setIsDismissed(true);
-    } catch (_) {}
-  }, []);
-
   const isEnabled = settings.diwali_theme_enabled !== false;
   if (!isHome || !isEnabled || isDismissed) return null;
 
   const message = settings.diwali_banner_text || '🪔 Shubh Deepavali! Flat 20% OFF on all Eyewear • Use Code: DIWALI20 ✨';
-
-  const handleDismiss = (e) => {
-    e.stopPropagation();
-    setIsDismissed(true);
-    try {
-      sessionStorage.setItem('chashmalay_diwali_banner_dismissed', 'true');
-    } catch (_) {}
-  };
 
   return (
     <div className="diwali-banner-bg text-amber-50 relative z-50 overflow-hidden py-1 sm:py-1.5 px-3 sm:px-6">
@@ -115,7 +100,7 @@ export const DiwaliAnnouncementBar = ({ settings = {} }) => {
           </div>
           <button
             type="button"
-            onClick={handleDismiss}
+            onClick={() => setIsDismissed(true)}
             className="p-0.5 text-amber-200/70 hover:text-white hover:bg-amber-900/40 rounded transition-colors cursor-pointer"
             aria-label="Dismiss festive banner"
             title="Dismiss"
@@ -142,10 +127,6 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
     const root = containerRef.current;
     const S = root.querySelector('#z-s');
     const D = root.querySelector('#z-d');
-    const K = root.querySelector('#z-c');
-
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const rnd = (a, b) => a + Math.random() * (b - a);
 
     // Diya vector generator
     function diya(w) {
@@ -183,9 +164,9 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
     }
 
     // Silk corner drapes
-    function silk(w, h, mirror) {
+    function silk(w, h, topOffset, mirror) {
       return (
-        '<svg class="a" style="top:0px;' +
+        '<svg class="a" style="top:' + topOffset + 'px;' +
         (mirror ? 'right:0;transform:scaleX(-1)' : 'left:0') +
         ';filter:drop-shadow(0 4px 6px rgba(40,0,10,.35))" width="' + w + '" height="' + h + '" viewBox="0 0 200 172">' +
         '<path d="M0 0H190C170 40 110 70 70 110C45 135 20 155 0 172Z" fill="url(#z-silk)"/>' +
@@ -197,30 +178,53 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
     // Build static decorative elements
     function build() {
       const W = window.innerWidth;
-      const small = W < 700;
+      const small = W < 768;
       let html = '';
       let h2 = '';
 
-      // 1. Silk Drapes in top corners (Scaled smaller on mobile: 55px vs 160px desktop)
-      const sw = small ? 55 : 160;
-      const sh = (sw * 172) / 200;
-      html += silk(sw, sh, false) + silk(sw, sh, true);
+      if (small) {
+        // MOBILE VIEW:
+        // On mobile, the sticky navbar takes ~84px (announcement bar + nav).
+        // To prevent covering the Search icon and Hamburger menu:
+        // Top offset is 84px so diyas & drapes hang gracefully right under the header!
+        const topOffset = 84;
+        const sw = 45;
+        const sh = (sw * 172) / 200;
+        html += silk(sw, sh, topOffset, false) + silk(sw, sh, topOffset, true);
 
-      // 2. Gold Lotus in bottom-left corner (Scaled smaller on mobile: 40px vs 90px desktop)
-      html += '<div class="a" style="left:' + (small ? 4 : 14) + 'px;bottom:' + (small ? 4 : 10) + 'px">' + lotus(small ? 40 : 90) + '</div>';
+        // Gold Lotus: Positioned ABOVE the mobile BottomNav (bottom: 74px) so it NEVER covers the "HOME" tab!
+        html += '<div class="a" style="left:8px;bottom:74px">' + lotus(38) + '</div>';
+
+        // Hanging Diyas: Scaled compact (26px), hanging under header into top of hero section
+        const dw = 26;
+        const spec = [[3, 38], [97, 38]];
+        spec.forEach((p, n) => {
+          h2 +=
+            '<div class="z-strand" style="left:' + p[0] + '%;top:' + topOffset + 'px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +
+            '<div class="z-chain" style="height:' + p[1] + 'px"></div><div style="margin-top:-2px">' + diya(dw) + '</div></div>';
+        });
+      } else {
+        // DESKTOP & TABLET VIEW:
+        // On desktop, the header content is centered with wide outer margins.
+        // The silk drapes and hanging diyas frame the screen gracefully from top: 0!
+        const sw = 160;
+        const sh = (sw * 172) / 200;
+        html += silk(sw, sh, 0, false) + silk(sw, sh, 0, true);
+
+        // Lotus in bottom-left corner
+        html += '<div class="a" style="left:14px;bottom:12px">' + lotus(88) + '</div>';
+
+        // Staggered hanging diyas in the wide outer margins
+        const dw = 52;
+        const spec = [[4, 75], [12, 140], [24, 50], [74, 65], [86, 145], [96, 90]];
+        spec.forEach((p, n) => {
+          h2 +=
+            '<div class="z-strand" style="left:' + p[0] + '%;top:0px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +
+            '<div class="z-chain" style="height:' + p[1] + 'px"></div><div style="margin-top:-2px">' + diya(dw) + '</div></div>';
+        });
+      }
+
       if (S) S.innerHTML = html;
-
-      // 3. Hanging Staggered Diyas on Golden Chains (Scaled small & clean on mobile: 28px width, 2 edge strands)
-      const dw = small ? 28 : 52;
-      const spec = small
-        ? [[5, 45], [95, 45]] // On mobile: only 2 delicate edge strands, 0 obstruction
-        : [[4, 75], [12, 140], [24, 50], [74, 65], [86, 145], [96, 90]];
-
-      spec.forEach((p, n) => {
-        h2 +=
-          '<div class="z-strand" style="left:' + p[0] + '%;top:0px;margin-left:-' + (dw / 2) + 'px;animation-duration:' + (4.2 + n * 0.5) + 's;animation-delay:-' + (n * 1.1) + 's">' +
-          '<div class="z-chain" style="height:' + p[1] + 'px"></div><div style="margin-top:-2px">' + diya(dw) + '</div></div>';
-      });
       if (D) D.innerHTML = h2;
     }
 
@@ -234,78 +238,10 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
     };
     window.addEventListener('resize', handleResize);
 
-    // Rising golden embers
-    let emberInterval;
-    if (!reduce) {
-      emberInterval = setInterval(() => {
-        if (document.hidden || !K || K.childNodes.length > 5) return;
-        const e = document.createElement('div');
-        const s = rnd(3, 5);
-        e.className = 'a';
-        e.style.cssText += 'bottom:-20px;left:' + rnd(3, 97) + '%;width:' + s + 'px;height:' + s + 'px;border-radius:50%;background:radial-gradient(#fff3c4,#ffb347 55%,transparent 72%);box-shadow:0 0 ' + (s * 2) + 'px #ffb347';
-        K.appendChild(e);
-        e.animate(
-          [
-            { transform: 'translate(0,0)', opacity: 0 },
-            { opacity: 0.9, offset: 0.15 },
-            { opacity: 0.8, offset: 0.7 },
-            { transform: 'translate(' + rnd(-30, 30) + 'px,' + (-rnd(window.innerHeight * 0.35, window.innerHeight * 0.6)) + 'px)', opacity: 0 }
-          ],
-          { duration: rnd(9000, 14000), easing: 'ease-out' }
-        ).onfinish = () => e.remove();
-      }, 2500);
-    }
-
-    // Click or tap to light a diya with golden burst
-    const handleClick = (ev) => {
-      if (ev.target.closest && ev.target.closest('a,button,input,select,textarea,label,summary,[role=button]')) return;
-      if (!K || K.childNodes.length > 15) return;
-
-      const w = window.innerWidth < 700 ? 42 : 56;
-      const d = document.createElement('div');
-      d.className = 'a';
-      d.style.left = (ev.clientX - w / 2) + 'px';
-      d.style.top = (ev.clientY - w * 0.6) + 'px';
-      d.innerHTML = diya(w);
-      K.appendChild(d);
-
-      d.animate(
-        [
-          { transform: 'scale(0)', opacity: 0 },
-          { transform: 'scale(1.12)', opacity: 1, offset: 0.12 },
-          { transform: 'scale(1)', opacity: 1, offset: 0.65 },
-          { transform: 'translateY(' + (reduce ? 0 : -60) + 'px) scale(.9)', opacity: 0 }
-        ],
-        { duration: 4000 }
-      ).onfinish = () => d.remove();
-
-      if (reduce) return;
-      for (let i = 0; i < 6; i++) {
-        const p = document.createElement('div');
-        const a = (i / 6) * Math.PI * 2 + rnd(0, 0.5);
-        const r = rnd(25, 50);
-        p.className = 'a';
-        p.style.cssText += 'left:' + ev.clientX + 'px;top:' + ev.clientY + 'px;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#ffd76a;box-shadow:0 0 6px #ffb347';
-        K.appendChild(p);
-        p.animate(
-          [
-            { transform: 'translate(0,0) scale(1)', opacity: 1 },
-            { transform: 'translate(' + Math.cos(a) * r + 'px,' + Math.sin(a) * r + 'px) scale(.2)', opacity: 0 }
-          ],
-          { duration: 750, easing: 'ease-out' }
-        ).onfinish = () => p.remove();
-      }
-    };
-
-    document.addEventListener('click', handleClick);
-
     return () => {
       window.removeEventListener('resize', handleResize);
-      document.removeEventListener('click', handleClick);
-      if (emberInterval) clearInterval(emberInterval);
       if (S) S.innerHTML = '';
       if (D) D.innerHTML = '';
-      if (K) K.innerHTML = '';
     };
   }, [isHome, settings.diwali_theme_enabled, settings.diwali_show_diyas]);
 
@@ -349,8 +285,6 @@ export const DiwaliDecorOverlay = ({ settings = {} }) => {
       <div className="l" id="z-s"></div>
       {/* Layer 2: Hanging Diyas on Chains */}
       <div className="l" id="z-d"></div>
-      {/* Layer 3: Interactive Embers & Click Diyas */}
-      <div className="l" id="z-c"></div>
     </div>
   );
 };
