@@ -4,6 +4,7 @@ import { Package, ShoppingBag, DollarSign, Users, TrendingUp, ArrowRight, Search
 import { subscribeDashboardStats } from '../../lib/firebase';
 import AdminSidebar from '../../components/layout/AdminSidebar';
 import { startContinuousOrderAlert, stopContinuousOrderAlert, playSingleChime, sendTestLockScreenNotification, registerAdminServiceWorker } from '../../lib/adminAlertManager';
+import { subscribeToWebPush } from '../../lib/pushSubscriptionHelper';
 import toast from 'react-hot-toast';
 import '../Admin.css';
 
@@ -46,6 +47,11 @@ const AdminDashboard = () => {
   useEffect(() => {
     // Register Service Worker for OS Lock Screen Notifications
     registerAdminServiceWorker();
+
+    // Auto-subscribe to Web Push if permission already granted
+    if ("Notification" in window && Notification.permission === "granted") {
+      subscribeToWebPush().catch(() => {});
+    }
 
     // Request notification permission on mount
     if ("Notification" in window && Notification.permission === "default") {

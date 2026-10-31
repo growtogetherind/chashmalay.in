@@ -550,6 +550,25 @@ export const createOrder = async ({
     console.warn("Prescription save skipped or failed:", err);
   }
 
+  // Trigger OS Lock Screen Web Push to Admin devices (wakes up phone if browser is closed)
+  try {
+    if (typeof window !== 'undefined') {
+      fetch('/api/send-order-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          total,
+          customerName: address.name || 'Customer',
+          productName: denormalizedItems[0]?.product_name || 'Eyewear',
+          image: denormalizedItems[0]?.frame_image || ''
+        })
+      }).catch(() => {});
+    }
+  } catch (pushErr) {
+    // Non-blocking background push
+  }
+
   return { id: orderId, ...orderData };
 };
 

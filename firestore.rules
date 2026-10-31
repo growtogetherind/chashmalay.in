@@ -234,5 +234,12 @@ service cloud.firestore {
       allow read: if isStaff();
       allow update, delete: if false; // Immutable audit trail
     }
+
+    // ─── Admin Push Subscriptions ─────────────────────────────────────────────
+    match /admin_push_subscriptions/{subId} {
+      allow read, write: if isStaff() || isAdmin();
+      allow delete: if isAdmin();
+    }
   }
 }
+
